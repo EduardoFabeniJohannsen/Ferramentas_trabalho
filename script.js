@@ -54,15 +54,15 @@ function calcularValor(){
 
     if(!valor) return;
 
-    valor = valor.replace(",", ".");
+    // troca vírgula por ponto
+    valor = valor.replace(/,/g, ".");
 
-    valor = parseFloat(valor);
+    let numero = Number(valor);
 
-    if(isNaN(valor)) return;
+    if(isNaN(numero)) return;
 
-    let metade = valor / 2;
+    let metade = numero / 2;
 
     document.getElementById("metade").innerText = metade.toFixed(2);
-
 }
 

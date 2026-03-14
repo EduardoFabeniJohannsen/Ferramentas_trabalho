@@ -54,6 +54,8 @@ function calcularValor(){
 
     if(!valor) return;
 
+    valor = valor.replace(",", ".");
+
     valor = parseFloat(valor);
 
     if(isNaN(valor)) return;

@@ -43,3 +43,24 @@ calcular();
 
 /* recalcular quando mudar a data */
 document.getElementById("data").addEventListener("change", calcular);
+
+/* calcular valor dos boletos automaticamente */
+document.getElementById("valor").addEventListener("input", calcularValor);
+
+
+function calcularValor(){
+
+    let valor = document.getElementById("valor").value;
+
+    if(!valor) return;
+
+    valor = parseFloat(valor);
+
+    if(isNaN(valor)) return;
+
+    let metade = valor / 2;
+
+    document.getElementById("metade").innerText = metade.toFixed(2);
+
+}
+

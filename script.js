@@ -8,6 +8,11 @@ function minusculo(){
     texto.value = texto.value.toLowerCase();
 }
 
+function formatarCNPJ(){
+    let texto = document.getElementById("texto");
+    texto.value = texto.value.replace(/[.\-\/]/g, "");
+}
+
 function calcular(){
 
     let dataInput = document.getElementById("data").value;

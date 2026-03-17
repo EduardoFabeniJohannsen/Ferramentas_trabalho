@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 <meta charset="UTF-8">
 <title>Ferramentas</title>
@@ -13,7 +12,6 @@
 
     <!-- Conversor -->
     <div class="card">
-
         <h2>Conversor de Texto</h2>
 
         <textarea id="texto" placeholder="Digite algo..."></textarea>
@@ -22,43 +20,39 @@
             <button onclick="maiusculo()">MAIÚSCULO</button>
             <button onclick="minusculo()">minúsculo</button>
             <button onclick="formatarCNPJ()">formatar CNPJ</button>
-           
         </div>
-
     </div>
 
-
-    <!-- Calculadora de datas -->
+    <!-- Calculadora -->
     <div class="card">
-
         <h2>Calculadora de Boletos</h2>
 
-        <input type="date" id="data">
-
-        <div class="resultado">
-            <p>+28 dias</p>
-            <span id="d28"></span>
+        <div class="linha-topo">
+            <input type="date" id="data">
+            <input type="text" id="valor" placeholder="Valor (ex: 100.50)">
         </div>
 
-        <div class="resultado">
-            <p>+56 dias</p>
-            <span id="d56"></span>
-        </div>
+        <div class="linha-resultado">
+            <div class="datas">
+                <p>28 dias: <span id="d28"></span></p>
+                <p>56 dias: <span id="d56"></span></p>
+            </div>
 
-        
-        <div class="valor-area">
-            <input type="text" id="valor" placeholder="Valor total (ex: 123456.78)">
-            <div class="resultado">
+            <div class="valor-lado">
                 <p>Cada boleto</p>
                 <span id="metade"></span>
             </div>
         </div>
+
+        <hr>
+
+        <input type="number" id="dias" placeholder="Dias personalizados">
+        <p>Resultado: <span id="resultadoDias"></span></p>
 
     </div>
 
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>

@@ -21,6 +21,7 @@ body{
     width:350px;
 }
 
+/* inputs e textarea */
 textarea{
     width:100%;
     height:120px;
@@ -37,6 +38,7 @@ input{
     border:1px solid #ccc;
 }
 
+/* botões */
 button{
     margin-top:10px;
     padding:10px 15px;
@@ -56,12 +58,43 @@ button:hover{
     margin-top:10px;
 }
 
-.resultado{
-    margin-top:20px;
+/* topo */
+.linha-topo{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
 }
 
-.resultado span{
+.linha-topo input{
+    flex:1;
+}
+
+/* resultado alinhado */
+.linha-resultado{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:40px;
+}
+
+/* lado esquerdo */
+.datas{
+    text-align:left;
+}
+
+/* lado direito */
+.valor-lado{
+    text-align:center;
+}
+
+.valor-lado span{
     font-size:20px;
+    font-weight:bold;
+    color:#2d7df6;
+}
+
+/* resultado custom */
+#resultadoDias{
     font-weight:bold;
     color:#2d7df6;
 }

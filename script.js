@@ -55,8 +55,6 @@ function calcularValor(){
     // remove pontos de milhar
     valor = valor.replace(/\./g, "");
 
-    // troca vírgula por ponto
-    valor = valor.replace(",", ".");
 
     let numero = Number(valor);
     if(isNaN(numero)) return;

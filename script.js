@@ -55,13 +55,15 @@ function calcularValor(){
     // remove pontos de milhar
     valor = valor.replace(/\./g, "");
 
+    // troca vírgula por ponto
+    valor = valor.replace(",", ".");
 
     let numero = Number(valor);
     if(isNaN(numero)) return;
 
     let metade = numero / 2;
 
-    document.getElementById("metade").innerText = metade.toFixed(2);
+    document.getElementById("metade").innerText = metade.toFixed(2).replace(".", ",");
 }
 
 // FORMATAR DATA

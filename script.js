@@ -104,6 +104,49 @@ function calcularDesconto(){
     document.getElementById("desconto").innerText = desconto.toFixed(2);
 }
 
+function gerarTextos(){
+
+    let nome = document.getElementById("nomeCliente").value.toUpperCase();
+    let equipamento = document.getElementById("equipamento").value.toUpperCase();
+    let periodoInput = document.getElementById("periodo").value;
+
+    let periodo = "";
+    if(periodoInput){
+        periodo = periodoInput.toUpperCase();
+
+        // se for número puro, adiciona DIAS
+        if(!isNaN(periodoInput)){
+            periodo = periodoInput + " DIAS";
+        }
+    }
+    let cidade = document.getElementById("cidade").value.toUpperCase();
+
+    // data hoje
+    let hoje = new Date();
+    let dia = String(hoje.getDate()).padStart(2,'0');
+    let mes = String(hoje.getMonth()+1).padStart(2,'0');
+    let ano = hoje.getFullYear();
+    let data = dia + "/" + mes + "/" + ano;
+
+    // TEXTO 1
+    if(nome){
+        let texto1 = `OPORTUNIDADE DE LOCAÇÃO_${nome}_${data}`;
+        document.getElementById("textoOportunidade").innerText = texto1;
+    }
+
+    // TEXTO 2
+    if(nome && equipamento && periodo && cidade){
+        let texto2 = `ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA_${nome}_${equipamento}_${periodo}_${cidade}`;
+        document.getElementById("textoOrcamento").innerText = texto2;
+    }
+}
+
+function copiarTexto(id){
+    let texto = document.getElementById(id).innerText;
+    if(!texto) return;
+
+    navigator.clipboard.writeText(texto);
+}
 
 // EVENTOS
 document.getElementById("data").addEventListener("change", calcular);
@@ -114,3 +157,8 @@ document.getElementById("valor").addEventListener("input", calcularValor);
 
 document.getElementById("valorTabela").addEventListener("input", calcularDesconto);
 document.getElementById("valorDesejado").addEventListener("input", calcularDesconto);
+
+document.getElementById("nomeCliente").addEventListener("input", gerarTextos);
+document.getElementById("equipamento").addEventListener("input", gerarTextos);
+document.getElementById("periodo").addEventListener("input", gerarTextos);
+document.getElementById("cidade").addEventListener("input", gerarTextos);

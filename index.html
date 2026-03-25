@@ -63,6 +63,25 @@
         <p>Desconto: <span id="desconto"></span></p>
     </div>
 
+    <!-- Oportunidades + Propostas -->
+    <div class="card">
+        <h2>Gerar Textos</h2>
+
+        <input type="text" id="nomeCliente" placeholder="Nome do cliente">
+
+        <p id="textoOportunidade"></p>
+        <button onclick="copiarTexto('textoOportunidade')">Copiar</button>
+
+        <hr>
+
+        <input type="text" id="equipamento" placeholder="Equipamento">
+        <input type="text" id="periodo" placeholder="Período (ex: 30 dias)">
+        <input type="text" id="cidade" placeholder="Cidade">
+
+        <p id="textoOrcamento"></p>
+        <button onclick="copiarTexto('textoOrcamento')">Copiar</button>
+    </div>
+
 </div>
 
 <script src="script.js"></script>

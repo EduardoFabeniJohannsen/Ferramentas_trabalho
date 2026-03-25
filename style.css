@@ -104,3 +104,10 @@ button:hover{
     width:100%;
     margin-bottom:10px;
 }
+
+#textoGerado{
+    font-weight:bold;
+    margin:10px 0;
+    color:#2d7df6;
+    word-break:break-word;
+}

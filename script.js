@@ -81,9 +81,36 @@ document.getElementById("data").value = hoje;
 
 calcular();
 
+function calcularDesconto(){
+
+    let tabela = document.getElementById("valorTabela").value;
+    let desejado = document.getElementById("valorDesejado").value;
+
+    if(!tabela || !desejado) return;
+
+    // tabela já vem padrão 16465.69
+    let valorTabela = Number(tabela);
+    if(isNaN(valorTabela)) return;
+
+    // tratar valor desejado (BR → EN)
+    desejado = desejado.replace(/\./g, "");
+    desejado = desejado.replace(",", ".");
+
+    let valorDesejado = Number(desejado);
+    if(isNaN(valorDesejado)) return;
+
+    let desconto = valorTabela - valorDesejado;
+
+    document.getElementById("desconto").innerText = desconto.toFixed(2);
+}
+
+
 // EVENTOS
 document.getElementById("data").addEventListener("change", calcular);
 document.getElementById("data").addEventListener("change", calcularDiasCustom);
 
 document.getElementById("dias").addEventListener("input", calcularDiasCustom);
 document.getElementById("valor").addEventListener("input", calcularValor);
+
+document.getElementById("valorTabela").addEventListener("input", calcularDesconto);
+document.getElementById("valorDesejado").addEventListener("input", calcularDesconto);

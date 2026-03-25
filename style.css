@@ -7,9 +7,9 @@ body{
 .container{
     display:flex;
     justify-content:center;
-    align-items:center;
-    height:100vh;
+    align-items:flex-start;
     gap:40px;
+    margin-top:150px;
 }
 
 .card{
@@ -97,4 +97,10 @@ button:hover{
 #resultadoDias{
     font-weight:bold;
     color:#2d7df6;
+}
+
+.card input{
+    display:block;
+    width:100%;
+    margin-bottom:10px;
 }

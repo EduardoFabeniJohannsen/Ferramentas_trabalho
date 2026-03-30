@@ -1,7 +1,8 @@
 body{
     margin:0;
     font-family:Arial, Helvetica, sans-serif;
-    background:#f4f6f8;
+    background:#0f172a; /* fundo escuro */
+    color:#e5e7eb;
 }
 
 .container{
@@ -10,14 +11,13 @@ body{
     align-items:flex-start;
     gap:40px;
     margin-top:70px;
-
 }
 
 .card{
-    background:white;
+    background:#1e293b; /* card escuro */
     padding:30px;
     border-radius:12px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    box-shadow:0 10px 25px rgba(0,0,0,0.5);
     text-align:center;
     width:350px;
 }
@@ -29,14 +29,22 @@ textarea{
     padding:10px;
     font-size:16px;
     border-radius:8px;
-    border:1px solid #ccc;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:#e5e7eb;
 }
 
 input{
     padding:10px;
     font-size:16px;
     border-radius:8px;
-    border:1px solid #ccc;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:#e5e7eb;
+}
+
+input::placeholder{
+    color:#94a3b8;
 }
 
 /* botões */
@@ -45,14 +53,14 @@ button{
     padding:10px 15px;
     border:none;
     border-radius:8px;
-    background:#2d7df6;
+    background:#3b82f6;
     color:white;
     font-weight:bold;
     cursor:pointer;
 }
 
 button:hover{
-    background:#1c5fd1;
+    background:#2563eb;
 }
 
 .botoes{
@@ -91,13 +99,13 @@ button:hover{
 .valor-lado span{
     font-size:20px;
     font-weight:bold;
-    color:#2d7df6;
+    color:#60a5fa; /* azul mais suave */
 }
 
 /* resultado custom */
 #resultadoDias{
     font-weight:bold;
-    color:#2d7df6;
+    color:#60a5fa;
 }
 
 .card input{
@@ -109,10 +117,11 @@ button:hover{
 #textoGerado{
     font-weight:bold;
     margin:10px 0;
-    color:#2d7df6;
+    color:#60a5fa;
     word-break:break-word;
 }
 
+/* STATUS BAR */
 .status-bar{
     position:fixed;
     top:0;
@@ -121,15 +130,14 @@ button:hover{
 
     flex-wrap:wrap;
 
-
-    background:#1f2937;
+    background:#020617; /* mais escuro */
     padding:10px 20px;
 
     display:flex;
     align-items:center;
     gap:10px;
 
-    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+    box-shadow:0 2px 10px rgba(0,0,0,0.8);
     z-index:1000;
 }
 
@@ -137,21 +145,20 @@ button:hover{
     padding:8px 14px;
     border:none;
     border-radius:6px;
-    background:#2d7df6;
+    background:#3b82f6;
     color:white;
     font-weight:bold;
     cursor:pointer;
 }
 
 .status-bar button:hover{
-    background:#1c5fd1;
+    background:#2563eb;
 }
 
 #statusGerado{
     width:100%;
-    color:white;
+    color:#e5e7eb;
     font-weight:bold;
-
     margin-top:5px;
 
     white-space:normal;

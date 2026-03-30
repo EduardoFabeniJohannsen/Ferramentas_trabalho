@@ -164,7 +164,9 @@ function gerarStatus(tipo){
 
         faturado: `${data} - Faturado - ${nome}`,
 
-        renovacao: `${data} - Enviado email de renovação - ${nome}`,
+        renovacaoEmail: `${data} - Enviado email de renovação - ${nome}`,
+        
+        renovacaoZap: `${data} - Enviado zap de renovação - ${nome}`,
 
         autorizado: "Autorizado Via Contrato XXX - Responsável: XXX <XXX>"
     };
@@ -179,6 +181,7 @@ function gerarStatus(tipo){
     // copia
     navigator.clipboard.writeText(texto);
 }
+
 
 // EVENTOS
 document.getElementById("data").addEventListener("change", calcular);

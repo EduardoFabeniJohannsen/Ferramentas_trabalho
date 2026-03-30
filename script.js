@@ -148,6 +148,27 @@ function copiarTexto(id){
     navigator.clipboard.writeText(texto);
 }
 
+function gerarStatus(tipo){
+
+    let hoje = new Date();
+
+    let dia = String(hoje.getDate()).padStart(2,'0');
+    let mes = String(hoje.getMonth()+1).padStart(2,'0');
+
+    let data = dia + "/" + mes;
+
+    let nome = "Eduardo";
+
+    let texto = `${data} - ${tipo} - ${nome}`;
+
+    // MOSTRAR NA TELA
+    document.getElementById("statusGerado").innerText = texto;
+
+    // COPIAR
+    navigator.clipboard.writeText(texto);
+
+}
+
 // EVENTOS
 document.getElementById("data").addEventListener("change", calcular);
 document.getElementById("data").addEventListener("change", calcularDiasCustom);

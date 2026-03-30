@@ -159,14 +159,25 @@ function gerarStatus(tipo){
 
     let nome = "Eduardo";
 
-    let texto = `${data} - ${tipo} - ${nome}`;
+    // 🔥 MENSAGENS PADRÃO
+    const mensagens = {
 
-    // MOSTRAR NA TELA
+        faturado: `${data} - Faturado - ${nome}`,
+
+        renovacao: `${data} - Enviado email de renovação - ${nome}`,
+
+        autorizado: "Autorizado Via Contrato XXX - Responsável: XXX <XXX>"
+    };
+
+    let texto = mensagens[tipo];
+
+    if(!texto) return;
+
+    // mostra na tela
     document.getElementById("statusGerado").innerText = texto;
 
-    // COPIAR
+    // copia
     navigator.clipboard.writeText(texto);
-
 }
 
 // EVENTOS

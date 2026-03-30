@@ -83,16 +83,18 @@
     </div>
 
 
-    <!-- Status rapido de copiar e cola -->   
-    <div class="card">
-        <h2>Status Rápido</h2>
-        <p id="statusGerado"></p>
-        <button onclick="gerarStatus('Faturado')">Faturado</button>
-        <button onclick="gerarStatus('Enviado email de renovação')">Renovação</button>
-    </div>
-
 </div>
 
 <script src="script.js"></script>
 </body>
+
+    <!-- Status rapido de copiar e cola -->   
+    <div class="status-bar">
+        <button onclick="gerarStatus('faturado')">Faturado</button>
+        <button onclick="gerarStatus('renovacao')">Renovação</button>
+        <button onclick="gerarStatus('autorizado')">Autorizado</button>
+
+        <span id="statusGerado"></span>
+    </div>
+
 </html>

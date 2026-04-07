@@ -96,7 +96,7 @@ function calcularDesconto(){
     const percentual = (desconto / valorTabela) * 100;
 
     $("desconto").innerHTML = `
-        ${numberToBR(desconto)}<br>
+        ${desconto.toFixed(2)}<br>
         <span style="color:#94a3b8">
             Desconto de ${percentual.toFixed(2)}%
         </span>

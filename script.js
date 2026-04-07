@@ -181,7 +181,7 @@ MAGNUS 47 9754-0321
 RR ( SOMENTE ATE WTE12 ) - 47 9180-5385 
 NÃO NOS RESPONSABILIZAMOS POR HORA PARADA, VALORES DE ACORDO COM A DISPONIBILIDADE DO TRANSPORTADOR
 ENTREGA TÉCNICA GRATUITA
-PROPOSTA VALIDA POR 7 DIAS`
+PROPOSTA VALIDA POR 7 DIAS`,
 
         CHEKLIST_Titulo: "CHEKLIST - PTA  - NOME_CLIENTE",
 
@@ -200,23 +200,34 @@ PROPOSTA VALIDA POR 7 DIAS`
 
         * Em caso de problemas no(s) equipamento(s) locado(s), somente técnico da W Rental está autorizado a proceder o reparo. Para tanto, solicitamos contatar nossa assistência técnica.
 
-        Obrigada`,
+        Obrigada`, 
 
         ICMS: "Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC"
 
     };
 
     let texto = mensagens[tipo];
-
     if(!texto) return;
 
-    // mostra na tela
-    document.getElementById("statusGerado").innerText = texto;
-
-    // copia
     navigator.clipboard.writeText(texto);
+
+    // 🔥 nome amigável no popup
+    let titulo = tipo;
+
+    mostrarToast(titulo + " copiado");
 }
 
+function mostrarToast(mensagem){
+
+    let toast = document.getElementById("toast");
+
+    toast.innerText = mensagem;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2000);
+}
 
 // EVENTOS
 document.getElementById("data").addEventListener("change", calcular);

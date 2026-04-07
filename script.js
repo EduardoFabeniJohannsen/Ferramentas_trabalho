@@ -1,175 +1,159 @@
+// =========================
+// HELPERS
+// =========================
+const $ = (id) => document.getElementById(id);
+
+const formatarData = (data) => {
+    const dia = String(data.getDate()).padStart(2,'0');
+    const mes = String(data.getMonth()+1).padStart(2,'0');
+    const ano = data.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+};
+
+const brToNumber = (valor) => {
+    return Number(valor.replace(/\./g, "").replace(",", "."));
+};
+
+const numberToBR = (num) => {
+    return num.toFixed(2).replace(".", ",");
+};
+
+// =========================
 // TEXTO
+// =========================
 function maiusculo(){
-    let texto = document.getElementById("texto");
-    texto.value = texto.value.toUpperCase();
+    $("texto").value = $("texto").value.toUpperCase();
 }
 
 function minusculo(){
-    let texto = document.getElementById("texto");
-    texto.value = texto.value.toLowerCase();
+    $("texto").value = $("texto").value.toLowerCase();
 }
 
 function formatarCNPJ(){
-    let texto = document.getElementById("texto");
-    texto.value = texto.value.replace(/[.\-\/]/g, "");
+    $("texto").value = $("texto").value.replace(/[.\-\/]/g, "");
 }
 
-// DATAS FIXAS
+// =========================
+// DATAS
+// =========================
 function calcular(){
-    let dataInput = document.getElementById("data").value;
+    const dataInput = $("data").value;
     if(!dataInput) return;
 
-    let data = new Date(dataInput);
+    const base = new Date(dataInput);
 
-    let d28 = new Date(data);
+    const d28 = new Date(base);
     d28.setDate(d28.getDate() + 28);
 
-    let d56 = new Date(data);
+    const d56 = new Date(base);
     d56.setDate(d56.getDate() + 56);
 
-    document.getElementById("d28").innerText = formatarData(d28);
-    document.getElementById("d56").innerText = formatarData(d56);
+    $("d28").innerText = formatarData(d28);
+    $("d56").innerText = formatarData(d56);
 }
 
-// DIAS PERSONALIZADOS
 function calcularDiasCustom(){
-    let dataInput = document.getElementById("data").value;
-    let dias = document.getElementById("dias").value;
+    const dataInput = $("data").value;
+    const dias = $("dias").value;
 
     if(!dataInput || dias === "") return;
 
-    let data = new Date(dataInput);
-    let novaData = new Date(data);
+    const base = new Date(dataInput);
+    base.setDate(base.getDate() + parseInt(dias, 10));
 
-    novaData.setDate(novaData.getDate() + parseInt(dias, 10));
-
-    document.getElementById("resultadoDias").innerText = formatarData(novaData);
+    $("resultadoDias").innerText = formatarData(base);
 }
 
+// =========================
 // VALOR
+// =========================
 function calcularValor(){
-
-    let valor = document.getElementById("valor").value;
+    const valor = $("valor").value;
     if(!valor) return;
 
-    // remove pontos de milhar
-    valor = valor.replace(/\./g, "");
-
-    // troca vírgula por ponto
-    valor = valor.replace(",", ".");
-
-    let numero = Number(valor);
+    const numero = brToNumber(valor);
     if(isNaN(numero)) return;
 
-    let metade = numero / 2;
-
-    document.getElementById("metade").innerText = metade.toFixed(2).replace(".", ",");
+    const metade = numero / 2;
+    $("metade").innerText = numberToBR(metade);
 }
 
-// FORMATAR DATA
-function formatarData(data){
-    let dia = String(data.getDate()).padStart(2,'0');
-    let mes = String(data.getMonth()+1).padStart(2,'0');
-    let ano = data.getFullYear();
-
-    return dia + "/" + mes + "/" + ano;
-}
-
-// AUTO LOAD
-let hoje = new Date().toISOString().split('T')[0];
-document.getElementById("data").value = hoje;
-
-calcular();
-
+// =========================
+// DESCONTO
+// =========================
 function calcularDesconto(){
-
-    let tabela = document.getElementById("valorTabela").value;
-    let desejado = document.getElementById("valorDesejado").value;
+    const tabela = $("valorTabela").value;
+    const desejado = $("valorDesejado").value;
 
     if(!tabela || !desejado) return;
 
-    let valorTabela = Number(tabela);
-    if(isNaN(valorTabela) || valorTabela === 0) return;
+    const valorTabela = Number(tabela);
+    const valorDesejado = brToNumber(desejado);
 
-    // tratar valor desejado (BR → EN)
-    desejado = desejado.replace(/\./g, "");
-    desejado = desejado.replace(",", ".");
+    if(isNaN(valorTabela) || valorTabela === 0 || isNaN(valorDesejado)) return;
 
-    let valorDesejado = Number(desejado);
-    if(isNaN(valorDesejado)) return;
+    const desconto = valorTabela - valorDesejado;
+    const percentual = (desconto / valorTabela) * 100;
 
-    let desconto = valorTabela - valorDesejado;
-
-    // 🔥 cálculo do percentual
-    let percentual = (desconto / valorTabela) * 100;
-
-    // saída
-    document.getElementById("desconto").innerText =
-        desconto.toFixed(2) + " \n Desconto Aferido de " + percentual.toFixed(2) + "%";
+    $("desconto").innerHTML = `
+        ${numberToBR(desconto)}<br>
+        <span style="color:#94a3b8">
+            Desconto de ${percentual.toFixed(2)}%
+        </span>
+    `;
 }
 
+// =========================
+// TEXTOS AUTOMÁTICOS
+// =========================
 function gerarTextos(){
-
-    let nome = document.getElementById("nomeCliente").value.toUpperCase();
-    let equipamento = document.getElementById("equipamento").value.toUpperCase();
-    let periodoInput = document.getElementById("periodo").value;
+    const nome = $("nomeCliente").value.toUpperCase();
+    const equipamento = $("equipamento").value.toUpperCase();
+    const periodoInput = $("periodo").value;
+    const cidade = $("cidade").value.toUpperCase();
 
     let periodo = "";
     if(periodoInput){
-        periodo = periodoInput.toUpperCase();
-
-        // se for número puro, adiciona DIAS
-        if(!isNaN(periodoInput)){
-            periodo = periodoInput + " DIAS";
-        }
+        periodo = isNaN(periodoInput)
+            ? periodoInput.toUpperCase()
+            : `${periodoInput} DIAS`;
     }
-    let cidade = document.getElementById("cidade").value.toUpperCase();
 
-    // data hoje
-    let hoje = new Date();
-    let dia = String(hoje.getDate()).padStart(2,'0');
-    let mes = String(hoje.getMonth()+1).padStart(2,'0');
-    let ano = hoje.getFullYear();
-    let data = dia + "/" + mes + "/" + ano;
+    const hoje = new Date();
+    const data = formatarData(hoje);
 
-    // TEXTO 1
     if(nome){
-        let texto1 = `OPORTUNIDADE DE LOCAÇÃO_${nome}_${data}`;
-        document.getElementById("textoOportunidade").innerText = texto1;
+        $("textoOportunidade").innerText =
+            `OPORTUNIDADE DE LOCAÇÃO_${nome}_${data}`;
     }
 
-    // TEXTO 2
     if(nome && equipamento && periodo && cidade){
-        let texto2 = `ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA_${nome}_${equipamento}_${periodo}_${cidade}`;
-        document.getElementById("textoOrcamento").innerText = texto2;
+        $("textoOrcamento").innerText =
+            `ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA_${nome}_${equipamento}_${periodo}_${cidade}`;
     }
 }
 
+// =========================
+// COPIAR
+// =========================
 function copiarTexto(id){
-    let texto = document.getElementById(id).innerText;
+    const texto = $(id).innerText;
     if(!texto) return;
-
     navigator.clipboard.writeText(texto);
 }
 
+// =========================
+// STATUS / MENSAGENS
+// =========================
 function gerarStatus(tipo){
 
-    let hoje = new Date();
+    const hoje = new Date();
+    const data = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}`;
+    const nome = "Eduardo";
 
-    let dia = String(hoje.getDate()).padStart(2,'0');
-    let mes = String(hoje.getMonth()+1).padStart(2,'0');
-
-    let data = dia + "/" + mes;
-
-    let nome = "Eduardo";
-
-    // 🔥 MENSAGENS PADRÃO
     const mensagens = {
-
         faturado: `${data} - Faturado - ${nome}`,
-
         renovacaoEmail: `${data} - Enviado email de renovação - ${nome}`,
-        
         renovacaoZap: `${data} - Enviado zap de renovação - ${nome}`,
 
         autorizado: "Autorizado Via Contrato XXX - Responsável: XXX <XXX>",
@@ -183,67 +167,49 @@ JEAN RICARDO SPIESS 47 99763-3333
 KUNG 47 9616-5616
 MAGNUS 47 9754-0321
 RR ( SOMENTE ATE WTE12 ) - 47 9180-5385 
-NÃO NOS RESPONSABILIZAMOS POR HORA PARADA, VALORES DE ACORDO COM A DISPONIBILIDADE DO TRANSPORTADOR
+NÃO NOS RESPONSABILIZAMOS POR HORA PARADA
 ENTREGA TÉCNICA GRATUITA
-PROPOSTA VALIDA POR 7 DIAS`,
-
-        CHEKLIST_Titulo: "CHEKLIST - PTA  - NOME_CLIENTE",
-
-        CHEKLIST_Mensagem: `Prezado Cliente,
-
-        Apresento em anexo Checklist de saída do equipamento locado.
-
-        Saliento algumas cláusulas presentes no contrato de locação:
-
-        * A LOCATÁRIA e/ou o preposto da LOCATÁRIA reconhece e declara ter recebido o(s) equipamento(s) em perfeito estado de conservação e uso (conforme check list). E, assim como o(s) recebeu, se compromete a conservá-lo(s) e a devolvê-lo(s), de forma a permitir sua imediata utilização pela LOCADORA, sem que haja necessidade de reparo(s) e substituição (ões) de peça(s) e componente(s).
-
-        É de obrigação da locatária a realização de "check-list" diário do(s) equipamento(s). Serão fornecidas instruções e modelo a ser seguido, caso solicitado.
-
-        O combustível, água de bateria (reposição), consertos de furos e cortes em pneus é de responsabilidade da LOCATÁRIA
-        * Os equipamentos denominados PTA - Plataforma de Trabalho Aéreo, independentemente do fabricante e do tipo de propulsão, não foram projetados para realizarem deslocamentos ininterruptos acima de 400 metros para equipamento diesel e 200 metros para equipamento elétrico. Portanto, sua dirigibilidade fica limitada ao número de metros acima informado. A não observância dessa orientação acarretará em superaquecimento do sistema hidráulico que poderá ocasionar vazamentos de óleo hidráulico, desgastes excessivos no sistema elétrico e até mesmo graves defeitos. Após a constatação do nosso corpo técnico que tais orientações não foram observadas, ficará caracterizado o "mau uso" da plataforma e a assistência técnica será cobrada conforme custos de atendimento. Km rodado: R$ 1,20 Hora do Técnico: R$ 120,00.
-
-        * Em caso de problemas no(s) equipamento(s) locado(s), somente técnico da W Rental está autorizado a proceder o reparo. Para tanto, solicitamos contatar nossa assistência técnica.
-
-        Obrigada`, 
-
-        ICMS: "Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC"
-
+PROPOSTA VALIDA POR 7 DIAS`
     };
 
-    let texto = mensagens[tipo];
+    const texto = mensagens[tipo];
     if(!texto) return;
 
     navigator.clipboard.writeText(texto);
-
-    // 🔥 nome amigável no popup
-    let titulo = tipo;
-
-    mostrarToast(titulo + " copiado");
+    mostrarToast(tipo + " copiado");
 }
 
-function mostrarToast(mensagem){
+// =========================
+// TOAST
+// =========================
+function mostrarToast(msg){
+    const toast = $("toast");
 
-    let toast = document.getElementById("toast");
-
-    toast.innerText = mensagem;
+    toast.innerText = msg;
     toast.classList.add("show");
 
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 2000);
+    setTimeout(() => toast.classList.remove("show"), 2000);
 }
 
-// EVENTOS
-document.getElementById("data").addEventListener("change", calcular);
-document.getElementById("data").addEventListener("change", calcularDiasCustom);
+// =========================
+// INIT
+// =========================
+(function init(){
+    $("data").value = new Date().toISOString().split('T')[0];
 
-document.getElementById("dias").addEventListener("input", calcularDiasCustom);
-document.getElementById("valor").addEventListener("input", calcularValor);
+    calcular();
 
-document.getElementById("valorTabela").addEventListener("input", calcularDesconto);
-document.getElementById("valorDesejado").addEventListener("input", calcularDesconto);
+    $("data").addEventListener("change", calcular);
+    $("data").addEventListener("change", calcularDiasCustom);
 
-document.getElementById("nomeCliente").addEventListener("input", gerarTextos);
-document.getElementById("equipamento").addEventListener("input", gerarTextos);
-document.getElementById("periodo").addEventListener("input", gerarTextos);
-document.getElementById("cidade").addEventListener("input", gerarTextos);
+    $("dias").addEventListener("input", calcularDiasCustom);
+    $("valor").addEventListener("input", calcularValor);
+
+    $("valorTabela").addEventListener("input", calcularDesconto);
+    $("valorDesejado").addEventListener("input", calcularDesconto);
+
+    $("nomeCliente").addEventListener("input", gerarTextos);
+    $("equipamento").addEventListener("input", gerarTextos);
+    $("periodo").addEventListener("input", gerarTextos);
+    $("cidade").addEventListener("input", gerarTextos);
+})();

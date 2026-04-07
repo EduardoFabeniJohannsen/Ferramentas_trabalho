@@ -88,9 +88,8 @@ function calcularDesconto(){
 
     if(!tabela || !desejado) return;
 
-    // tabela já vem padrão 16465.69
     let valorTabela = Number(tabela);
-    if(isNaN(valorTabela)) return;
+    if(isNaN(valorTabela) || valorTabela === 0) return;
 
     // tratar valor desejado (BR → EN)
     desejado = desejado.replace(/\./g, "");
@@ -101,7 +100,12 @@ function calcularDesconto(){
 
     let desconto = valorTabela - valorDesejado;
 
-    document.getElementById("desconto").innerText = desconto.toFixed(2);
+    // 🔥 cálculo do percentual
+    let percentual = (desconto / valorTabela) * 100;
+
+    // saída
+    document.getElementById("desconto").innerText =
+        desconto.toFixed(2) + " \n Desconto Aferido de " + percentual.toFixed(2) + "%";
 }
 
 function gerarTextos(){

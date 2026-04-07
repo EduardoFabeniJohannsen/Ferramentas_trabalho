@@ -169,7 +169,30 @@ MAGNUS 47 9754-0321
 RR ( SOMENTE ATE WTE12 ) - 47 9180-5385 
 NÃO NOS RESPONSABILIZAMOS POR HORA PARADA
 ENTREGA TÉCNICA GRATUITA
-PROPOSTA VALIDA POR 7 DIAS`
+PROPOSTA VALIDA POR 7 DIAS`,
+
+
+CHEKLIST_Titulo: "CHEKLIST - PTA  - NOME_CLIENTE",
+
+        CHEKLIST_Mensagem: 
+`Prezado Cliente,
+
+Apresento em anexo Checklist de saída do equipamento locado.
+
+Saliento algumas cláusulas presentes no contrato de locação:
+
+* A LOCATÁRIA e/ou o preposto da LOCATÁRIA reconhece e declara ter recebido o(s) equipamento(s) em perfeito estado de conservação e uso (conforme check list). E, assim como o(s) recebeu, se compromete a conservá-lo(s) e a devolvê-lo(s), de forma a permitir sua imediata utilização pela LOCADORA, sem que haja necessidade de reparo(s) e substituição (ões) de peça(s) e componente(s).
+
+É de obrigação da locatária a realização de "check-list" diário do(s) equipamento(s). Serão fornecidas instruções e modelo a ser seguido, caso solicitado.
+
+O combustível, água de bateria (reposição), consertos de furos e cortes em pneus é de responsabilidade da LOCATÁRIA
+* Os equipamentos denominados PTA - Plataforma de Trabalho Aéreo, independentemente do fabricante e do tipo de propulsão, não foram projetados para realizarem deslocamentos ininterruptos acima de 400 metros para equipamento diesel e 200 metros para equipamento elétrico. Portanto, sua dirigibilidade fica limitada ao número de metros acima informado. A não observância dessa orientação acarretará em superaquecimento do sistema hidráulico que poderá ocasionar vazamentos de óleo hidráulico, desgastes excessivos no sistema elétrico e até mesmo graves defeitos. Após a constatação do nosso corpo técnico que tais orientações não foram observadas, ficará caracterizado o "mau uso" da plataforma e a assistência técnica será cobrada conforme custos de atendimento. Km rodado: R$ 1,20 Hora do Técnico: R$ 120,00.
+
+* Em caso de problemas no(s) equipamento(s) locado(s), somente técnico da W Rental está autorizado a proceder o reparo. Para tanto, solicitamos contatar nossa assistência técnica.
+
+Obrigada`,
+
+        ICMS: "Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC"
     };
 
     const texto = mensagens[tipo];

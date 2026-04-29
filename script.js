@@ -441,8 +441,8 @@ function copiarPropostaZap(){
 
 💵 Total máquina + seguro: R$ ${total.toFixed(2)}
 
-🚚 Frete de entrega: R$ ${valorFrete}
-🚚 Frete de retirada: R$ ${valorFrete}
+🚚 Frete entrega: R$ ${valorFrete} de Itajai x ${cidadeFormatada}
+🚚 Frete retirada: R$ ${valorFrete} de ${cidadeFormatada} x Itajai
 
 (Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)
 

@@ -1,99 +1,195 @@
-// =========================
+// ======================================
 // HELPERS
-// =========================
+// ======================================
 const $ = (id) => document.getElementById(id);
 
 const formatarData = (data) => {
-    const dia = String(data.getDate()).padStart(2,'0');
-    const mes = String(data.getMonth()+1).padStart(2,'0');
+    const dia = String(data.getDate()).padStart(2, "0");
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
     const ano = data.getFullYear();
+
     return `${dia}/${mes}/${ano}`;
 };
 
 const brToNumber = (valor) => {
-    return Number(valor.replace(/\./g, "").replace(",", "."));
+    if (!valor) return 0;
+
+    valor = valor.trim();
+
+    // se tem vírgula = formato BR
+    if (valor.includes(",")) {
+        valor = valor.replace(/\./g, "").replace(",", ".");
+    }
+
+    return Number(valor);
 };
 
-const numberToBR = (num) => {
-    return num.toFixed(2).replace(".", ",");
+const copiar = (texto) => navigator.clipboard.writeText(texto);
+
+const mostrarToast = (msg) => {
+    const toast = $("toast");
+
+    toast.innerText = msg;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2000);
 };
 
-// =========================
-// TEXTO
-// =========================
-function maiusculo(){
+// ======================================
+// TABELA PREÇOS
+// ======================================
+let tabelaPrecos = {};
+
+async function carregarTabela(){
+
+    try{
+
+        const resposta = await fetch("tabela.csv");
+        const texto = await resposta.text();
+
+        const linhas = texto.trim().split("\n");
+
+        const cabecalho = linhas[0].split(";");
+
+        for(let i = 1; i < linhas.length; i++){
+
+            const colunas = linhas[i].split(";");
+
+            const modelo = colunas[0]
+                .trim()
+                .toUpperCase();
+
+            tabelaPrecos[modelo] = {};
+
+            for(let j = 1; j < cabecalho.length; j++){
+
+                const dias = cabecalho[j].trim();
+
+                let valor = colunas[j].trim();
+
+                valor = valor.replace(",", ".");
+
+                tabelaPrecos[modelo][dias] =
+                    parseFloat(valor);
+            }
+        }
+
+        console.log("Tabela carregada");
+
+    }catch(erro){
+
+        console.log("Erro CSV", erro);
+    }
+}
+
+function preencherValorTabela(){
+
+    const modelo = $("equipamento")
+        .value
+        .toUpperCase()
+        .trim();
+
+    const dias = $("periodo").value.trim();
+
+    if(!modelo || !dias) return;
+
+    if(
+        tabelaPrecos[modelo] &&
+        tabelaPrecos[modelo][dias]
+    ){
+
+        $("valorTabela").value =
+            tabelaPrecos[modelo][dias].toFixed(2);
+
+        calcularDesconto();
+    }
+}
+
+// ======================================
+// CONVERSOR TEXTO
+// ======================================
+function maiusculo() {
     $("texto").value = $("texto").value.toUpperCase();
 }
 
-function minusculo(){
+function minusculo() {
     $("texto").value = $("texto").value.toLowerCase();
 }
 
-function formatarCNPJ(){
-    $("texto").value = $("texto").value.replace(/[.\-\/]/g, "");
+function formatarCNPJ() {
+    $("texto").value =
+        $("texto").value.replace(/[.\-\/]/g, "");
 }
 
-// =========================
+// ======================================
 // DATAS
-// =========================
-function calcular(){
-    const dataInput = $("data").value;
-    if(!dataInput) return;
+// ======================================
+function calcularDatas() {
+    const valor = $("data").value;
+    if (!valor) return;
 
-    const base = new Date(dataInput);
+    const base = new Date(valor);
 
     const d28 = new Date(base);
-    d28.setDate(d28.getDate() + 28 + 1);
+    d28.setDate(d28.getDate() + 29);
 
     const d56 = new Date(base);
-    d56.setDate(d56.getDate() + 56 + 1);
+    d56.setDate(d56.getDate() + 57);
 
     $("d28").innerText = formatarData(d28);
     $("d56").innerText = formatarData(d56);
 }
 
-function calcularDiasCustom(){
-    const dataInput = $("data").value;
+function calcularDiasCustom() {
+    const valor = $("data").value;
     const dias = $("dias").value;
 
-    if(!dataInput || dias === "") return;
+    if (!valor || dias === "") return;
 
-    const base = new Date(dataInput);
-    base.setDate(base.getDate() + parseInt(dias, 10 + 1));
+    const base = new Date(valor);
 
-    $("resultadoDias").innerText = formatarData(base);
+    base.setDate(base.getDate() + Number(dias) + 1);
+
+    $("resultadoDias").innerText =
+        formatarData(base);
 }
 
-// =========================
-// VALOR
-// =========================
-function calcularValor(){
+// ======================================
+// BOLETOS
+// ======================================
+function calcularValor() {
     const valor = $("valor").value;
-    if(!valor) return;
+    if (!valor) return;
 
     const numero = brToNumber(valor);
-    if(isNaN(numero)) return;
 
-    const metade = numero / 2;
-    $("metade").innerText = numberToBR(metade);
+    if (isNaN(numero)) return;
+
+    $("metade").innerText =
+        (numero / 2).toFixed(2);
 }
 
-// =========================
+// ======================================
 // DESCONTO
-// =========================
-function calcularDesconto(){
+// ======================================
+function calcularDesconto() {
     const tabela = $("valorTabela").value;
     const desejado = $("valorDesejado").value;
 
-    if(!tabela || !desejado) return;
+    if (!tabela || !desejado) return;
 
-    const valorTabela = Number(tabela);
+    const valorTabela = brToNumber(tabela);
     const valorDesejado = brToNumber(desejado);
 
-    if(isNaN(valorTabela) || valorTabela === 0 || isNaN(valorDesejado)) return;
+    if (!valorTabela || !valorDesejado) return;
 
-    const desconto = valorTabela - valorDesejado;
-    const percentual = (desconto / valorTabela) * 100;
+    const desconto =
+        valorTabela - valorDesejado;
+
+    const percentual =
+        (desconto / valorTabela) * 100;
 
     $("desconto").innerHTML = `
         ${desconto.toFixed(2)}<br>
@@ -103,168 +199,180 @@ function calcularDesconto(){
     `;
 }
 
-// =========================
+// ======================================
 // TEXTOS AUTOMÁTICOS
-// =========================
-function gerarTextos(){
+// ======================================
+function gerarTextos() {
+    const nome =
+        $("nomeCliente").value.toUpperCase();
 
-    const nome = $("nomeCliente").value.toUpperCase();
-    const equipamento = $("equipamento").value.toUpperCase();
-    const periodoInput = $("periodo").value;
-    const cidade = $("cidade").value.toUpperCase();
+    const equipamento =
+        $("equipamento").value.toUpperCase();
+
+    const cidade =
+        $("cidade").value.toUpperCase();
+
+    const periodoInput =
+        $("periodo").value.trim();
 
     let periodo = "";
 
-    if(periodoInput){
+    if (periodoInput) {
 
-        if(isNaN(periodoInput)){
+        if (isNaN(periodoInput)) {
+            periodo =
+                periodoInput.toUpperCase();
 
-            periodo = periodoInput.toUpperCase();
+        } else {
 
-        }else{
+            const numero =
+                Number(periodoInput);
 
-            const numero = Number(periodoInput);
-
-            if(numero === 1){
-
+            if (numero === 1) {
                 periodo = "DIARIA";
 
-            }else if(numero > 30){
+            } else if (
+                numero > 30 &&
+                numero % 30 === 0
+            ) {
+                periodo =
+                    `${numero / 30} PERIODOS`;
 
-                const periodos = numero / 30;
-                periodo = `${periodos} PERIODOS`;
-
-            }else{
-
-                periodo = `${numero} DIAS`;
-
+            } else {
+                periodo =
+                    `${numero} DIAS`;
             }
-
         }
     }
 
-    const hoje = new Date();
-    const data = formatarData(hoje);
+    const hoje =
+        formatarData(new Date());
 
-    if(nome){
+    // oportunidade
+    if (nome) {
         $("textoOportunidade").innerText =
-            `OPORTUNIDADE DE LOCAÇÃO_${nome}_${data}`;
+            `OPORTUNIDADE DE LOCAÇÃO_${nome}_${hoje}`;
     }
 
-    if(nome && equipamento && periodo && cidade){
+    // orçamento
+    if (
+        nome &&
+        equipamento &&
+        periodo &&
+        cidade
+    ) {
         $("textoOrcamento").innerText =
             `ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA_${nome}_${equipamento}_${periodo}_${cidade}`;
     }
+
+    preencherValorTabela();
 }
 
-// =========================
+// ======================================
 // COPIAR
-// =========================
-function copiarTexto(id){
+// ======================================
+function copiarTexto(id) {
     const texto = $(id).innerText;
-    if(!texto) return;
-    navigator.clipboard.writeText(texto);
+
+    if (!texto) return;
+
+    copiar(texto);
+    mostrarToast("Copiado");
 }
 
-// =========================
-// STATUS / MENSAGENS
-// =========================
-function gerarStatus(tipo){
+// ======================================
+// STATUS
+// ======================================
+function gerarStatus(tipo) {
 
     const hoje = new Date();
-    const data = `${String(hoje.getDate()).padStart(2,'0')}/${String(hoje.getMonth()+1).padStart(2,'0')}`;
+
+    const data =
+        String(hoje.getDate()).padStart(2, "0")
+        + "/"
+        + String(hoje.getMonth() + 1).padStart(2, "0");
+
     const nome = "Eduardo";
 
+    const cidade =
+        $("cidade").value.toUpperCase() || "CIDADE";
+
+    const frete =
+        $("valorFrete").value || "0.00";
+
     const mensagens = {
-        faturado: `${data} - Faturado - ${nome}`,
-        renovacaoEmail: `${data} - Enviado email de renovação - ${nome}`,
-        renovacaoZap: `${data} - Enviado zap de renovação - ${nome}`,
 
-        autorizado: "Autorizado Via Contrato XXX - Responsável: XXX <XXX>",
+        faturado:
+            `${data} - Faturado - ${nome}`,
 
-FreteZOHO: (() => {
+        renovacaoEmail:
+            `${data} - Enviado email de renovação - ${nome}`,
 
-    const cidade = $("cidade").value.trim().toUpperCase() || "CIDADE";
-    const valorFrete = $("valorFrete").value.trim() || "0.00";
+        renovacaoZap:
+            `${data} - Enviado zap de renovação - ${nome}`,
 
-    return `FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
+        autorizado:
+            `Autorizado Via Contrato XXX - Responsável: XXX <XXX>`,
 
-* Frete entrega: R$ ${valorFrete} - ITAJAÍ x ${cidade}
-* Frete retirada: R$ ${valorFrete} - ${cidade} x ITAJAÍ
+        FreteZOHO:
+`FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
+
+* Frete entrega: R$ ${frete} - ITAJAÍ x ${cidade}
+* Frete retirada: R$ ${frete} - ${cidade} x ITAJAÍ
 
 Transportadores Indicados:
 JEAN RICARDO SPIESS 47 99763-3333
 KUNG 47 9616-5616
 MAGNUS 47 9754-0321
-RR (SOMENTE ATÉ WTE12) - 47 9180-5385
+RR (SOMENTE ATÉ WTE12)
 
-NÃO NOS RESPONSABILIZAMOS POR HORA PARADA
-ENTREGA TÉCNICA GRATUITA
-PROPOSTA VÁLIDA POR 7 DIAS`;
+PROPOSTA VÁLIDA POR 7 DIAS`,
 
-})(),
+        FreteZOHOLocComp:
+`* FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR *
+PROPOSTA VÁLIDA POR 7 DIAS`,
 
-FreteZOHOLocComp: `
-* FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR *
-NÃO NOS RESPONSABILIZAMOS POR HORA PARADA, VALORES DE ACORDO COM A DISPONIBILIDADE DO TRANSPORTADOR
-ENTREGA TÉCNICA GRATUITA
-PROPOSTA VALIDA POR 7 DIAS`,
+        CHEKLIST_Titulo:
+            `CHEKLIST - PTA - ${$("nomeCliente").value.toUpperCase()}`,
 
-
-CHEKLIST_Titulo: "CHEKLIST - PTA  - NOME_CLIENTE",
-
-        CHEKLIST_Mensagem: 
+        CHEKLIST_Mensagem:
 `Prezado Cliente,
 
-Apresento em anexo Checklist de saída do equipamento locado.
+Segue checklist de saída do equipamento locado.
 
-Saliento algumas cláusulas presentes no contrato de locação:
+Obrigada.`,
 
-* A LOCATÁRIA e/ou o preposto da LOCATÁRIA reconhece e declara ter recebido o(s) equipamento(s) em perfeito estado de conservação e uso (conforme check list). E, assim como o(s) recebeu, se compromete a conservá-lo(s) e a devolvê-lo(s), de forma a permitir sua imediata utilização pela LOCADORA, sem que haja necessidade de reparo(s) e substituição (ões) de peça(s) e componente(s).
-
-É de obrigação da locatária a realização de "check-list" diário do(s) equipamento(s). Serão fornecidas instruções e modelo a ser seguido, caso solicitado.
-
-O combustível, água de bateria (reposição), consertos de furos e cortes em pneus é de responsabilidade da LOCATÁRIA
-* Os equipamentos denominados PTA - Plataforma de Trabalho Aéreo, independentemente do fabricante e do tipo de propulsão, não foram projetados para realizarem deslocamentos ininterruptos acima de 400 metros para equipamento diesel e 200 metros para equipamento elétrico. Portanto, sua dirigibilidade fica limitada ao número de metros acima informado. A não observância dessa orientação acarretará em superaquecimento do sistema hidráulico que poderá ocasionar vazamentos de óleo hidráulico, desgastes excessivos no sistema elétrico e até mesmo graves defeitos. Após a constatação do nosso corpo técnico que tais orientações não foram observadas, ficará caracterizado o "mau uso" da plataforma e a assistência técnica será cobrada conforme custos de atendimento. Km rodado: R$ 1,20 Hora do Técnico: R$ 120,00.
-
-* Em caso de problemas no(s) equipamento(s) locado(s), somente técnico da W Rental está autorizado a proceder o reparo. Para tanto, solicitamos contatar nossa assistência técnica.
-
-Obrigada`,
-
-        ICMS: "Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC"
+        ICMS:
+            `Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC`
     };
 
     const texto = mensagens[tipo];
-    if(!texto) return;
 
-    navigator.clipboard.writeText(texto);
+    if (!texto) return;
+
+    copiar(texto);
     mostrarToast(tipo + " copiado");
 }
 
-// =========================
-// TOAST
-// =========================
-function mostrarToast(msg){
-    const toast = $("toast");
-
-    toast.innerText = msg;
-    toast.classList.add("show");
-
-    setTimeout(() => toast.classList.remove("show"), 2000);
-}
-
-// =========================
+// ======================================
 // INIT
-// =========================
-(function init(){
-    $("data").value = new Date().toISOString().split('T')[0];
+// ======================================
+(async function init() {
 
-    calcular();
+    $("data").value =
+        new Date()
+        .toISOString()
+        .split("T")[0];
 
-    $("data").addEventListener("change", calcular);
+    await carregarTabela();
+
+    calcularDatas();
+
+    $("data").addEventListener("change", calcularDatas);
     $("data").addEventListener("change", calcularDiasCustom);
 
     $("dias").addEventListener("input", calcularDiasCustom);
+
     $("valor").addEventListener("input", calcularValor);
 
     $("valorTabela").addEventListener("input", calcularDesconto);
@@ -274,4 +382,5 @@ function mostrarToast(msg){
     $("equipamento").addEventListener("input", gerarTextos);
     $("periodo").addEventListener("input", gerarTextos);
     $("cidade").addEventListener("input", gerarTextos);
+
 })();

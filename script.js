@@ -112,11 +112,21 @@ function gerarTextos(){
     const periodoInput = $("periodo").value;
     const cidade = $("cidade").value.toUpperCase();
 
-    let periodo = "";
     if(periodoInput){
-        periodo = isNaN(periodoInput)
-            ? periodoInput.toUpperCase()
-            : `${periodoInput} DIAS`;
+
+        if(isNaN(periodoInput)){
+            periodo = periodoInput.toUpperCase();
+        }else{
+
+            const numero = Number(periodoInput);
+
+            if(numero === 1){
+                periodo = "DIARIA";
+            }else{
+                periodo = `${numero} DIAS`;
+            }
+
+        }
     }
 
     const hoje = new Date();

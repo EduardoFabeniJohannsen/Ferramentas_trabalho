@@ -429,7 +429,8 @@ function copiarPropostaZap(){
     const valorNumero = Number(valorLocacao);
     const seguro = valorNumero * 0.07;
 
-    const texto = `🟡 *Modelo: ${modelo} - ${tipoMaquina} ${energia} de ${alturaTrabalho} metros altura de trabalho*
+    const texto = `*🟡 Modelo: ${modelo} - ${tipoMaquina} ${energia} de ${alturaTrabalho} metros altura de trabalho*
+
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${alturaTrabalho} metros
 * Período locação: ${periodo} dias

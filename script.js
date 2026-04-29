@@ -386,53 +386,42 @@ Obrigada.`,
 })();
 
 
-
 function copiarPropostaZap(){
 
     const modelo = $("equipamento").value.toUpperCase().trim();
     const periodo = $("periodo").value.trim();
-    const cidade = $("cidade").value.trim().toUpperCase();
+
+    let cidade = $("cidade").value.trim().toLowerCase();
+    cidade = cidade.charAt(0).toUpperCase() + cidade.slice(1);
+
     const valorFrete = $("valorFrete").value.trim();
-    const valorLocacao = $("valorTabela").value.trim();
+
+    // 🔥 pega valor COM DESCONTO
+    const valorNumero = brToNumber($("valorDesejado").value);
 
     if(!modelo) return mostrarToast("Informe o modelo");
-    if(!valorLocacao) return mostrarToast("Informe valor locação");
+    if(!valorNumero) return mostrarToast("Informe valor locação");
 
-    // =========================
-    // QUEBRAR MODELO
-    // Ex: WAE18
-    // W = prefixo
-    // A = Articulada
-    // E = Elétrica
-    // 18 = altura
-    // =========================
     const letra2 = modelo.charAt(1);
     const letra3 = modelo.charAt(2);
     const altura = parseInt(modelo.replace(/[^\d]/g, ""));
 
-    // Tipo máquina
     let tipoMaquina = "";
     if(letra2 === "A") tipoMaquina = "Articulada";
     if(letra2 === "T") tipoMaquina = "Tesoura";
     if(letra2 === "M") tipoMaquina = "Mastro";
 
-    // Energia
     let energia = "";
     if(letra3 === "E") energia = "Elétrica";
     if(letra3 === "D") energia = "Diesel";
 
-    // Alturas
-    const alturaTrabalho = altura;
     const alturaPlataforma = altura - 2;
-
-    // Valores
-    const valorNumero = Number(valorLocacao);
     const seguro = valorNumero * 0.07;
 
-    const texto = `*🟡 Modelo: ${modelo} - ${tipoMaquina} ${energia} de ${alturaTrabalho} metros altura de trabalho*
+    const texto = `*🟡 Modelo: ${modelo} - ${tipoMaquina} ${energia} de ${altura} metros altura de trabalho*
 
 * Altura da plataforma: ${alturaPlataforma} metros
-* Altura de trabalho: ${alturaTrabalho} metros
+* Altura de trabalho: ${altura} metros
 * Período locação: ${periodo} dias
 * Valor locação: R$ ${valorNumero.toFixed(2)}
 * Seguro contra acidentes e furtos (Opcional): R$ ${seguro.toFixed(2)}
@@ -444,6 +433,6 @@ function copiarPropostaZap(){
 * Cortesia: Entrega técnica (Mediante solicitação)
 * Forma de pagamento: mediante aprovação cadastral.`;
 
-    navigator.clipboard.writeText(texto);
+    copiar(texto);
     mostrarToast("Proposta Zap copiada");
 }

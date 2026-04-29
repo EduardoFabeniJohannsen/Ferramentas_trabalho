@@ -43,10 +43,10 @@ function calcular(){
     const base = new Date(dataInput);
 
     const d28 = new Date(base);
-    d28.setDate(d28.getDate() + 28);
+    d28.setDate(d28.getDate() + 28 + 1);
 
     const d56 = new Date(base);
-    d56.setDate(d56.getDate() + 56);
+    d56.setDate(d56.getDate() + 56 + 1);
 
     $("d28").innerText = formatarData(d28);
     $("d56").innerText = formatarData(d56);
@@ -59,7 +59,7 @@ function calcularDiasCustom(){
     if(!dataInput || dias === "") return;
 
     const base = new Date(dataInput);
-    base.setDate(base.getDate() + parseInt(dias, 10));
+    base.setDate(base.getDate() + parseInt(dias, 10 + 1));
 
     $("resultadoDias").innerText = formatarData(base);
 }

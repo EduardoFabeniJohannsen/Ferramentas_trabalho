@@ -107,23 +107,37 @@ function calcularDesconto(){
 // TEXTOS AUTOMÁTICOS
 // =========================
 function gerarTextos(){
+
     const nome = $("nomeCliente").value.toUpperCase();
     const equipamento = $("equipamento").value.toUpperCase();
     const periodoInput = $("periodo").value;
     const cidade = $("cidade").value.toUpperCase();
 
+    let periodo = "";
+
     if(periodoInput){
 
         if(isNaN(periodoInput)){
+
             periodo = periodoInput.toUpperCase();
+
         }else{
 
             const numero = Number(periodoInput);
 
             if(numero === 1){
+
                 periodo = "DIARIA";
+
+            }else if(numero > 30){
+
+                const periodos = numero / 30;
+                periodo = `${periodos} PERIODOS`;
+
             }else{
+
                 periodo = `${numero} DIAS`;
+
             }
 
         }

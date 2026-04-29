@@ -86,8 +86,7 @@ async function carregarTabela(){
 
 function preencherValorTabela(){
 
-    const modelo = $("equipamento")
-        .value
+    const modelo = $("equipamento").value
         .toUpperCase()
         .trim();
 
@@ -95,6 +94,23 @@ function preencherValorTabela(){
 
     if(!modelo || !dias) return;
 
+    // dias válidos da tabela
+    const diasValidos = [
+        "1","2","3","4","5","6","7",
+        "10","14","15","21","28","30"
+    ];
+
+    // se digitou número fora da tabela
+    if(!diasValidos.includes(dias)){
+        $("valorTabela").value = "";
+        $("desconto").innerHTML =
+            `<span style="color:#ef4444">
+                Valor fora de tabela
+            </span>`;
+        return;
+    }
+
+    // procura valor normal
     if(
         tabelaPrecos[modelo] &&
         tabelaPrecos[modelo][dias]
@@ -104,6 +120,14 @@ function preencherValorTabela(){
             tabelaPrecos[modelo][dias].toFixed(2);
 
         calcularDesconto();
+
+    }else{
+
+        $("valorTabela").value = "";
+        $("desconto").innerHTML =
+            `<span style="color:#ef4444">
+                Modelo não encontrado
+            </span>`;
     }
 }
 

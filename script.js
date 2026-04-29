@@ -417,6 +417,10 @@ function copiarPropostaZap(){
     const cidade = $("cidade").value.trim();
     const valorFrete = $("valorFrete").value.trim();
 
+    const cidadeFormatada = cidade
+    ? cidade.charAt(0).toUpperCase() + cidade.slice(1).toLowerCase()
+    : "Cidade";
+    
     // prioridade: valor desejado (com desconto)
     const valorLocacaoTexto =
         $("valorDesejado").value.trim() ||

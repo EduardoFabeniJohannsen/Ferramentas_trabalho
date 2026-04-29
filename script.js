@@ -390,49 +390,66 @@ function copiarPropostaZap(){
 
     const modelo = $("equipamento").value.toUpperCase().trim();
     const periodo = $("periodo").value.trim();
-
-    let cidade = $("cidade").value.trim().toLowerCase();
-    cidade = cidade.charAt(0).toUpperCase() + cidade.slice(1);
-
+    const cidade = $("cidade").value.trim();
     const valorFrete = $("valorFrete").value.trim();
 
-    // 🔥 pega valor COM DESCONTO
-    const valorNumero = brToNumber($("valorDesejado").value);
+    // prioridade: valor desejado (com desconto)
+    const valorLocacaoTexto =
+        $("valorDesejado").value.trim() ||
+        $("valorTabela").value.trim();
 
     if(!modelo) return mostrarToast("Informe o modelo");
-    if(!valorNumero) return mostrarToast("Informe valor locação");
+    if(!periodo) return mostrarToast("Informe período");
+    if(!valorLocacaoTexto) return mostrarToast("Informe valor locação");
 
+    // =========================
+    // MODELO
+    // =========================
     const letra2 = modelo.charAt(1);
     const letra3 = modelo.charAt(2);
     const altura = parseInt(modelo.replace(/[^\d]/g, ""));
 
-    let tipoMaquina = "";
-    if(letra2 === "A") tipoMaquina = "Articulada";
-    if(letra2 === "T") tipoMaquina = "Tesoura";
-    if(letra2 === "M") tipoMaquina = "Mastro";
+    let tipo = "";
+    if(letra2 === "A") tipo = "Articulada";
+    if(letra2 === "T") tipo = "Tesoura";
+    if(letra2 === "M") tipo = "Mastro";
 
     let energia = "";
-    if(letra3 === "E") energia = "Elétrica";
-    if(letra3 === "D") energia = "Diesel";
+    if(letra3 === "E") energia = "elétrica";
+    if(letra3 === "D") energia = "diesel";
 
     const alturaPlataforma = altura - 2;
-    const seguro = valorNumero * 0.07;
 
-    const texto = `*🟡 Modelo: ${modelo} - ${tipoMaquina} ${energia} de ${altura} metros altura de trabalho*
+    // =========================
+    // VALORES
+    // =========================
+    const valorLocacao = brToNumber(valorLocacaoTexto);
+    const seguro = valorLocacao * 0.07;
+    const total = valorLocacao + seguro;
+
+    // =========================
+    // TEXTO
+    // =========================
+    const texto = `🟡 Modelo: ${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
 
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
-* Período locação: ${periodo} dias
-* Valor locação: R$ ${valorNumero.toFixed(2)}
-* Seguro contra acidentes e furtos (Opcional): R$ ${seguro.toFixed(2)}
+* Período de locação: ${periodo} dias
 
-* Frete entrega: R$ ${valorFrete} de Itajai x ${cidade}
-* Frete retirada: R$ ${valorFrete} de ${cidade} x Itajai
-(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada).
+💰 Valor da locação: R$ ${valorLocacao.toFixed(2)}
+🛡️ Seguro contra acidentes e furtos (opcional): R$ ${seguro.toFixed(2)}
 
-* Cortesia: Entrega técnica (Mediante solicitação)
-* Forma de pagamento: mediante aprovação cadastral.`;
+💵 Total máquina + seguro: R$ ${total.toFixed(2)}
 
-    copiar(texto);
+🚚 Frete de entrega: R$ ${valorFrete}
+🚚 Frete de retirada: R$ ${valorFrete}
+
+(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)
+
+🎁 Cortesia: Entrega técnica (mediante solicitação)
+
+📄 Forma de pagamento: Mediante aprovação cadastral.`;
+
+    navigator.clipboard.writeText(texto);
     mostrarToast("Proposta Zap copiada");
 }

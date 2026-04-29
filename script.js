@@ -182,18 +182,27 @@ function gerarStatus(tipo){
 
         autorizado: "Autorizado Via Contrato XXX - Responsável: XXX <XXX>",
 
-        FreteZOHO: `FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
-R$ 800,00 ENTREGA
-R$ 800,00 RETORNO
+FreteZOHO: (() => {
+
+    const cidade = $("cidade").value.trim().toUpperCase() || "CIDADE";
+    const valorFrete = $("valorFrete").value.trim() || "0.00";
+
+    return `FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
+
+* Frete entrega: R$ ${valorFrete} - ITAJAÍ x ${cidade}
+* Frete retirada: R$ ${valorFrete} - ${cidade} x ITAJAÍ
 
 Transportadores Indicados:
 JEAN RICARDO SPIESS 47 99763-3333
 KUNG 47 9616-5616
 MAGNUS 47 9754-0321
-RR ( SOMENTE ATE WTE12 ) - 47 9180-5385 
+RR (SOMENTE ATÉ WTE12) - 47 9180-5385
+
 NÃO NOS RESPONSABILIZAMOS POR HORA PARADA
 ENTREGA TÉCNICA GRATUITA
-PROPOSTA VALIDA POR 7 DIAS`,
+PROPOSTA VÁLIDA POR 7 DIAS`;
+
+})(),
 
 FreteZOHOLocComp: `
 * FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR *

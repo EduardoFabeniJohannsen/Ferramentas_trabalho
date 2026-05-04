@@ -94,14 +94,21 @@ function preencherValorTabela(){
 
     if(!modelo || !dias) return;
 
-    // dias válidos da tabela
+    const diasNumero = Number(dias);
+
+    // se for múltiplo de 30 → converter
+    let diasBusca = dias;
+
+    if(diasNumero > 30 && diasNumero % 30 === 0){
+        diasBusca = "30";
+    }
+
     const diasValidos = [
         "1","2","3","4","5","6","7",
         "10","14","15","21","28","30"
     ];
 
-    // se digitou número fora da tabela
-    if(!diasValidos.includes(dias)){
+    if(!diasValidos.includes(diasBusca)){
         $("valorTabela").value = "";
         $("desconto").innerHTML =
             `<span style="color:#ef4444">
@@ -110,14 +117,13 @@ function preencherValorTabela(){
         return;
     }
 
-    // procura valor normal
     if(
         tabelaPrecos[modelo] &&
-        tabelaPrecos[modelo][dias]
+        tabelaPrecos[modelo][diasBusca]
     ){
 
         $("valorTabela").value =
-            tabelaPrecos[modelo][dias].toFixed(2);
+            tabelaPrecos[modelo][diasBusca].toFixed(2);
 
         calcularDesconto();
 
@@ -417,6 +423,16 @@ function copiarPropostaZap(){
     const cidade = $("cidade").value.trim();
     const valorFrete = $("valorFrete").value.trim();
 
+    const diasNumero = Number(periodo);
+
+    let periodoExibicao = periodo;
+    let multiplicador = 1;
+
+    if(diasNumero > 30 && diasNumero % 30 === 0){
+        multiplicador = diasNumero / 30;
+        periodoExibicao = "30";
+    }
+
     const cidadeFormatada = cidade
     ? cidade.charAt(0).toUpperCase() + cidade.slice(1).toLowerCase()
     : "Cidade";
@@ -462,12 +478,16 @@ function copiarPropostaZap(){
 
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
-* Período de locação: ${periodo} dias
+* Período de locação: ${periodoExibicao} dias
 
 💰 Valor da locação: R$ ${valorLocacao.toFixed(2)}
 🛡️ Seguro contra acidentes e furtos (opcional): R$ ${seguro.toFixed(2)}
 
-💵 Total máquina + seguro: R$ ${total.toFixed(2)}
+💵 Total máquina + seguro: R$ ${total.toFixed(2)}${
+    multiplicador > 1
+        ? ` * ${multiplicador} períodos = R$ ${(total * multiplicador).toFixed(2)}`
+        : ""
+}
 
 🚚 Frete entrega: R$ ${valorFrete} de Itajai x ${cidadeFormatada}
 🚚 Frete retirada: R$ ${valorFrete} de ${cidadeFormatada} x Itajai

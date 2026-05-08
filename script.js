@@ -292,7 +292,7 @@ function gerarTextos() {
         cidade
     ) {
         $("textoOrcamento").innerText =
-            `ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA_${nome}_${equipamento}_${periodo}_${cidade}`;
+                `${nome}_${equipamento}_${periodo}`;
     }
 
     preencherValorTabela();

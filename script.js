@@ -119,83 +119,63 @@ async function carregarFretes() {
     console.log("Fretes carregados");
 }
 
-    function mostrarFretes() {
+function mostrarFretes() {
 
-        const modelo =
-            $("equipamento").value
-            .trim()
-            .toUpperCase();
+    const modelo =
+        $("equipamento").value
+        .trim()
+        .toUpperCase();
 
-        const cidade =
-            $("cidade").value
-            .trim()
-            .toUpperCase();
+    const cidade =
+        $("cidade").value
+        .trim()
+        .toUpperCase();
 
-        if (!modelo || !cidade) return;
+    if (!modelo || !cidade) return;
 
-        let html = "";
+    let html = "";
 
-        for (const transportador in tabelasFrete) {
+    for (const transportador in tabelasFrete) {
 
-            // CSV inexistente
-            if (!tabelasFrete[transportador]) {
+        // modelo inexistente
+        if (!tabelasFrete[transportador][modelo]) {
 
-                html += `
-                <div class="frete-item">
-                    ❌ <strong>${transportador}</strong><br>
-                    CSV não encontrado
-                </div>
-                `;
-
-                continue;
-            }
-
-            // modelo inexistente
-            if (!tabelasFrete[transportador][modelo]) {
-
-                html += `
-                <div class="frete-item">
-                    ⚠️ <strong>${transportador}</strong><br>
-                    Modelo "${modelo}" não encontrado
-                </div>
-                `;
-
-                continue;
-            }
-
-            const valor =
-                tabelasFrete[transportador][modelo][cidade];
-
-            // cidade inexistente
-            if (!valor || valor === "") {
-
-                html += `
-                <div class="frete-item">
-                    ⚠️ <strong>${transportador}</strong><br>
-                    Cidade "${cidade}" não encontrada
-                </div>
-                `;
-
-                continue;
-            }
-
-            // sucesso
             html += `
             <div class="frete-item">
-                ✅ <strong>${transportador}</strong><br>
-                R$ ${valor}
+                ⚠️ <strong>${transportador}</strong><br>
+                Modelo "${modelo}" não encontrado
             </div>
             `;
+
+            continue;
         }
 
-        $("resultadoFretes").innerHTML = html;
+        const valor =
+            tabelasFrete[transportador][modelo][cidade];
 
-        $("modalFretes").style.display = "flex";
+        // cidade inexistente
+        if (!valor || valor === "") {
+
+            html += `
+            <div class="frete-item">
+                ⚠️ <strong>${transportador}</strong><br>
+                Cidade "${cidade}" não encontrada
+            </div>
+            `;
+
+            continue;
+        }
+
+        // sucesso
+        html += `
+        <div class="frete-item">
+            ✅ <strong>${transportador}</strong><br>
+            R$ ${valor}
+        </div>
+        `;
     }
 
-    function fecharModalFretes() {
-
-    $("modalFretes").style.display = "none";
+    $("resultadoFretes").innerHTML = html;
 }
 
 async function carregarTabela(){

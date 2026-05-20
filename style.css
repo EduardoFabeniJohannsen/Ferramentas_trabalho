@@ -278,3 +278,60 @@ MODAL FRETES
 
     line-height: 1.5;
 }
+
+/* =========================
+PAINEL FRETES
+========================= */
+
+.painel-fretes {
+
+    margin-top: 20px;
+
+    background: #0f172a;
+
+    border: 1px solid #334155;
+
+    border-radius: 12px;
+
+    padding: 15px;
+}
+
+.painel-fretes h3 {
+
+    margin-bottom: 15px;
+
+    color: #f8fafc;
+}
+
+.frete-item {
+
+    background: #1e293b;
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    margin-bottom: 10px;
+
+    color: #e2e8f0;
+
+    line-height: 1.5;
+}
+
+
+
+.painel-fretes{
+    margin-top:20px;
+    background:#111827;
+    border:1px solid #374151;
+    border-radius:12px;
+    padding:20px;
+}
+
+.frete-item{
+    background:#1f2937;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+    border:1px solid #374151;
+}

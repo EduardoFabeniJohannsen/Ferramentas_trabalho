@@ -542,12 +542,29 @@ Obrigada.`,
 
     $("valor").addEventListener("input", calcularValor);
 
+    if ($("valorTabela")) {
     $("valorTabela").addEventListener("input", calcularDesconto);
+    }
+
+    if ($("valorDesejado")) {
+        $("valorDesejado").addEventListener("input", calcularDesconto);
+    }
+
     $("valorDesejado").addEventListener("input", calcularDesconto);
 
-    $("nomeCliente").addEventListener("input", gerarTextos);
-    $("equipamento").addEventListener("input", gerarTextos);
-    $("periodo").addEventListener("input", gerarTextos);
+    if ($("nomeCliente")) {
+        $("nomeCliente").addEventListener("input", gerarTextos);
+    }
+
+    if ($("equipamento")) {
+        $("equipamento").addEventListener("input", gerarTextos);
+    }
+
+    if ($("periodo")) {
+        $("periodo").addEventListener("input", gerarTextos);
+    }
+
+
     $("cidade").addEventListener("change", () => {
 
     gerarTextos();

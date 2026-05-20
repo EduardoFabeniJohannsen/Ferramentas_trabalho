@@ -175,7 +175,9 @@ function mostrarFretes() {
         `;
     }
 
+    if ($("resultadoFretes")) {
     $("resultadoFretes").innerHTML = html;
+    }
 }
 
 async function carregarTabela(){
@@ -523,54 +525,121 @@ Obrigada.`,
 // ======================================
 // INIT
 // ======================================
+// ======================================
+// INIT
+// ======================================
 (async function init() {
 
-    $("data").value =
-        new Date()
-        .toISOString()
-        .split("T")[0];
-
+    // carregar csv
     await carregarTabela();
     await carregarFretes();
-    
-    calcularDatas();
 
-    $("data").addEventListener("change", calcularDatas);
-    $("data").addEventListener("change", calcularDiasCustom);
+    // =========================
+    // DATA
+    // =========================
+    if ($("data")) {
 
-    $("dias").addEventListener("input", calcularDiasCustom);
+        $("data").value =
+            new Date()
+            .toISOString()
+            .split("T")[0];
 
-    $("valor").addEventListener("input", calcularValor);
+        calcularDatas();
 
+        $("data").addEventListener(
+            "change",
+            calcularDatas
+        );
+
+        $("data").addEventListener(
+            "change",
+            calcularDiasCustom
+        );
+    }
+
+    // =========================
+    // DIAS
+    // =========================
+    if ($("dias")) {
+
+        $("dias").addEventListener(
+            "input",
+            calcularDiasCustom
+        );
+    }
+
+    // =========================
+    // VALOR BOLETO
+    // =========================
+    if ($("valor")) {
+
+        $("valor").addEventListener(
+            "input",
+            calcularValor
+        );
+    }
+
+    // =========================
+    // DESCONTO
+    // =========================
     if ($("valorTabela")) {
-    $("valorTabela").addEventListener("input", calcularDesconto);
+
+        $("valorTabela").addEventListener(
+            "input",
+            calcularDesconto
+        );
     }
 
     if ($("valorDesejado")) {
-        $("valorDesejado").addEventListener("input", calcularDesconto);
+
+        $("valorDesejado").addEventListener(
+            "input",
+            calcularDesconto
+        );
     }
 
-    $("valorDesejado").addEventListener("input", calcularDesconto);
-
+    // =========================
+    // TEXTOS
+    // =========================
     if ($("nomeCliente")) {
-        $("nomeCliente").addEventListener("input", gerarTextos);
+
+        $("nomeCliente").addEventListener(
+            "input",
+            gerarTextos
+        );
     }
 
     if ($("equipamento")) {
-        $("equipamento").addEventListener("input", gerarTextos);
+
+        $("equipamento").addEventListener(
+            "input",
+            gerarTextos
+        );
     }
 
     if ($("periodo")) {
-        $("periodo").addEventListener("input", gerarTextos);
+
+        $("periodo").addEventListener(
+            "input",
+            gerarTextos
+        );
     }
 
+    // =========================
+    // FRETES
+    // =========================
+    if ($("cidade")) {
 
-    $("cidade").addEventListener("change", () => {
+        $("cidade").addEventListener(
+            "input",
+            () => {
 
-    gerarTextos();
+                gerarTextos();
 
-    mostrarFretes();
-    });
+                mostrarFretes();
+            }
+        );
+    }
 
 })();
 

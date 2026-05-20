@@ -81,7 +81,29 @@
 
         <input type="text" id="equipamento" placeholder="Equipamento">
         <input type="text" id="periodo" placeholder="Período (ex: 30 dias)">
-        <input type="text" id="cidade" placeholder="Cidade">
+        <input
+            type="text"
+            id="cidade"
+            placeholder="Cidade"
+            list="listaCidades"
+        >
+        <datalist id="listaCidades">
+            <option value="BC">
+            <option value="CAMBORIU">
+            <option value="NAVEGANTES">
+            <option value="ILHOTA">
+            <option value="PENHA">
+            <option value="PICARRAS">
+            <option value="ITAPEMA">
+            <option value="PORTO BELO">
+            <option value="BARRA VELHA">
+            <option value="LUIS ALVES">
+            <option value="BOMBINHAS">
+            <option value="TIJUCAS">
+            <option value="GASPAR">
+            <option value="ITAJAI">
+            <option value="Blumenau">
+        </datalist>
         <input type="text" id="valorFrete" placeholder="Valor frete (ex: 800.00)">
 
         <p id="textoOrcamento"></p>

@@ -463,10 +463,14 @@ function gerarStatus(tipo) {
     const nome = "Eduardo";
 
     const cidade =
-        $("cidade").value.toUpperCase() || "CIDADE";
+        $("cidade")
+            ? $("cidade").value.toUpperCase()
+            : "CIDADE";
 
     const frete =
-        $("valorFrete").value || "0.00";
+        $("valorFrete")
+            ? $("valorFrete").value
+            : "0.00";
 
     const mensagens = {
 
@@ -500,8 +504,12 @@ PROPOSTA VÁLIDA POR 7 DIAS`,
 `* FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR *
 PROPOSTA VÁLIDA POR 7 DIAS`,
 
-        CHEKLIST_Titulo:
-            `CHEKLIST - PTA - ${$("nomeCliente").value.toUpperCase()}`,
+    CHEKLIST_Titulo:
+        `CHEKLIST - PTA - ${
+            $("nomeCliente")
+                ? $("nomeCliente").value.toUpperCase()
+                : ""
+        }`,
 
         CHEKLIST_Mensagem:
 `Prezado Cliente,

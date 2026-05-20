@@ -199,3 +199,82 @@ button:hover{
     z-index: 9999;
     user-select: none;
 }
+
+
+/* =========================
+MODAL FRETES
+========================= */
+
+.modal-fretes {
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.7);
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+.modal-conteudo {
+
+    width: 500px;
+    max-width: 90%;
+
+    background: #111827;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    color: white;
+
+    max-height: 80vh;
+
+    overflow-y: auto;
+}
+
+.modal-topo {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.modal-topo button {
+
+    background: #ef4444;
+
+    border: none;
+
+    color: white;
+
+    width: 35px;
+    height: 35px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+.frete-item {
+
+    background: #1f2937;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    margin-bottom: 10px;
+
+    line-height: 1.5;
+}

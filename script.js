@@ -48,6 +48,155 @@ const formatarMoedaBR = (valor) => {
 // TABELA PREÇOS
 // ======================================
 let tabelaPrecos = {};
+let tabelasFrete = {};
+
+async function carregarFretes() {
+
+    const arquivos = [
+        "frete_Magnus.csv",
+        "frete_Kung.csv",
+        "frete_Jean.csv",
+        "frete_Dionisio.csv",
+        "frete_RR.csv"
+    ];
+
+    for (const arquivo of arquivos) {
+
+        try {
+
+            const resposta = await fetch(arquivo);
+            const texto = await resposta.text();
+
+            const linhas = texto.trim().split("\n");
+
+            const cabecalho =
+                linhas[0]
+                .replace("\r", "")
+                .split(";");
+
+            const transportador =
+                arquivo
+                .replace("frete_", "")
+                .replace(".csv", "");
+
+            tabelasFrete[transportador] = {};
+
+            for (let i = 1; i < linhas.length; i++) {
+
+                const colunas =
+                    linhas[i]
+                    .replace("\r", "")
+                    .split(";");
+
+                const modelo =
+                    colunas[0]
+                    .trim()
+                    .toUpperCase();
+
+                tabelasFrete[transportador][modelo] = {};
+
+                for (let j = 1; j < cabecalho.length; j++) {
+
+                    const cidade =
+                        cabecalho[j]
+                        .trim()
+                        .toUpperCase();
+
+                    const valor =
+                        colunas[j]
+                        ?.trim();
+
+                    tabelasFrete[transportador][modelo][cidade] = valor;
+                }
+            }
+
+        } catch (erro) {
+
+            console.log("Erro no arquivo:", arquivo);
+        }
+    }
+
+    console.log("Fretes carregados");
+}
+
+    function mostrarFretes() {
+
+        const modelo =
+            $("equipamento").value
+            .trim()
+            .toUpperCase();
+
+        const cidade =
+            $("cidade").value
+            .trim()
+            .toUpperCase();
+
+        if (!modelo || !cidade) return;
+
+        let html = "";
+
+        for (const transportador in tabelasFrete) {
+
+            // CSV inexistente
+            if (!tabelasFrete[transportador]) {
+
+                html += `
+                <div class="frete-item">
+                    ❌ <strong>${transportador}</strong><br>
+                    CSV não encontrado
+                </div>
+                `;
+
+                continue;
+            }
+
+            // modelo inexistente
+            if (!tabelasFrete[transportador][modelo]) {
+
+                html += `
+                <div class="frete-item">
+                    ⚠️ <strong>${transportador}</strong><br>
+                    Modelo "${modelo}" não encontrado
+                </div>
+                `;
+
+                continue;
+            }
+
+            const valor =
+                tabelasFrete[transportador][modelo][cidade];
+
+            // cidade inexistente
+            if (!valor || valor === "") {
+
+                html += `
+                <div class="frete-item">
+                    ⚠️ <strong>${transportador}</strong><br>
+                    Cidade "${cidade}" não encontrada
+                </div>
+                `;
+
+                continue;
+            }
+
+            // sucesso
+            html += `
+            <div class="frete-item">
+                ✅ <strong>${transportador}</strong><br>
+                R$ ${valor}
+            </div>
+            `;
+        }
+
+        $("resultadoFretes").innerHTML = html;
+
+        $("modalFretes").style.display = "flex";
+    }
+
+    function fecharModalFretes() {
+
+    $("modalFretes").style.display = "none";
+}
 
 async function carregarTabela(){
 
@@ -402,7 +551,8 @@ Obrigada.`,
         .split("T")[0];
 
     await carregarTabela();
-
+    await carregarFretes();
+    
     calcularDatas();
 
     $("data").addEventListener("change", calcularDatas);
@@ -418,12 +568,18 @@ Obrigada.`,
     $("nomeCliente").addEventListener("input", gerarTextos);
     $("equipamento").addEventListener("input", gerarTextos);
     $("periodo").addEventListener("input", gerarTextos);
-    $("cidade").addEventListener("input", gerarTextos);
+    $("cidade").addEventListener("change", () => {
+
+    gerarTextos();
+
+    mostrarFretes();
+    });
 
 })();
 
 
 function copiarPropostaZap(){
+
 
     const modelo = $("equipamento").value.toUpperCase().trim();
     const periodo = $("periodo").value.trim();

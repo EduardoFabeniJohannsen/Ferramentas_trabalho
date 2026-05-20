@@ -1,80 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
 <meta charset="UTF-8">
+
 <title>Propostas</title>
 
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="icon.png">
+
 </head>
 
 <body>
-
-    <input
-    type="text"
-    id="equipamento"
-    placeholder="Equipamento"
-    list="listaEquipamentos"
->
-
-<datalist id="listaEquipamentos">
-
-    <option value="WTE06M">
-    <option value="WTE6">
-    <option value="WTE8">
-    <option value="WTE10">
-    <option value="WTE12">
-    <option value="WTE14">
-    <option value="WTE16">
-    <option value="WTE12R">
-
-    <option value="WTD10">
-    <option value="WTD12">
-    <option value="WTD15">
-    <option value="WTD18">
-
-    <option value="WTLD21">
-    <option value="WTLD25">
-    <option value="WTLD41">
-
-    <option value="WAE12">
-    <option value="WAE14">
-    <option value="WAE15">
-    <option value="WAE16">
-    <option value="WAE17">
-    <option value="WAE18">
-    <option value="WAE18R">
-    <option value="WAE20">
-    <option value="WAE20R">
-    <option value="WAE22R">
-    <option value="WAE24R">
-    <option value="WAE28R">
-
-    <option value="WAD12">
-    <option value="WAD16">
-    <option value="WAD17">
-    <option value="WAD18">
-    <option value="WAD20">
-    <option value="WAD22">
-    <option value="WAD26">
-    <option value="WAD28">
-    <option value="WAD32">
-    <option value="WAD40">
-    <option value="WAD43">
-
-    <option value="WME08">
-    <option value="WME10">
-    <option value="WME11">
-
-    <option value="WQ8">
-    <option value="WQ9">
-    <option value="WQ12">
-    <option value="WQ14">
-
-    <option value="WCP20">
-    <option value="WMS05">
-
-</datalist>
 
 <div class="topbar">
 
@@ -91,7 +28,7 @@
     </a>
 
     <div class="versao">
-       v5.1.1
+        v5.1.2
     </div>
 
 </div>
@@ -141,18 +78,81 @@
 
         <hr>
 
+        <!-- EQUIPAMENTO -->
         <input
             type="text"
             id="equipamento"
             placeholder="Equipamento"
+            list="listaEquipamentos"
         >
 
+        <datalist id="listaEquipamentos">
+
+            <option value="WTE06M">
+            <option value="WTE6">
+            <option value="WTE8">
+            <option value="WTE10">
+            <option value="WTE12">
+            <option value="WTE14">
+            <option value="WTE16">
+            <option value="WTE12R">
+
+            <option value="WTD10">
+            <option value="WTD12">
+            <option value="WTD15">
+            <option value="WTD18">
+
+            <option value="WTLD21">
+            <option value="WTLD25">
+            <option value="WTLD41">
+
+            <option value="WAE12">
+            <option value="WAE14">
+            <option value="WAE15">
+            <option value="WAE16">
+            <option value="WAE17">
+            <option value="WAE18">
+            <option value="WAE18R">
+            <option value="WAE20">
+            <option value="WAE20R">
+            <option value="WAE22R">
+            <option value="WAE24R">
+            <option value="WAE28R">
+
+            <option value="WAD12">
+            <option value="WAD16">
+            <option value="WAD17">
+            <option value="WAD18">
+            <option value="WAD20">
+            <option value="WAD22">
+            <option value="WAD26">
+            <option value="WAD28">
+            <option value="WAD32">
+            <option value="WAD40">
+            <option value="WAD43">
+
+            <option value="WME08">
+            <option value="WME10">
+            <option value="WME11">
+
+            <option value="WQ8">
+            <option value="WQ9">
+            <option value="WQ12">
+            <option value="WQ14">
+
+            <option value="WCP20">
+            <option value="WMS05">
+
+        </datalist>
+
+        <!-- PERIODO -->
         <input
             type="text"
             id="periodo"
             placeholder="Período"
         >
 
+        <!-- CIDADE -->
         <input
             type="text"
             id="cidade"
@@ -161,6 +161,7 @@
         >
 
         <datalist id="listaCidades">
+
             <option value="BC">
             <option value="CAMBORIU">
             <option value="NAVEGANTES">
@@ -176,8 +177,10 @@
             <option value="GASPAR">
             <option value="ITAJAI">
             <option value="BLUMENAU">
+
         </datalist>
 
+        <!-- FRETE -->
         <input
             type="text"
             id="valorFrete"

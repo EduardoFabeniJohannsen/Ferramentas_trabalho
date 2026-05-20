@@ -37,6 +37,13 @@ const mostrarToast = (msg) => {
     }, 2000);
 };
 
+const formatarMoedaBR = (valor) => {
+    return Number(valor).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+};
+
 // ======================================
 // TABELA PREÇOS
 // ======================================
@@ -480,12 +487,12 @@ function copiarPropostaZap(){
 * Altura de trabalho: ${altura} metros
 * Período de locação: ${periodoExibicao} dias
 
-💰 Valor da locação: R$ ${valorLocacao.toFixed(2)}
-🛡️ Seguro contra acidentes e furtos (opcional): R$ ${seguro.toFixed(2)}
+💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacao)}
+🛡️ Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguro)}
 
-💵 Total máquina + seguro: R$ ${total.toFixed(2)}${
+💵 Total máquina + seguro: R$ ${formatarMoedaBR(total)}${
     multiplicador > 1
-        ? ` * ${multiplicador} períodos = R$ ${(total * multiplicador).toFixed(2)}`
+        ? ` * ${multiplicador} períodos = R$ ${formatarMoedaBR(total * multiplicador)}`
         : ""
 }
 

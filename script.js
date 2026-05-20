@@ -613,7 +613,12 @@ Obrigada.`,
 
         $("equipamento").addEventListener(
             "input",
-            gerarTextos
+            () => {
+
+                gerarTextos();
+
+                mostrarFretes();
+            }
         );
     }
 

@@ -85,6 +85,16 @@ LAYOUT
     padding:90px 20px 40px;
 }
 
+/* coluna esquerda */
+.coluna-esquerda{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+}
+
 /* =========================
 CARDS
 ========================= */
@@ -345,36 +355,7 @@ TOAST
 }
 
 
-/* =========================
-AGENDAMENTO
-========================= */
 
-.agendamento-linha{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:flex-start;
-
-    margin-bottom:12px;
-}
-
-.agendamento-linha label{
-
-    margin-bottom:5px;
-
-    font-size:14px;
-
-    color:#cbd5e1;
-
-    font-weight:bold;
-}
-
-.agendamento-linha input{
-
-    margin-bottom:0;
-}
 
 .duplo{
 
@@ -403,4 +384,128 @@ AGENDAMENTO
     border-radius:8px;
     font-size:22px;
     cursor:pointer;
+}
+
+
+
+.agendamento-linha{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:8px;
+}
+
+.agendamento-linha label{
+
+    width:130px;
+
+    margin:0;
+
+    font-size:14px;
+
+    color:#cbd5e1;
+
+    font-weight:bold;
+
+    text-align:left;
+
+    flex-shrink:0;
+}
+
+.agendamento-linha input{
+
+    flex:1;
+
+    margin:0;
+}
+
+
+.card hr{
+
+    margin:10px 0;
+}
+
+.card p{
+
+    margin:6px 0;
+}
+
+.card button{
+
+    margin-top:6px;
+}
+
+.card input{
+
+    margin-bottom:8px;
+}
+
+
+#textoOrcamento{
+
+    margin:6px 0;
+}
+
+.container{
+
+    align-items:flex-start;
+}
+
+.coluna{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:20px;
+}
+
+/* =========================
+GERAR TEXTOS + DESCONTO
+========================= */
+
+.coluna-esquerda{
+
+    gap:12px;
+}
+
+.coluna-esquerda .card{
+
+    padding:18px;
+}
+
+.coluna-esquerda .card h2{
+
+    margin-top:0;
+    margin-bottom:1px;
+}
+
+.coluna-esquerda .card input{
+
+    margin-bottom:1px;
+}
+
+.coluna-esquerda .card button{
+
+    margin-top:4px;
+}
+
+.coluna-esquerda .card hr{
+
+    margin:8px 0;
+}
+
+.coluna-esquerda .card p{
+
+    margin:4px 0;
+}
+
+#textoOportunidade,
+#textoOrcamento{
+
+    margin:1px 0;
+    min-height:18px;
 }

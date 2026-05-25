@@ -28,302 +28,308 @@
     </a>
 
     <div class="versao">
-        v5.2.0
+        v5.2.1
     </div>
 
 </div>
 
 <div class="container">
 
-<!-- AGENDAMENTO -->
-<div class="card">
+    <!-- AGENDAMENTO -->
+    <div class="card">
 
-    <h2>Agendamento de Entrega</h2>
+        <h2>Agendamento de Entrega</h2>
 
-    <div class="agendamento-linha">
-        <span>🚚 AGENDAMENTO DE ENTREGA</span>
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Data:</label>
-        <input type="text" id="agData" placeholder="hora">
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Horário:</label>
-        <input type="text" id="agHorario" placeholder="hora">
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Equipamento:</label>
-        <input type="text" id="agEquipamento" placeholder="PEMT">
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Local de Saída:</label>
-        <input type="text" id="agSaida" value="WR">
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Local de entrega:</label>
-        <input type="text" id="agEntrega" placeholder="Nome_do_Local">
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Endereço:</label>
-        <input type="text" id="agEndereco" placeholder="Endereço">
-    </div>
-
-    <div class="agendamento-linha">
-        <label>Contato:</label>
-
-        <div class="duplo">
-            <input type="text" id="agContato" placeholder="Nome">
-            <input type="text" id="agNumero" placeholder="Número">
+        <div class="agendamento-linha">
+            <span>🚚 AGENDAMENTO DE ENTREGA</span>
         </div>
-    </div>
+
+        <div class="agendamento-linha">
+            <label>Data:</label>
+            <input type="text" id="agData" placeholder="hora">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Horário:</label>
+            <input type="text" id="agHorario" placeholder="hora">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Equipamento:</label>
+            <input type="text" id="agEquipamento" placeholder="PEMT">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Local de Saída:</label>
+            <input type="text" id="agSaida" value="WR">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Local de entrega:</label>
+            <input type="text" id="agEntrega" placeholder="Nome_do_Local">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Endereço:</label>
+            <input type="text" id="agEndereco" placeholder="Endereço">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Contato:</label>
+
+            <div class="duplo">
+                <input type="text" id="agContato" placeholder="Nome">
+                <input type="text" id="agNumero" placeholder="Número">
+            </div>
+        </div>
+
         <div class="linha-agendamento">
 
-        <select id="tipoFrete" class="input-mini">
+            <select id="tipoFrete" class="input-mini">
 
-            <option value="CLIENTE">
-                Por conta do cliente
-            </option>
+                <option value="CLIENTE">
+                    Por conta do cliente
+                </option>
 
-            <option value="NOSSA">
-                Por nossa conta
-            </option>
+                <option value="NOSSA">
+                    Por nossa conta
+                </option>
 
-        </select>
+            </select>
 
-        <input
-            type="text"
-            id="agendamentoValorFrete"
-            class="input-flex"
-            placeholder='Valor frete'
-        >
-
-    </div>
-    <div class="agendamento-linha">
-        <label>Nome proposta:</label>
-        <input type="text" id="agNomeProposta" placeholder="Nome">
-    </div>
-
-
-    <hr>
-    
-<div id="blocoFinanceiro">
-
-    <div class="financeiro-topo">
-
-        <h3>📍 Financeiro</h3>
-
-        <button
-            type="button"
-            class="btn-add"
-            onclick="adicionarFinanceiro()"
-        >
-            +
-        </button>
-
-    </div>
-
-    <div id="listaFinanceiros">
-
-        <div class="financeiro-item">
-
-            <div class="agendamento-linha">
-                <label>Nome:</label>
-                <input type="text" class="financeiroNome">
-            </div>
-
-            <div class="agendamento-linha">
-                <label>Telefone:</label>
-                <input type="text" class="financeiroTelefone">
-            </div>
-
-            <div class="agendamento-linha">
-                <label>Email:</label>
-                <input type="text" class="financeiroEmail">
-            </div>
-
-            <hr>
+            <input
+                type="text"
+                id="agendamentoValorFrete"
+                class="input-flex"
+                placeholder="Valor frete"
+            >
 
         </div>
 
-    </div>
-
-</div>
-
-    <button onclick="copiarAgendamento()">
-        Copiar Agendamento
-    </button>
-
-</div>
-
-    <!-- DESCONTO -->
-    <div class="card">
-
-        <h2>Calcular Desconto</h2>
-
-        <input
-            type="text"
-            id="valorTabela"
-            placeholder="Valor tabela"
-        >
-
-        <input
-            type="text"
-            id="valorDesejado"
-            placeholder="Valor desejado"
-        >
-
-        <p>
-            Desconto:
-            <span id="desconto"></span>
-        </p>
-
-    </div>
-
-    <!-- GERAR TEXTOS -->
-    <div class="card">
-
-        <h2>Gerar Textos</h2>
-
-        <input
-            type="text"
-            id="nomeCliente"
-            placeholder="Nome do cliente"
-        >
-
-        <p id="textoOportunidade"></p>
-
-        <button onclick="copiarTexto('textoOportunidade')">
-            Copiar Oportunidade ZOHO
-        </button>
+        <div class="agendamento-linha">
+            <label>Nome proposta:</label>
+            <input type="text" id="agNomeProposta" placeholder="Nome">
+        </div>
 
         <hr>
 
-        <!-- EQUIPAMENTO -->
-        <input
-            type="text"
-            id="equipamento"
-            placeholder="Equipamento"
-            list="listaEquipamentos"
-        >
+        <div id="blocoFinanceiro">
 
-        <datalist id="listaEquipamentos">
+            <div class="financeiro-topo">
 
-            <option value="WTE06M">
-            <option value="WTE6">
-            <option value="WTE8">
-            <option value="WTE10">
-            <option value="WTE12">
-            <option value="WTE14">
-            <option value="WTE16">
-            <option value="WTE12R">
+                <h3>📍 Financeiro</h3>
 
-            <option value="WTD10">
-            <option value="WTD12">
-            <option value="WTD15">
-            <option value="WTD18">
+                <button
+                    type="button"
+                    class="btn-add"
+                    onclick="adicionarFinanceiro()"
+                >
+                    +
+                </button>
 
-            <option value="WTLD21">
-            <option value="WTLD25">
-            <option value="WTLD41">
+            </div>
 
-            <option value="WAE12">
-            <option value="WAE14">
-            <option value="WAE15">
-            <option value="WAE16">
-            <option value="WAE17">
-            <option value="WAE18">
-            <option value="WAE18R">
-            <option value="WAE20">
-            <option value="WAE20R">
-            <option value="WAE22R">
-            <option value="WAE24R">
-            <option value="WAE28R">
+            <div id="listaFinanceiros">
 
-            <option value="WAD12">
-            <option value="WAD16">
-            <option value="WAD17">
-            <option value="WAD18">
-            <option value="WAD20">
-            <option value="WAD22">
-            <option value="WAD26">
-            <option value="WAD28">
-            <option value="WAD32">
-            <option value="WAD40">
-            <option value="WAD43">
+                <div class="financeiro-item">
 
-            <option value="WME08">
-            <option value="WME10">
-            <option value="WME11">
+                    <div class="agendamento-linha">
+                        <label>Nome:</label>
+                        <input type="text" class="financeiroNome">
+                    </div>
 
-            <option value="WQ8">
-            <option value="WQ9">
-            <option value="WQ12">
-            <option value="WQ14">
+                    <div class="agendamento-linha">
+                        <label>Telefone:</label>
+                        <input type="text" class="financeiroTelefone">
+                    </div>
 
-            <option value="WCP20">
-            <option value="WMS05">
+                    <div class="agendamento-linha">
+                        <label>Email:</label>
+                        <input type="text" class="financeiroEmail">
+                    </div>
 
-        </datalist>
+                    <hr>
 
-        <!-- PERIODO -->
-        <input
-            type="text"
-            id="periodo"
-            placeholder="Período"
-        >
+                </div>
 
-        <!-- CIDADE -->
-        <input
-            type="text"
-            id="cidade"
-            placeholder="Cidade"
-            list="listaCidades"
-        >
+            </div>
 
-        <datalist id="listaCidades">
+        </div>
 
-            <option value="BC">
-            <option value="CAMBORIU">
-            <option value="NAVEGANTES">
-            <option value="ILHOTA">
-            <option value="PENHA">
-            <option value="PICARRAS">
-            <option value="ITAPEMA">
-            <option value="PORTO BELO">
-            <option value="BARRA VELHA">
-            <option value="LUIS ALVES">
-            <option value="BOMBINHAS">
-            <option value="TIJUCAS">
-            <option value="GASPAR">
-            <option value="ITAJAI">
-            <option value="BLUMENAU">
-
-        </datalist>
-
-        <!-- FRETE -->
-        <input
-            type="text"
-            id="valorFrete"
-            placeholder="Valor frete"
-        >
-
-        <p id="textoOrcamento"></p>
-
-        <button onclick="copiarTexto('textoOrcamento')">
-            Copiar Proposta ZOHO
+        <button onclick="copiarAgendamento()">
+            Copiar Agendamento
         </button>
 
-        <br><br>
+    </div>
 
-        <button onclick="copiarPropostaZap()">
-            Copiar Proposta Zap
-        </button>
+    <!-- COLUNA ESQUERDA -->
+    <div class="coluna-esquerda">
+
+        <!-- GERAR TEXTOS -->
+        <div class="card">
+
+            <h2>Gerar Textos</h2>
+
+            <input
+                type="text"
+                id="nomeCliente"
+                placeholder="Nome do cliente"
+            >
+
+            <p id="textoOportunidade"></p>
+
+            <button onclick="copiarTexto('textoOportunidade')">
+                Copiar Oportunidade ZOHO
+            </button>
+
+            <hr>
+
+            <!-- EQUIPAMENTO -->
+            <input
+                type="text"
+                id="equipamento"
+                placeholder="Equipamento"
+                list="listaEquipamentos"
+            >
+
+            <datalist id="listaEquipamentos">
+
+                <option value="WTE06M">
+                <option value="WTE6">
+                <option value="WTE8">
+                <option value="WTE10">
+                <option value="WTE12">
+                <option value="WTE14">
+                <option value="WTE16">
+                <option value="WTE12R">
+
+                <option value="WTD10">
+                <option value="WTD12">
+                <option value="WTD15">
+                <option value="WTD18">
+
+                <option value="WTLD21">
+                <option value="WTLD25">
+                <option value="WTLD41">
+
+                <option value="WAE12">
+                <option value="WAE14">
+                <option value="WAE15">
+                <option value="WAE16">
+                <option value="WAE17">
+                <option value="WAE18">
+                <option value="WAE18R">
+                <option value="WAE20">
+                <option value="WAE20R">
+                <option value="WAE22R">
+                <option value="WAE24R">
+                <option value="WAE28R">
+
+                <option value="WAD12">
+                <option value="WAD16">
+                <option value="WAD17">
+                <option value="WAD18">
+                <option value="WAD20">
+                <option value="WAD22">
+                <option value="WAD26">
+                <option value="WAD28">
+                <option value="WAD32">
+                <option value="WAD40">
+                <option value="WAD43">
+
+                <option value="WME08">
+                <option value="WME10">
+                <option value="WME11">
+
+                <option value="WQ8">
+                <option value="WQ9">
+                <option value="WQ12">
+                <option value="WQ14">
+
+                <option value="WCP20">
+                <option value="WMS05">
+
+            </datalist>
+
+            <!-- PERIODO -->
+            <input
+                type="text"
+                id="periodo"
+                placeholder="Período"
+            >
+
+            <!-- CIDADE -->
+            <input
+                type="text"
+                id="cidade"
+                placeholder="Cidade"
+                list="listaCidades"
+            >
+
+            <datalist id="listaCidades">
+
+                <option value="BC">
+                <option value="CAMBORIU">
+                <option value="NAVEGANTES">
+                <option value="ILHOTA">
+                <option value="PENHA">
+                <option value="PICARRAS">
+                <option value="ITAPEMA">
+                <option value="PORTO BELO">
+                <option value="BARRA VELHA">
+                <option value="LUIS ALVES">
+                <option value="BOMBINHAS">
+                <option value="TIJUCAS">
+                <option value="GASPAR">
+                <option value="ITAJAI">
+                <option value="BLUMENAU">
+
+            </datalist>
+
+            <!-- FRETE -->
+            <input
+                type="text"
+                id="valorFrete"
+                placeholder="Valor frete"
+            >
+
+            <p id="textoOrcamento"></p>
+
+            <button onclick="copiarTexto('textoOrcamento')">
+                Copiar Proposta ZOHO
+            </button>
+
+            <br><br>
+
+            <button onclick="copiarPropostaZap()">
+                Copiar Proposta Zap
+            </button>
+
+        </div>
+
+        <!-- DESCONTO -->
+        <div class="card">
+
+            <h2>Calcular Desconto</h2>
+
+            <input
+                type="text"
+                id="valorTabela"
+                placeholder="Valor tabela"
+            >
+
+            <input
+                type="text"
+                id="valorDesejado"
+                placeholder="Valor desejado"
+            >
+
+            <p>
+                Desconto:
+                <span id="desconto"></span>
+            </p>
+
+        </div>
 
     </div>
 

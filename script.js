@@ -743,3 +743,95 @@ function copiarPropostaZap(){
     navigator.clipboard.writeText(texto);
     mostrarToast("Proposta Zap copiada");
 }
+
+function copiarAgendamento(){
+
+    const data =
+        $("agData").value || '"hora"';
+
+    const horario =
+        $("agHorario").value || '"hora"';
+
+    const equipamento =
+        $("agEquipamento").value || '"PEMT"';
+
+    const saida =
+        $("agSaida").value || "WR";
+
+    const entrega =
+        $("agEntrega").value || '"Nome_do_Local"';
+
+    const endereco =
+        $("agEndereco").value || '"Endereço"';
+
+    const contato =
+        $("agContato").value.trim();
+
+    const numero =
+        $("agNumero").value.trim();
+
+    const frete =
+        $("agFrete").value || '"Valor"';
+
+    const nomeProposta =
+        $("agNomeProposta").value || '"Nome_Proposta"';
+
+    const numeroProposta =
+        $("agNumeroProposta").value || '"Número_da_Proposta"';
+
+    const financeiroNome =
+        $("agFinanceiroNome").value || '"nome"';
+
+    const financeiroTelefone =
+        $("agFinanceiroTelefone").value || '"telefone"';
+
+    const financeiroEmail =
+        $("agFinanceiroEmail").value || '"email"';
+
+    let blocoContato = "";
+
+    if(contato && numero){
+
+        blocoContato =
+`Contato de quem vai receber: ${contato} - ${numero}`;
+
+    }else{
+
+        blocoContato =
+`Contato de quem vai receber: abaixo ⤵️`;
+    }
+
+    const texto =
+`🚚 AGENDAMENTO DE ENTREGA
+
+Data: ${data}
+Horário: ${horario}
+
+Equipamento: ${equipamento}
+
+Local de Saída: ${saida}
+
+Local de entrega: ${entrega}
+
+Endereço: ${endereco}
+
+${blocoContato}
+
+* FRETE POR CONTA DO CLIENTE - R$ ${frete}
+
+* ${nomeProposta} - Proposta: ${numeroProposta}
+
+* Contatos: ⤵️
+
+📍Financeiro:
+
+Nome: ${financeiroNome}
+
+Telefone: ${financeiroTelefone}
+
+Email: ${financeiroEmail}`;
+
+    copiar(texto);
+
+    mostrarToast("Agendamento copiado");
+}

@@ -343,3 +343,48 @@ TOAST
 
     transform:translateY(0);
 }
+
+
+/* =========================
+AGENDAMENTO
+========================= */
+
+.agendamento-linha{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    margin-bottom:12px;
+}
+
+.agendamento-linha label{
+
+    margin-bottom:5px;
+
+    font-size:14px;
+
+    color:#cbd5e1;
+
+    font-weight:bold;
+}
+
+.agendamento-linha input{
+
+    margin-bottom:0;
+}
+
+.duplo{
+
+    display:flex;
+
+    gap:10px;
+
+    width:100%;
+}
+
+.duplo input{
+    flex:1;
+}

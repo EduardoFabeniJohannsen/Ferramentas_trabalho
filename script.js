@@ -817,11 +817,8 @@ function copiarAgendamento(){
 
         financeiroTexto =
 `
-
 * Contatos: ⤵️
-
 📍Financeiro:
-
 Nome: ${financeiroNome}
 Telefone: ${financeiroTelefone}
 Email: ${financeiroEmail}`;
@@ -836,7 +833,6 @@ Email: ${financeiroEmail}`;
 Data: ${data}
 Horário: ${horario}
 Equipamento: ${equipamento}
-
 Local de Saída: ${saida}
 Local de entrega: ${entrega}
 Endereço: ${endereco}

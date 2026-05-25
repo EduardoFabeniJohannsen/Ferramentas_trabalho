@@ -28,7 +28,7 @@
     </a>
 
     <div class="versao">
-        v5.1.7
+        v5.1.8
     </div>
 
 </div>
@@ -105,37 +105,32 @@
 
     </div>
     <div class="agendamento-linha">
-        <label>Frete:</label>
-        <input type="text" id="agFrete" placeholder="Valor">
-    </div>
-
-    <div class="agendamento-linha">
         <label>Nome proposta:</label>
         <input type="text" id="agNomeProposta" placeholder="Nome">
     </div>
 
-    <div class="agendamento-linha">
-        <label>Número proposta:</label>
-        <input type="text" id="agNumeroProposta" placeholder="Número">
-    </div>
 
     <hr>
     
-    <h3>📍 Financeiro</h3>
+    <div id="blocoFinanceiro">
 
-    <div class="agendamento-linha">
-        <label>Nome:</label>
-        <input type="text" id="agFinanceiroNome">
-    </div>
+        <h3>📍 Financeiro</h3>
 
-    <div class="agendamento-linha">
-        <label>Telefone:</label>
-        <input type="text" id="agFinanceiroTelefone">
-    </div>
+        <div class="agendamento-linha">
+            <label>Nome:</label>
+            <input type="text" id="agFinanceiroNome">
+        </div>
 
-    <div class="agendamento-linha">
-        <label>Email:</label>
-        <input type="text" id="agFinanceiroEmail">
+        <div class="agendamento-linha">
+            <label>Telefone:</label>
+            <input type="text" id="agFinanceiroTelefone">
+        </div>
+
+        <div class="agendamento-linha">
+            <label>Email:</label>
+            <input type="text" id="agFinanceiroEmail">
+        </div>
+
     </div>
 
     <button onclick="copiarAgendamento()">

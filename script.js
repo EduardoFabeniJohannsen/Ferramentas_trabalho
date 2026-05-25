@@ -783,9 +783,6 @@ function copiarAgendamento(){
     const nomeProposta =
         $("agNomeProposta").value || '"Nome_Proposta"';
 
-    const numeroProposta =
-        $("agNumeroProposta").value || '"Número_da_Proposta"';
-
     const financeiroNome =
         $("agFinanceiroNome").value || '"nome"';
 
@@ -795,6 +792,9 @@ function copiarAgendamento(){
     const financeiroEmail =
         $("agFinanceiroEmail").value || '"email"';
 
+    // =========================
+    // CONTATO
+    // =========================
     let blocoContato = "";
 
     if(contato && numero){
@@ -808,6 +808,28 @@ function copiarAgendamento(){
 `Contato de quem vai receber: abaixo ⤵️`;
     }
 
+    // =========================
+    // FINANCEIRO
+    // =========================
+    let financeiroTexto = "";
+
+    if(tipoFrete !== "NOSSA"){
+
+        financeiroTexto =
+`
+
+* Contatos: ⤵️
+
+📍Financeiro:
+
+Nome: ${financeiroNome}
+Telefone: ${financeiroTelefone}
+Email: ${financeiroEmail}`;
+    }
+
+    // =========================
+    // TEXTO FINAL
+    // =========================
     const texto =
 `🚚 AGENDAMENTO DE ENTREGA
 
@@ -826,15 +848,29 @@ ${blocoContato}
         ? "NOSSA CONTA"
         : "CONTA DO CLIENTE"
 } - R$ ${frete}
-* ${nomeProposta} - Proposta: ${numeroProposta}
-* Contatos: ⤵️
-📍Financeiro:
-
-Nome: ${financeiroNome}
-Telefone: ${financeiroTelefone}
-Email: ${financeiroEmail}`;
+* ${nomeProposta}${financeiroTexto}`;
 
     copiar(texto);
 
     mostrarToast("Agendamento copiado");
+}
+
+const tipoFreteSelect = $("tipoFrete");
+
+if(tipoFreteSelect){
+
+    tipoFreteSelect.addEventListener("change", () => {
+
+        const bloco =
+            $("blocoFinanceiro");
+
+        if(tipoFreteSelect.value === "NOSSA"){
+
+            bloco.style.display = "none";
+
+        }else{
+
+            bloco.style.display = "block";
+        }
+    });
 }

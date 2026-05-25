@@ -806,29 +806,20 @@ function copiarAgendamento(){
 
 Data: ${data}
 Horário: ${horario}
-
-Equipamento: ${equipamento}
-
 Local de Saída: ${saida}
-
 Local de entrega: ${entrega}
-
 Endereço: ${endereco}
 
 ${blocoContato}
 
 * FRETE POR CONTA DO CLIENTE - R$ ${frete}
-
 * ${nomeProposta} - Proposta: ${numeroProposta}
-
 * Contatos: ⤵️
 
 📍Financeiro:
 
 Nome: ${financeiroNome}
-
 Telefone: ${financeiroTelefone}
-
 Email: ${financeiroEmail}`;
 
     copiar(texto);

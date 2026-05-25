@@ -783,15 +783,6 @@ function copiarAgendamento(){
     const nomeProposta =
         $("agNomeProposta").value || '"Nome_Proposta"';
 
-    const financeiroNome =
-        $("agFinanceiroNome").value || '"nome"';
-
-    const financeiroTelefone =
-        $("agFinanceiroTelefone").value || '"telefone"';
-
-    const financeiroEmail =
-        $("agFinanceiroEmail").value || '"email"';
-
     // =========================
     // CONTATO
     // =========================
@@ -815,13 +806,56 @@ function copiarAgendamento(){
 
     if(tipoFrete !== "NOSSA"){
 
-        financeiroTexto =
+        const financeiros =
+            document.querySelectorAll(".financeiro-item");
+
+        let listaFinanceiros = "";
+
+        financeiros.forEach((item) => {
+
+            const nome =
+                item.querySelector(".financeiroNome")
+                ?.value
+                .trim();
+
+            const telefone =
+                item.querySelector(".financeiroTelefone")
+                ?.value
+                .trim();
+
+            const email =
+                item.querySelector(".financeiroEmail")
+                ?.value
+                .trim();
+
+            let bloco = "";
+
+            if(nome){
+                bloco += `Nome: ${nome}\n`;
+            }
+
+            if(telefone){
+                bloco += `Telefone: ${telefone}\n`;
+            }
+
+            if(email){
+                bloco += `Email: ${email}\n`;
+            }
+
+            if(bloco.trim()){
+                listaFinanceiros += `
+${bloco}`;
+            }
+        });
+
+        if(listaFinanceiros.trim()){
+
+            financeiroTexto =
 `
 * Contatos: ⤵️
 📍Financeiro:
-Nome: ${financeiroNome}
-Telefone: ${financeiroTelefone}
-Email: ${financeiroEmail}`;
+${listaFinanceiros}`;
+        }
     }
 
     // =========================
@@ -833,23 +867,24 @@ Email: ${financeiroEmail}`;
 Data: ${data}
 Horário: ${horario}
 Equipamento: ${equipamento}
+
 Local de Saída: ${saida}
 Local de entrega: ${entrega}
 Endereço: ${endereco}
 
 ${blocoContato}
-
 * FRETE POR ${
     tipoFrete === "NOSSA"
         ? "NOSSA CONTA"
         : "CONTA DO CLIENTE"
 } - R$ ${frete}
 * ${nomeProposta}${financeiroTexto}`;
-
     copiar(texto);
 
     mostrarToast("Agendamento copiado");
 }
+
+
 
 const tipoFreteSelect = $("tipoFrete");
 
@@ -869,4 +904,37 @@ if(tipoFreteSelect){
             bloco.style.display = "block";
         }
     });
+}
+
+
+function adicionarFinanceiro(){
+
+    const lista =
+        $("listaFinanceiros");
+
+    lista.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="financeiro-item">
+
+            <div class="agendamento-linha">
+                <label>Nome:</label>
+                <input type="text" class="financeiroNome">
+            </div>
+
+            <div class="agendamento-linha">
+                <label>Telefone:</label>
+                <input type="text" class="financeiroTelefone">
+            </div>
+
+            <div class="agendamento-linha">
+                <label>Email:</label>
+                <input type="text" class="financeiroEmail">
+            </div>
+
+            <hr>
+
+        </div>
+        `
+    );
 }

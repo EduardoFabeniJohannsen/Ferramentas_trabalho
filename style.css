@@ -388,3 +388,19 @@ AGENDAMENTO
 .duplo input{
     flex:1;
 }
+
+.financeiro-topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.btn-add{
+    width:35px;
+    height:35px;
+    border:none;
+    border-radius:8px;
+    font-size:22px;
+    cursor:pointer;
+}

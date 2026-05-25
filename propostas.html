@@ -28,7 +28,7 @@
     </a>
 
     <div class="versao">
-        v5.1.9
+        v5.2.0
     </div>
 
 </div>
@@ -112,26 +112,48 @@
 
     <hr>
     
-    <div id="blocoFinanceiro">
+<div id="blocoFinanceiro">
+
+    <div class="financeiro-topo">
 
         <h3>📍 Financeiro</h3>
 
-        <div class="agendamento-linha">
-            <label>Nome:</label>
-            <input type="text" id="agFinanceiroNome">
-        </div>
+        <button
+            type="button"
+            class="btn-add"
+            onclick="adicionarFinanceiro()"
+        >
+            +
+        </button>
 
-        <div class="agendamento-linha">
-            <label>Telefone:</label>
-            <input type="text" id="agFinanceiroTelefone">
-        </div>
+    </div>
 
-        <div class="agendamento-linha">
-            <label>Email:</label>
-            <input type="text" id="agFinanceiroEmail">
+    <div id="listaFinanceiros">
+
+        <div class="financeiro-item">
+
+            <div class="agendamento-linha">
+                <label>Nome:</label>
+                <input type="text" class="financeiroNome">
+            </div>
+
+            <div class="agendamento-linha">
+                <label>Telefone:</label>
+                <input type="text" class="financeiroTelefone">
+            </div>
+
+            <div class="agendamento-linha">
+                <label>Email:</label>
+                <input type="text" class="financeiroEmail">
+            </div>
+
+            <hr>
+
         </div>
 
     </div>
+
+</div>
 
     <button onclick="copiarAgendamento()">
         Copiar Agendamento

@@ -826,11 +826,8 @@ ${blocoContato}
         ? "NOSSA CONTA"
         : "CONTA DO CLIENTE"
 } - R$ ${frete}
-
 * ${nomeProposta} - Proposta: ${numeroProposta}
-
 * Contatos: ⤵️
-
 📍Financeiro:
 
 Nome: ${financeiroNome}

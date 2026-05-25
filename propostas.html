@@ -28,7 +28,7 @@
     </a>
 
     <div class="versao">
-        v5.1.5
+        v5.1.6
     </div>
 
 </div>
@@ -82,7 +82,28 @@
             <input type="text" id="agNumero" placeholder="Número">
         </div>
     </div>
+        <div class="linha-agendamento">
 
+        <select id="tipoFrete" class="input-mini">
+
+            <option value="CLIENTE">
+                Por conta do cliente
+            </option>
+
+            <option value="NOSSA">
+                Por nossa conta
+            </option>
+
+        </select>
+
+        <input
+            type="text"
+            id="agendamentoValorFrete"
+            class="input-flex"
+            placeholder='Valor frete'
+        >
+
+    </div>
     <div class="agendamento-linha">
         <label>Frete:</label>
         <input type="text" id="agFrete" placeholder="Valor">
@@ -99,7 +120,7 @@
     </div>
 
     <hr>
-
+    
     <h3>📍 Financeiro</h3>
 
     <div class="agendamento-linha">

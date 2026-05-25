@@ -663,7 +663,11 @@ function copiarPropostaZap(){
     const modelo = $("equipamento").value.toUpperCase().trim();
     const periodo = $("periodo").value.trim();
     const cidade = $("cidade").value.trim();
-    const valorFrete = $("valorFrete").value.trim();
+    const valorFrete =
+    $("agendamentoValorFrete").value.trim();
+
+    const tipoFrete =
+        $("tipoFrete").value;
 
     const diasNumero = Number(periodo);
 
@@ -771,7 +775,10 @@ function copiarAgendamento(){
         $("agNumero").value.trim();
 
     const frete =
-        $("agFrete").value || '"Valor"';
+        $("agendamentoValorFrete").value || '"Valor"';
+
+    const tipoFrete =
+        $("tipoFrete").value;
 
     const nomeProposta =
         $("agNomeProposta").value || '"Nome_Proposta"';
@@ -806,14 +813,22 @@ function copiarAgendamento(){
 
 Data: ${data}
 Horário: ${horario}
+Equipamento: ${equipamento}
+
 Local de Saída: ${saida}
 Local de entrega: ${entrega}
 Endereço: ${endereco}
 
 ${blocoContato}
 
-* FRETE POR CONTA DO CLIENTE - R$ ${frete}
+* FRETE POR ${
+    tipoFrete === "NOSSA"
+        ? "NOSSA CONTA"
+        : "CONTA DO CLIENTE"
+} - R$ ${frete}
+
 * ${nomeProposta} - Proposta: ${numeroProposta}
+
 * Contatos: ⤵️
 
 📍Financeiro:

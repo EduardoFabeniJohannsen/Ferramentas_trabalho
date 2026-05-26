@@ -659,12 +659,12 @@ Obrigada.`,
 
 function copiarPropostaZap(){
 
-
     const modelo = $("equipamento").value.toUpperCase().trim();
     const periodo = $("periodo").value.trim();
     const cidade = $("cidade").value.trim();
+
     const valorFrete =
-    $("agendamentoValorFrete").value.trim();
+        $("valorFrete").value.trim();
 
     const tipoFrete =
         $("tipoFrete").value;

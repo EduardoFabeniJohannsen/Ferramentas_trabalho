@@ -492,11 +492,15 @@ function gerarStatus(tipo) {
 * Frete entrega: R$ ${frete} - ITAJAÍ x ${cidade}
 * Frete retirada: R$ ${frete} - ${cidade} x ITAJAÍ
 
+-Valores sujeitos à alteração no retorno conforme reajustes de mercado, combustível, pedágios e inflação do período (IPCA).
+-Alteração de endereço de entrega/coleta poderá alterar o valor do frete.
+-Não nos responsabilizamos por custos de hora parada.
+
 Transportadores Indicados:
 JEAN RICARDO SPIESS 47 99763-3333
 KUNG 47 9616-5616
 MAGNUS 47 9754-0321
-RR (SOMENTE ATÉ WTE12)
+RR 47 9180-5385 (SOMENTE ATÉ WTE12)
 
 PROPOSTA VÁLIDA POR 7 DIAS`,
 

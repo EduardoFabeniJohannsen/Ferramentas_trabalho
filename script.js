@@ -664,7 +664,12 @@ function copiarPropostaZap(){
     const cidade = $("cidade").value.trim();
 
     const valorFrete =
-        $("valorFrete").value.trim();
+    Number(
+        $("valorFrete").value
+        .replace(",", ".")
+    )
+    .toFixed(2)
+    .replace(".", ",");
 
     const tipoFrete =
         $("tipoFrete").value;

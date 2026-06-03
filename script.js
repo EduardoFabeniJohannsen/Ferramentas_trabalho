@@ -343,28 +343,56 @@ function calcularValor() {
 // DESCONTO
 // ======================================
 function calcularDesconto() {
-    const tabela = $("valorTabela").value;
-    const desejado = $("valorDesejado").value;
 
-    if (!tabela || !desejado) return;
+    const tabela =
+        brToNumber($("valorTabela").value);
 
-    const valorTabela = brToNumber(tabela);
-    const valorDesejado = brToNumber(desejado);
-
-    if (!valorTabela || !valorDesejado) return;
-
-    const desconto =
-        valorTabela - valorDesejado;
+    const desejado =
+        brToNumber($("valorDesejado").value);
 
     const percentual =
-        (desconto / valorTabela) * 100;
+        brToNumber($("percentualDesconto").value);
 
-    $("desconto").innerHTML = `
-        ${desconto.toFixed(2)}<br>
-        <span style="color:#94a3b8">
-            Desconto de ${percentual.toFixed(2)}%
-        </span>
-    `;
+    if(!tabela) return;
+
+    // digitou %
+    if(percentual){
+
+        const valorFinal =
+            tabela * (1 - percentual / 100);
+
+        const desconto =
+            tabela - valorFinal;
+
+        $("valorDesejado").value =
+            valorFinal.toFixed(2);
+
+        $("desconto").innerHTML = `
+            ${desconto.toFixed(2)}<br>
+            <span style="color:#94a3b8">
+                Desconto de ${percentual.toFixed(2)}%
+            </span>
+        `;
+
+        return;
+    }
+
+    // digitou valor final
+    if(desejado){
+
+        const desconto =
+            tabela - desejado;
+
+        const percentualCalculado =
+            (desconto / tabela) * 100;
+
+        $("desconto").innerHTML = `
+            ${desconto.toFixed(2)}<br>
+            <span style="color:#94a3b8">
+                Desconto de ${percentualCalculado.toFixed(2)}%
+            </span>
+        `;
+    }
 }
 
 // ======================================
@@ -545,6 +573,14 @@ Obrigada.`,
     // carregar csv
     await carregarTabela();
     await carregarFretes();
+
+    if ($("percentualDesconto")) {
+
+    $("percentualDesconto").addEventListener(
+        "input",
+        calcularDesconto
+    );
+}
 
     // =========================
     // DATA

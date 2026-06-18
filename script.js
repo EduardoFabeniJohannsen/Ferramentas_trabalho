@@ -56,7 +56,7 @@ async function carregarFretes() {
         "frete_Magnus.csv",
         "frete_Kung.csv",
         "frete_Jean.csv",
-        "frete_Dionisio.csv",
+        "frete_Dionizio.csv",
         "frete_RR.csv"
     ];
 

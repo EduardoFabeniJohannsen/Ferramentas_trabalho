@@ -9,6 +9,7 @@ body{
     color:#e5e7eb;
 }
 
+
 /* =========================
 TOPBAR
 ========================= */
@@ -16,12 +17,16 @@ TOPBAR
 .topbar{
 
     position:fixed;
+
     top:0;
     left:0;
+
     width:100%;
 
     display:flex;
+
     align-items:center;
+
     gap:10px;
 
     padding:12px 20px;
@@ -33,6 +38,29 @@ TOPBAR
     z-index:1000;
 
     box-sizing:border-box;
+}
+
+.topbar button{
+
+    margin:0;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:8px;
+
+    border:none;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.topbar button:hover{
+    background:#1d4ed8;
 }
 
 .botao-topbar{
@@ -48,8 +76,6 @@ TOPBAR
     border-radius:8px;
 
     font-weight:bold;
-
-    transition:0.2s;
 }
 
 .botao-topbar:hover{
@@ -67,6 +93,7 @@ TOPBAR
     user-select:none;
 }
 
+
 /* =========================
 LAYOUT
 ========================= */
@@ -76,24 +103,25 @@ LAYOUT
     display:flex;
 
     justify-content:center;
+
     align-items:flex-start;
 
-    gap:30px;
+    gap:25px;
 
     flex-wrap:wrap;
 
     padding:90px 20px 40px;
 }
 
-/* coluna esquerda */
 .coluna-esquerda{
 
     display:flex;
 
     flex-direction:column;
 
-    gap:20px;
+    gap:12px;
 }
+
 
 /* =========================
 CARDS
@@ -105,46 +133,45 @@ CARDS
 
     background:#1e293b;
 
-    padding:25px;
+    padding:16px;
 
     border-radius:12px;
 
     box-shadow:0 10px 25px rgba(0,0,0,0.4);
 
     text-align:center;
+
+    box-sizing:border-box;
 }
+
+.card h2{
+
+    margin:0 0 14px 0;
+}
+
+.card hr{
+
+    margin:10px 0;
+}
+
+.card p{
+
+    margin:6px 0;
+}
+
 
 /* =========================
 INPUTS
 ========================= */
 
-textarea{
-
-    width:100%;
-    height:120px;
-
-    padding:10px;
-
-    font-size:16px;
-
-    border-radius:8px;
-
-    border:1px solid #334155;
-
-    background:#0f172a;
-
-    color:#e5e7eb;
-
-    box-sizing:border-box;
-}
-
-input{
+input,
+select{
 
     width:100%;
 
     padding:10px;
 
-    margin-bottom:10px;
+    margin-bottom:8px;
 
     font-size:16px;
 
@@ -163,13 +190,127 @@ input::placeholder{
     color:#94a3b8;
 }
 
+select{
+    cursor:pointer;
+}
+
+
+/* =========================
+EQUIPAMENTOS
+========================= */
+
+#listaEquipamentosProposta{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+    width:100%;
+}
+
+.equipamento-linha{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    width:100%;
+}
+
+.equipamento-linha .equipamento{
+
+    flex:1;
+
+    min-width:0;
+
+    margin:0;
+}
+
+.quantidadeEquipamento{
+
+    width:52px !important;
+
+    flex:none;
+
+    text-align:center;
+
+    margin:0 !important;
+}
+
+.btn-add-equipamento{
+
+    width:35px;
+
+    height:35px;
+
+    flex:none;
+
+    padding:0;
+
+    margin:0;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#3b82f6;
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.btn-add-equipamento:hover{
+    background:#2563eb;
+}
+
+.btn-remover-equipamento{
+
+    width:35px;
+
+    height:35px;
+
+    flex:none;
+
+    padding:0;
+
+    margin:0;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#475569;
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.btn-remover-equipamento:hover{
+    background:#ef4444;
+}
+
+
 /* =========================
 BOTÕES
 ========================= */
 
 button{
 
-    margin-top:10px;
+    margin-top:6px;
 
     padding:10px 15px;
 
@@ -192,201 +333,10 @@ button:hover{
     background:#2563eb;
 }
 
-.botoes{
-    margin-top:10px;
-}
 
 /* =========================
-CALCULADORA
+AGENDAMENTO
 ========================= */
-
-.linha-topo{
-
-    display:flex;
-
-    gap:10px;
-
-    margin-bottom:15px;
-}
-
-.linha-topo input{
-    flex:1;
-}
-
-.linha-resultado{
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:40px;
-}
-
-.datas{
-    text-align:left;
-}
-
-.valor-lado{
-    text-align:center;
-}
-
-.valor-lado span{
-
-    font-size:20px;
-
-    font-weight:bold;
-
-    color:#60a5fa;
-}
-
-#resultadoDias{
-
-    font-weight:bold;
-
-    color:#60a5fa;
-}
-
-/* =========================
-PAINEL FRETES
-========================= */
-
-.painel-fretes{
-
-    width:350px;
-
-    background:#111827;
-
-    border:1px solid #374151;
-
-    border-radius:12px;
-
-    padding:20px;
-}
-
-.painel-fretes h3{
-
-    margin-top:0;
-
-    margin-bottom:15px;
-}
-
-.frete-item{
-
-    background:#1f2937;
-
-    border:1px solid #374151;
-
-    border-radius:10px;
-
-    padding:12px;
-
-    margin-bottom:10px;
-
-    line-height:1.5;
-}
-
-/* =========================
-STATUS BAR
-========================= */
-
-.status-bar{
-
-    position:fixed;
-
-    bottom:0;
-    left:0;
-
-    width:100%;
-
-    display:flex;
-
-    flex-wrap:wrap;
-
-    gap:10px;
-
-    padding:10px 20px;
-
-    background:#020617;
-
-    border-top:1px solid #334155;
-
-    z-index:1000;
-
-    box-sizing:border-box;
-}
-
-/* =========================
-TOAST
-========================= */
-
-#toast{
-
-    position:fixed;
-
-    bottom:80px;
-    right:20px;
-
-    background:#22c55e;
-
-    color:white;
-
-    padding:12px 18px;
-
-    border-radius:8px;
-
-    font-weight:bold;
-
-    opacity:0;
-
-    transform:translateY(20px);
-
-    transition:0.3s;
-
-    z-index:9999;
-}
-
-#toast.show{
-
-    opacity:1;
-
-    transform:translateY(0);
-}
-
-
-
-
-.duplo{
-
-    display:flex;
-
-    gap:10px;
-
-    width:100%;
-}
-
-.duplo input{
-    flex:1;
-}
-
-.financeiro-topo{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
-}
-
-.btn-add{
-    width:35px;
-    height:35px;
-    border:none;
-    border-radius:8px;
-    font-size:22px;
-    cursor:pointer;
-}
-
-
 
 .agendamento-linha{
 
@@ -423,89 +373,238 @@ TOAST
     margin:0;
 }
 
+.duplo{
 
-.card hr{
+    display:flex;
 
-    margin:10px 0;
+    gap:10px;
+
+    width:100%;
 }
 
-.card p{
-
-    margin:6px 0;
+.duplo input{
+    flex:1;
 }
 
-.card button{
+.linha-agendamento{
 
-    margin-top:6px;
-}
+    display:flex;
 
-.card input{
+    gap:10px;
+
+    width:100%;
 
     margin-bottom:8px;
 }
 
+.input-mini{
+    width:55%;
 
-#textoOrcamento{
-
-    margin:6px 0;
+    margin:0;
 }
 
-.container{
+.input-flex{
+    flex:1;
 
-    align-items:flex-start;
+    margin:0;
 }
 
-.coluna{
-
-    display:flex;
-    flex-direction:column;
-
-    gap:20px;
-}
 
 /* =========================
-GERAR TEXTOS + DESCONTO
+FINANCEIRO
 ========================= */
 
-.coluna-esquerda{
+.financeiro-topo{
 
-    gap:12px;
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:10px;
 }
 
-.coluna-esquerda .card{
-
-    padding:18px;
+.financeiro-topo h3{
+    margin:0;
 }
 
-.coluna-esquerda .card h2{
+.btn-add{
+
+    width:35px;
+
+    height:35px;
+
+    padding:0;
+
+    margin:0;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
+
+.financeiro-item hr{
+    margin:10px 0;
+}
+
+
+/* =========================
+DESCONTO
+========================= */
+
+.desconto-card{
+
+    padding-top:12px;
+
+    padding-bottom:12px;
+}
+
+.desconto-card h2{
+    margin-bottom:12px;
+}
+
+#desconto{
+
+    font-weight:bold;
+
+    color:#60a5fa;
+}
+
+
+/* =========================
+PAINEL FRETES
+========================= */
+
+.painel-fretes{
+
+    width:350px;
+
+    min-height:70px;
+
+    background:#111827;
+
+    border:1px solid #374151;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    box-sizing:border-box;
+}
+
+.painel-fretes h3{
 
     margin-top:0;
-    margin-bottom:1px;
+
+    margin-bottom:15px;
 }
 
-.coluna-esquerda .card input{
+.frete-item{
 
-    margin-bottom:1px;
+    background:#1f2937;
+
+    border:1px solid #374151;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    margin-bottom:10px;
+
+    line-height:1.5;
 }
 
-.coluna-esquerda .card button{
 
-    margin-top:4px;
+/* =========================
+STATUS BAR
+========================= */
+
+.status-bar{
+
+    position:fixed;
+
+    bottom:0;
+    left:0;
+
+    width:100%;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    padding:10px 20px;
+
+    background:#020617;
+
+    border-top:1px solid #334155;
+
+    z-index:1000;
+
+    box-sizing:border-box;
 }
 
-.coluna-esquerda .card hr{
 
-    margin:8px 0;
+/* =========================
+TOAST
+========================= */
+
+#toast{
+
+    position:fixed;
+
+    bottom:80px;
+
+    right:20px;
+
+    background:#22c55e;
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:8px;
+
+    font-weight:bold;
+
+    opacity:0;
+
+    transform:translateY(20px);
+
+    transition:0.3s;
+
+    z-index:9999;
 }
 
-.coluna-esquerda .card p{
+#toast.show{
 
-    margin:4px 0;
+    opacity:1;
+
+    transform:translateY(0);
 }
 
-#textoOportunidade,
-#textoOrcamento{
 
-    margin:1px 0;
-    min-height:18px;
+/* =========================
+RESPONSIVO
+========================= */
+
+@media(max-width:800px){
+
+    .container{
+        padding-left:10px;
+        padding-right:10px;
+    }
+
+    .card,
+    .painel-fretes{
+        width:100%;
+        max-width:350px;
+    }
+
 }

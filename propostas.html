@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
 <meta charset="UTF-8">
@@ -12,6 +13,10 @@
 </head>
 
 <body>
+
+<!-- =========================
+TOPBAR
+========================= -->
 
 <div class="topbar">
 
@@ -28,14 +33,23 @@
     </a>
 
     <div class="versao">
-        v5.4.7
+        v5.5.0
     </div>
 
 </div>
 
+
+<!-- =========================
+CONTAINER
+========================= -->
+
 <div class="container">
 
-    <!-- AGENDAMENTO -->
+
+    <!-- =========================
+    AGENDAMENTO
+    ========================= -->
+
     <div class="card">
 
         <h2>Agendamento de Entrega</h2>
@@ -46,46 +60,87 @@
 
         <div class="agendamento-linha">
             <label>Data:</label>
-            <input type="text" id="agData" placeholder="hora">
+            <input
+                type="text"
+                id="agData"
+                placeholder="hora"
+            >
         </div>
 
         <div class="agendamento-linha">
             <label>Horário:</label>
-            <input type="text" id="agHorario" placeholder="hora">
+            <input
+                type="text"
+                id="agHorario"
+                placeholder="hora"
+            >
         </div>
 
         <div class="agendamento-linha">
             <label>Equipamento:</label>
-            <input type="text" id="agEquipamento" placeholder="PEMT">
+            <input
+                type="text"
+                id="agEquipamento"
+                placeholder="PEMT"
+            >
         </div>
 
         <div class="agendamento-linha">
             <label>Local de Saída:</label>
-            <input type="text" id="agSaida" value="WR">
+            <input
+                type="text"
+                id="agSaida"
+                value="WR"
+            >
         </div>
 
         <div class="agendamento-linha">
             <label>Local de entrega:</label>
-            <input type="text" id="agEntrega" placeholder="Nome_do_Local">
+            <input
+                type="text"
+                id="agEntrega"
+                placeholder="Nome_do_Local"
+            >
         </div>
 
         <div class="agendamento-linha">
             <label>Endereço:</label>
-            <input type="text" id="agEndereco" placeholder="Endereço">
+            <input
+                type="text"
+                id="agEndereco"
+                placeholder="Endereço"
+            >
         </div>
 
         <div class="agendamento-linha">
+
             <label>Contato:</label>
 
             <div class="duplo">
-                <input type="text" id="agContato" placeholder="Nome">
-                <input type="text" id="agNumero" placeholder="Número">
+
+                <input
+                    type="text"
+                    id="agContato"
+                    placeholder="Nome"
+                >
+
+                <input
+                    type="text"
+                    id="agNumero"
+                    placeholder="Número"
+                >
+
             </div>
+
         </div>
+
 
         <div class="linha-agendamento">
 
-            <select id="tipoFrete" class="input-mini">
+            <select
+                id="tipoFrete"
+                class="input-mini"
+            >
 
                 <option value="CLIENTE">
                     Por conta do cliente
@@ -106,12 +161,26 @@
 
         </div>
 
+
         <div class="agendamento-linha">
+
             <label>Nome proposta:</label>
-            <input type="text" id="agNomeProposta" placeholder="Nome">
+
+            <input
+                type="text"
+                id="agNomeProposta"
+                placeholder="Nome"
+            >
+
         </div>
 
+
         <hr>
+
+
+        <!-- =========================
+        FINANCEIRO
+        ========================= -->
 
         <div id="blocoFinanceiro">
 
@@ -129,24 +198,46 @@
 
             </div>
 
+
             <div id="listaFinanceiros">
 
                 <div class="financeiro-item">
 
                     <div class="agendamento-linha">
+
                         <label>Nome:</label>
-                        <input type="text" class="financeiroNome">
+
+                        <input
+                            type="text"
+                            class="financeiroNome"
+                        >
+
                     </div>
 
+
                     <div class="agendamento-linha">
+
                         <label>Telefone:</label>
-                        <input type="text" class="financeiroTelefone">
+
+                        <input
+                            type="text"
+                            class="financeiroTelefone"
+                        >
+
                     </div>
 
+
                     <div class="agendamento-linha">
+
                         <label>Email:</label>
-                        <input type="text" class="financeiroEmail">
+
+                        <input
+                            type="text"
+                            class="financeiroEmail"
+                        >
+
                     </div>
+
 
                     <hr>
 
@@ -156,19 +247,29 @@
 
         </div>
 
+
         <button onclick="copiarAgendamento()">
             Copiar Agendamento
         </button>
 
     </div>
 
-    <!-- COLUNA ESQUERDA -->
+
+    <!-- =========================
+    COLUNA ESQUERDA
+    ========================= -->
+
     <div class="coluna-esquerda">
 
-        <!-- GERAR TEXTOS -->
+
+        <!-- =========================
+        GERAR TEXTOS
+        ========================= -->
+
         <div class="card">
 
             <h2>Gerar Textos</h2>
+
 
             <input
                 type="text"
@@ -176,21 +277,62 @@
                 placeholder="Nome do cliente"
             >
 
+
             <p id="textoOportunidade"></p>
+
 
             <button onclick="copiarTexto('textoOportunidade')">
                 Copiar Oportunidade ZOHO
             </button>
 
+
             <hr>
 
-            <!-- EQUIPAMENTO -->
-            <input
-                type="text"
-                id="equipamento"
-                placeholder="Equipamento"
-                list="listaEquipamentos"
-            >
+
+            <!-- EQUIPAMENTOS -->
+
+            <div id="listaEquipamentosProposta">
+
+<div class="equipamento-linha">
+
+    <input
+        type="text"
+        id="equipamento"
+        class="equipamento"
+        placeholder="Equipamento"
+        list="listaEquipamentos"
+    >
+
+    <input
+        type="text"
+        id="quantidadeEquipamento"
+        class="quantidadeEquipamento"
+        value="1"
+        inputmode="numeric"
+        title="Quantidade"
+    >
+
+    <button
+        type="button"
+        class="btn-remover-equipamento"
+        onclick="removerEquipamento(this)"
+        title="Remover"
+    >
+        −
+    </button>
+
+    <button
+        type="button"
+        class="btn-add-equipamento"
+        onclick="adicionarEquipamento()"
+    >
+        +
+    </button>
+
+</div>
+
+            </div>
+
 
             <datalist id="listaEquipamentos">
 
@@ -216,7 +358,7 @@
                 <option value="WAE14">
                 <option value="WAE15">
                 <option value="WAE16">
-                <option value="WAE16R">                   
+                <option value="WAE16R">
                 <option value="WAE17">
                 <option value="WAE18">
                 <option value="WAE18R">
@@ -235,7 +377,6 @@
                 <option value="WAD26">
                 <option value="WAD28">
                 <option value="WAD32">
-                <option value="WAD34">
                 <option value="WAD40">
                 <option value="WAD43">
                 <option value="WAD44">
@@ -254,20 +395,25 @@
 
             </datalist>
 
-            <!-- PERIODO -->
+
+            <!-- PERÍODO -->
+
             <input
                 type="text"
                 id="periodo"
                 placeholder="Período"
             >
 
+
             <!-- CIDADE -->
+
             <input
                 type="text"
                 id="cidade"
                 placeholder="Cidade"
                 list="listaCidades"
             >
+
 
             <datalist id="listaCidades">
 
@@ -286,26 +432,29 @@
                 <option value="GASPAR">
                 <option value="ITAJAI">
                 <option value="BLUMENAU">
-                <option value="BRUSQUE">
-                <option value="GUARAMIRIM">
-                <option value="JARAGUA DO SUL">
 
             </datalist>
 
+
             <!-- FRETE -->
+
             <input
                 type="text"
                 id="valorFrete"
                 placeholder="Valor frete"
             >
 
+
             <p id="textoOrcamento"></p>
+
 
             <button onclick="copiarTexto('textoOrcamento')">
                 Copiar Proposta ZOHO
             </button>
 
+
             <br><br>
+
 
             <button onclick="copiarPropostaZap()">
                 Copiar Proposta Zap
@@ -313,10 +462,15 @@
 
         </div>
 
-        <!-- DESCONTO -->
-        <div class="card">
+
+        <!-- =========================
+        DESCONTO
+        ========================= -->
+
+        <div class="card desconto-card">
 
             <h2>Calcular Desconto</h2>
+
 
             <input
                 type="text"
@@ -324,11 +478,13 @@
                 placeholder="Valor tabela"
             >
 
+
             <input
                 type="text"
                 id="valorDesejado"
                 placeholder="Valor desejado"
             >
+
 
             <input
                 type="text"
@@ -336,17 +492,27 @@
                 placeholder="% desconto"
             >
 
+
             <p>
+
                 Desconto:
                 <span id="desconto"></span>
+
             </p>
 
         </div>
 
     </div>
 
-    <!-- PAINEL FRETES -->
-    <div id="painelFretes" class="painel-fretes">
+
+    <!-- =========================
+    FRETES
+    ========================= -->
+
+    <div
+        id="painelFretes"
+        class="painel-fretes"
+    >
 
         <h3>Fretes encontrados</h3>
 
@@ -358,9 +524,12 @@
 
 </div>
 
+
 <div id="toast"></div>
+
 
 <script src="script.js"></script>
 
 </body>
+
 </html>

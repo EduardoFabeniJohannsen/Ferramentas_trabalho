@@ -1,518 +1,1336 @@
 // ======================================
 // HELPERS
 // ======================================
+
 const $ = (id) => document.getElementById(id);
 
+
 const formatarData = (data) => {
-    const dia = String(data.getDate()).padStart(2, "0");
-    const mes = String(data.getMonth() + 1).padStart(2, "0");
-    const ano = data.getFullYear();
+
+    const dia =
+        String(data.getDate()).padStart(2, "0");
+
+    const mes =
+        String(data.getMonth() + 1).padStart(2, "0");
+
+    const ano =
+        data.getFullYear();
 
     return `${dia}/${mes}/${ano}`;
 };
 
+
 const brToNumber = (valor) => {
+
+    if (
+        valor === null ||
+        valor === undefined ||
+        valor === ""
+    ) {
+        return 0;
+    }
+
+    valor = String(valor).trim();
+
     if (!valor) return 0;
 
-    valor = valor.trim();
-
-    // se tem vírgula = formato BR
+    // Formato brasileiro:
+    // 1.234,56
     if (valor.includes(",")) {
-        valor = valor.replace(/\./g, "").replace(",", ".");
+
+        valor =
+            valor
+                .replace(/\./g, "")
+                .replace(",", ".");
     }
 
     return Number(valor);
 };
 
-const copiar = (texto) => navigator.clipboard.writeText(texto);
+
+const formatarMoedaBR = (valor) => {
+
+    return Number(valor).toLocaleString(
+        "pt-BR",
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+};
+
+
+const copiar = (texto) => {
+
+    return navigator.clipboard.writeText(texto);
+};
+
 
 const mostrarToast = (msg) => {
+
     const toast = $("toast");
 
+    if (!toast) return;
+
     toast.innerText = msg;
+
     toast.classList.add("show");
 
     setTimeout(() => {
+
         toast.classList.remove("show");
+
     }, 2000);
 };
 
-const formatarMoedaBR = (valor) => {
-    return Number(valor).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-};
 
 // ======================================
-// TABELA PREÇOS
+// TABELAS
 // ======================================
+
 let tabelaPrecos = {};
+
 let tabelasFrete = {};
 
-async function carregarFretes() {
+
+// ======================================
+// NORMALIZAR MODELO
+// ======================================
+
+function normalizarModelo(valor){
+
+    return String(valor || "")
+        .replace(/\uFEFF/g, "")
+        .trim()
+        .toUpperCase();
+}
+
+
+// ======================================
+// CARREGAR TABELA DE PREÇOS
+// ======================================
+
+async function carregarTabela() {
+
+    try {
+
+        const resposta = await fetch("./tabela.csv");
+
+        if (!resposta.ok) {
+            throw new Error(
+                `Erro HTTP ${resposta.status} ao carregar tabela.csv`
+            );
+        }
+
+        const texto = await resposta.text();
+
+        const linhas = texto
+            .replace(/^\uFEFF/, "")
+            .trim()
+            .split(/\r?\n/);
+
+        if (linhas.length < 2) {
+            throw new Error("tabela.csv está vazia");
+        }
+
+        const cabecalho = linhas[0]
+            .split(";")
+            .map(item => item.trim());
+
+        tabelaPrecos = {};
+
+        for (let i = 1; i < linhas.length; i++) {
+
+            if (!linhas[i].trim()) continue;
+
+            const colunas = linhas[i]
+                .split(";")
+                .map(item => item.trim());
+
+            let modelo = colunas[0]
+                .replace(/^\uFEFF/, "")
+                .trim()
+                .toUpperCase();
+
+            // Corrige possíveis diferenças no CSV
+            modelo = modelo.replace(/\s+/g, "");
+
+            if (!modelo) continue;
+
+            tabelaPrecos[modelo] = {};
+
+            for (let j = 1; j < cabecalho.length; j++) {
+
+                const dias = cabecalho[j].trim();
+
+                const valorTexto = colunas[j];
+
+                if (
+                    valorTexto === undefined ||
+                    valorTexto === ""
+                ) {
+                    continue;
+                }
+
+                // Se tiver vírgula, é formato BR (1.234,56).
+                // Se não tiver, é ponto decimal simples (913.5),
+                // que é o formato real do tabela.csv.
+                const valorFinal =
+                    valorTexto.includes(",")
+                        ? parseFloat(
+                            valorTexto
+                                .replace(/\./g, "")
+                                .replace(",", ".")
+                        )
+                        : parseFloat(valorTexto);
+
+                if (!isNaN(valorFinal)) {
+                    tabelaPrecos[modelo][dias] = valorFinal;
+                }
+            }
+        }
+
+        console.log(
+            "Tabela carregada:",
+            Object.keys(tabelaPrecos)
+        );
+
+        console.log(
+            "WTE10:",
+            tabelaPrecos["WTE10"]
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "ERRO AO CARREGAR tabela.csv:",
+            erro
+        );
+
+    }
+}
+
+
+// ======================================
+// CARREGAR FRETES
+// ======================================
+
+async function carregarFretes(){
 
     const arquivos = [
+
         "frete_Magnus.csv",
         "frete_Kung.csv",
         "frete_Jean.csv",
         "frete_Dionizio.csv",
         "frete_RR.csv"
+
     ];
 
-    for (const arquivo of arquivos) {
 
-        try {
+    for(const arquivo of arquivos){
 
-            const resposta = await fetch(arquivo);
-            const texto = await resposta.text();
+        try{
 
-            const linhas = texto.trim().split("\n");
+            const resposta =
+                await fetch(
+                    arquivo,
+                    {cache:"no-store"}
+                );
+
+
+            if(!resposta.ok){
+
+                throw new Error(
+                    `HTTP ${resposta.status}`
+                );
+            }
+
+
+            const texto =
+                await resposta.text();
+
+
+            const linhas =
+                texto
+                    .replace(/\r/g, "")
+                    .trim()
+                    .split("\n");
+
+
+            if(!linhas.length) continue;
+
 
             const cabecalho =
                 linhas[0]
-                .replace("\r", "")
-                .split(";");
+                    .replace(/^\uFEFF/, "")
+                    .split(";")
+                    .map(item =>
+                        item
+                            .trim()
+                            .toUpperCase()
+                    );
+
 
             const transportador =
                 arquivo
-                .replace("frete_", "")
-                .replace(".csv", "");
+                    .replace("frete_", "")
+                    .replace(".csv", "");
+
 
             tabelasFrete[transportador] = {};
 
-            for (let i = 1; i < linhas.length; i++) {
+
+            for(
+                let i = 1;
+                i < linhas.length;
+                i++
+            ){
+
+                if(!linhas[i].trim()) continue;
+
 
                 const colunas =
-                    linhas[i]
-                    .replace("\r", "")
-                    .split(";");
+                    linhas[i].split(";");
+
 
                 const modelo =
-                    colunas[0]
-                    .trim()
-                    .toUpperCase();
+                    normalizarModelo(
+                        colunas[0]
+                    );
 
-                tabelasFrete[transportador][modelo] = {};
 
-                for (let j = 1; j < cabecalho.length; j++) {
+                if(!modelo) continue;
+
+
+                tabelasFrete[
+                    transportador
+                ][modelo] = {};
+
+
+                for(
+                    let j = 1;
+                    j < cabecalho.length;
+                    j++
+                ){
 
                     const cidade =
-                        cabecalho[j]
-                        .trim()
-                        .toUpperCase();
+                        cabecalho[j];
+
 
                     const valor =
                         colunas[j]
-                        ?.trim();
+                            ?.trim();
 
-                    tabelasFrete[transportador][modelo][cidade] = valor;
+
+                    tabelasFrete[
+                        transportador
+                    ][modelo][cidade] =
+                        valor;
                 }
             }
 
-        } catch (erro) {
 
-            console.log("Erro no arquivo:", arquivo);
+        }catch(erro){
+
+            console.error(
+                "Erro no arquivo:",
+                arquivo,
+                erro
+            );
         }
     }
 
-    console.log("Fretes carregados");
+
+    console.log(
+        "Fretes carregados:",
+        tabelasFrete
+    );
 }
 
-function mostrarFretes() {
 
-    const modelo =
-        $("equipamento").value
-        .trim()
-        .toUpperCase();
+// ======================================
+// PEGAR EQUIPAMENTOS
+// ======================================
 
-    const cidade =
-        $("cidade").value
-        .trim()
-        .toUpperCase();
+function obterEquipamentos(){
 
-    if (!modelo || !cidade) return;
+    const linhas =
+        document.querySelectorAll(
+            ".equipamento-linha"
+        );
 
-    let html = "";
 
-    for (const transportador in tabelasFrete) {
+    const equipamentos = [];
 
-        // modelo inexistente
-        if (!tabelasFrete[transportador][modelo]) {
 
-            html += `
-            <div class="frete-item">
-                ⚠️ <strong>${transportador}</strong><br>
-                Modelo "${modelo}" não encontrado
-            </div>
-            `;
+    linhas.forEach(linha => {
 
-            continue;
+        const campoModelo =
+            linha.querySelector(
+                ".equipamento"
+            );
+
+
+        const campoQuantidade =
+            linha.querySelector(
+                ".quantidadeEquipamento"
+            );
+
+
+        const modelo =
+            normalizarModelo(
+                campoModelo?.value
+            );
+
+
+        let quantidade =
+            parseInt(
+                campoQuantidade?.value,
+                10
+            );
+
+
+        if(
+            !Number.isFinite(quantidade) ||
+            quantidade < 1
+        ){
+            quantidade = 1;
         }
+
+
+        if(modelo){
+
+            equipamentos.push({
+
+                modelo: modelo,
+
+                quantidade: quantidade
+
+            });
+        }
+
+    });
+
+
+    return equipamentos;
+}
+
+
+// ======================================
+// ADICIONAR EQUIPAMENTO
+// ======================================
+
+function adicionarEquipamento(){
+
+    const lista =
+        $("listaEquipamentosProposta");
+
+
+    const div =
+        document.createElement("div");
+
+
+    div.className =
+        "equipamento-linha";
+
+
+    div.innerHTML = `
+
+        <input
+            type="text"
+            class="equipamento"
+            placeholder="Equipamento"
+            list="listaEquipamentos"
+        >
+
+        <input
+            type="text"
+            class="quantidadeEquipamento"
+            value="1"
+            inputmode="numeric"
+            title="Quantidade"
+        >
+
+        <button
+            type="button"
+            class="btn-remover-equipamento"
+            onclick="removerEquipamento(this)"
+            title="Remover"
+        >
+            −
+        </button>
+
+        <button
+            type="button"
+            class="btn-add-equipamento"
+            onclick="adicionarEquipamento()"
+        >
+            +
+        </button>
+
+    `;
+
+
+    lista.appendChild(div);
+
+
+    configurarEventosEquipamentos();
+
+
+    // foco no novo equipamento
+    div.querySelector(
+        ".equipamento"
+    ).focus();
+}
+
+
+// ======================================
+// REMOVER EQUIPAMENTO
+// ======================================
+
+function removerEquipamento(botao){
+
+    const linha =
+        botao.closest(".equipamento-linha");
+
+    if(!linha) return;
+
+    const lista =
+        $("listaEquipamentosProposta");
+
+    const totalLinhas =
+        lista.querySelectorAll(
+            ".equipamento-linha"
+        ).length;
+
+    // Se for a única linha, só limpa os campos
+    // em vez de remover (sempre precisa sobrar
+    // pelo menos uma linha com o botão "+").
+    if(totalLinhas <= 1){
+
+        const campoModelo =
+            linha.querySelector(".equipamento");
+
+        const campoQuantidade =
+            linha.querySelector(".quantidadeEquipamento");
+
+        if(campoModelo) campoModelo.value = "";
+        if(campoQuantidade) campoQuantidade.value = "1";
+
+    }else{
+
+        linha.remove();
+    }
+
+    gerarTextos();
+
+    mostrarFretes();
+}
+
+
+// ======================================
+// CONFIGURAR EVENTOS DOS EQUIPAMENTOS
+// ======================================
+
+function configurarEventosEquipamentos(){
+
+    const campos =
+        document.querySelectorAll(
+            ".equipamento, .quantidadeEquipamento"
+        );
+
+
+    campos.forEach(campo => {
+
+        if(campo.dataset.evento === "1"){
+            return;
+        }
+
+
+        campo.dataset.evento = "1";
+
+
+        campo.addEventListener(
+            "input",
+            () => {
+
+                gerarTextos();
+
+                mostrarFretes();
+
+            }
+        );
+
+    });
+
+
+    // Valida quantidade ao sair do campo: se não for
+    // um número inteiro >= 1, corrige pra 1 na tela
+    // (evita total travado em NaN sem o usuário notar).
+
+    const camposQuantidade =
+        document.querySelectorAll(
+            ".quantidadeEquipamento"
+        );
+
+
+    camposQuantidade.forEach(campo => {
+
+        if(campo.dataset.eventoBlur === "1"){
+            return;
+        }
+
+
+        campo.dataset.eventoBlur = "1";
+
+
+        campo.addEventListener(
+            "blur",
+            () => {
+
+                const numero =
+                    parseInt(campo.value, 10);
+
+                if(
+                    !Number.isFinite(numero) ||
+                    numero < 1
+                ){
+
+                    campo.value = "1";
+
+                    gerarTextos();
+
+                    mostrarFretes();
+                }
+
+            }
+        );
+
+    });
+}
+
+
+// ======================================
+// OBTER PERÍODO DA TABELA
+// ======================================
+
+function obterPeriodoTabela(){
+
+    const valor =
+        $("periodo")?.value.trim();
+
+
+    if(!valor) return null;
+
+
+    const numero =
+        Number(valor);
+
+
+    if(
+        !Number.isFinite(numero) ||
+        numero <= 0
+    ){
+        return null;
+    }
+
+
+    if(
+        numero > 30 &&
+        numero % 30 === 0
+    ){
+        return "30";
+    }
+
+
+    const diasValidos = [
+
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "10",
+        "14",
+        "15",
+        "21",
+        "28",
+        "30"
+
+    ];
+
+
+    if(
+        !diasValidos.includes(
+            String(numero)
+        )
+    ){
+
+        return null;
+    }
+
+
+    return String(numero);
+}
+
+
+// ======================================
+// CALCULAR VALOR TOTAL DA TABELA
+// ======================================
+
+function calcularValorTabela(){
+
+    const equipamentos =
+        obterEquipamentos();
+
+
+    const periodo =
+        obterPeriodoTabela();
+
+
+    if(
+        !equipamentos.length ||
+        !periodo
+    ){
+        return null;
+    }
+
+
+    let total = 0;
+
+
+    for(
+        const equipamento
+        of equipamentos
+    ){
+
+        const tabelaModelo =
+            tabelaPrecos[
+                equipamento.modelo
+            ];
+
+
+        if(!tabelaModelo){
+
+            return {
+                erro:
+                    `Modelo ${equipamento.modelo} não encontrado`
+            };
+        }
+
 
         const valor =
-            tabelasFrete[transportador][modelo][cidade];
+            tabelaModelo[periodo];
 
-        // cidade inexistente
-        if (!valor || valor === "") {
 
-            html += `
-            <div class="frete-item">
-                ⚠️ <strong>${transportador}</strong><br>
-                Cidade "${cidade}" não encontrada
-            </div>
-            `;
+        if(
+            valor === undefined ||
+            valor === null
+        ){
 
-            continue;
+            return {
+                erro:
+                    `Período ${periodo} dias não encontrado para ${equipamento.modelo}`
+            };
         }
 
-        // sucesso
-        html += `
-        <div class="frete-item">
-            ✅ <strong>${transportador}</strong><br>
-            R$ ${valor}
-        </div>
-        `;
+
+        total +=
+            valor *
+            equipamento.quantidade;
     }
 
-    if ($("resultadoFretes")) {
-    $("resultadoFretes").innerHTML = html;
-    }
+
+    return {
+        total: total
+    };
 }
 
-async function carregarTabela(){
 
-    try{
+// ======================================
+// PREENCHER VALOR TABELA
+// ======================================
 
-        const resposta = await fetch("tabela.csv");
-        const texto = await resposta.text();
+function preencherValorTabela() {
 
-        const linhas = texto.trim().split("\n");
+    const periodo =
+        $("periodo")?.value.trim();
 
-        const cabecalho = linhas[0].split(";");
+    if (!periodo) return;
 
-        for(let i = 1; i < linhas.length; i++){
+    const diasNumero = Number(periodo);
 
-            const colunas = linhas[i].split(";");
+    let diasBusca = periodo;
 
-            const modelo = colunas[0]
-                .trim()
-                .toUpperCase();
-
-            tabelaPrecos[modelo] = {};
-
-            for(let j = 1; j < cabecalho.length; j++){
-
-                const dias = cabecalho[j].trim();
-
-                let valor = colunas[j].trim();
-
-                valor = valor.replace(",", ".");
-
-                tabelaPrecos[modelo][dias] =
-                    parseFloat(valor);
-            }
-        }
-
-        console.log("Tabela carregada");
-
-    }catch(erro){
-
-        console.log("Erro CSV", erro);
-    }
-}
-
-function preencherValorTabela(){
-
-    const modelo = $("equipamento").value
-        .toUpperCase()
-        .trim();
-
-    const dias = $("periodo").value.trim();
-
-    if(!modelo || !dias) return;
-
-    const diasNumero = Number(dias);
-
-    // se for múltiplo de 30 → converter
-    let diasBusca = dias;
-
-    if(diasNumero > 30 && diasNumero % 30 === 0){
+    if (
+        diasNumero > 30 &&
+        diasNumero % 30 === 0
+    ) {
         diasBusca = "30";
     }
 
     const diasValidos = [
-        "1","2","3","4","5","6","7",
-        "10","14","15","21","28","30"
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "10",
+        "14",
+        "15",
+        "21",
+        "28",
+        "30"
     ];
 
-    if(!diasValidos.includes(diasBusca)){
+    if (!diasValidos.includes(diasBusca)) {
+
         $("valorTabela").value = "";
-        $("desconto").innerHTML =
-            `<span style="color:#ef4444">
+
+        $("desconto").innerHTML = `
+            <span style="color:#ef4444">
                 Valor fora de tabela
-            </span>`;
+            </span>
+        `;
+
         return;
     }
 
-    if(
-        tabelaPrecos[modelo] &&
-        tabelaPrecos[modelo][diasBusca]
-    ){
+    // Usa obterEquipamentos(), a mesma fonte usada por
+    // gerarTextos() e mostrarFretes(), pra que TODA linha
+    // de equipamento (fixa ou adicionada com "+") entre
+    // no cálculo aqui também.
 
-        $("valorTabela").value =
-            tabelaPrecos[modelo][diasBusca].toFixed(2);
+    const equipamentos =
+        obterEquipamentos();
 
-        calcularDesconto();
+    let total = 0;
+    let encontrou = false;
+    let erroModelo = "";
 
-    }else{
+    equipamentos.forEach((equipamento) => {
+
+        const modelo = equipamento.modelo;
+        const quantidade = equipamento.quantidade;
+
+        if (!tabelaPrecos[modelo]) {
+
+            erroModelo = modelo;
+            return;
+        }
+
+        const valor =
+            tabelaPrecos[modelo][diasBusca];
+
+        if (
+            valor === undefined ||
+            valor === null ||
+            isNaN(valor)
+        ) {
+
+            erroModelo = modelo;
+            return;
+        }
+
+        total +=
+            valor * quantidade;
+
+        encontrou = true;
+    });
+
+    if (!encontrou) {
 
         $("valorTabela").value = "";
-        $("desconto").innerHTML =
-            `<span style="color:#ef4444">
-                Modelo não encontrado
-            </span>`;
+
+        $("desconto").innerHTML = `
+            <span style="color:#ef4444">
+                ${erroModelo
+                    ? `Modelo ${erroModelo} não encontrado`
+                    : "Informe um equipamento"
+                }
+            </span>
+        `;
+
+        return;
     }
+
+    $("valorTabela").value =
+        total.toFixed(2);
+
+    calcularDesconto();
 }
+
 
 // ======================================
-// CONVERSOR TEXTO
+// FRETES
 // ======================================
-function maiusculo() {
-    $("texto").value = $("texto").value.toUpperCase();
+
+function mostrarFretes(){
+
+    const modelos =
+        obterEquipamentos();
+
+
+    const cidade =
+        normalizarModelo(
+            $("cidade")?.value
+        );
+
+
+    if(
+        !modelos.length ||
+        !cidade
+    ){
+
+        if($("resultadoFretes")){
+
+            $("resultadoFretes").innerHTML =
+                "Nenhum frete consultado";
+        }
+
+        return;
+    }
+
+
+    let html = "";
+
+
+    for(
+        const equipamento
+        of modelos
+    ){
+
+        html += `
+            <div class="frete-item">
+                <strong>
+                    ${equipamento.quantidade > 1
+                        ? equipamento.quantidade + " "
+                        : ""
+                    }${equipamento.modelo}
+                </strong>
+                <br>
+            `;
+
+
+        for(
+            const transportador
+            in tabelasFrete
+        ){
+
+            const modeloTabela =
+                tabelasFrete[
+                    transportador
+                ][
+                    equipamento.modelo
+                ];
+
+
+            if(!modeloTabela){
+
+                html += `
+                    ⚠️ ${transportador}:
+                    modelo não encontrado
+                    <br>
+                `;
+
+                continue;
+            }
+
+
+            const valor =
+                modeloTabela[cidade];
+
+
+            if(
+                valor === undefined ||
+                valor === ""
+            ){
+
+                html += `
+                    ⚠️ ${transportador}:
+                    cidade não encontrada
+                    <br>
+                `;
+
+            }else{
+
+                html += `
+                    ✅ ${transportador}:
+                    R$ ${valor}
+                    <br>
+                `;
+            }
+
+        }
+
+
+        html += `
+            </div>
+        `;
+    }
+
+
+    $("resultadoFretes").innerHTML =
+        html;
 }
 
-function minusculo() {
-    $("texto").value = $("texto").value.toLowerCase();
-}
-
-function formatarCNPJ() {
-    $("texto").value =
-        $("texto").value.replace(/[.\-\/]/g, "");
-}
-
-// ======================================
-// DATAS
-// ======================================
-function calcularDatas() {
-    const valor = $("data").value;
-    if (!valor) return;
-
-    const base = new Date(valor);
-
-    const d28 = new Date(base);
-    d28.setDate(d28.getDate() + 29);
-
-    const d56 = new Date(base);
-    d56.setDate(d56.getDate() + 57);
-
-    $("d28").innerText = formatarData(d28);
-    $("d56").innerText = formatarData(d56);
-}
-
-function calcularDiasCustom() {
-    const valor = $("data").value;
-    const dias = $("dias").value;
-
-    if (!valor || dias === "") return;
-
-    const base = new Date(valor);
-
-    base.setDate(base.getDate() + Number(dias) + 1);
-
-    $("resultadoDias").innerText =
-        formatarData(base);
-}
-
-// ======================================
-// BOLETOS
-// ======================================
-function calcularValor() {
-    const valor = $("valor").value;
-    if (!valor) return;
-
-    const numero = brToNumber(valor);
-
-    if (isNaN(numero)) return;
-
-    $("metade").innerText =
-        (numero / 2).toFixed(2);
-}
 
 // ======================================
 // DESCONTO
 // ======================================
-function calcularDesconto() {
 
-    const tabela =
-        brToNumber($("valorTabela").value);
+function calcularDesconto(){
 
-    const desejado =
-        brToNumber($("valorDesejado").value);
+    const tabelaTexto =
+        $("valorTabela")?.value.trim();
 
-    const percentual =
-        brToNumber($("percentualDesconto").value);
 
-    if(!tabela) return;
+    const desejadoTexto =
+        $("valorDesejado")?.value.trim();
 
-    // digitou %
-    if(percentual){
 
-        const valorFinal =
-            tabela * (1 - percentual / 100);
+    const percentualTexto =
+        $("percentualDesconto")?.value.trim();
 
-        const desconto =
-            tabela - valorFinal;
 
-        $("valorDesejado").value =
-            valorFinal.toFixed(2);
+    if(!tabelaTexto){
+
+        $("desconto").innerHTML = "";
+
+        return;
+    }
+
+
+    const valorTabela =
+        brToNumber(
+            tabelaTexto
+        );
+
+
+    if(
+        !Number.isFinite(valorTabela) ||
+        valorTabela <= 0
+    ){
+
+        $("desconto").innerHTML = "";
+
+        return;
+    }
+
+
+    // ==================================
+    // OPÇÃO 1
+    // USUÁRIO DIGITOU %
+    // ==================================
+
+    if(percentualTexto){
+
+        let percentual =
+            brToNumber(
+                percentualTexto
+            );
+
+
+        if(
+            Number.isFinite(percentual) &&
+            percentual >= 0 &&
+            percentual <= 100
+        ){
+
+            const valorDesconto =
+                valorTabela *
+                (percentual / 100);
+
+
+            const valorFinal =
+                valorTabela -
+                valorDesconto;
+
+
+            $("valorDesejado").value =
+                formatarMoedaBR(
+                    valorFinal
+                );
+
+
+            $("desconto").innerHTML = `
+
+                <strong>
+                    R$ ${formatarMoedaBR(valorDesconto)}
+                </strong>
+
+                <br>
+
+                <span style="color:#94a3b8">
+                    ${percentual.toFixed(2)}%
+                    →
+                    R$ ${formatarMoedaBR(valorFinal)}
+                </span>
+
+            `;
+
+            return;
+        }
+    }
+
+
+    // ==================================
+    // OPÇÃO 2
+    // USUÁRIO DIGITOU VALOR FINAL
+    // ==================================
+
+    if(desejadoTexto){
+
+        const valorDesejado =
+            brToNumber(
+                desejadoTexto
+            );
+
+
+        if(
+            !Number.isFinite(valorDesejado) ||
+            valorDesejado <= 0
+        ){
+
+            $("desconto").innerHTML = "";
+
+            return;
+        }
+
+
+        const valorDesconto =
+            valorTabela -
+            valorDesejado;
+
+
+        const percentual =
+            (
+                valorDesconto /
+                valorTabela
+            ) * 100;
+
 
         $("desconto").innerHTML = `
-            ${desconto.toFixed(2)}<br>
+
+            <strong>
+                R$ ${formatarMoedaBR(valorDesconto)}
+            </strong>
+
+            <br>
+
             <span style="color:#94a3b8">
-                Desconto de ${percentual.toFixed(2)}%
+                Desconto de
+                ${percentual.toFixed(2)}%
             </span>
+
         `;
 
         return;
     }
 
-    // digitou valor final
-    if(desejado){
 
-        const desconto =
-            tabela - desejado;
-
-        const percentualCalculado =
-            (desconto / tabela) * 100;
-
-        $("desconto").innerHTML = `
-            ${desconto.toFixed(2)}<br>
-            <span style="color:#94a3b8">
-                Desconto de ${percentualCalculado.toFixed(2)}%
-            </span>
-        `;
-    }
+    $("desconto").innerHTML = "";
 }
+
 
 // ======================================
 // TEXTOS AUTOMÁTICOS
 // ======================================
-function gerarTextos() {
-    const nome =
-        $("nomeCliente").value.toUpperCase();
 
-    const equipamento =
-        $("equipamento").value.toUpperCase();
+function gerarTextos(){
+
+    const nome =
+        $("nomeCliente")?.value
+            .toUpperCase()
+            .trim();
+
+
+    const equipamentos =
+        obterEquipamentos();
+
 
     const cidade =
-        $("cidade").value.toUpperCase();
+        $("cidade")?.value
+            .toUpperCase()
+            .trim();
+
 
     const periodoInput =
-        $("periodo").value.trim();
+        $("periodo")?.value.trim();
+
 
     let periodo = "";
 
-    if (periodoInput) {
 
-        if (isNaN(periodoInput)) {
+    if(periodoInput){
+
+        if(isNaN(periodoInput)){
+
             periodo =
                 periodoInput.toUpperCase();
 
-        } else {
+        }else{
 
             const numero =
                 Number(periodoInput);
 
-            if (numero === 1) {
-                periodo = "DIARIA";
 
-            } else if (
+            if(numero === 1){
+
+                periodo =
+                    "DIARIA";
+
+            }else if(
                 numero > 30 &&
                 numero % 30 === 0
-            ) {
+            ){
+
                 periodo =
                     `${numero / 30} PERIODOS`;
 
-            } else {
+            }else{
+
                 periodo =
                     `${numero} DIAS`;
             }
         }
     }
 
-    const hoje =
-        formatarData(new Date());
 
-    // oportunidade
-    if (nome) {
+    const hoje =
+        formatarData(
+            new Date()
+        );
+
+
+    // ==================================
+    // OPORTUNIDADE
+    // ==================================
+
+    if(nome){
+
         $("textoOportunidade").innerText =
             `OPORTUNIDADE DE LOCAÇÃO_${nome}_${hoje}`;
     }
 
-    // orçamento
-    if (
+
+    // ==================================
+    // ORÇAMENTO
+    // ==================================
+
+    if(
         nome &&
-        equipamento &&
+        equipamentos.length &&
         periodo &&
         cidade
-    ) {
+    ){
+
+        const modelosTexto =
+            equipamentos
+                .map(item => {
+
+                    return (
+                        item.quantidade > 1
+                            ? `${item.quantidade} ${item.modelo}`
+                            : item.modelo
+                    );
+
+                })
+                .join(" + ");
+
+
         $("textoOrcamento").innerText =
-                `${nome}_${equipamento}_${periodo}`;
+            `${nome}_${modelosTexto}_${periodo}`;
     }
+
 
     preencherValorTabela();
 }
 
-// ======================================
-// COPIAR
-// ======================================
-function copiarTexto(id) {
-    const texto = $(id).innerText;
 
-    if (!texto) return;
+// ======================================
+// COPIAR TEXTO
+// ======================================
+
+function copiarTexto(id){
+
+    const texto =
+        $(id)?.innerText;
+
+
+    if(!texto) return;
+
 
     copiar(texto);
-    mostrarToast("Copiado");
+
+    mostrarToast(
+        "Copiado"
+    );
 }
+
 
 // ======================================
 // STATUS
 // ======================================
-function gerarStatus(tipo) {
 
-    const hoje = new Date();
+function gerarStatus(tipo){
+
+    const hoje =
+        new Date();
+
 
     const data =
-        String(hoje.getDate()).padStart(2, "0")
+        String(
+            hoje.getDate()
+        ).padStart(2,"0")
         + "/"
-        + String(hoje.getMonth() + 1).padStart(2, "0");
+        +
+        String(
+            hoje.getMonth() + 1
+        ).padStart(2,"0");
 
-    const nome = "Eduardo";
+
+    const nome =
+        "Eduardo";
+
 
     const cidade =
         $("cidade")
-            ? $("cidade").value.toUpperCase()
+            ? $("cidade")
+                .value
+                .toUpperCase()
             : "CIDADE";
+
 
     const frete =
         $("valorFrete")
             ? $("valorFrete").value
-            : "0.00";
+            : "0,00";
+
 
     const mensagens = {
+
 
         faturado:
             `${data} - Faturado - ${nome}`,
 
+
         renovacaoEmail:
             `${data} - Enviado email de renovação - ${nome}`,
+
 
         renovacaoZap:
             `${data} - Enviado zap de renovação - ${nome}`,
 
+
         autorizado:
             `Autorizado Via Contrato XXX - Responsável: XXX <XXX>`,
+
 
         FreteZOHO:
 `FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
@@ -520,28 +1338,29 @@ function gerarStatus(tipo) {
 * Frete entrega: R$ ${frete} - ITAJAÍ x ${cidade}
 * Frete retirada: R$ ${frete} - ${cidade} x ITAJAÍ
 
--Valores sujeitos à alteração no retorno conforme reajustes de mercado, combustível, pedágios e inflação do período (IPCA).
--Alteração de endereço de entrega/coleta poderá alterar o valor do frete.
--Não nos responsabilizamos por custos de hora parada.
-
 Transportadores Indicados:
 JEAN RICARDO SPIESS 47 99763-3333
 KUNG 47 9616-5616
 MAGNUS 47 9754-0321
-RR 47 9180-5385 (SOMENTE ATÉ WTE12)
+RR (SOMENTE ATÉ WTE12)
 
-`,
+PROPOSTA VÁLIDA POR 7 DIAS`,
+
 
         FreteZOHOLocComp:
 `* FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR *
 PROPOSTA VÁLIDA POR 7 DIAS`,
 
-    CHEKLIST_Titulo:
-        `CHEKLIST - PTA - ${
-            $("nomeCliente")
-                ? $("nomeCliente").value.toUpperCase()
-                : ""
-        }`,
+
+        CHEKLIST_Titulo:
+            `CHEKLIST - PTA - ${
+                $("nomeCliente")
+                    ? $("nomeCliente")
+                        .value
+                        .toUpperCase()
+                    : ""
+            }`,
+
 
         CHEKLIST_Mensagem:
 `Prezado Cliente,
@@ -550,238 +1369,314 @@ Segue checklist de saída do equipamento locado.
 
 Obrigada.`,
 
+
         ICMS:
             `Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC`
+
     };
 
-    const texto = mensagens[tipo];
 
-    if (!texto) return;
+    const texto =
+        mensagens[tipo];
+
+
+    if(!texto) return;
+
 
     copiar(texto);
-    mostrarToast(tipo + " copiado");
-}
 
-// ======================================
-// INIT
-// ======================================
-// ======================================
-// INIT
-// ======================================
-(async function init() {
-
-    // carregar csv
-    await carregarTabela();
-    await carregarFretes();
-
-    if ($("percentualDesconto")) {
-
-    $("percentualDesconto").addEventListener(
-        "input",
-        calcularDesconto
+    mostrarToast(
+        tipo + " copiado"
     );
 }
 
-    // =========================
-    // DATA
-    // =========================
-    if ($("data")) {
 
-        $("data").value =
-            new Date()
-            .toISOString()
-            .split("T")[0];
-
-        calcularDatas();
-
-        $("data").addEventListener(
-            "change",
-            calcularDatas
-        );
-
-        $("data").addEventListener(
-            "change",
-            calcularDiasCustom
-        );
-    }
-
-    // =========================
-    // DIAS
-    // =========================
-    if ($("dias")) {
-
-        $("dias").addEventListener(
-            "input",
-            calcularDiasCustom
-        );
-    }
-
-    // =========================
-    // VALOR BOLETO
-    // =========================
-    if ($("valor")) {
-
-        $("valor").addEventListener(
-            "input",
-            calcularValor
-        );
-    }
-
-    // =========================
-    // DESCONTO
-    // =========================
-    if ($("valorTabela")) {
-
-        $("valorTabela").addEventListener(
-            "input",
-            calcularDesconto
-        );
-    }
-
-    if ($("valorDesejado")) {
-
-        $("valorDesejado").addEventListener(
-            "input",
-            calcularDesconto
-        );
-    }
-
-    // =========================
-    // TEXTOS
-    // =========================
-    if ($("nomeCliente")) {
-
-        $("nomeCliente").addEventListener(
-            "input",
-            gerarTextos
-        );
-    }
-
-    if ($("equipamento")) {
-
-        $("equipamento").addEventListener(
-            "input",
-            () => {
-
-                gerarTextos();
-
-                mostrarFretes();
-            }
-        );
-    }
-
-    if ($("periodo")) {
-
-        $("periodo").addEventListener(
-            "input",
-            gerarTextos
-        );
-    }
-
-    // =========================
-    // FRETES
-    // =========================
-    if ($("cidade")) {
-
-        $("cidade").addEventListener(
-            "input",
-            () => {
-
-                gerarTextos();
-
-                mostrarFretes();
-            }
-        );
-    }
-
-})();
-
+// ======================================
+// PROPOSTA ZAP
+// ======================================
 
 function copiarPropostaZap(){
 
-    const modelo = $("equipamento").value.toUpperCase().trim();
-    const periodo = $("periodo").value.trim();
-    const cidade = $("cidade").value.trim();
+    const equipamentos =
+        obterEquipamentos();
 
-    const valorFrete =
-    Number(
-        $("valorFrete").value
-        .replace(",", ".")
-    )
-    .toFixed(2)
-    .replace(".", ",");
 
-    const tipoFrete =
-        $("tipoFrete").value;
+    const periodo =
+        $("periodo")
+            .value
+            .trim();
 
-    const diasNumero = Number(periodo);
 
-    let periodoExibicao = periodo;
-    let multiplicador = 1;
+    const cidade =
+        $("cidade")
+            .value
+            .trim();
 
-    if(diasNumero > 30 && diasNumero % 30 === 0){
-        multiplicador = diasNumero / 30;
-        periodoExibicao = "30";
+
+    const valorFreteTexto =
+        $("valorFrete")
+            .value
+            .trim();
+
+
+    if(!equipamentos.length){
+
+        return mostrarToast(
+            "Informe o modelo"
+        );
     }
 
-    const cidadeFormatada = cidade
-    ? cidade.charAt(0).toUpperCase() + cidade.slice(1).toLowerCase()
-    : "Cidade";
-    
-    // prioridade: valor desejado (com desconto)
+
+    if(!periodo){
+
+        return mostrarToast(
+            "Informe período"
+        );
+    }
+
+
     const valorLocacaoTexto =
-        $("valorDesejado").value.trim() ||
-        $("valorTabela").value.trim();
+        $("valorDesejado")
+            .value
+            .trim()
+        ||
+        $("valorTabela")
+            .value
+            .trim();
 
-    if(!modelo) return mostrarToast("Informe o modelo");
-    if(!periodo) return mostrarToast("Informe período");
-    if(!valorLocacaoTexto) return mostrarToast("Informe valor locação");
 
-    // =========================
-    // MODELO
-    // =========================
-    const letra2 = modelo.charAt(1);
-    const letra3 = modelo.charAt(2);
-    const altura = parseInt(modelo.replace(/[^\d]/g, ""));
+    if(!valorLocacaoTexto){
 
-    let tipo = "";
-    if(letra2 === "A") tipo = "Articulada";
-    if(letra2 === "T") tipo = "Tesoura";
-    if(letra2 === "M") tipo = "Mastro";
+        return mostrarToast(
+            "Informe valor locação"
+        );
+    }
 
-    let energia = "";
-    if(letra3 === "E") energia = "elétrica";
-    if(letra3 === "D") energia = "diesel";
 
-    const alturaPlataforma = altura - 2;
+    // ==================================
+    // PERÍODO
+    // ==================================
 
-    // =========================
-    // VALORES
-    // =========================
-    const valorLocacao = brToNumber(valorLocacaoTexto);
-    const seguro = valorLocacao * 0.07;
-    const total = valorLocacao + seguro;
+    const diasNumero =
+        Number(periodo);
 
-    // =========================
-    // TEXTO
-    // =========================
-    const texto = `🟡 Modelo: ${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
+
+    let periodoExibicao =
+        periodo;
+
+
+    let multiplicadorPeriodo =
+        1;
+
+
+    if(
+        diasNumero > 30 &&
+        diasNumero % 30 === 0
+    ){
+
+        multiplicadorPeriodo =
+            diasNumero / 30;
+
+        periodoExibicao =
+            "30";
+    }
+
+
+    // ==================================
+    // CIDADE
+    // ==================================
+
+    const cidadeFormatada =
+        cidade
+            ? cidade.charAt(0)
+                .toUpperCase()
+                +
+                cidade.slice(1)
+                    .toLowerCase()
+            : "Cidade";
+
+
+    // ==================================
+    // VALOR TOTAL
+    // ==================================
+
+    const valorLocacao =
+        brToNumber(
+            valorLocacaoTexto
+        );
+
+
+    const seguro =
+        valorLocacao * 0.07;
+
+
+    const total =
+        valorLocacao + seguro;
+
+
+    // ==================================
+    // BLOCOS DOS EQUIPAMENTOS
+    // ==================================
+
+    let blocosEquipamentos =
+        "";
+
+
+    equipamentos.forEach(
+        (equipamento, index) => {
+
+
+            const modelo =
+                equipamento.modelo;
+
+
+            const quantidade =
+                equipamento.quantidade;
+
+
+            const letra2 =
+                modelo.charAt(1);
+
+
+            const letra3 =
+                modelo.charAt(2);
+
+
+            const altura =
+                parseInt(
+                    modelo.replace(
+                        /[^\d]/g,
+                        ""
+                    )
+                );
+
+
+            let tipo = "";
+
+
+            if(letra2 === "A")
+                tipo = "Articulada";
+
+
+            if(letra2 === "T")
+                tipo = "Tesoura";
+
+
+            if(letra2 === "M")
+                tipo = "Mastro";
+
+
+            let energia = "";
+
+
+            if(letra3 === "E")
+                energia = "elétrica";
+
+
+            if(letra3 === "D")
+                energia = "diesel";
+
+
+            const alturaPlataforma =
+                altura - 2;
+
+
+            if(index > 0){
+
+                blocosEquipamentos +=
+                    "\n=======\n\n";
+            }
+
+
+            blocosEquipamentos +=
+`🟡 Modelo: ${
+    quantidade > 1
+        ? quantidade + " "
+        : ""
+}${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
 
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
 * Período de locação: ${periodoExibicao} dias
+`;
 
-💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacao)}
+        }
+    );
+
+
+    // ==================================
+    // QUANTIDADE TOTAL
+    // ==================================
+
+    const quantidadeTotal =
+        equipamentos.reduce(
+            (
+                total,
+                equipamento
+            ) => {
+
+                return total +
+                    equipamento.quantidade;
+
+            },
+            0
+        );
+
+
+    const textoMaquina =
+        quantidadeTotal > 1
+            ? "máquinas"
+            : "máquina";
+
+
+    // ==================================
+    // VALOR
+    // ==================================
+
+    const textoValor =
+        equipamentos.length > 1 ||
+        quantidadeTotal > 1
+            ? "Valor da locação (Ambos juntos)"
+            : "Valor da locação";
+
+
+    const textoTotal =
+        equipamentos.length > 1 ||
+        quantidadeTotal > 1
+            ? "Total máquinas + seguro"
+            : "Total máquina + seguro";
+
+
+    let textoFinal =
+`${blocosEquipamentos}
+
+💰 ${textoValor}: R$ ${formatarMoedaBR(valorLocacao)}
 🛡️ Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguro)}
 
-💵 Total máquina + seguro: R$ ${formatarMoedaBR(total)}${
-    multiplicador > 1
-        ? ` * ${multiplicador} períodos = R$ ${formatarMoedaBR(total * multiplicador)}`
-        : ""
-}
+💵 ${textoTotal}: R$ ${formatarMoedaBR(total)}`;
 
-🚚 Frete entrega: R$ ${valorFrete} de Itajai x ${cidadeFormatada}
-🚚 Frete retirada: R$ ${valorFrete} de ${cidadeFormatada} x Itajai
+
+    if(
+        multiplicadorPeriodo > 1
+    ){
+
+        textoFinal +=
+            ` * ${multiplicadorPeriodo} períodos = R$ ${formatarMoedaBR(
+                total * multiplicadorPeriodo
+            )}`;
+    }
+
+
+    textoFinal +=
+`
+
+🚚 Frete entrega: R$ ${
+    valorFreteTexto || "0,00"
+} de Itajai x ${cidadeFormatada}
+
+🚚 Frete retirada: R$ ${
+    valorFreteTexto || "0,00"
+} de ${cidadeFormatada} x Itajai
 
 (Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)
 
@@ -789,51 +1684,90 @@ function copiarPropostaZap(){
 
 📄 Forma de pagamento: Mediante aprovação cadastral.`;
 
-    navigator.clipboard.writeText(texto);
-    mostrarToast("Proposta Zap copiada");
+
+    copiar(textoFinal);
+
+    mostrarToast(
+        "Proposta Zap copiada"
+    );
 }
+
+
+// ======================================
+// AGENDAMENTO
+// ======================================
 
 function copiarAgendamento(){
 
     const data =
-        $("agData").value || '"hora"';
+        $("agData").value ||
+        '"hora"';
+
 
     const horario =
-        $("agHorario").value || '"hora"';
+        $("agHorario").value ||
+        '"hora"';
+
 
     const equipamento =
-        $("agEquipamento").value || '"PEMT"';
+        $("agEquipamento").value ||
+        '"PEMT"';
+
 
     const saida =
-        $("agSaida").value || "WR";
+        $("agSaida").value ||
+        "WR";
+
 
     const entrega =
-        $("agEntrega").value || '"Nome_do_Local"';
+        $("agEntrega").value ||
+        '"Nome_do_Local"';
+
 
     const endereco =
-        $("agEndereco").value || '"Endereço"';
+        $("agEndereco").value ||
+        '"Endereço"';
+
 
     const contato =
-        $("agContato").value.trim();
+        $("agContato")
+            .value
+            .trim();
+
 
     const numero =
-        $("agNumero").value.trim();
+        $("agNumero")
+            .value
+            .trim();
+
 
     const frete =
-        $("agendamentoValorFrete").value || '"Valor"';
+        $("agendamentoValorFrete")
+            .value ||
+        '"Valor"';
+
 
     const tipoFrete =
         $("tipoFrete").value;
 
-    const nomeProposta =
-        $("agNomeProposta").value || '"Nome_Proposta"';
 
-    // =========================
+    const nomeProposta =
+        $("agNomeProposta")
+            .value ||
+        '"Nome_Proposta"';
+
+
+    // ==================================
     // CONTATO
-    // =========================
+    // ==================================
+
     let blocoContato = "";
 
-    if(contato && numero){
+
+    if(
+        contato &&
+        numero
+    ){
 
         blocoContato =
 `Contato de quem vai receber: ${contato} - ${numero}`;
@@ -844,56 +1778,92 @@ function copiarAgendamento(){
 `Contato de quem vai receber: abaixo ⤵️`;
     }
 
-    // =========================
+
+    // ==================================
     // FINANCEIRO
-    // =========================
+    // ==================================
+
     let financeiroTexto = "";
 
-    if(tipoFrete !== "NOSSA"){
+
+    if(
+        tipoFrete !== "NOSSA"
+    ){
 
         const financeiros =
-            document.querySelectorAll(".financeiro-item");
+            document.querySelectorAll(
+                ".financeiro-item"
+            );
+
 
         let listaFinanceiros = "";
 
-        financeiros.forEach((item) => {
 
-            const nome =
-                item.querySelector(".financeiroNome")
-                ?.value
-                .trim();
+        financeiros.forEach(
+            (item) => {
 
-            const telefone =
-                item.querySelector(".financeiroTelefone")
-                ?.value
-                .trim();
+                const nome =
+                    item.querySelector(
+                        ".financeiroNome"
+                    )
+                    ?.value
+                    .trim();
 
-            const email =
-                item.querySelector(".financeiroEmail")
-                ?.value
-                .trim();
 
-            let bloco = "";
+                const telefone =
+                    item.querySelector(
+                        ".financeiroTelefone"
+                    )
+                    ?.value
+                    .trim();
 
-            if(nome){
-                bloco += `Nome: ${nome}\n`;
-            }
 
-            if(telefone){
-                bloco += `Telefone: ${telefone}\n`;
-            }
+                const email =
+                    item.querySelector(
+                        ".financeiroEmail"
+                    )
+                    ?.value
+                    .trim();
 
-            if(email){
-                bloco += `Email: ${email}\n`;
-            }
 
-            if(bloco.trim()){
-                listaFinanceiros += `
+                let bloco = "";
+
+
+                if(nome){
+
+                    bloco +=
+                        `Nome: ${nome}\n`;
+                }
+
+
+                if(telefone){
+
+                    bloco +=
+                        `Telefone: ${telefone}\n`;
+                }
+
+
+                if(email){
+
+                    bloco +=
+                        `Email: ${email}\n`;
+                }
+
+
+                if(bloco.trim()){
+
+                    listaFinanceiros +=
+`
 ${bloco}`;
-            }
-        });
+                }
 
-        if(listaFinanceiros.trim()){
+            }
+        );
+
+
+        if(
+            listaFinanceiros.trim()
+        ){
 
             financeiroTexto =
 `
@@ -903,9 +1873,11 @@ ${listaFinanceiros}`;
         }
     }
 
-    // =========================
-    // TEXTO FINAL
-    // =========================
+
+    // ==================================
+    // TEXTO
+    // ==================================
+
     const texto =
 `🚚 AGENDAMENTO DE ENTREGA
 
@@ -924,62 +1896,269 @@ ${blocoContato}
         : "CONTA DO CLIENTE"
 } - R$ ${frete}
 * ${nomeProposta}${financeiroTexto}`;
+
+
     copiar(texto);
 
-    mostrarToast("Agendamento copiado");
+    mostrarToast(
+        "Agendamento copiado"
+    );
 }
 
 
+// ======================================
+// TIPO FRETE
+// ======================================
 
-const tipoFreteSelect = $("tipoFrete");
+function configurarTipoFrete(){
 
-if(tipoFreteSelect){
+    const tipoFreteSelect =
+        $("tipoFrete");
 
-    tipoFreteSelect.addEventListener("change", () => {
 
-        const bloco =
-            $("blocoFinanceiro");
+    if(!tipoFreteSelect) return;
 
-        if(tipoFreteSelect.value === "NOSSA"){
 
-            bloco.style.display = "none";
+    tipoFreteSelect.addEventListener(
+        "change",
+        () => {
 
-        }else{
+            const bloco =
+                $("blocoFinanceiro");
 
-            bloco.style.display = "block";
+
+            if(
+                tipoFreteSelect.value ===
+                "NOSSA"
+            ){
+
+                bloco.style.display =
+                    "none";
+
+            }else{
+
+                bloco.style.display =
+                    "block";
+            }
+
         }
-    });
+    );
 }
 
+
+// ======================================
+// ADICIONAR FINANCEIRO
+// ======================================
 
 function adicionarFinanceiro(){
 
     const lista =
         $("listaFinanceiros");
 
+
     lista.insertAdjacentHTML(
         "beforeend",
         `
+
         <div class="financeiro-item">
 
             <div class="agendamento-linha">
+
                 <label>Nome:</label>
-                <input type="text" class="financeiroNome">
+
+                <input
+                    type="text"
+                    class="financeiroNome"
+                >
+
             </div>
 
+
             <div class="agendamento-linha">
+
                 <label>Telefone:</label>
-                <input type="text" class="financeiroTelefone">
+
+                <input
+                    type="text"
+                    class="financeiroTelefone"
+                >
+
             </div>
 
+
             <div class="agendamento-linha">
+
                 <label>Email:</label>
-                <input type="text" class="financeiroEmail">
+
+                <input
+                    type="text"
+                    class="financeiroEmail"
+                >
+
             </div>
+
 
             <hr>
 
         </div>
+
         `
     );
 }
+
+
+// ======================================
+// INIT
+// ======================================
+
+(async function init(){
+
+    // ==================================
+    // CARREGAR CSVs
+    // ==================================
+
+    await carregarTabela();
+
+    await carregarFretes();
+
+
+    // ==================================
+    // EQUIPAMENTOS
+    // ==================================
+
+    configurarEventosEquipamentos();
+
+
+    // ==================================
+    // NOME CLIENTE
+    // ==================================
+
+    if($("nomeCliente")){
+
+        $("nomeCliente")
+            .addEventListener(
+                "input",
+                gerarTextos
+            );
+    }
+
+
+    // ==================================
+    // PERÍODO
+    // ==================================
+
+    if($("periodo")){
+
+        $("periodo")
+            .addEventListener(
+                "input",
+                () => {
+
+                    gerarTextos();
+
+                    mostrarFretes();
+
+                }
+            );
+    }
+
+
+    // ==================================
+    // CIDADE
+    // ==================================
+
+    if($("cidade")){
+
+        $("cidade")
+            .addEventListener(
+                "input",
+                () => {
+
+                    gerarTextos();
+
+                    mostrarFretes();
+
+                }
+            );
+    }
+
+
+    // ==================================
+    // VALOR TABELA
+    // ==================================
+
+    if($("valorTabela")){
+
+        $("valorTabela")
+            .addEventListener(
+                "input",
+                calcularDesconto
+            );
+    }
+
+
+    // ==================================
+    // VALOR DESEJADO
+    // ==================================
+
+    if($("valorDesejado")){
+
+        $("valorDesejado")
+            .addEventListener(
+                "input",
+                () => {
+
+                    // Ao digitar valor desejado,
+                    // limpa percentual
+                    $("percentualDesconto").value = "";
+
+                    calcularDesconto();
+
+                }
+            );
+    }
+
+
+    // ==================================
+    // PERCENTUAL
+    // ==================================
+
+    if($("percentualDesconto")){
+
+        $("percentualDesconto")
+            .addEventListener(
+                "input",
+                () => {
+
+                    // Ao digitar percentual,
+                    // limpa valor desejado
+                    $("valorDesejado").value = "";
+
+                    calcularDesconto();
+
+                }
+            );
+    }
+
+
+    // ==================================
+    // FRETE
+    // ==================================
+
+    if($("valorFrete")){
+
+        $("valorFrete")
+            .addEventListener(
+                "input",
+                gerarTextos
+            );
+    }
+
+
+    // ==================================
+    // TIPO FRETE
+    // ==================================
+
+    configurarTipoFrete();
+
+})();

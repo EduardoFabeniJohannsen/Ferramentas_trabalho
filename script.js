@@ -1673,11 +1673,9 @@ function copiarPropostaZap(){
 🚚 Frete entrega: R$ ${
     valorFreteTexto || "0,00"
 } de Itajai x ${cidadeFormatada}
-
 🚚 Frete retirada: R$ ${
     valorFreteTexto || "0,00"
 } de ${cidadeFormatada} x Itajai
-
 (Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)
 
 🎁 Cortesia: Entrega técnica (mediante solicitação)

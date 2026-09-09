@@ -475,6 +475,51 @@ DESCONTO
     color:#60a5fa;
 }
 
+.desconto-item{
+
+    text-align:left;
+
+    margin-bottom:12px;
+
+    padding-bottom:10px;
+
+    border-bottom:1px solid #334155;
+}
+
+.desconto-item-titulo{
+
+    font-weight:bold;
+
+    margin:0 0 6px 0;
+}
+
+.desconto-item-valor-tabela{
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    margin:0 0 8px 0;
+}
+
+.desconto-item-resultado{
+
+    font-weight:bold;
+
+    color:#60a5fa;
+
+    margin:6px 0 0 0;
+}
+
+#valorFinalProposta{
+
+    font-weight:bold;
+
+    color:#22c55e;
+
+    font-size:18px;
+}
+
 
 /* =========================
 PAINEL FRETES

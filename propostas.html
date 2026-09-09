@@ -33,7 +33,7 @@ TOPBAR
     </a>
 
     <div class="versao">
-        v5.5.2
+        v5.6.0
     </div>
 
 </div>
@@ -293,7 +293,7 @@ CONTAINER
 
             <div id="listaEquipamentosProposta">
 
-<div class="equipamento-linha">
+<div class="equipamento-linha" data-equip-id="1">
 
     <input
         type="text"
@@ -471,33 +471,17 @@ CONTAINER
 
             <h2>Calcular Desconto</h2>
 
+            <div id="listaDescontosEquipamentos">
+                <p class="desconto-placeholder" style="color:#94a3b8">
+                    Adicione um equipamento e o período pra calcular.
+                </p>
+            </div>
 
-            <input
-                type="text"
-                id="valorTabela"
-                placeholder="Valor tabela"
-            >
-
-
-            <input
-                type="text"
-                id="valorDesejado"
-                placeholder="Valor desejado"
-            >
-
-
-            <input
-                type="text"
-                id="percentualDesconto"
-                placeholder="% desconto"
-            >
-
+            <hr>
 
             <p>
-
-                Desconto:
-                <span id="desconto"></span>
-
+                Valor final da proposta:
+                <span id="valorFinalProposta"></span>
             </p>
 
         </div>

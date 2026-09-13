@@ -1,7 +1,7 @@
 // ======================================
 // HELPERS
 // ======================================
-const VERSAO_SISTEMA = "5.7.1";
+const VERSAO_SISTEMA = "5.7.3";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;

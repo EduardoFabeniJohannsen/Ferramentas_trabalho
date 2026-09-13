@@ -303,6 +303,19 @@ EQUIPAMENTOS
     background:#ef4444;
 }
 
+.btn-limpar-tudo{
+
+    width:100%;
+
+    background:#7f1d1d;
+
+    margin-bottom:10px;
+}
+
+.btn-limpar-tudo:hover{
+    background:#991b1b;
+}
+
 
 /* =========================
 BOTÕES

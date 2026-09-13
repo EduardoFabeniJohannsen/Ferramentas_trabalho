@@ -370,6 +370,7 @@ function copiarPropostaZap(){
         ? quantidade + " "
         : ""
 }${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
+
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
 * Período de locação: ${periodoExibicao} dias${
@@ -750,6 +751,13 @@ function adicionarFinanceiro(){
     // ==================================
 
     configurarEventosEquipamentos();
+
+
+    // ==================================
+    // CACHE (repõe o que tava salvo)
+    // ==================================
+
+    restaurarCache();
 
 
     // ==================================

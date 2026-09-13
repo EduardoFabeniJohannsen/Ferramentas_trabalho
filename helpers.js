@@ -1,12 +1,18 @@
 // ======================================
-// HELPERS
+// VERSÃO DO SISTEMA
 // ======================================
-const VERSAO_SISTEMA = "5.7.4";
+// Só precisa trocar aqui — aparece sozinho nas duas páginas.
+
+const VERSAO_SISTEMA = "5.7.5";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
 });
 
+
+// ======================================
+// HELPERS
+// ======================================
 
 const $ = (id) => document.getElementById(id);
 
@@ -188,6 +194,13 @@ function calcularBoletos(){
             data28.getDate() + 28
         );
 
+        const data42 =
+            new Date(data);
+
+        data42.setDate(
+            data42.getDate() + 42
+        );
+
         const data56 =
             new Date(data);
 
@@ -198,12 +211,16 @@ function calcularBoletos(){
         $("d28").innerText =
             formatarData(data28);
 
+        $("d42").innerText =
+            formatarData(data42);
+
         $("d56").innerText =
             formatarData(data56);
 
     }else{
 
         $("d28").innerText = "";
+        $("d42").innerText = "";
         $("d56").innerText = "";
     }
 
@@ -219,7 +236,7 @@ function calcularBoletos(){
         ){
 
             $("metade").innerText =
-                "R$ " + formatarMoedaBR(valor / 2);
+                "R$ " + formatarMoedaBR(valor / 3);
 
         }else{
 
@@ -405,6 +422,28 @@ Obrigada.`,
 (function initCalculadoraBoletos(){
 
     if($("data")){
+
+        // Puxa a data de hoje sozinho, se o campo
+        // estiver vazio (ex: assim que a página abre).
+        if(!$("data").value){
+
+            const hoje = new Date();
+
+            const ano = hoje.getFullYear();
+
+            const mes =
+                String(hoje.getMonth() + 1)
+                    .padStart(2, "0");
+
+            const dia =
+                String(hoje.getDate())
+                    .padStart(2, "0");
+
+            $("data").value =
+                `${ano}-${mes}-${dia}`;
+
+            calcularBoletos();
+        }
 
         $("data")
             .addEventListener(

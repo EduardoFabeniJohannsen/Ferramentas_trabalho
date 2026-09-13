@@ -493,13 +493,18 @@ DESCONTO
     margin:0 0 6px 0;
 }
 
-.desconto-item-valor-tabela{
+.descValorTabela{
 
-    color:#94a3b8;
+    font-weight:bold;
+
+    color:#e5e7eb;
+}
+
+.desconto-item-erro{
+
+    margin:-4px 0 8px 0;
 
     font-size:14px;
-
-    margin:0 0 8px 0;
 }
 
 .desconto-item-resultado{

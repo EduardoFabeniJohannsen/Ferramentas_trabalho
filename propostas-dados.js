@@ -124,6 +124,8 @@ async function carregarTabela() {
             tabelaPrecos["WTE10"]
         );
 
+        preencherListaEquipamentos();
+
     } catch (erro) {
 
         console.error(
@@ -141,15 +143,10 @@ async function carregarTabela() {
 
 async function carregarFretes(){
 
-    const arquivos = [
-
-        "frete_Magnus.csv",
-        "frete_Kung.csv",
-        "frete_Jean.csv",
-        "frete_Dionizio.csv",
-        "frete_RR.csv"
-
-    ];
+    const arquivos =
+        TRANSPORTADORAS_FRETE.map(
+            nome => `frete_${nome}.csv`
+        );
 
 
     for(const arquivo of arquivos){
@@ -270,6 +267,63 @@ async function carregarFretes(){
         "Fretes carregados:",
         tabelasFrete
     );
+
+    preencherListaCidades();
+}
+
+
+// ======================================
+// LISTAS DE SUGESTÃO (datalists)
+// ======================================
+// Geradas automaticamente a partir dos dados carregados,
+// em vez de ficarem digitadas fixas no HTML.
+
+function preencherListaEquipamentos(){
+
+    const lista =
+        $("listaEquipamentos");
+
+    if(!lista) return;
+
+    const modelos =
+        Object.keys(tabelaPrecos).sort();
+
+    lista.innerHTML =
+        modelos
+            .map(modelo => `<option value="${modelo}">`)
+            .join("");
+}
+
+
+function preencherListaCidades(){
+
+    const lista =
+        $("listaCidades");
+
+    if(!lista) return;
+
+    // une as cidades de TODAS as transportadoras
+    // (não só as que todo mundo atende)
+    const cidades = new Set();
+
+    Object.values(tabelasFrete).forEach(modelos => {
+
+        Object.values(modelos).forEach(cidadesModelo => {
+
+            Object.keys(cidadesModelo).forEach(cidade => {
+
+                if(cidade) cidades.add(cidade);
+            });
+        });
+    });
+
+    const cidadesOrdenadas =
+        Array.from(cidades).sort();
+
+    lista.innerHTML =
+        cidadesOrdenadas
+            .map(cidade => `<option value="${cidade}">`)
+            .join("");
 }
 
 

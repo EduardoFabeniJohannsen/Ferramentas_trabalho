@@ -3,11 +3,27 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "5.8.0";
+const VERSAO_SISTEMA = "5.9.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
 });
+
+
+// ======================================
+// TRANSPORTADORAS DE FRETE
+// ======================================
+// Única lista de transportadoras do sistema. Pra adicionar
+// ou remover uma, mexe só aqui — desde que exista o arquivo
+// frete_NOME.csv correspondente na pasta.
+
+const TRANSPORTADORAS_FRETE = [
+    "Magnus",
+    "Kung",
+    "Jean",
+    "Dionizio",
+    "RR"
+];
 
 
 // ======================================
@@ -236,7 +252,7 @@ function calcularBoletos(){
         ){
 
             $("metade").innerText =
-                "R$ " + formatarMoedaBR(valor / 3);
+                "R$ " + formatarMoedaBR(valor / 2);
 
         }else{
 

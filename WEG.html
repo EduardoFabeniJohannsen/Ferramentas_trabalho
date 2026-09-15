@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>WEG - Contrato</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="icon.png">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <a href="propostas.html" class="botao-topbar">
+        ⬅ Voltar
+    </a>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER
+========================= -->
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Contrato WEG</h2>
+
+        <p style="color:#94a3b8; font-size:13px; margin-top:-8px;">
+            Preços fixos em contrato. Período sempre de 30 dias.
+        </p>
+
+        <hr>
+
+        <!-- EQUIPAMENTOS -->
+
+        <div id="listaEquipamentosWEG"></div>
+
+        <hr>
+
+        <!-- FRETE -->
+
+        <div class="agendamento-linha">
+            <label>Valor do frete:</label>
+            <input
+                type="text"
+                id="valorFrete"
+                placeholder="Ex: 450,00"
+            >
+        </div>
+
+        <hr>
+
+        <!-- DATAS -->
+
+        <div class="agendamento-linha">
+            <label>Data início:</label>
+            <input
+                type="date"
+                id="dataInicio"
+            >
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+    DOCUMENTO (área pra print)
+    ========================= -->
+
+    <div
+        id="documentoProposta"
+        class="documento-proposta"
+    ></div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="helpers.js"></script>
+<script src="weg.js"></script>
+
+</body>
+
+</html>

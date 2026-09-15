@@ -272,50 +272,6 @@ EQUIPAMENTOS
     background:#2563eb;
 }
 
-.btn-remover-equipamento{
-
-    width:35px;
-
-    height:35px;
-
-    flex:none;
-
-    padding:0;
-
-    margin:0;
-
-    border:none;
-
-    border-radius:8px;
-
-    background:#475569;
-
-    color:white;
-
-    font-size:22px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-}
-
-.btn-remover-equipamento:hover{
-    background:#ef4444;
-}
-
-.btn-limpar-tudo{
-
-    width:100%;
-
-    background:#7f1d1d;
-
-    margin-bottom:10px;
-}
-
-.btn-limpar-tudo:hover{
-    background:#991b1b;
-}
-
 
 /* =========================
 BOTÕES
@@ -488,56 +444,6 @@ DESCONTO
     color:#60a5fa;
 }
 
-.desconto-item{
-
-    text-align:left;
-
-    margin-bottom:12px;
-
-    padding-bottom:10px;
-
-    border-bottom:1px solid #334155;
-}
-
-.desconto-item-titulo{
-
-    font-weight:bold;
-
-    margin:0 0 6px 0;
-}
-
-.descValorTabela{
-
-    font-weight:bold;
-
-    color:#e5e7eb;
-}
-
-.desconto-item-erro{
-
-    margin:-4px 0 8px 0;
-
-    font-size:14px;
-}
-
-.desconto-item-resultado{
-
-    font-weight:bold;
-
-    color:#60a5fa;
-
-    margin:6px 0 0 0;
-}
-
-#valorFinalProposta{
-
-    font-weight:bold;
-
-    color:#22c55e;
-
-    font-size:18px;
-}
-
 
 /* =========================
 PAINEL FRETES
@@ -665,9 +571,130 @@ RESPONSIVO
     }
 
     .card,
-    .painel-fretes{
+    .painel-fretes,
+    .documento-proposta{
         width:100%;
         max-width:350px;
     }
 
+}
+
+
+/* =========================
+DOCUMENTO PROPOSTA (impressão/print)
+========================= */
+
+.documento-proposta{
+
+    width:380px;
+
+    background:#ffffff;
+
+    color:#111827;
+
+    padding:24px;
+
+    border-radius:12px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+
+    box-sizing:border-box;
+}
+
+.documento-proposta h3{
+
+    margin:0 0 4px 0;
+
+    font-size:16px;
+
+    color:#0f172a;
+}
+
+.documento-proposta .subtitulo{
+
+    font-size:12px;
+
+    color:#64748b;
+
+    margin-bottom:16px;
+}
+
+.documento-proposta table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    font-size:13px;
+
+    margin-bottom:16px;
+}
+
+.documento-proposta th{
+
+    background:#0f172a;
+
+    color:#fff;
+
+    text-align:left;
+
+    padding:8px;
+
+    border:1px solid #0f172a;
+}
+
+.documento-proposta td{
+
+    padding:8px;
+
+    border:1px solid #cbd5e1;
+}
+
+.documento-proposta tr.linha-selecionada td{
+
+    background:#eff6ff;
+
+    font-weight:bold;
+
+    border-left:3px solid #2563eb;
+}
+
+.documento-proposta .resumo-linha{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:13px;
+
+    margin-bottom:6px;
+}
+
+.documento-proposta .resumo-linha.total{
+
+    font-weight:bold;
+
+    font-size:15px;
+
+    border-top:1px solid #e2e8f0;
+
+    padding-top:8px;
+
+    margin-top:8px;
+}
+
+.documento-proposta .perguntas{
+
+    margin-top:20px;
+
+    font-size:13px;
+
+    line-height:2;
+}
+
+.documento-proposta .perguntas strong{
+
+    display:block;
+
+    margin-bottom:6px;
 }

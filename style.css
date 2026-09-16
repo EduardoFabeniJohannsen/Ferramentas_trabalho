@@ -692,9 +692,24 @@ DOCUMENTO PROPOSTA (impressão/print)
     line-height:2;
 }
 
-.documento-proposta .perguntas strong{
+/* =========================
+TOGGLE LOCAÇÃO COMPLEMENTAR
+========================= */
 
-    display:block;
+.btn-toggle{
 
-    margin-bottom:6px;
+    background:#475569;
+}
+
+.btn-toggle:hover{
+    background:#334155;
+}
+
+.btn-toggle.ativo{
+
+    background:#16a34a;
+}
+
+.btn-toggle.ativo:hover{
+    background:#15803d;
 }

@@ -270,6 +270,19 @@ function copiarPropostaZap(){
 
 
     // ==================================
+    // LOCAÇÃO COMPLEMENTAR (frete)
+    // ==================================
+
+    const valorFreteNumero =
+        brToNumber(valorFreteTexto);
+
+    const valorComplementar =
+        locacaoComplementarAtiva
+            ? (valorFreteNumero * 2) * 1.2
+            : 0;
+
+
+    // ==================================
     // BLOCOS DOS EQUIPAMENTOS
     // (valor + seguro calculados por equipamento)
     // ==================================
@@ -349,12 +362,28 @@ function copiarPropostaZap(){
                 valorLocacaoItem * 0.07;
 
 
+            // Locação complementar só entra na linha de Total
+            // do próprio item quando ele é o único da proposta
+            // — com mais de um equipamento, ela entra uma única
+            // vez lá embaixo, na linha "Valor final da proposta".
+            const complementarNesteItem =
+                (
+                    locacaoComplementarAtiva &&
+                    dadosComValor.length === 1
+                )
+                    ? valorComplementar
+                    : 0;
+
+
             const totalItem =
-                valorLocacaoItem + seguroItem;
+                valorLocacaoItem +
+                seguroItem +
+                complementarNesteItem;
 
 
             totalGeral +=
-                totalItem;
+                valorLocacaoItem +
+                seguroItem;
 
 
             if(index > 0){
@@ -364,13 +393,18 @@ function copiarPropostaZap(){
             }
 
 
+            const rotuloTotal =
+                complementarNesteItem > 0
+                    ? "Total máquina + seguro + Frete com locação complementar"
+                    : "Total máquina + seguro";
+
+
             blocosEquipamentos +=
 `🟡 Modelo: ${
     quantidade > 1
         ? quantidade + " "
         : ""
 }${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
-
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
 * Período de locação: ${periodoExibicao} dias${
@@ -381,29 +415,51 @@ function copiarPropostaZap(){
 
 💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacaoItem)}
 🛡️ Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguroItem)}
-💵 Total máquina + seguro: R$ ${formatarMoedaBR(totalItem)}
+💵 ${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}
 `;
 
         }
     );
 
 
+    // Com mais de 1 equipamento, a locação complementar
+    // entra uma única vez aqui, não em cada item.
+    const complementarNoTotalGeral =
+        (
+            locacaoComplementarAtiva &&
+            dadosComValor.length > 1
+        )
+            ? valorComplementar
+            : 0;
+
+
+    const rotuloValorFinal =
+        complementarNoTotalGeral > 0
+            ? "Valor final da proposta (tudo incluso + Frete com locação complementar)"
+            : "Valor final da proposta (tudo incluso)";
+
+
     const linhaValorFinal =
         dadosComValor.length > 1
-            ? `\n💵 Valor final da proposta (tudo incluso): R$ ${formatarMoedaBR(totalGeral)}\n`
+            ? `\n💵 ${rotuloValorFinal}: R$ ${formatarMoedaBR(totalGeral + complementarNoTotalGeral)}\n`
             : "";
+
+
+    const notaFrete =
+        locacaoComplementarAtiva
+            ? `(Frete incluso como "Locação Complementar")`
+            : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)`;
 
 
     let textoFinal =
 `${blocosEquipamentos}${linhaValorFinal}
-
 🚚 Frete entrega: R$ ${
     valorFreteTexto || "0,00"
 } de Itajai x ${cidadeFormatada}
 🚚 Frete retirada: R$ ${
     valorFreteTexto || "0,00"
 } de ${cidadeFormatada} x Itajai
-(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)
+${notaFrete}
 
 🎁 Cortesia: Entrega técnica (mediante solicitação)
 📄 Forma de pagamento: Mediante aprovação cadastral.`;

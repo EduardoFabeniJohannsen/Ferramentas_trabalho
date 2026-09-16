@@ -1284,6 +1284,44 @@ document.addEventListener("input", (evento) => {
 const CHAVE_CACHE_PROPOSTA = "propostaCache";
 
 
+// ======================================
+// LOCAÇÃO COMPLEMENTAR (toggle)
+// ======================================
+// Desativado por padrão. Quando ativado, muda o cálculo
+// da mensagem "Copiar Proposta Zap" (ver copiarPropostaZap
+// em propostas-textos.js).
+
+let locacaoComplementarAtiva = false;
+
+
+function alternarLocacaoComplementar(){
+
+    locacaoComplementarAtiva = !locacaoComplementarAtiva;
+
+    atualizarBotaoLocacaoComplementar();
+
+    salvarCache();
+}
+
+
+function atualizarBotaoLocacaoComplementar(){
+
+    const botao = $("btnLocacaoComplementar");
+
+    if(!botao) return;
+
+    botao.classList.toggle(
+        "ativo",
+        locacaoComplementarAtiva
+    );
+
+    botao.innerText =
+        `Locação complementar: ${
+            locacaoComplementarAtiva ? "Ativada" : "Desativada"
+        }`;
+}
+
+
 function salvarCache(){
 
     const equipamentos = [];
@@ -1322,6 +1360,7 @@ function salvarCache(){
         periodo: $("periodo")?.value || "",
         cidade: $("cidade")?.value || "",
         valorFrete: $("valorFrete")?.value || "",
+        locacaoComplementarAtiva: locacaoComplementarAtiva,
         equipamentos: equipamentos
     };
 
@@ -1362,6 +1401,10 @@ function restaurarCache(){
     if($("periodo")) $("periodo").value = dados.periodo || "";
     if($("cidade")) $("cidade").value = dados.cidade || "";
     if($("valorFrete")) $("valorFrete").value = dados.valorFrete || "";
+
+    locacaoComplementarAtiva = dados.locacaoComplementarAtiva === true;
+
+    atualizarBotaoLocacaoComplementar();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)

@@ -1322,6 +1322,44 @@ function atualizarBotaoLocacaoComplementar(){
 }
 
 
+// ======================================
+// VALOR DA DIÁRIA (toggle)
+// ======================================
+// Desativado por padrão. Quando ativado, mostra a diária
+// (valor da locação ÷ dias do período) ao lado do valor
+// da locação na mensagem "Copiar Proposta Zap".
+
+let valorDiariaAtivo = false;
+
+
+function alternarValorDiaria(){
+
+    valorDiariaAtivo = !valorDiariaAtivo;
+
+    atualizarBotaoValorDiaria();
+
+    salvarCache();
+}
+
+
+function atualizarBotaoValorDiaria(){
+
+    const botao = $("btnValorDiaria");
+
+    if(!botao) return;
+
+    botao.classList.toggle(
+        "ativo",
+        valorDiariaAtivo
+    );
+
+    botao.innerText =
+        `Valor da diária: ${
+            valorDiariaAtivo ? "Ativada" : "Desativada"
+        }`;
+}
+
+
 function salvarCache(){
 
     const equipamentos = [];
@@ -1361,6 +1399,7 @@ function salvarCache(){
         cidade: $("cidade")?.value || "",
         valorFrete: $("valorFrete")?.value || "",
         locacaoComplementarAtiva: locacaoComplementarAtiva,
+        valorDiariaAtivo: valorDiariaAtivo,
         equipamentos: equipamentos
     };
 
@@ -1405,6 +1444,10 @@ function restaurarCache(){
     locacaoComplementarAtiva = dados.locacaoComplementarAtiva === true;
 
     atualizarBotaoLocacaoComplementar();
+
+    valorDiariaAtivo = dados.valorDiariaAtivo === true;
+
+    atualizarBotaoValorDiaria();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)

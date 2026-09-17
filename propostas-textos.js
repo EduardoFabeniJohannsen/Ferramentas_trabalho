@@ -395,8 +395,18 @@ function copiarPropostaZap(){
 
             const rotuloTotal =
                 complementarNesteItem > 0
-                    ? "Total máquina + seguro + Frete com locação complementar"
+                    ? "Total máquina + seguro + Frete com locação complementar(+20%)"
                     : "Total máquina + seguro";
+
+
+            const textoDiaria =
+                (
+                    valorDiariaAtivo &&
+                    Number.isFinite(diasNumero) &&
+                    diasNumero > 0
+                )
+                    ? ` ( Diária = R$ ${formatarMoedaBR(valorLocacaoItem / diasNumero)} )`
+                    : "";
 
 
             blocosEquipamentos +=
@@ -413,7 +423,7 @@ function copiarPropostaZap(){
         : ""
 }
 
-💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacaoItem)}
+💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacaoItem)}${textoDiaria}
 🛡️ Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguroItem)}
 💵 ${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}
 `;
@@ -435,7 +445,7 @@ function copiarPropostaZap(){
 
     const rotuloValorFinal =
         complementarNoTotalGeral > 0
-            ? "Valor final da proposta (tudo incluso + Frete com locação complementar)"
+            ? "Valor final da proposta (tudo incluso + Frete com locação complementar(+20%))"
             : "Valor final da proposta (tudo incluso)";
 
 

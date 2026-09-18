@@ -3,7 +3,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho em todas as páginas.
 
-const VERSAO_SISTEMA = "6.3.0";
+const VERSAO_SISTEMA = "6.4.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;

@@ -424,8 +424,8 @@ function copiarPropostaZap(){
 }
 
 💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacaoItem)}${textoDiaria}
-🛡️ *Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguroItem)}*
-💵 ${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}
+🛡️ Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguroItem)}
+💵 *${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 `;
 
         }

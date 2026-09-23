@@ -24,6 +24,8 @@ TOPBAR
         ⬅ Voltar
     </a>
 
+    <button onclick="fazerLogout()">Sair</button>
+
     <div class="versao" id="versaoSistema"></div>
 
 </div>
@@ -91,6 +93,10 @@ CONTAINER
 
 <div id="toast"></div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth-guard.js"></script>
 
 <script src="helpers.js"></script>
 <script src="weg.js"></script>

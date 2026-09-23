@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="icon.png">
+</head>
+
+<body>
+
+<div class="container" style="padding-top:120px;">
+
+    <div class="card" style="width:320px;">
+
+        <h2>Login</h2>
+
+        <input
+            type="email"
+            id="loginEmail"
+            placeholder="E-mail"
+            autocomplete="username"
+        >
+
+        <input
+            type="password"
+            id="loginSenha"
+            placeholder="Senha"
+            autocomplete="current-password"
+        >
+
+        <button onclick="fazerLogin()">Entrar</button>
+
+        <p id="loginErro" style="color:#ef4444; font-size:13px; margin-top:8px;"></p>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
+<script>
+
+// pequeno helper local (helpers.js não é carregado aqui)
+const $ = (id) => document.getElementById(id);
+
+
+// ======================================
+// SE JÁ ESTIVER LOGADO, PULA DIRETO
+// ======================================
+
+(async function verificarSessaoExistente(){
+
+    const { data } =
+        await supabaseClient.auth.getSession();
+
+    if(data.session){
+
+        window.location.href = "propostas.html";
+    }
+
+})();
+
+
+// ======================================
+// LOGIN
+// ======================================
+
+async function fazerLogin(){
+
+    const email =
+        $("loginEmail").value.trim();
+
+    const senha =
+        $("loginSenha").value;
+
+    const erroEl =
+        $("loginErro");
+
+    erroEl.innerText = "";
+
+    if(!email || !senha){
+
+        erroEl.innerText =
+            "Preencha e-mail e senha";
+
+        return;
+    }
+
+    const { error } =
+        await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: senha
+        });
+
+    if(error){
+
+        erroEl.innerText =
+            "E-mail ou senha inválidos";
+
+        return;
+    }
+
+    window.location.href = "propostas.html";
+}
+
+
+// permite dar Enter no campo de senha pra logar
+document.addEventListener("DOMContentLoaded", () => {
+
+    const campoSenha =
+        $("loginSenha");
+
+    if(campoSenha){
+
+        campoSenha.addEventListener(
+            "keydown",
+            (evento) => {
+
+                if(evento.key === "Enter"){
+                    fazerLogin();
+                }
+            }
+        );
+    }
+});
+
+</script>
+
+</body>
+</html>

@@ -10,6 +10,81 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="icon.png">
 
+<style>
+/* ===== Engrenagem + modal de configurações ===== */
+.card-com-engrenagem{
+    position:relative;
+}
+.btn-engrenagem{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:auto;
+    margin:0;
+    padding:4px 8px;
+    font-size:18px;
+    line-height:1;
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:8px;
+    cursor:pointer;
+}
+.btn-engrenagem:hover{
+    background:rgba(148,163,184,.2);
+}
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:rgba(0,0,0,.6);
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.modal-overlay.aberto{
+    display:flex;
+}
+.modal-config{
+    width:100%;
+    max-width:380px;
+    background:#1e293b;
+    color:#e2e8f0;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:18px 20px 20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.modal-config-topo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+.modal-config-topo h3{
+    margin:0;
+}
+.modal-config .btn-fechar{
+    width:auto;
+    margin:0;
+    padding:2px 10px;
+    font-size:20px;
+    line-height:1.2;
+}
+.modal-config .btn-toggle{
+    display:block;
+    width:100%;
+    margin:10px 0 2px;
+    text-align:left;
+}
+.modal-config .dica{
+    margin:0 0 6px;
+    font-size:12px;
+    color:#94a3b8;
+}
+</style>
+
+
 </head>
 
 <body>
@@ -269,7 +344,16 @@ CONTAINER
         GERAR TEXTOS
         ========================= -->
 
-        <div class="card">
+        <div class="card card-com-engrenagem">
+
+            <button
+                type="button"
+                class="btn-engrenagem"
+                onclick="abrirConfiguracoes()"
+                title="Configurações da proposta"
+            >
+                ⚙️
+            </button>
 
             <h2>Gerar Textos</h2>
 
@@ -394,26 +478,6 @@ CONTAINER
             <br><br>
 
 
-            <button
-                type="button"
-                id="btnLocacaoComplementar"
-                class="btn-toggle"
-                onclick="alternarLocacaoComplementar()"
-            >
-                Locação complementar: Desativada
-            </button>
-
-
-            <button
-                type="button"
-                id="btnValorDiaria"
-                class="btn-toggle"
-                onclick="alternarValorDiaria()"
-            >
-                Valor da diária: Desativada
-            </button>
-
-
             <button onclick="copiarPropostaZap()">
                 Copiar Proposta Zap
             </button>
@@ -461,6 +525,74 @@ CONTAINER
         <div id="resultadoFretes">
             Nenhum frete consultado
         </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+MODAL DE CONFIGURAÇÕES
+========================= -->
+
+<div
+    id="modalConfig"
+    class="modal-overlay"
+    onclick="if(event.target === this) fecharConfiguracoes()"
+>
+
+    <div class="modal-config">
+
+        <div class="modal-config-topo">
+
+            <h3>⚙️ Configurações</h3>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                onclick="fecharConfiguracoes()"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="btnLocacaoComplementar"
+            class="btn-toggle"
+            onclick="alternarLocacaoComplementar()"
+        >
+            Locação complementar: Desativada
+        </button>
+
+        <p class="dica">Frete entra como "Locação Complementar" (+20%).</p>
+
+
+        <button
+            type="button"
+            id="btnValorDiaria"
+            class="btn-toggle"
+            onclick="alternarValorDiaria()"
+        >
+            Valor da diária: Desativada
+        </button>
+
+        <p class="dica">Mostra a diária ao lado do valor da locação.</p>
+
+
+        <button
+            type="button"
+            id="btnEmojis"
+            class="btn-toggle ativo"
+            onclick="alternarEmojis()"
+        >
+            Emojis: Ativado
+        </button>
+
+        <p class="dica">Desativado, a mensagem sai sem emojis (mantém só 🟡 e 🚚).</p>
 
     </div>
 

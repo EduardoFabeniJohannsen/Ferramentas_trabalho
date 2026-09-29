@@ -1253,6 +1253,74 @@ function atualizarBotaoValorDiaria(){
 }
 
 
+// ======================================
+// EMOJIS (toggle)
+// ======================================
+// Ativado por padrão (mensagem original). Desativado,
+// a mensagem "Copiar Proposta Zap" sai sem emojis
+// (mantém só 🟡 e 🚚).
+
+let emojisAtivo = true;
+
+
+function alternarEmojis(){
+
+    emojisAtivo = !emojisAtivo;
+
+    atualizarBotaoEmojis();
+
+    salvarCache();
+}
+
+
+function atualizarBotaoEmojis(){
+
+    const botao = $("btnEmojis");
+
+    if(!botao) return;
+
+    botao.classList.toggle(
+        "ativo",
+        emojisAtivo
+    );
+
+    botao.innerText =
+        `Emojis: ${
+            emojisAtivo ? "Ativado" : "Desativado"
+        }`;
+}
+
+
+// ======================================
+// MODAL DE CONFIGURAÇÕES (engrenagem)
+// ======================================
+// Abre/fecha o modal que guarda os toggles
+// (locação complementar, valor da diária, emojis).
+
+function abrirConfiguracoes(){
+
+    const modal = $("modalConfig");
+
+    if(modal) modal.classList.add("aberto");
+}
+
+
+function fecharConfiguracoes(){
+
+    const modal = $("modalConfig");
+
+    if(modal) modal.classList.remove("aberto");
+}
+
+
+document.addEventListener("keydown", (evento) => {
+
+    if(evento.key === "Escape"){
+        fecharConfiguracoes();
+    }
+});
+
+
 function salvarCache(){
 
     const equipamentos = [];
@@ -1293,6 +1361,7 @@ function salvarCache(){
         valorFrete: $("valorFrete")?.value || "",
         locacaoComplementarAtiva: locacaoComplementarAtiva,
         valorDiariaAtivo: valorDiariaAtivo,
+        emojisAtivo: emojisAtivo,
         equipamentos: equipamentos
     };
 
@@ -1341,6 +1410,10 @@ function restaurarCache(){
     valorDiariaAtivo = dados.valorDiariaAtivo === true;
 
     atualizarBotaoValorDiaria();
+
+    emojisAtivo = dados.emojisAtivo !== false;
+
+    atualizarBotaoEmojis();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)

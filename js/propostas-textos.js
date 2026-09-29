@@ -287,6 +287,15 @@ function copiarPropostaZap(){
     // (valor + seguro calculados por equipamento)
     // ==================================
 
+    // Com emojis: "💰 ". Sem emojis: "* ".
+    const marca = (emoji) =>
+        emojisAtivo ? `${emoji} ` : "* ";
+
+    // Frete mantém o 🚚 nos dois modos; sem emojis ganha "* " na frente.
+    const prefixoFrete =
+        emojisAtivo ? "" : "* ";
+
+
     let blocosEquipamentos =
         "";
 
@@ -423,9 +432,9 @@ function copiarPropostaZap(){
         : ""
 }
 
-💰 Valor da locação: R$ ${formatarMoedaBR(valorLocacaoItem)}${textoDiaria}
-🛡️ Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguroItem)}
-💵 *${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
+${marca("💰")}Valor da locação: R$ ${formatarMoedaBR(valorLocacaoItem)}${textoDiaria}
+${marca("🛡️")}Seguro contra acidentes e furtos (opcional): R$ ${formatarMoedaBR(seguroItem)}
+${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 `;
 
         }
@@ -451,7 +460,7 @@ function copiarPropostaZap(){
 
     const linhaValorFinal =
         dadosComValor.length > 1
-            ? `\n💵 ${rotuloValorFinal}: R$ ${formatarMoedaBR(totalGeral + complementarNoTotalGeral)}\n`
+            ? `\n${marca("💵")}${rotuloValorFinal}: R$ ${formatarMoedaBR(totalGeral + complementarNoTotalGeral)}\n`
             : "";
 
 
@@ -461,18 +470,27 @@ function copiarPropostaZap(){
             : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)`;
 
 
+    const textoPagamento =
+        emojisAtivo
+            ? "Mediante aprovação cadastral."
+            : "28 dias, mediante aprovação cadastral.";
+
+    // Sem emojis há uma linha em branco entre Cortesia e Pagamento
+    const separadorFinal =
+        emojisAtivo ? "\n" : "\n\n";
+
+
     let textoFinal =
 `${blocosEquipamentos}${linhaValorFinal}
-🚚 Frete entrega: R$ ${
+${prefixoFrete}🚚 Frete entrega: R$ ${
     valorFreteTexto || "0,00"
 } de Itajai x ${cidadeFormatada}
-🚚 Frete retirada: R$ ${
+${prefixoFrete}🚚 Frete retirada: R$ ${
     valorFreteTexto || "0,00"
 } de ${cidadeFormatada} x Itajai
 ${notaFrete}
 
-🎁 Cortesia: Entrega técnica (mediante solicitação)
-📄 Forma de pagamento: Mediante aprovação cadastral.`;
+${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFinal}${marca("📄")}Forma de pagamento: ${textoPagamento}`;
 
 
     copiar(textoFinal);

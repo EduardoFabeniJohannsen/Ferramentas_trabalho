@@ -1387,8 +1387,7 @@ document.addEventListener("input", (evento) => {
 // ======================================
 // Salva sozinho no navegador (localStorage) pra não perder
 // nada se a página recarregar ou o navegador travar.
-// Só cobre "Gerar Textos" e "Calcular Desconto" — o card
-// de Agendamento não entra nisso.
+// Só cobre "Gerar Textos" e "Calcular Desconto".
 
 const CHAVE_CACHE_PROPOSTA = "propostaCache";
 

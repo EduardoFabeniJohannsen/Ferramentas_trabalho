@@ -493,11 +493,11 @@ function copiarPropostaZap(){
 
 
             blocosEquipamentos +=
-`🟡 Modelo: ${
+`🟡 *Modelo: ${
     quantidade > 1
         ? quantidade + " "
         : ""
-}${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
+}${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho*
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
 * Período de locação: ${periodoExibicao} dias${
@@ -551,7 +551,7 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 
     // Sem emojis há uma linha em branco entre Cortesia e Pagamento
     const separadorFinal =
-        emojisAtivo ? "\n" : "\n\n";
+        emojisAtivo ? "\n" : "\n";
 
 
     // cidade de saída do frete (⚙️ Configurações): Itajai ou Joinville

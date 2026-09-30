@@ -504,7 +504,13 @@ DOCUMENTO PROPOSTA (impressão/print)
 
 .documento-proposta{
 
-    width:380px;
+    width:max-content;
+
+    min-width:380px;
+
+    max-width:100%;
+
+    overflow-x:auto;
 
     background:#ffffff;
 
@@ -562,6 +568,8 @@ DOCUMENTO PROPOSTA (impressão/print)
 }
 
 .documento-proposta td{
+
+    white-space:nowrap;
 
     padding:8px;
 

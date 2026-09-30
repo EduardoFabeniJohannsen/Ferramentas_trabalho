@@ -3,7 +3,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "7.6.0";
+const VERSAO_SISTEMA = "7.7.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -460,23 +460,19 @@ function gerarStatus(tipo){
 
 
         FreteZOHO:
-`FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
+`- FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE ( Boleto - 14 DD )
 
-* Frete entrega: R$ ${frete} - ${saida} x ${cidade}
-* Frete retirada: R$ ${frete} - ${cidade} x ${saida}
+- Frete entrega: R$ ${frete} - ${saida} x ${cidade}
+- Frete retirada: R$ ${frete} - ${cidade} x ${saida}
 
 Transportadores Indicados:
-JEAN RICARDO SPIESS 47 99763-3333
 KUNG 47 9616-5616
 MAGNUS 47 9754-0321
-RR (SOMENTE ATÉ WTE12)
-
-PROPOSTA VÁLIDA POR 7 DIAS`,
+RR 47 9180-5385`,
 
 
         FreteZOHOLocComp:
-`* FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR *
-PROPOSTA VÁLIDA POR 7 DIAS`,
+`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR`,
 
 
         ICMS:

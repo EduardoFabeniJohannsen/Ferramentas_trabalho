@@ -554,14 +554,19 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
         emojisAtivo ? "\n" : "\n\n";
 
 
+    // cidade de saída do frete (⚙️ Configurações): Itajai ou Joinville
+    const cidadeSaidaTexto =
+        obterCidadeSaida().zap;
+
+
     let textoFinal =
 `${blocosEquipamentos}${linhaValorFinal}
 ${prefixoFrete}🚚 Frete entrega: R$ ${
     valorFreteTexto || "0,00"
-} de Itajai x ${cidadeFormatada}
+} de ${cidadeSaidaTexto} x ${cidadeFormatada}
 ${prefixoFrete}🚚 Frete retirada: R$ ${
     valorFreteTexto || "0,00"
-} de ${cidadeFormatada} x Itajai
+} de ${cidadeFormatada} x ${cidadeSaidaTexto}
 ${notaFrete}
 
 ${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFinal}${marca("📄")}Forma de pagamento: ${textoPagamento}`;

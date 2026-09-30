@@ -3,7 +3,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "7.5.0";
+const VERSAO_SISTEMA = "7.6.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -170,6 +170,40 @@ const mostrarToast = (msg, erro = false) => {
 
     }, erro ? 4000 : 2000);
 };
+
+
+// ======================================
+// CIDADE DE SAÍDA DO FRETE
+// ======================================
+// De onde o equipamento sai, nas mensagens de frete.
+// O toggle fica em ⚙️ Configurações (propostas.html) e o estado
+// (cidadeSaidaAtual) vive em propostas-dados.js. Em outra página,
+// que não tem o toggle, fica sempre Itajaí.
+// zap = como aparece na Proposta Zap; zoho = na mensagem Frete ZOHO.
+
+const CIDADES_SAIDA = {
+
+    ITAJAI: {
+        zap: "Itajai",
+        zoho: "ITAJAÍ"
+    },
+
+    JOINVILLE: {
+        zap: "Joinville",
+        zoho: "JOINVILLE"
+    }
+};
+
+
+function obterCidadeSaida(){
+
+    const chave =
+        typeof cidadeSaidaAtual !== "undefined"
+            ? cidadeSaidaAtual
+            : "ITAJAI";
+
+    return CIDADES_SAIDA[chave] || CIDADES_SAIDA.ITAJAI;
+}
 
 
 // ======================================
@@ -414,6 +448,10 @@ function gerarStatus(tipo){
     }
 
 
+    const saida =
+        obterCidadeSaida().zoho;
+
+
     const mensagens = {
 
 
@@ -424,8 +462,8 @@ function gerarStatus(tipo){
         FreteZOHO:
 `FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE
 
-* Frete entrega: R$ ${frete} - ITAJAÍ x ${cidade}
-* Frete retirada: R$ ${frete} - ${cidade} x ITAJAÍ
+* Frete entrega: R$ ${frete} - ${saida} x ${cidade}
+* Frete retirada: R$ ${frete} - ${cidade} x ${saida}
 
 Transportadores Indicados:
 JEAN RICARDO SPIESS 47 99763-3333

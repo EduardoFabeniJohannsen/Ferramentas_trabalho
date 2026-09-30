@@ -1507,10 +1507,53 @@ function atualizarBotaoEmojis(){
 
 
 // ======================================
+// CIDADE DE SAÍDA (toggle)
+// ======================================
+// Itajaí é o padrão (nada muda). Joinville troca a cidade de
+// saída do frete nas mensagens "Copiar Proposta Zap" e "Frete
+// ZOHO" (ver obterCidadeSaida em helpers.js).
+// Valores: "ITAJAI" ou "JOINVILLE".
+
+let cidadeSaidaAtual = "ITAJAI";
+
+
+function alternarCidadeSaida(){
+
+    cidadeSaidaAtual =
+        cidadeSaidaAtual === "ITAJAI"
+            ? "JOINVILLE"
+            : "ITAJAI";
+
+    atualizarBotaoCidadeSaida();
+
+    salvarCache();
+}
+
+
+function atualizarBotaoCidadeSaida(){
+
+    const botao = $("btnCidadeSaida");
+
+    if(!botao) return;
+
+    // verde = fora do padrão (Joinville)
+    botao.classList.toggle(
+        "ativo",
+        cidadeSaidaAtual === "JOINVILLE"
+    );
+
+    botao.innerText =
+        `Cidade de saída: ${
+            cidadeSaidaAtual === "JOINVILLE" ? "Joinville" : "Itajaí"
+        }`;
+}
+
+
+// ======================================
 // MODAL DE CONFIGURAÇÕES (engrenagem)
 // ======================================
 // Abre/fecha o modal que guarda os toggles
-// (locação complementar, valor da diária, emojis).
+// (locação complementar, valor da diária, emojis, cidade de saída).
 
 function abrirConfiguracoes(){
 
@@ -1577,6 +1620,7 @@ function salvarCache(){
         locacaoComplementarAtiva: locacaoComplementarAtiva,
         valorDiariaAtivo: valorDiariaAtivo,
         emojisAtivo: emojisAtivo,
+        cidadeSaida: cidadeSaidaAtual,
         equipamentos: equipamentos
     };
 
@@ -1629,6 +1673,13 @@ function restaurarCache(){
     emojisAtivo = dados.emojisAtivo !== false;
 
     atualizarBotaoEmojis();
+
+    cidadeSaidaAtual =
+        dados.cidadeSaida === "JOINVILLE"
+            ? "JOINVILLE"
+            : "ITAJAI";
+
+    atualizarBotaoCidadeSaida();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)

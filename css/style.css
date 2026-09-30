@@ -437,14 +437,6 @@ DESCONTO
     margin-bottom:12px;
 }
 
-#desconto{
-
-    font-weight:bold;
-
-    color:#60a5fa;
-}
-
-
 /* =========================
 PAINEL FRETES
 ========================= */
@@ -556,6 +548,11 @@ TOAST
     opacity:1;
 
     transform:translateY(0);
+}
+
+#toast.erro{
+
+    background:#ef4444;
 }
 
 

@@ -3,27 +3,11 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "7.3.0";
+const VERSAO_SISTEMA = "7.4.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
 });
-
-
-// ======================================
-// TRANSPORTADORAS DE FRETE
-// ======================================
-// Única lista de transportadoras do sistema. Pra adicionar
-// ou remover uma, mexe só aqui — desde que exista o arquivo
-// frete_NOME.csv correspondente na pasta.
-
-const TRANSPORTADORAS_FRETE = [
-    "Magnus",
-    "Kung",
-    "Jean",
-    "Dionizio",
-    "RR"
-];
 
 
 // ======================================
@@ -62,6 +46,12 @@ const brToNumber = (valor) => {
 
     if (!valor) return 0;
 
+    // Tira "R$", espaços e qualquer coisa que não seja número
+    valor = valor.replace(/[^\d.,-]/g, "");
+
+    // Sem nenhum dígito (ex: "abc") = valor inválido
+    if (!/\d/.test(valor)) return NaN;
+
     // Formato brasileiro:
     // 1.234,56
     if (valor.includes(",")) {
@@ -70,6 +60,13 @@ const brToNumber = (valor) => {
             valor
                 .replace(/\./g, "")
                 .replace(",", ".");
+
+    }else if (/^-?\d{1,3}(\.\d{3})+$/.test(valor)) {
+
+        // Sem vírgula, mas no padrão de milhar:
+        // 1.234 ou 1.234.567 (100.50 continua decimal)
+        valor =
+            valor.replace(/\./g, "");
     }
 
     return Number(valor);
@@ -94,13 +91,66 @@ const formatarNumeroPonto = (valor) => {
 };
 
 
-const copiar = (texto) => {
+// Copia pro clipboard e já mostra o toast (sucesso ou erro).
+// Se o navegador bloquear o clipboard (ex: fora de HTTPS/localhost),
+// tenta o método antigo com textarea antes de desistir.
+const copiar = async (texto, mensagem) => {
 
-    return navigator.clipboard.writeText(texto);
+    let copiou = false;
+
+    try {
+
+        await navigator.clipboard.writeText(texto);
+
+        copiou = true;
+
+    } catch (erro) {
+
+        try {
+
+            const area = document.createElement("textarea");
+
+            area.value = texto;
+
+            area.style.position = "fixed";
+
+            area.style.opacity = "0";
+
+            document.body.appendChild(area);
+
+            area.select();
+
+            copiou = document.execCommand("copy");
+
+            document.body.removeChild(area);
+
+        } catch (erro2) {
+
+            console.error("Erro ao copiar:", erro2);
+        }
+    }
+
+    if (mensagem) {
+
+        if (copiou) {
+
+            mostrarToast(mensagem);
+
+        } else {
+
+            mostrarToast("Não foi possível copiar", true);
+        }
+    }
+
+    return copiou;
 };
 
 
-const mostrarToast = (msg) => {
+let toastTimer;
+
+
+// erro = true deixa o toast vermelho e um pouco mais na tela
+const mostrarToast = (msg, erro = false) => {
 
     const toast = $("toast");
 
@@ -108,13 +158,17 @@ const mostrarToast = (msg) => {
 
     toast.innerText = msg;
 
+    toast.classList.toggle("erro", erro);
+
     toast.classList.add("show");
 
-    setTimeout(() => {
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
 
         toast.classList.remove("show");
 
-    }, 2000);
+    }, erro ? 4000 : 2000);
 };
 
 
@@ -333,25 +387,6 @@ function calcularDiasPersonalizados(){
 
 function gerarStatus(tipo){
 
-    const hoje =
-        new Date();
-
-
-    const data =
-        String(
-            hoje.getDate()
-        ).padStart(2,"0")
-        + "/"
-        +
-        String(
-            hoje.getMonth() + 1
-        ).padStart(2,"0");
-
-
-    const nome =
-        "Eduardo";
-
-
     const cidade =
         $("cidade")
             ? $("cidade")
@@ -366,19 +401,20 @@ function gerarStatus(tipo){
             : "0,00";
 
 
+    // FreteZOHO só faz sentido com cidade e frete preenchidos
+    if(
+        tipo === "FreteZOHO" &&
+        (!cidade.trim() || !frete.trim())
+    ){
+
+        return mostrarToast(
+            "Informe cidade e frete",
+            true
+        );
+    }
+
+
     const mensagens = {
-
-
-        faturado:
-            `${data} - Faturado - ${nome}`,
-
-
-        renovacaoEmail:
-            `${data} - Enviado email de renovação - ${nome}`,
-
-
-        renovacaoZap:
-            `${data} - Enviado zap de renovação - ${nome}`,
 
 
         autorizado:
@@ -405,24 +441,6 @@ PROPOSTA VÁLIDA POR 7 DIAS`,
 PROPOSTA VÁLIDA POR 7 DIAS`,
 
 
-        CHEKLIST_Titulo:
-            `CHEKLIST - PTA - ${
-                $("nomeCliente")
-                    ? $("nomeCliente")
-                        .value
-                        .toUpperCase()
-                    : ""
-            }`,
-
-
-        CHEKLIST_Mensagem:
-`Prezado Cliente,
-
-Segue checklist de saída do equipamento locado.
-
-Obrigada.`,
-
-
         ICMS:
             `Saida sem incidencia de ICMS cfe Cap. II, art 6 do RICMS/SC`
 
@@ -436,11 +454,7 @@ Obrigada.`,
     if(!texto) return;
 
 
-    copiar(texto);
-
-    mostrarToast(
-        tipo + " copiado"
-    );
+    copiar(texto, tipo + " copiado");
 }
 
 

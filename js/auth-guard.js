@@ -7,15 +7,69 @@
 
 (async function protegerPagina(){
 
-    const { data, error } =
-        await supabaseClient.auth.getSession();
+    // Esconde a página até a sessão ser confirmada, pra quem
+    // não está logado não ver a tela antes do redirect.
+    document.documentElement.style.visibility = "hidden";
 
-    if(error || !data.session){
+    try{
 
-        window.location.href = "login.html";
+        const { data, error } =
+            await supabaseClient.auth.getSession();
+
+        if(error || !data.session){
+
+            // Sem internet o token pode não renovar. Se esse navegador
+            // já fez login antes, deixa entrar (os dados continuam
+            // protegidos pelo Supabase, não por esta tela).
+            const semRede =
+                !navigator.onLine ||
+                error?.name === "AuthRetryableFetchError";
+
+            if(semRede && existeLoginSalvo()){
+
+                console.warn(
+                    "[auth] Sem conexão: usando o login salvo no navegador"
+                );
+
+            }else{
+
+                window.location.href = "login.html";
+
+                return;
+            }
+        }
+
+    }catch(erro){
+
+        console.error("[auth] Erro ao verificar sessão:", erro);
     }
 
+    document.documentElement.style.visibility = "";
+
 })();
+
+
+// ======================================
+// LOGIN SALVO NO NAVEGADOR
+// ======================================
+// O Supabase guarda a sessão no localStorage numa chave
+// "sb-...-auth-token". O logout apaga essa chave.
+
+function existeLoginSalvo(){
+
+    try{
+
+        return Object.keys(localStorage).some(
+            chave =>
+                chave.startsWith("sb-") &&
+                chave.endsWith("-auth-token")
+        );
+
+    }catch(erro){
+
+        return false;
+    }
+}
 
 
 // ======================================

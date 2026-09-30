@@ -13,6 +13,15 @@ let tabelaPrecos = {};
 
 let tabelasFrete = {};
 
+// nome "bonito" de cada cidade (chave normalizada -> nome pra datalist)
+let nomesCidades = {};
+
+// Avisos de falha no carregamento (vazio = tudo certo).
+// Aparecem na tela pra não parecer que o modelo/cidade não existe.
+let erroTabelaPrecos = "";
+
+let erroTabelaFretes = "";
+
 // A linha fixa do HTML já nasce com data-equip-id="1"
 let proximoEquipId = 2;
 
@@ -31,10 +40,130 @@ function normalizarModelo(valor){
 
 
 // ======================================
+// NORMALIZAR CIDADE
+// ======================================
+// Maiúsculas, sem acento e sem espaço sobrando:
+// "Itajaí " e "ITAJAI" viram a mesma chave.
+
+function normalizarCidade(valor){
+
+    return String(valor || "")
+        .replace(/\uFEFF/g, "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toUpperCase();
+}
+
+
+// ======================================
+// CÓPIA OFFLINE DAS TABELAS
+// ======================================
+// Depois que as tabelas carregam 1x do Supabase, uma cópia
+// fica salva no navegador (localStorage). Se a internet cair
+// (ou o Supabase não responder), o sistema usa essa cópia.
+
+const CHAVE_CACHE_TABELA_PRECOS = "cacheTabelaPrecos";
+
+const CHAVE_CACHE_TABELA_FRETES = "cacheTabelaFretes";
+
+// Data/hora (ISO) da cópia que está sendo usada.
+// Vazio = dados atuais, direto do Supabase.
+let tabelaPrecosSalvaEm = "";
+
+let tabelaFretesSalvaEm = "";
+
+
+function salvarCopiaTabela(chave, linhas){
+
+    try{
+
+        localStorage.setItem(
+            chave,
+            JSON.stringify({
+                salvoEm: new Date().toISOString(),
+                linhas: linhas
+            })
+        );
+
+    }catch(erro){
+
+        console.error(
+            `[${chave}] Erro ao salvar cópia offline:`,
+            erro
+        );
+    }
+}
+
+
+function lerCopiaTabela(chave){
+
+    try{
+
+        const salvo =
+            localStorage.getItem(chave);
+
+        if(!salvo) return null;
+
+        const copia =
+            JSON.parse(salvo);
+
+        if(
+            !copia ||
+            !Array.isArray(copia.linhas) ||
+            !copia.linhas.length
+        ){
+            return null;
+        }
+
+        return copia;
+
+    }catch(erro){
+
+        console.error(
+            `[${chave}] Cópia offline inválida, ignorando:`,
+            erro
+        );
+
+        return null;
+    }
+}
+
+
+// ======================================
 // CARREGAR TABELA DE PREÇOS
 // ======================================
 
+function processarLinhasPrecos(linhas){
+
+    tabelaPrecos = {};
+
+    linhas.forEach(linha => {
+
+        const modelo =
+            normalizarModelo(linha.modelo);
+
+        if (!modelo) return;
+
+        if (!tabelaPrecos[modelo]) {
+            tabelaPrecos[modelo] = {};
+        }
+
+        const valor = Number(linha.valor);
+
+        if (!isNaN(valor)) {
+            tabelaPrecos[modelo][linha.dias] = valor;
+        }
+    });
+}
+
+
 async function carregarTabela() {
+
+    erroTabelaPrecos = "";
+
+    tabelaPrecosSalvaEm = "";
 
     try {
 
@@ -47,46 +176,71 @@ async function carregarTabela() {
             throw error;
         }
 
-        tabelaPrecos = {};
+        processarLinhasPrecos(data);
 
-        data.forEach(linha => {
+        const totalModelos =
+            Object.keys(tabelaPrecos).length;
 
-            const modelo =
-                normalizarModelo(linha.modelo);
+        // Sem erro mas sem nenhuma linha: quase sempre é
+        // login/permissão (RLS) bloqueando, ou tabela vazia.
+        if (!totalModelos) {
 
-            if (!modelo) return;
+            erroTabelaPrecos =
+                "Tabela de preços vazia (verifique login/permissões)";
 
-            if (!tabelaPrecos[modelo]) {
-                tabelaPrecos[modelo] = {};
-            }
+            console.warn(
+                "[tabela_precos] Nenhuma linha retornada"
+            );
 
-            const valor = Number(linha.valor);
+        }else{
 
-            if (!isNaN(valor)) {
-                tabelaPrecos[modelo][linha.dias] = valor;
-            }
-        });
+            // deu certo: atualiza a cópia offline
+            salvarCopiaTabela(
+                CHAVE_CACHE_TABELA_PRECOS,
+                data
+            );
 
-        console.log(
-            "Tabela carregada:",
-            Object.keys(tabelaPrecos)
-        );
-
-        console.log(
-            "WTE10:",
-            tabelaPrecos["WTE10"]
-        );
-
-        preencherListaEquipamentos();
+            console.log(
+                `[tabela_precos] ${data.length} linhas, ${totalModelos} modelos carregados`
+            );
+        }
 
     } catch (erro) {
 
         console.error(
-            "ERRO AO CARREGAR tabela_precos:",
-            erro
+            "[tabela_precos] Falha ao carregar:",
+            {
+                mensagem: erro?.message,
+                codigo: erro?.code,
+                detalhes: erro?.details,
+                dica: erro?.hint
+            }
         );
 
+        // sem internet/servidor: tenta a cópia salva no navegador
+        const copia =
+            lerCopiaTabela(CHAVE_CACHE_TABELA_PRECOS);
+
+        if (copia) {
+
+            processarLinhasPrecos(copia.linhas);
+
+            tabelaPrecosSalvaEm = copia.salvoEm;
+
+            console.warn(
+                `[tabela_precos] Usando cópia salva em ${copia.salvoEm}`
+            );
+
+        }else{
+
+            tabelaPrecos = {};
+
+            erroTabelaPrecos =
+                "Tabela de preços não carregada (verifique conexão/login)";
+        }
     }
+
+    preencherListaEquipamentos();
 }
 
 
@@ -94,9 +248,50 @@ async function carregarTabela() {
 // CARREGAR FRETES
 // ======================================
 
-async function carregarFretes(){
+function processarLinhasFretes(linhas){
 
     tabelasFrete = {};
+
+    nomesCidades = {};
+
+    linhas.forEach(linha => {
+
+        const transportador =
+            linha.transportadora;
+
+        const modelo =
+            normalizarModelo(linha.modelo);
+
+        const cidade =
+            normalizarCidade(linha.cidade);
+
+        if(!modelo || !cidade) return;
+
+        if(!tabelasFrete[transportador]){
+            tabelasFrete[transportador] = {};
+        }
+
+        if(!tabelasFrete[transportador][modelo]){
+            tabelasFrete[transportador][modelo] = {};
+        }
+
+        tabelasFrete[transportador][modelo][cidade] =
+            linha.valor;
+
+        nomesCidades[cidade] =
+            String(linha.cidade)
+                .trim()
+                .replace(/\s+/g, " ")
+                .toUpperCase();
+    });
+}
+
+
+async function carregarFretes(){
+
+    erroTabelaFretes = "";
+
+    tabelaFretesSalvaEm = "";
 
     try{
 
@@ -109,46 +304,152 @@ async function carregarFretes(){
             throw error;
         }
 
-        data.forEach(linha => {
+        processarLinhasFretes(data);
 
-            const transportador =
-                linha.transportadora;
+        // Sem erro mas sem nenhuma linha: quase sempre é
+        // login/permissão (RLS) bloqueando, ou tabela vazia.
+        if(!Object.keys(tabelasFrete).length){
 
-            const modelo =
-                normalizarModelo(linha.modelo);
+            erroTabelaFretes =
+                "Tabela de fretes vazia (verifique login/permissões)";
 
-            const cidade =
-                (linha.cidade || "").toUpperCase();
+            console.warn(
+                "[tabela_fretes] Nenhuma linha retornada"
+            );
 
-            if(!modelo || !cidade) return;
+        }else{
 
-            if(!tabelasFrete[transportador]){
-                tabelasFrete[transportador] = {};
-            }
+            // deu certo: atualiza a cópia offline
+            salvarCopiaTabela(
+                CHAVE_CACHE_TABELA_FRETES,
+                data
+            );
 
-            if(!tabelasFrete[transportador][modelo]){
-                tabelasFrete[transportador][modelo] = {};
-            }
-
-            tabelasFrete[transportador][modelo][cidade] =
-                linha.valor;
-        });
+            console.log(
+                `[tabela_fretes] ${data.length} linhas, ${Object.keys(tabelasFrete).length} transportadoras, ${Object.keys(nomesCidades).length} cidades carregadas`
+            );
+        }
 
     }catch(erro){
 
         console.error(
-            "Erro ao carregar tabela_fretes:",
-            erro
+            "[tabela_fretes] Falha ao carregar:",
+            {
+                mensagem: erro?.message,
+                codigo: erro?.code,
+                detalhes: erro?.details,
+                dica: erro?.hint
+            }
         );
+
+        // sem internet/servidor: tenta a cópia salva no navegador
+        const copia =
+            lerCopiaTabela(CHAVE_CACHE_TABELA_FRETES);
+
+        if(copia){
+
+            processarLinhasFretes(copia.linhas);
+
+            tabelaFretesSalvaEm = copia.salvoEm;
+
+            console.warn(
+                `[tabela_fretes] Usando cópia salva em ${copia.salvoEm}`
+            );
+
+        }else{
+
+            tabelasFrete = {};
+
+            nomesCidades = {};
+
+            erroTabelaFretes =
+                "Tabela de fretes não carregada (verifique conexão/login)";
+        }
     }
 
+    preencherListaCidades();
+}
 
-    console.log(
-        "Fretes carregados:",
-        tabelasFrete
+
+// ======================================
+// AVISOS DO CARREGAMENTO
+// ======================================
+// Chamado pelo init depois de carregar as duas tabelas.
+// Deixa o motivo visível na tela (faixa + toast + painéis)
+// em vez de só no console.
+
+function mostrarAvisoDadosSalvos(){
+
+    const formatar = (iso) =>
+        new Date(iso).toLocaleString(
+            "pt-BR",
+            { dateStyle: "short", timeStyle: "short" }
+        );
+
+    const partes = [];
+
+    if(tabelaPrecosSalvaEm){
+        partes.push(`preços (${formatar(tabelaPrecosSalvaEm)})`);
+    }
+
+    if(tabelaFretesSalvaEm){
+        partes.push(`fretes (${formatar(tabelaFretesSalvaEm)})`);
+    }
+
+    let aviso =
+        $("avisoDadosSalvos");
+
+    if(!partes.length){
+
+        if(aviso) aviso.remove();
+
+        return;
+    }
+
+    if(!aviso){
+
+        const container =
+            document.querySelector(".container");
+
+        if(!container) return;
+
+        aviso =
+            document.createElement("div");
+
+        aviso.id = "avisoDadosSalvos";
+
+        aviso.style.cssText =
+            "width:100%;max-width:1100px;box-sizing:border-box;" +
+            "text-align:center;padding:10px 14px;border-radius:8px;" +
+            "background:#78350f;color:#fde68a;font-size:14px;";
+
+        container.prepend(aviso);
+    }
+
+    aviso.innerText =
+        `⚠️ Sem conexão com o servidor. Usando tabelas salvas no navegador: ${partes.join(" e ")}. Os valores podem estar desatualizados.`;
+}
+
+
+function avisarFalhaCarregamento(){
+
+    mostrarAvisoDadosSalvos();
+
+    if(
+        !erroTabelaPrecos &&
+        !erroTabelaFretes
+    ){
+        return;
+    }
+
+    mostrarToast(
+        "Falha ao carregar dados — veja o aviso na tela",
+        true
     );
 
-    preencherListaCidades();
+    mostrarFretes();
+
+    renderizarDescontosPorEquipamento([]);
 }
 
 
@@ -182,23 +483,11 @@ function preencherListaCidades(){
 
     if(!lista) return;
 
-    // une as cidades de TODAS as transportadoras
-    // (não só as que todo mundo atende)
-    const cidades = new Set();
-
-    Object.values(tabelasFrete).forEach(modelos => {
-
-        Object.values(modelos).forEach(cidadesModelo => {
-
-            Object.keys(cidadesModelo).forEach(cidade => {
-
-                if(cidade) cidades.add(cidade);
-            });
-        });
-    });
-
+    // cidades de TODAS as transportadoras (nomesCidades é montado
+    // em carregarFretes), com o nome original (com acento)
     const cidadesOrdenadas =
-        Array.from(cidades).sort();
+        Object.values(nomesCidades)
+            .sort((a, b) => a.localeCompare(b, "pt-BR"));
 
     lista.innerHTML =
         cidadesOrdenadas
@@ -402,6 +691,8 @@ function removerEquipamento(botao){
     gerarTextos();
 
     mostrarFretes();
+
+    salvarCache();
 }
 
 
@@ -488,145 +779,6 @@ function configurarEventosEquipamentos(){
 
 
 // ======================================
-// OBTER PERÍODO DA TABELA
-// ======================================
-
-function obterPeriodoTabela(){
-
-    const valor =
-        $("periodo")?.value.trim();
-
-
-    if(!valor) return null;
-
-
-    const numero =
-        Number(valor);
-
-
-    if(
-        !Number.isFinite(numero) ||
-        numero <= 0
-    ){
-        return null;
-    }
-
-
-    if(
-        numero > 30 &&
-        numero % 30 === 0
-    ){
-        return "30";
-    }
-
-
-    const diasValidos = [
-
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "10",
-        "14",
-        "15",
-        "21",
-        "28",
-        "30"
-
-    ];
-
-
-    if(
-        !diasValidos.includes(
-            String(numero)
-        )
-    ){
-
-        return null;
-    }
-
-
-    return String(numero);
-}
-
-
-// ======================================
-// CALCULAR VALOR TOTAL DA TABELA
-// ======================================
-
-function calcularValorTabela(){
-
-    const equipamentos =
-        obterEquipamentos();
-
-
-    const periodo =
-        obterPeriodoTabela();
-
-
-    if(
-        !equipamentos.length ||
-        !periodo
-    ){
-        return null;
-    }
-
-
-    let total = 0;
-
-
-    for(
-        const equipamento
-        of equipamentos
-    ){
-
-        const tabelaModelo =
-            tabelaPrecos[
-                equipamento.modelo
-            ];
-
-
-        if(!tabelaModelo){
-
-            return {
-                erro:
-                    `Modelo ${equipamento.modelo} não encontrado`
-            };
-        }
-
-
-        const valor =
-            tabelaModelo[periodo];
-
-
-        if(
-            valor === undefined ||
-            valor === null
-        ){
-
-            return {
-                erro:
-                    `Período ${periodo} dias não encontrado para ${equipamento.modelo}`
-            };
-        }
-
-
-        total +=
-            valor *
-            equipamento.quantidade;
-    }
-
-
-    return {
-        total: total
-    };
-}
-
-
-// ======================================
 // PREENCHER VALOR TABELA
 // ======================================
 
@@ -676,6 +828,16 @@ function preencherValorTabela() {
 
     const dadosPorEquipamento =
         equipamentos.map((equipamento) => {
+
+            // tabela não carregou: mostra o motivo real
+            if (erroTabelaPrecos) {
+
+                return {
+                    ...equipamento,
+                    valorTabela: null,
+                    erro: erroTabelaPrecos
+                };
+            }
 
             if (!periodoValido) {
 
@@ -738,9 +900,22 @@ function mostrarFretes(){
 
 
     const cidade =
-        normalizarModelo(
+        normalizarCidade(
             $("cidade")?.value
         );
+
+
+    // tabela de fretes não carregou: mostra o motivo
+    if(erroTabelaFretes){
+
+        if($("resultadoFretes")){
+
+            $("resultadoFretes").innerHTML =
+                `<span style="color:#ef4444">⚠️ ${erroTabelaFretes}</span>`;
+        }
+
+        return;
+    }
 
 
     if(
@@ -858,6 +1033,25 @@ function mostrarFretes(){
 // DESCONTO POR EQUIPAMENTO
 // ======================================
 
+function htmlPlaceholderDesconto(){
+
+    if(erroTabelaPrecos){
+
+        return `
+            <p class="desconto-placeholder" style="color:#ef4444">
+                ⚠️ ${erroTabelaPrecos}
+            </p>
+        `;
+    }
+
+    return `
+        <p class="desconto-placeholder" style="color:#94a3b8">
+            Adicione um equipamento e o período pra calcular.
+        </p>
+    `;
+}
+
+
 function renderizarDescontosPorEquipamento(dadosPorEquipamento){
 
     const lista =
@@ -867,11 +1061,8 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
 
     if(!dadosPorEquipamento.length){
 
-        lista.innerHTML = `
-            <p class="desconto-placeholder" style="color:#94a3b8">
-                Adicione um equipamento e o período pra calcular.
-            </p>
-        `;
+        lista.innerHTML =
+            htmlPlaceholderDesconto();
 
         $("valorFinalProposta").innerText = "";
 
@@ -974,6 +1165,31 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
             calcularDescontoBloco(bloco);
         }
     });
+
+    // mantém os blocos na mesma ordem das linhas de equipamento
+    // (uma linha que ganhou modelo depois não fica no fim da lista)
+    const ordemAtual =
+        Array.from(lista.querySelectorAll(".desconto-item"))
+            .map(bloco => bloco.dataset.equipId)
+            .join(",");
+
+    const ordemDesejada =
+        dadosPorEquipamento
+            .map(equip => String(equip.id))
+            .join(",");
+
+    if(ordemAtual !== ordemDesejada){
+
+        dadosPorEquipamento.forEach(equip => {
+
+            const bloco =
+                lista.querySelector(
+                    `.desconto-item[data-equip-id="${equip.id}"]`
+                );
+
+            if(bloco) lista.appendChild(bloco);
+        });
+    }
 
     atualizarValorFinalProposta();
 }
@@ -1422,6 +1638,9 @@ function restaurarCache(){
 
     if(!equipamentos.length) return;
 
+    // guarda a linha de cada equipamento restaurado (pelo índice salvo)
+    const linhasRestauradas = [];
+
     equipamentos.forEach((equip, index) => {
 
         let linha;
@@ -1445,6 +1664,8 @@ function restaurarCache(){
 
         if(!linha) return;
 
+        linhasRestauradas[index] = linha;
+
         linha.querySelector(".equipamento").value = equip.modelo || "";
         linha.querySelector(".quantidadeEquipamento").value = equip.quantidade || "1";
     });
@@ -1454,13 +1675,19 @@ function restaurarCache(){
     gerarTextos();
     mostrarFretes();
 
-    // agora repõe o que era manual em cada bloco, na mesma ordem
-    const blocos =
-        document.querySelectorAll(".desconto-item");
-
+    // agora repõe o que era manual em cada bloco, achando o bloco
+    // pelo id da linha (linha sem modelo não gera bloco, então
+    // o índice sozinho não serve)
     equipamentos.forEach((equip, index) => {
 
-        const bloco = blocos[index];
+        const linha = linhasRestauradas[index];
+
+        if(!linha) return;
+
+        const bloco =
+            document.querySelector(
+                `.desconto-item[data-equip-id="${linha.dataset.equipId}"]`
+            );
 
         if(!bloco) return;
 

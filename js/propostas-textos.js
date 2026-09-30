@@ -84,6 +84,10 @@ function gerarTextos(){
 
         $("textoOportunidade").innerText =
             `OPORTUNIDADE DE LOCAÇÃO_${nome}_${hoje}`;
+
+    }else{
+
+        $("textoOportunidade").innerText = "";
     }
 
 
@@ -114,6 +118,10 @@ function gerarTextos(){
 
         $("textoOrcamento").innerText =
             `${nome}_${modelosTexto}_${periodo}`;
+
+    }else{
+
+        $("textoOrcamento").innerText = "";
     }
 
 
@@ -128,17 +136,21 @@ function gerarTextos(){
 function copiarTexto(id){
 
     const texto =
-        $(id)?.innerText;
+        $(id)?.innerText.trim();
 
 
-    if(!texto) return;
+    if(!texto){
+
+        return mostrarToast(
+            id === "textoOportunidade"
+                ? "Informe o nome do cliente"
+                : "Preencha nome, equipamento, período e cidade",
+            true
+        );
+    }
 
 
-    copiar(texto);
-
-    mostrarToast(
-        "Copiado"
-    );
+    copiar(texto, "Copiado");
 }
 
 // ======================================
@@ -172,7 +184,8 @@ function copiarPropostaZap(){
     if(!equipamentos.length){
 
         return mostrarToast(
-            "Informe o modelo"
+            "Informe o modelo",
+            true
         );
     }
 
@@ -180,7 +193,70 @@ function copiarPropostaZap(){
     if(!periodo){
 
         return mostrarToast(
-            "Informe período"
+            "Informe período",
+            true
+        );
+    }
+
+
+    if(!cidade){
+
+        return mostrarToast(
+            "Informe a cidade",
+            true
+        );
+    }
+
+
+    if(!valorFreteTexto){
+
+        return mostrarToast(
+            "Informe o frete",
+            true
+        );
+    }
+
+
+    const valorFreteNumero =
+        brToNumber(valorFreteTexto);
+
+
+    if(!Number.isFinite(valorFreteNumero)){
+
+        return mostrarToast(
+            "Frete inválido",
+            true
+        );
+    }
+
+
+    // O texto depende do padrão do modelo: 2ª letra A/T/M,
+    // 3ª letra E/D e número = altura de trabalho.
+    const modeloForaPadrao =
+        equipamentos.find(equipamento => {
+
+            const modelo =
+                equipamento.modelo;
+
+            const altura =
+                parseInt(
+                    modelo.replace(/[^\d]/g, ""),
+                    10
+                );
+
+            return (
+                !["A", "T", "M"].includes(modelo.charAt(1)) ||
+                !["E", "D"].includes(modelo.charAt(2)) ||
+                !Number.isFinite(altura)
+            );
+        });
+
+
+    if(modeloForaPadrao){
+
+        return mostrarToast(
+            `Modelo ${modeloForaPadrao.modelo} fora do padrão`,
+            true
         );
     }
 
@@ -221,7 +297,8 @@ function copiarPropostaZap(){
     if(semValor){
 
         return mostrarToast(
-            `Confira o valor de ${semValor.modelo} em Calcular Desconto`
+            `Confira o valor de ${semValor.modelo} em Calcular Desconto`,
+            true
         );
     }
 
@@ -272,9 +349,6 @@ function copiarPropostaZap(){
     // ==================================
     // LOCAÇÃO COMPLEMENTAR (frete)
     // ==================================
-
-    const valorFreteNumero =
-        brToNumber(valorFreteTexto);
 
     const valorComplementar =
         locacaoComplementarAtiva
@@ -493,11 +567,7 @@ ${notaFrete}
 ${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFinal}${marca("📄")}Forma de pagamento: ${textoPagamento}`;
 
 
-    copiar(textoFinal);
-
-    mostrarToast(
-        "Proposta Zap copiada"
-    );
+    copiar(textoFinal, "Proposta Zap copiada");
 }
 
 
@@ -706,11 +776,7 @@ ${blocoContato}
 * ${nomeProposta}${financeiroTexto}`;
 
 
-    copiar(texto);
-
-    mostrarToast(
-        "Agendamento copiado"
-    );
+    copiar(texto, "Agendamento copiado");
 }
 
 
@@ -822,12 +888,14 @@ function adicionarFinanceiro(){
 (async function init(){
 
     // ==================================
-    // CARREGAR CSVs
+    // CARREGAR TABELAS (Supabase)
     // ==================================
 
     await carregarTabela();
 
     await carregarFretes();
+
+    avisarFalhaCarregamento();
 
 
     // ==================================

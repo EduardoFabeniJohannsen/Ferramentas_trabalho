@@ -100,7 +100,13 @@ function gerarDocumento() {
 
     const frete = brToNumber($("valorFrete").value);
 
-    const complementar = frete * 2 * 1.2;
+    // frete digitado errado (ex: letras): avisa em vez de mostrar R$ NaN
+    const freteInvalido = !Number.isFinite(frete);
+
+    $("valorFrete").style.borderColor =
+        freteInvalido ? "#ef4444" : "";
+
+    const complementar = freteInvalido ? 0 : frete * 2 * 1.2;
 
     let valorLocacao = 0;
 
@@ -166,12 +172,12 @@ function gerarDocumento() {
 
         <div class="resumo-linha">
             <span>Locação complementar (frete)</span>
-            <span>R$ ${formatarMoedaBR(complementar)}</span>
+            <span>${freteInvalido ? "Frete inválido" : "R$ " + formatarMoedaBR(complementar)}</span>
         </div>
 
         <div class="resumo-linha total">
             <span>Total</span>
-            <span>R$ ${formatarMoedaBR(total)}</span>
+            <span>${freteInvalido ? "—" : "R$ " + formatarMoedaBR(total)}</span>
         </div>
 
         <div class="perguntas">

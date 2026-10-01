@@ -4,7 +4,11 @@
 
 const contratoWEG = {
 
+    // dias de cada período (1 período = 30 dias)
     periodoDias: 30,
+
+    // a partir de quantos períodos o frete é bonificado
+    periodosFreteBonificado: 4,
 
     itens: [
         { modelo: "WME10", descricao: "MASTRO ELÉTRICO 10M", preco: 5820 },
@@ -65,6 +69,21 @@ function obterQuantidade(modelo) {
 
 
 // ======================================
+// PERÍODOS
+// ======================================
+// Quantidade de períodos de 30 dias (mínimo 1).
+
+function obterPeriodos() {
+
+    const numero = parseInt($("periodos")?.value, 10);
+
+    if (!Number.isFinite(numero) || numero < 1) return 1;
+
+    return numero;
+}
+
+
+// ======================================
 // DATAS
 // ======================================
 
@@ -81,7 +100,7 @@ function obterDatas() {
     const final = new Date(inicio);
 
     final.setDate(
-        final.getDate() + (contratoWEG.periodoDias - 1)
+        final.getDate() + (contratoWEG.periodoDias * obterPeriodos() - 1)
     );
 
     return {
@@ -101,13 +120,24 @@ function gerarDocumento() {
 
     const frete = brToNumber($("valorFrete").value);
 
+    const periodos = obterPeriodos();
+
+    const diasTotal = contratoWEG.periodoDias * periodos;
+
+    // 4 períodos ou mais: frete bonificado (não entra no total)
+    const freteBonificado =
+        periodos >= contratoWEG.periodosFreteBonificado;
+
     // frete digitado errado (ex: letras): avisa em vez de mostrar R$ NaN
-    const freteInvalido = !Number.isFinite(frete);
+    // (bonificado ignora o frete, então não precisa validar)
+    const freteInvalido =
+        !freteBonificado && !Number.isFinite(frete);
 
     $("valorFrete").style.borderColor =
         freteInvalido ? "#ef4444" : "";
 
-    const complementar = freteInvalido ? 0 : frete * 2 * 1.2;
+    const complementar =
+        (freteBonificado || freteInvalido) ? 0 : frete * 2 * 1.2;
 
     let valorLocacao = 0;
 
@@ -121,7 +151,7 @@ function gerarDocumento() {
 
         if (selecionado) {
 
-            valorLocacao += item.preco * quantidade;
+            valorLocacao += item.preco * quantidade * periodos;
         }
 
         linhasTabela += `
@@ -137,9 +167,28 @@ function gerarDocumento() {
 
     const total = valorLocacao + complementar;
 
+    const periodoTexto =
+        periodos > 1
+            ? `${periodos} períodos = ${diasTotal} dias`
+            : `${diasTotal} dias`;
+
     const periodoHtml = datas
-        ? `${formatarData(datas.inicio)} a ${formatarData(datas.final)} (${contratoWEG.periodoDias} dias)`
+        ? `${formatarData(datas.inicio)} a ${formatarData(datas.final)} (${periodoTexto})`
         : "—";
+
+    const linhaFrete = freteBonificado
+        ? `
+        <div class="resumo-linha bonificado">
+            <span>Locação complementar (frete)</span>
+            <span>BONIFICADO</span>
+        </div>
+        `
+        : `
+        <div class="resumo-linha">
+            <span>Locação complementar (frete)</span>
+            <span>${freteInvalido ? "Frete inválido" : "R$ " + formatarMoedaBR(complementar)}</span>
+        </div>
+        `;
 
     $("documentoProposta").innerHTML = `
 
@@ -171,10 +220,7 @@ function gerarDocumento() {
             <span>R$ ${formatarMoedaBR(valorLocacao)}</span>
         </div>
 
-        <div class="resumo-linha">
-            <span>Locação complementar (frete)</span>
-            <span>${freteInvalido ? "Frete inválido" : "R$ " + formatarMoedaBR(complementar)}</span>
-        </div>
+        ${linhaFrete}
 
         <div class="resumo-linha total">
             <span>Total</span>
@@ -220,6 +266,22 @@ function gerarDocumento() {
     $("valorFrete").addEventListener(
         "input",
         gerarDocumento
+    );
+
+    $("periodos").addEventListener(
+        "input",
+        gerarDocumento
+    );
+
+    // períodos inválido (vazio, 0, negativo) volta pra 1 ao sair do campo
+    $("periodos").addEventListener(
+        "blur",
+        () => {
+
+            $("periodos").value = obterPeriodos();
+
+            gerarDocumento();
+        }
     );
 
 })();

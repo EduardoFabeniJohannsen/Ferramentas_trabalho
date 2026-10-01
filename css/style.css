@@ -576,6 +576,17 @@ DOCUMENTO PROPOSTA (impressão/print)
     border:1px solid #cbd5e1;
 }
 
+.documento-proposta tr.separador-grupo td{
+
+    height:10px;
+
+    padding:0;
+
+    border:none;
+
+    background:transparent;
+}
+
 .documento-proposta tr.linha-selecionada td{
 
     background:#93c5fd;

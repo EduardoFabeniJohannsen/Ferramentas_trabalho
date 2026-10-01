@@ -10,6 +10,10 @@ const contratoWEG = {
     // a partir de quantos períodos o frete é bonificado
     periodosFreteBonificado: 4,
 
+    // ordem dos grupos no documento (2ª e 3ª letra do modelo:
+    // ME = mastro, TE = tesoura, AD = articulada diesel, AE = articulada elétrica)
+    ordemGrupos: ["ME", "TE", "AD", "AE"],
+
     itens: [
         { modelo: "WME10", descricao: "MASTRO ELÉTRICO 10M", preco: 5820 },
         { modelo: "WAE12", descricao: "ARTICULADA ELÉTRICA 12M", preco: 8970 },
@@ -111,6 +115,26 @@ function obterDatas() {
 
 
 // ======================================
+// GRUPOS (tipo de equipamento)
+// ======================================
+
+function grupoDoModelo(modelo) {
+
+    return modelo.slice(1, 3);
+}
+
+
+// modelo de grupo fora da lista vai pro final
+function ordemDoGrupo(modelo) {
+
+    const posicao =
+        contratoWEG.ordemGrupos.indexOf(grupoDoModelo(modelo));
+
+    return posicao === -1 ? 999 : posicao;
+}
+
+
+// ======================================
 // GERAR DOCUMENTO (área pra print)
 // ======================================
 
@@ -143,7 +167,28 @@ function gerarDocumento() {
 
     let linhasTabela = "";
 
-    contratoWEG.itens.forEach((item, index) => {
+    // Agrupa por tipo de equipamento e numera na ordem exibida (1, 2, 3...)
+    const itensOrdenados =
+        [...contratoWEG.itens]
+            .sort((a, b) => ordemDoGrupo(a.modelo) - ordemDoGrupo(b.modelo));
+
+    let grupoAnterior = null;
+
+    itensOrdenados.forEach((item, posicao) => {
+
+        const grupo = grupoDoModelo(item.modelo);
+
+        // linha em branco entre um grupo e outro
+        if (grupoAnterior !== null && grupo !== grupoAnterior) {
+
+            linhasTabela += `
+            <tr class="separador-grupo">
+                <td colspan="5"></td>
+            </tr>
+            `;
+        }
+
+        grupoAnterior = grupo;
 
         const quantidade = obterQuantidade(item.modelo);
 
@@ -156,7 +201,7 @@ function gerarDocumento() {
 
         linhasTabela += `
             <tr class="${selecionado ? "linha-selecionada" : ""}">
-                <td>${index + 1}</td>
+                <td>${posicao + 1}</td>
                 <td>${item.descricao}</td>
                 <td><strong>${item.modelo}</strong></td>
                 <td>${selecionado ? quantidade + "x" : ""}</td>

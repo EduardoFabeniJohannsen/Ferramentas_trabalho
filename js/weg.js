@@ -9,6 +9,7 @@ const contratoWEG = {
     itens: [
         { modelo: "WME10", descricao: "MASTRO ELÉTRICO 10M", preco: 5820 },
         { modelo: "WAE12", descricao: "ARTICULADA ELÉTRICA 12M", preco: 8970 },
+        { modelo: "WTE10", descricao: "TESOURA ELÉTRICA 10M", preco: 2900 },
         { modelo: "WTE12", descricao: "TESOURA ELÉTRICA 12M", preco: 3990 },
         { modelo: "WAD16", descricao: "ARTICULADA DIESEL 16M", preco: 11980 },
         { modelo: "WAE15", descricao: "ARTICULADA ELÉTRICA 15M", preco: 11100 }

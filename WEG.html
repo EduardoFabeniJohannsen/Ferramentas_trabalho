@@ -1,119 +1,332 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+// ======================================
+// CONTRATO WEG
+// ======================================
 
-<head>
+const contratoWEG = {
 
-<meta charset="UTF-8">
+    // dias de cada período (1 período = 30 dias)
+    periodoDias: 30,
 
-<title>WEG - Contrato</title>
+    // a partir de quantos períodos o frete é bonificado
+    periodosFreteBonificado: 4,
 
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="icon.png">
+    // ordem dos grupos no documento (2ª e 3ª letra do modelo:
+    // ME = mastro, TE = tesoura, AD = articulada diesel, AE = articulada elétrica)
+    ordemGrupos: ["ME", "TE", "AD", "AE"],
 
-</head>
+    itens: [
+        { modelo: "WME10", descricao: "MASTRO ELÉTRICO 10M", preco: 5820 },
+        { modelo: "WAE12", descricao: "ARTICULADA ELÉTRICA 12M", preco: 8970 },
+        { modelo: "WTE10", descricao: "TESOURA ELÉTRICA 10M", preco: 2900 },
+        { modelo: "WTE12", descricao: "TESOURA ELÉTRICA 12M", preco: 3990 },
+        { modelo: "WAD16", descricao: "ARTICULADA DIESEL 16M", preco: 11980 },
+        { modelo: "WAE15", descricao: "ARTICULADA ELÉTRICA 15M", preco: 11100 }
+    ]
 
-<body>
-
-<!-- =========================
-TOPBAR
-========================= -->
-
-<div class="topbar">
-
-    <a href="propostas.html" class="botao-topbar">
-        ⬅ Voltar
-    </a>
-
-    <button onclick="fazerLogout()">Sair</button>
-
-    <div class="versao" id="versaoSistema"></div>
-
-</div>
+};
 
 
-<!-- =========================
-CONTAINER
-========================= -->
+// ======================================
+// MONTAR LISTA DE EQUIPAMENTOS (formulário)
+// ======================================
 
-<div class="container">
+function montarListaEquipamentos() {
 
-    <div class="card">
+    const lista = $("listaEquipamentosWEG");
 
-        <h2>Contrato WEG</h2>
+    let html = "";
 
-        <p style="color:#94a3b8; font-size:13px; margin-top:-8px;">
-            Preços fixos em contrato. Cada período = 30 dias. Frete bonificado a partir de 4 períodos.
-        </p>
+    contratoWEG.itens.forEach((item) => {
 
-        <hr>
+        html += `
+            <div class="agendamento-linha">
+                <label>${item.modelo}</label>
+                <span style="flex:1; color:#94a3b8;">
+                    R$ ${formatarMoedaBR(item.preco)}
+                </span>
+                <input
+                    type="number"
+                    class="quantidadeEquipamento"
+                    id="qtd-${item.modelo}"
+                    value="0"
+                    min="0"
+                    style="width:60px; flex:none; text-align:center; margin:0;"
+                >
+            </div>
+        `;
+    });
 
-        <!-- EQUIPAMENTOS -->
+    lista.innerHTML = html;
+}
 
-        <div id="listaEquipamentosWEG"></div>
 
-        <hr>
+// ======================================
+// QUANTIDADE POR MODELO
+// ======================================
 
-        <!-- FRETE -->
+function obterQuantidade(modelo) {
 
-        <div class="agendamento-linha">
-            <label>Valor do frete:</label>
-            <input
-                type="text"
-                id="valorFrete"
-                placeholder="Ex: 450,00"
-            >
+    const input = $(`qtd-${modelo}`);
+
+    return Number(input?.value || 0);
+}
+
+
+// ======================================
+// PERÍODOS
+// ======================================
+// Quantidade de períodos de 30 dias (mínimo 1).
+
+function obterPeriodos() {
+
+    const numero = parseInt($("periodos")?.value, 10);
+
+    if (!Number.isFinite(numero) || numero < 1) return 1;
+
+    return numero;
+}
+
+
+// ======================================
+// DATAS
+// ======================================
+
+function obterDatas() {
+
+    const valor = $("dataInicio").value;
+
+    if (!valor) return null;
+
+    const [ano, mes, dia] = valor.split("-").map(Number);
+
+    const inicio = new Date(ano, mes - 1, dia);
+
+    const final = new Date(inicio);
+
+    final.setDate(
+        final.getDate() + (contratoWEG.periodoDias * obterPeriodos() - 1)
+    );
+
+    return {
+        inicio: inicio,
+        final: final
+    };
+}
+
+
+// ======================================
+// GRUPOS (tipo de equipamento)
+// ======================================
+
+function grupoDoModelo(modelo) {
+
+    return modelo.slice(1, 3);
+}
+
+
+// modelo de grupo fora da lista vai pro final
+function ordemDoGrupo(modelo) {
+
+    const posicao =
+        contratoWEG.ordemGrupos.indexOf(grupoDoModelo(modelo));
+
+    return posicao === -1 ? 999 : posicao;
+}
+
+
+// ======================================
+// GERAR DOCUMENTO (área pra print)
+// ======================================
+
+function gerarDocumento() {
+
+    const datas = obterDatas();
+
+    const frete = brToNumber($("valorFrete").value);
+
+    const periodos = obterPeriodos();
+
+    const diasTotal = contratoWEG.periodoDias * periodos;
+
+    // 4 períodos ou mais: frete bonificado (não entra no total)
+    const freteBonificado =
+        periodos >= contratoWEG.periodosFreteBonificado;
+
+    // frete digitado errado (ex: letras): avisa em vez de mostrar R$ NaN
+    // (bonificado ignora o frete, então não precisa validar)
+    const freteInvalido =
+        !freteBonificado && !Number.isFinite(frete);
+
+    $("valorFrete").style.borderColor =
+        freteInvalido ? "#ef4444" : "";
+
+    const complementar =
+        (freteBonificado || freteInvalido) ? 0 : frete * 2 * 1.2;
+
+    let valorLocacao = 0;
+
+    let linhasTabela = "";
+
+    // Agrupa por tipo de equipamento e numera na ordem exibida (1, 2, 3...)
+    const itensOrdenados =
+        [...contratoWEG.itens]
+            .sort((a, b) => ordemDoGrupo(a.modelo) - ordemDoGrupo(b.modelo));
+
+    let grupoAnterior = null;
+
+    itensOrdenados.forEach((item, posicao) => {
+
+        const grupo = grupoDoModelo(item.modelo);
+
+        // linha em branco entre um grupo e outro
+        if (grupoAnterior !== null && grupo !== grupoAnterior) {
+
+            linhasTabela += `
+            <tr class="separador-grupo">
+                <td colspan="5"></td>
+            </tr>
+            `;
+        }
+
+        grupoAnterior = grupo;
+
+        const quantidade = obterQuantidade(item.modelo);
+
+        const selecionado = quantidade > 0;
+
+        if (selecionado) {
+
+            valorLocacao += item.preco * quantidade * periodos;
+        }
+
+        linhasTabela += `
+            <tr class="${selecionado ? "linha-selecionada" : ""}">
+                <td>${posicao + 1}</td>
+                <td>${item.descricao}</td>
+                <td><strong>${item.modelo}</strong></td>
+                <td>${selecionado ? quantidade + "x" : ""}</td>
+                <td>R$ ${formatarMoedaBR(item.preco)}</td>
+            </tr>
+        `;
+    });
+
+    const total = valorLocacao + complementar;
+
+    const periodoTexto =
+        periodos > 1
+            ? `${periodos} períodos = ${diasTotal} dias`
+            : `${diasTotal} dias`;
+
+    const periodoHtml = datas
+        ? `${formatarData(datas.inicio)} a ${formatarData(datas.final)} (${periodoTexto})`
+        : "—";
+
+    const linhaFrete = freteBonificado
+        ? `
+        <div class="resumo-linha bonificado">
+            <span>Locação complementar (frete)</span>
+            <span>BONIFICADO</span>
+        </div>
+        `
+        : `
+        <div class="resumo-linha">
+            <span>Locação complementar (frete)</span>
+            <span>${freteInvalido ? "Frete inválido" : "R$ " + formatarMoedaBR(complementar)}</span>
+        </div>
+        `;
+
+    $("documentoProposta").innerHTML = `
+
+        <h3>Locação de Equipamentos</h3>
+        <div class="subtitulo">Lista de Preços Unitários</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Descrição</th>
+                    <th>COD</th>
+                    <th>Qtd</th>
+                    <th>Valor Unitário</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${linhasTabela}
+            </tbody>
+        </table>
+
+        <div class="resumo-linha">
+            <span>Período</span>
+            <span>${periodoHtml}</span>
         </div>
 
-        <hr>
-
-        <!-- PERÍODOS -->
-
-        <div class="agendamento-linha">
-            <label>Períodos (30 dias):</label>
-            <input
-                type="number"
-                id="periodos"
-                value="1"
-                min="1"
-                step="1"
-            >
+        <div class="resumo-linha">
+            <span>Valor locação</span>
+            <span>R$ ${formatarMoedaBR(valorLocacao)}</span>
         </div>
 
-        <!-- DATAS -->
+        ${linhaFrete}
 
-        <div class="agendamento-linha">
-            <label>Data início:</label>
-            <input
-                type="date"
-                id="dataInicio"
-            >
+        <div class="resumo-linha total">
+            <span>Total</span>
+            <span>${freteInvalido ? "—" : "R$ " + formatarMoedaBR(total)}</span>
         </div>
 
-    </div>
+        <div class="perguntas">
+            <strong>Para confirmação de Locação enviar:</strong>
+            CNPJ DE FATURAMENTO:<br>
+            DATA DA NECESSIDADE:<br>
+            PRÉDIO E SETOR QUE A MAQUINA VAI FICAR:<br>
+            RESPONSAVEL PELO RECEBIMENTO:
+        </div>
+    `;
+}
 
 
-    <!-- =========================
-    DOCUMENTO (área pra print)
-    ========================= -->
+// ======================================
+// INIT
+// ======================================
 
-    <div
-        id="documentoProposta"
-        class="documento-proposta"
-    ></div>
+(function init() {
 
-</div>
+    montarListaEquipamentos();
 
+    gerarDocumento();
 
-<div id="toast"></div>
+    document
+        .querySelectorAll(".quantidadeEquipamento")
+        .forEach((input) => {
 
+            input.addEventListener(
+                "input",
+                gerarDocumento
+            );
+        });
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
-<script src="js/supabase-config.js"></script>
-<script src="js/auth-guard.js"></script>
+    $("dataInicio").addEventListener(
+        "input",
+        gerarDocumento
+    );
 
-<script src="js/helpers.js"></script>
-<script src="js/weg.js"></script>
+    $("valorFrete").addEventListener(
+        "input",
+        gerarDocumento
+    );
 
-</body>
+    $("periodos").addEventListener(
+        "input",
+        gerarDocumento
+    );
 
-</html>
+    // períodos inválido (vazio, 0, negativo) volta pra 1 ao sair do campo
+    $("periodos").addEventListener(
+        "blur",
+        () => {
+
+            $("periodos").value = obterPeriodos();
+
+            gerarDocumento();
+        }
+    );
+
+})();

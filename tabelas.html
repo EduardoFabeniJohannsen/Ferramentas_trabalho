@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Consultar tabelas</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<style>
+/* ===== Página de consulta de tabelas ===== */
+.pagina-tabelas{
+    width:100%;
+    max-width:1300px;
+    box-sizing:border-box;
+}
+.abas-tabelas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+}
+.abas-tabelas button{
+    margin:0;
+}
+.barra-busca{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+.barra-busca input{
+    max-width:320px;
+    margin:0;
+}
+.info-tabela{
+    color:#94a3b8;
+    font-size:13px;
+}
+.aviso-tabelas{
+    margin-bottom:12px;
+    padding:10px 14px;
+    border-radius:8px;
+    background:#78350f;
+    color:#fde68a;
+    font-size:14px;
+}
+.aviso-tabelas.erro{
+    background:#7f1d1d;
+    color:#fecaca;
+}
+.scroll-tabela{
+    overflow:auto;
+    max-height:calc(100vh - 230px);
+    border:1px solid #334155;
+    border-radius:10px;
+    background:#111827;
+}
+.tabela-dados{
+    border-collapse:collapse;
+    font-size:13px;
+    width:max-content;
+    min-width:100%;
+}
+.tabela-dados th,
+.tabela-dados td{
+    padding:8px 12px;
+    border:1px solid #1f2937;
+    white-space:nowrap;
+    text-align:right;
+}
+.tabela-dados thead th{
+    position:sticky;
+    top:0;
+    z-index:2;
+    background:#0f172a;
+    color:#e2e8f0;
+}
+.tabela-dados th:first-child,
+.tabela-dados td:first-child{
+    position:sticky;
+    left:0;
+    z-index:1;
+    text-align:left;
+    font-weight:bold;
+    background:#0f172a;
+    color:#e2e8f0;
+}
+.tabela-dados thead th:first-child{
+    z-index:3;
+}
+.tabela-dados tbody tr:hover td{
+    background:#1e293b;
+}
+.tabela-dados td.vazio{
+    color:#475569;
+    text-align:center;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <a href="propostas.html" class="botao-topbar">
+        ⬅ Voltar
+    </a>
+
+    <button onclick="fazerLogout()">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER
+========================= -->
+
+<div class="container">
+
+    <div class="pagina-tabelas">
+
+        <div id="avisoTabelas"></div>
+
+        <div class="abas-tabelas" id="abasTabelas"></div>
+
+        <div class="barra-busca">
+
+            <input
+                type="text"
+                id="buscaTabela"
+                placeholder="Buscar..."
+            >
+
+            <span class="info-tabela" id="infoTabela"></span>
+
+        </div>
+
+        <div class="scroll-tabela" id="conteudoTabela">
+            Carregando...
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-guard.js"></script>
+
+<script src="js/helpers.js"></script>
+<script src="js/tabelas.js"></script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "7.11.2";
+const VERSAO_SISTEMA = "8.0.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -203,6 +203,54 @@ function obterCidadeSaida(){
             : "ITAJAI";
 
     return CIDADES_SAIDA[chave] || CIDADES_SAIDA.ITAJAI;
+}
+
+
+// ======================================
+// FRETES POR TRANSPORTADORA
+// ======================================
+// Cada transportadora tem a sua tabela no Supabase
+// (colunas: modelo, cidade, valor). Transportadora nova:
+// criar a tabela e acrescentar uma linha aqui.
+// nome = como aparece nas telas / tabela = nome no Supabase.
+
+const TRANSPORTADORAS_FRETE = [
+    { nome: "Dionizio", tabela: "frete_dionizio" },
+    { nome: "Magnus", tabela: "frete_magnus" },
+    { nome: "Kung", tabela: "frete_kung" },
+    { nome: "RR", tabela: "frete_rr" }
+];
+
+
+// Busca todas as tabelas de frete e devolve uma lista única
+// [{ transportadora, modelo, cidade, valor }]. Se qualquer
+// uma falhar, dá erro (quem chamou usa a cópia offline).
+async function buscarLinhasFretes(){
+
+    const resultados =
+        await Promise.all(
+            TRANSPORTADORAS_FRETE.map(async (transportadora) => {
+
+                const { data, error } =
+                    await supabaseClient
+                        .from(transportadora.tabela)
+                        .select("modelo, cidade, valor")
+                        .order("id");
+
+                if(error){
+                    throw error;
+                }
+
+                return (data || []).map(linha => ({
+                    transportadora: transportadora.nome,
+                    modelo: linha.modelo,
+                    cidade: linha.cidade,
+                    valor: linha.valor
+                }));
+            })
+        );
+
+    return resultados.flat();
 }
 
 

@@ -295,14 +295,9 @@ async function carregarFretes(){
 
     try{
 
-        const { data, error } =
-            await supabaseClient
-                .from("tabela_fretes")
-                .select("transportadora, modelo, cidade, valor");
-
-        if(error){
-            throw error;
-        }
+        // uma tabela por transportadora (ver helpers.js)
+        const data =
+            await buscarLinhasFretes();
 
         processarLinhasFretes(data);
 

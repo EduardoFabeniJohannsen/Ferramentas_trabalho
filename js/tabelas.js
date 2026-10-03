@@ -22,7 +22,10 @@ const TABELAS = {
             { campo: "modelo", tipo: "text", obrigatorio: true },
             { campo: "dias", tipo: "text", obrigatorio: true },
             { campo: "valor", tipo: "numeric", obrigatorio: true }
-        ]
+        ],
+
+        // consulta: linhas = modelo, colunas = dias, valor no meio
+        matriz: { linha: ["modelo"], coluna: "dias", numerico: true }
     },
 
     tabela_fretes: {
@@ -34,7 +37,10 @@ const TABELAS = {
             { campo: "modelo", tipo: "text", obrigatorio: true },
             { campo: "cidade", tipo: "text", obrigatorio: true },
             { campo: "valor", tipo: "text", obrigatorio: false }
-        ]
+        ],
+
+        // consulta: linhas = transportadora + modelo, colunas = cidade
+        matriz: { linha: ["transportadora", "modelo"], coluna: "cidade" }
     },
 
     frete_dionizio: {
@@ -45,7 +51,10 @@ const TABELAS = {
             { campo: "modelo", tipo: "text", obrigatorio: true },
             { campo: "cidade", tipo: "text", obrigatorio: true },
             { campo: "valor", tipo: "text", obrigatorio: false }
-        ]
+        ],
+
+        // consulta: linhas = modelo, colunas = cidade, valor no meio
+        matriz: { linha: ["modelo"], coluna: "cidade" }
     },
 
     frete_magnus: {
@@ -56,7 +65,10 @@ const TABELAS = {
             { campo: "modelo", tipo: "text", obrigatorio: true },
             { campo: "cidade", tipo: "text", obrigatorio: true },
             { campo: "valor", tipo: "text", obrigatorio: false }
-        ]
+        ],
+
+        // consulta: linhas = modelo, colunas = cidade, valor no meio
+        matriz: { linha: ["modelo"], coluna: "cidade" }
     }
 };
 
@@ -75,7 +87,10 @@ let tabelaAtual = "tabela_precos";
 
 let linhasAtuais = [];
 
-// admin edita; os demais só consultam (definido no init)
+// admin logado (definido no init). Só ele vê o botão de editar.
+let ehAdminLogado = false;
+
+// false = consulta (matriz, igual pra todos); true = editor (só admin)
 let podeEditar = false;
 
 
@@ -219,6 +234,12 @@ function desenharTabela(){
             .trim()
             .toLowerCase();
 
+    // consulta: matriz (linhas = modelo, colunas = dias/cidades)
+    if(!podeEditar){
+
+        return desenharMatriz(config, filtro);
+    }
+
 
     // ---------- cabeçalho ----------
 
@@ -229,7 +250,7 @@ function desenharTabela(){
     const linhaCab =
         document.createElement("tr");
 
-    ["id", ...config.colunas.map(c => c.campo), ...(podeEditar ? [""] : [])]
+    ["id", ...config.colunas.map(c => c.campo), ""]
         .forEach(titulo => {
 
             const th = document.createElement("th");
@@ -248,11 +269,8 @@ function desenharTabela(){
 
     corpo.innerHTML = "";
 
-    // linha de adicionar (sempre no topo, só pra admin)
-    if(podeEditar){
-
-        corpo.appendChild(criarLinhaNova(config));
-    }
+    // linha de adicionar (sempre no topo)
+    corpo.appendChild(criarLinhaNova(config));
 
     const filtradas =
         linhasAtuais.filter(linha => {
@@ -282,6 +300,149 @@ function desenharTabela(){
 }
 
 
+// ======================================
+// CONSULTA (matriz)
+// ======================================
+// Linhas = modelo (e transportadora, na tabela_fretes),
+// colunas = dias (preços) ou cidade (fretes), valor no meio.
+// O filtro procura primeiro nas linhas; se nenhuma bater,
+// procura nas colunas (ex: filtrar uma cidade).
+
+function desenharMatriz(config, filtro){
+
+    const regra = config.matriz;
+
+    const ordenarTexto = (a, b) =>
+        String(a).localeCompare(String(b), "pt-BR", { numeric: true });
+
+    const mapa = {};
+
+    const rotulosLinhas = new Map();
+
+    const colunasSet = new Set();
+
+    linhasAtuais.forEach(linha => {
+
+        const partes =
+            regra.linha.map(campo => String(linha[campo] ?? ""));
+
+        const chaveLinha = partes.join("\u0001");
+
+        const coluna = String(linha[regra.coluna] ?? "");
+
+        rotulosLinhas.set(chaveLinha, partes);
+
+        colunasSet.add(coluna);
+
+        mapa[chaveLinha + "\u0002" + coluna] = linha.valor;
+    });
+
+    let linhas =
+        [...rotulosLinhas.entries()]
+            .sort((a, b) =>
+                ordenarTexto(a[1].join(" "), b[1].join(" "))
+            );
+
+    let colunas =
+        [...colunasSet]
+            .sort(
+                regra.numerico
+                    ? (a, b) => Number(a) - Number(b)
+                    : ordenarTexto
+            );
+
+    if(filtro){
+
+        const linhasFiltradas =
+            linhas.filter(([, partes]) =>
+                partes.join(" ").toLowerCase().includes(filtro)
+            );
+
+        if(linhasFiltradas.length){
+
+            linhas = linhasFiltradas;
+
+        }else{
+
+            colunas =
+                colunas.filter(coluna =>
+                    coluna.toLowerCase().includes(filtro)
+                );
+        }
+    }
+
+
+    // ---------- cabeçalho ----------
+
+    const cabecalho = $("cabecalhoTabela");
+
+    cabecalho.innerHTML = "";
+
+    const linhaCab = document.createElement("tr");
+
+    const thRotulo = document.createElement("th");
+
+    thRotulo.className = "col-rotulo";
+
+    thRotulo.innerText = regra.linha.join(" / ");
+
+    linhaCab.appendChild(thRotulo);
+
+    colunas.forEach(coluna => {
+
+        const th = document.createElement("th");
+
+        th.innerText = coluna;
+
+        linhaCab.appendChild(th);
+    });
+
+    cabecalho.appendChild(linhaCab);
+
+
+    // ---------- corpo ----------
+
+    const corpo = $("corpoTabela");
+
+    corpo.innerHTML = "";
+
+    linhas.forEach(([chaveLinha, partes]) => {
+
+        const tr = document.createElement("tr");
+
+        const tdRotulo = document.createElement("td");
+
+        tdRotulo.className = "col-rotulo";
+
+        tdRotulo.innerText = partes.join(" / ");
+
+        tr.appendChild(tdRotulo);
+
+        colunas.forEach(coluna => {
+
+            const td = document.createElement("td");
+
+            const valor = mapa[chaveLinha + "\u0002" + coluna];
+
+            if(valor !== undefined && valor !== null && valor !== ""){
+
+                td.innerText =
+                    regra.numerico || typeof valor === "number"
+                        ? formatarMoedaBR(valor)
+                        : valor;
+            }
+
+            tr.appendChild(td);
+        });
+
+        corpo.appendChild(tr);
+    });
+
+    $("contagemTabela").innerText =
+        `${linhas.length} linhas`;
+}
+
+
 function criarLinhaTabela(config, linha){
 
     const tr = document.createElement("tr");
@@ -303,25 +464,15 @@ function criarLinhaTabela(config, linha){
         const input =
             criarCampo(linha[coluna.campo], coluna.campo);
 
-        if(podeEditar){
-
-            input.addEventListener(
-                "change",
-                () => salvarCampo(linha, input)
-            );
-
-        }else{
-
-            // consulta: dá pra selecionar e copiar, mas não editar
-            input.readOnly = true;
-        }
+        input.addEventListener(
+            "change",
+            () => salvarCampo(linha, input)
+        );
 
         td.appendChild(input);
 
         tr.appendChild(td);
     });
-
-    if(!podeEditar) return tr;
 
     const tdAcao = document.createElement("td");
 
@@ -581,13 +732,14 @@ async function excluirLinha(linha){
 
 
 // ======================================
-// INIT
+// MODO CONSULTA / EDIÇÃO
 // ======================================
 
-(async function init(){
+function atualizarModo(){
 
-    // admin edita; os demais só consultam
-    podeEditar = await ehAdmin();
+    const tabela = document.querySelector(".tabela-editor");
+
+    tabela.classList.toggle("tabela-matriz", !podeEditar);
 
     $("tituloTabelas").innerText =
         podeEditar ? "Editar tabelas" : "Consultar tabelas";
@@ -595,7 +747,44 @@ async function excluirLinha(linha){
     $("avisoEdicao").innerText =
         podeEditar
             ? "A alteração é salva sozinha ao sair do campo."
-            : "Somente consulta.";
+            : (
+                ehAdminLogado
+                    ? "Clique em Editar para alterar os valores."
+                    : "Somente consulta."
+            );
+
+    $("btnModoEdicao").innerText =
+        podeEditar ? "👁 Consultar" : "✏️ Editar";
+
+    desenharTabela();
+}
+
+
+function alternarModoEdicao(){
+
+    if(!ehAdminLogado) return;
+
+    podeEditar = !podeEditar;
+
+    $("filtroTabela").value = "";
+
+    atualizarModo();
+}
+
+
+// ======================================
+// INIT
+// ======================================
+
+(async function init(){
+
+    // todo mundo consulta; só o admin vê o botão de editar
+    ehAdminLogado = await ehAdmin();
+
+    if(ehAdminLogado){
+
+        $("btnModoEdicao").style.display = "";
+    }
 
     const select = $("selectTabela");
 
@@ -626,6 +815,8 @@ async function excluirLinha(linha){
         "input",
         desenharTabela
     );
+
+    atualizarModo();
 
     carregarLinhasTabela();
 

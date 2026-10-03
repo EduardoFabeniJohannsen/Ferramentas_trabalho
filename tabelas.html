@@ -85,6 +85,28 @@
 .tabela-editor .btn-excluir:hover{
     background:#b91c1c;
 }
+/* ----- consulta (matriz) ----- */
+.tabela-matriz th,
+.tabela-matriz td{
+    text-align:center;
+    white-space:nowrap;
+    padding:8px 12px;
+}
+.tabela-matriz .col-rotulo{
+    position:sticky;
+    left:0;
+    text-align:left;
+    font-weight:bold;
+    background:#1e293b;
+    border-right:1px solid #334155;
+}
+.tabela-matriz th.col-rotulo{
+    z-index:2;
+    background:#0f172a;
+}
+.tabela-matriz tbody tr:hover td{
+    background:#334155;
+}
 .tabela-editor tr.linha-nova td{
     background:#1e3a2f;
 }
@@ -138,6 +160,15 @@ CONTAINER
                 id="filtroTabela"
                 placeholder="Filtrar (modelo, cidade, transportadora...)"
             >
+
+            <button
+                type="button"
+                id="btnModoEdicao"
+                onclick="alternarModoEdicao()"
+                style="display:none; margin:0"
+            >
+                ✏️ Editar
+            </button>
 
             <span class="contagem" id="contagemTabela"></span>
 

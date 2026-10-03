@@ -44,6 +44,17 @@
         console.error("[auth] Erro ao verificar sessão:", erro);
     }
 
+    // Admin vê os itens marcados com class="so-admin"
+    // (começam escondidos com display:none no HTML)
+    if(await ehAdmin()){
+
+        document
+            .querySelectorAll(".so-admin")
+            .forEach(elemento => {
+                elemento.style.display = "";
+            });
+    }
+
     document.documentElement.style.visibility = "";
 
 })();
@@ -63,6 +74,32 @@ function existeLoginSalvo(){
             chave =>
                 chave.startsWith("sb-") &&
                 chave.endsWith("-auth-token")
+        );
+
+    }catch(erro){
+
+        return false;
+    }
+}
+
+
+// ======================================
+// ADMIN
+// ======================================
+// O papel vem de app_metadata.role no login (o usuário não
+// consegue alterar esse campo). Isso só controla o que aparece
+// na tela — quem protege os dados de verdade são as policies
+// de RLS no Supabase.
+
+async function ehAdmin(){
+
+    try{
+
+        const { data } =
+            await supabaseClient.auth.getSession();
+
+        return (
+            data?.session?.user?.app_metadata?.role === "admin"
         );
 
     }catch(erro){

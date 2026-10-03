@@ -1,426 +1,566 @@
 // ======================================
-// CONSULTAR TABELAS
+// TABELAS (ADMIN)
 // ======================================
-// Só leitura: mostra tabela_precos e tabela_fretes
-// (uma aba por transportadora).
-// Depende de helpers.js (precisa vir carregado antes).
-
-// ======================================
-// DADOS
-// ======================================
-
-// { MODELO: { dias: valor } }
-let precosTabela = {};
-
-// { transportadora: { MODELO: { CIDADE: valor } } }
-let fretesTabela = {};
-
-// nome "bonito" de cada cidade (chave sem acento -> nome exibido)
-let nomesCidadesTabela = {};
-
-// abas: [{ tipo: "precos" } | { tipo: "frete", nome: "Magnus" }]
-let abasTabelas = [];
-
-let abaAtual = 0;
-
-// Avisos (cópia offline em uso / falha de carregamento)
-let avisosTabelas = [];
-
+// Edição direta das tabelas do Supabase. Só funciona logado
+// como admin (app_metadata.role = "admin"): as policies de RLS
+// bloqueiam insert/update/delete para qualquer outro usuário.
+// Depende de helpers.js e auth-guard.js (precisam vir antes).
 
 // ======================================
-// NORMALIZAR
+// CONFIGURAÇÃO DAS TABELAS
 // ======================================
+// obrigatorio = não aceita vazio
+// tipo "numeric" = número (aceita vírgula, ex: 1.234,56)
 
-function normalizarModeloTabela(valor){
+const TABELAS = {
 
-    return String(valor || "")
-        .replace(/\uFEFF/g, "")
-        .trim()
-        .toUpperCase();
-}
+    tabela_precos: {
 
+        nome: "Preços (tabela_precos)",
 
-function normalizarCidadeTabela(valor){
+        colunas: [
+            { campo: "modelo", tipo: "text", obrigatorio: true },
+            { campo: "dias", tipo: "text", obrigatorio: true },
+            { campo: "valor", tipo: "numeric", obrigatorio: true }
+        ]
+    },
 
-    return String(valor || "")
-        .replace(/\uFEFF/g, "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toUpperCase();
-}
+    tabela_fretes: {
 
+        nome: "Fretes (tabela_fretes)",
 
-// ======================================
-// CARREGAR (Supabase, com cópia offline como reserva)
-// ======================================
-// Usa as mesmas cópias que a página de propostas grava
-// no localStorage (cacheTabelaPrecos / cacheTabelaFretes).
+        colunas: [
+            { campo: "transportadora", tipo: "text", obrigatorio: true },
+            { campo: "modelo", tipo: "text", obrigatorio: true },
+            { campo: "cidade", tipo: "text", obrigatorio: true },
+            { campo: "valor", tipo: "text", obrigatorio: false }
+        ]
+    },
 
-function lerCopiaOffline(chave){
+    frete_dionizio: {
 
-    try{
+        nome: "Frete Dionizio (frete_dionizio)",
 
-        const salvo =
-            localStorage.getItem(chave);
+        colunas: [
+            { campo: "modelo", tipo: "text", obrigatorio: true },
+            { campo: "cidade", tipo: "text", obrigatorio: true },
+            { campo: "valor", tipo: "text", obrigatorio: false }
+        ]
+    },
 
-        if(!salvo) return null;
+    frete_magnus: {
 
-        const copia =
-            JSON.parse(salvo);
+        nome: "Frete Magnus (frete_magnus)",
 
-        if(
-            !copia ||
-            !Array.isArray(copia.linhas) ||
-            !copia.linhas.length
-        ){
-            return null;
-        }
-
-        return copia;
-
-    }catch(erro){
-
-        return null;
+        colunas: [
+            { campo: "modelo", tipo: "text", obrigatorio: true },
+            { campo: "cidade", tipo: "text", obrigatorio: true },
+            { campo: "valor", tipo: "text", obrigatorio: false }
+        ]
     }
-}
+};
 
 
-function formatarDataHora(iso){
+// mesmos períodos válidos da tabela de preços
+const DIAS_VALIDOS_TABELA = [
+    "1", "2", "3", "4", "5", "6", "7",
+    "10", "14", "15", "21", "28", "30"
+];
 
-    return new Date(iso).toLocaleString(
-        "pt-BR",
-        { dateStyle: "short", timeStyle: "short" }
-    );
-}
+// máximo de linhas desenhadas na tela de uma vez (o filtro
+// busca em todas, mas só desenha as primeiras)
+const LIMITE_LINHAS_TELA = 200;
+
+let tabelaAtual = "tabela_precos";
+
+let linhasAtuais = [];
 
 
-async function buscarLinhas(buscar, chaveCache, rotulo){
+// ======================================
+// TRATAR VALOR DIGITADO
+// ======================================
+// Devolve { valor } pronto pro banco ou { erro }.
 
-    try{
+function tratarValor(tabela, campo, texto){
 
-        return await buscar();
+    const coluna =
+        TABELAS[tabela].colunas.find(
+            item => item.campo === campo
+        );
 
-    }catch(erro){
+    let valor =
+        String(texto ?? "")
+            .trim()
+            .replace(/\s+/g, " ");
 
-        console.error(`[${rotulo}] Falha ao carregar:`, erro);
+    // modelo e cidade sempre em maiúsculas (como o sistema lê)
+    if(campo === "modelo" || campo === "cidade"){
 
-        const copia =
-            lerCopiaOffline(chaveCache);
-
-        if(copia){
-
-            avisosTabelas.push({
-                texto: `⚠️ ${rotulo}: sem conexão, usando cópia salva em ${formatarDataHora(copia.salvoEm)}. Os valores podem estar desatualizados.`,
-                erro: false
-            });
-
-            return copia.linhas;
-        }
-
-        avisosTabelas.push({
-            texto: `⚠️ ${rotulo} não carregada (verifique conexão/login)`,
-            erro: true
-        });
-
-        return [];
+        valor = valor.toUpperCase();
     }
-}
 
+    if(!valor){
 
-function processarPrecos(linhas){
+        if(coluna.obrigatorio){
 
-    precosTabela = {};
-
-    linhas.forEach(linha => {
-
-        const modelo =
-            normalizarModeloTabela(linha.modelo);
-
-        if(!modelo) return;
-
-        const valor =
-            Number(linha.valor);
-
-        if(isNaN(valor)) return;
-
-        if(!precosTabela[modelo]){
-            precosTabela[modelo] = {};
+            return { erro: `${campo} é obrigatório` };
         }
 
-        precosTabela[modelo][linha.dias] = valor;
-    });
-}
+        return { valor: null };
+    }
 
+    if(coluna.tipo === "numeric"){
 
-function processarFretes(linhas){
+        const numero = brToNumber(valor);
 
-    fretesTabela = {};
+        if(!Number.isFinite(numero)){
 
-    nomesCidadesTabela = {};
-
-    linhas.forEach(linha => {
-
-        const transportador =
-            linha.transportadora;
-
-        const modelo =
-            normalizarModeloTabela(linha.modelo);
-
-        const cidade =
-            normalizarCidadeTabela(linha.cidade);
-
-        if(!transportador || !modelo || !cidade) return;
-
-        if(!fretesTabela[transportador]){
-            fretesTabela[transportador] = {};
+            return { erro: "Valor inválido" };
         }
 
-        if(!fretesTabela[transportador][modelo]){
-            fretesTabela[transportador][modelo] = {};
-        }
+        return { valor: numero };
+    }
 
-        fretesTabela[transportador][modelo][cidade] =
-            linha.valor;
+    if(
+        tabela === "tabela_precos" &&
+        campo === "dias" &&
+        !DIAS_VALIDOS_TABELA.includes(valor)
+    ){
 
-        nomesCidadesTabela[cidade] =
-            String(linha.cidade)
-                .trim()
-                .replace(/\s+/g, " ")
-                .toUpperCase();
-    });
-}
-
-
-// ======================================
-// ABAS
-// ======================================
-
-function montarAbas(){
-
-    abasTabelas = [{ tipo: "precos" }];
-
-    Object.keys(fretesTabela)
-        .sort((a, b) => a.localeCompare(b, "pt-BR"))
-        .forEach(nome => {
-
-            abasTabelas.push({
-                tipo: "frete",
-                nome: nome
-            });
-        });
-
-    const container =
-        $("abasTabelas");
-
-    container.innerHTML = "";
-
-    abasTabelas.forEach((aba, indice) => {
-
-        const botao =
-            document.createElement("button");
-
-        botao.type = "button";
-
-        botao.className =
-            "btn-toggle" +
-            (indice === abaAtual ? " ativo" : "");
-
-        botao.innerText =
-            aba.tipo === "precos"
-                ? "💰 Tabela de preços"
-                : "🚚 Frete: " + aba.nome;
-
-        botao.onclick = () => {
-
-            abaAtual = indice;
-
-            $("buscaTabela").value = "";
-
-            montarAbas();
-
-            renderizarTabela();
+        return {
+            erro: `Dias inválido (use: ${DIAS_VALIDOS_TABELA.join(", ")})`
         };
+    }
 
-        container.appendChild(botao);
-    });
+    return { valor: valor };
 }
 
 
 // ======================================
-// RENDERIZAR
+// CARREGAR LINHAS
+// ======================================
+// O Supabase devolve no máximo 1000 linhas por consulta,
+// então busca em páginas até acabar.
+
+async function carregarLinhasTabela(){
+
+    $("contagemTabela").innerText = "Carregando...";
+
+    const tamanhoPagina = 1000;
+
+    let inicio = 0;
+
+    let todas = [];
+
+    try{
+
+        while(true){
+
+            const { data, error } =
+                await supabaseClient
+                    .from(tabelaAtual)
+                    .select("*")
+                    .order("id")
+                    .range(inicio, inicio + tamanhoPagina - 1);
+
+            if(error) throw error;
+
+            todas = todas.concat(data);
+
+            if(data.length < tamanhoPagina) break;
+
+            inicio += tamanhoPagina;
+        }
+
+        linhasAtuais = todas;
+
+    }catch(erro){
+
+        console.error("[tabelas] Falha ao carregar:", erro);
+
+        linhasAtuais = [];
+
+        mostrarToast("Falha ao carregar a tabela", true);
+    }
+
+    desenharTabela();
+}
+
+
+// ======================================
+// DESENHAR TABELA
 // ======================================
 
-function celulaValor(valor){
+function criarCampo(valor, campo){
 
-    if(valor === undefined || valor === null || valor === ""){
+    const input =
+        document.createElement("input");
 
-        return `<td class="vazio">—</td>`;
-    }
+    input.type = "text";
 
-    // valor numérico vira moeda BR; texto (ex: "1.200,00") aparece como está
-    const texto =
-        typeof valor === "number"
-            ? formatarMoedaBR(valor)
-            : String(valor);
+    input.value = valor ?? "";
 
-    return `<td>${texto}</td>`;
+    input.dataset.campo = campo;
+
+    return input;
 }
 
 
-function renderizarPrecos(busca){
+function desenharTabela(){
 
-    const modelos =
-        Object.keys(precosTabela)
-            .sort()
-            .filter(modelo => modelo.includes(busca));
+    const config =
+        TABELAS[tabelaAtual];
 
-    const dias =
-        [...new Set(
-            Object.values(precosTabela)
-                .flatMap(item => Object.keys(item))
-        )]
-        .map(Number)
-        .sort((a, b) => a - b);
+    const filtro =
+        $("filtroTabela").value
+            .trim()
+            .toLowerCase();
 
-    if(!modelos.length){
 
-        $("infoTabela").innerText = "";
+    // ---------- cabeçalho ----------
 
-        return "<p style='padding:16px'>Nenhum modelo encontrado</p>";
-    }
+    const cabecalho = $("cabecalhoTabela");
 
-    let html = `
-        <table class="tabela-dados">
-            <thead>
-                <tr>
-                    <th>Modelo</th>
-                    ${dias.map(d => `<th>${d} ${d === 1 ? "dia" : "dias"}</th>`).join("")}
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    cabecalho.innerHTML = "";
 
-    modelos.forEach(modelo => {
+    const linhaCab =
+        document.createElement("tr");
 
-        html += `<tr><td>${modelo}</td>`;
+    ["id", ...config.colunas.map(c => c.campo), ""]
+        .forEach(titulo => {
 
-        dias.forEach(d => {
-            html += celulaValor(precosTabela[modelo][d]);
+            const th = document.createElement("th");
+
+            th.innerText = titulo;
+
+            linhaCab.appendChild(th);
         });
 
-        html += `</tr>`;
-    });
-
-    html += `</tbody></table>`;
-
-    $("infoTabela").innerText =
-        `${modelos.length} modelos · valores em R$`;
-
-    return html;
-}
+    cabecalho.appendChild(linhaCab);
 
 
-function renderizarFrete(transportador, busca){
+    // ---------- corpo ----------
 
-    const dadosTransportador =
-        fretesTabela[transportador] || {};
+    const corpo = $("corpoTabela");
 
-    // mesma ordem do banco (igual à planilha): modelos nas
-    // linhas, cidades nas colunas
-    const modelos =
-        Object.keys(dadosTransportador);
+    corpo.innerHTML = "";
 
-    const buscaCidade =
-        normalizarCidadeTabela(busca);
+    // linha de adicionar (sempre no topo)
+    corpo.appendChild(criarLinhaNova(config));
 
-    const cidades =
-        [...new Set(
-            modelos.flatMap(modelo =>
-                Object.keys(dadosTransportador[modelo])
-            )
-        )]
-        .filter(cidade => cidade.includes(buscaCidade));
+    const filtradas =
+        linhasAtuais.filter(linha => {
 
-    if(!cidades.length){
+            if(!filtro) return true;
 
-        $("infoTabela").innerText = "";
-
-        return "<p style='padding:16px'>Nenhuma cidade encontrada</p>";
-    }
-
-    let html = `
-        <table class="tabela-dados">
-            <thead>
-                <tr>
-                    <th>Modelo</th>
-                    ${cidades.map(c => `<th>${nomesCidadesTabela[c] || c}</th>`).join("")}
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    modelos.forEach(modelo => {
-
-        html += `<tr><td>${modelo}</td>`;
-
-        cidades.forEach(cidade => {
-            html += celulaValor(dadosTransportador[modelo][cidade]);
+            return config.colunas.some(coluna =>
+                String(linha[coluna.campo] ?? "")
+                    .toLowerCase()
+                    .includes(filtro)
+            );
         });
 
-        html += `</tr>`;
+    filtradas
+        .slice(0, LIMITE_LINHAS_TELA)
+        .forEach(linha => {
+
+            corpo.appendChild(
+                criarLinhaTabela(config, linha)
+            );
+        });
+
+    $("contagemTabela").innerText =
+        filtradas.length > LIMITE_LINHAS_TELA
+            ? `Mostrando ${LIMITE_LINHAS_TELA} de ${filtradas.length} (use o filtro)`
+            : `${filtradas.length} linhas`;
+}
+
+
+function criarLinhaTabela(config, linha){
+
+    const tr = document.createElement("tr");
+
+    tr.dataset.id = linha.id;
+
+    const tdId = document.createElement("td");
+
+    tdId.className = "col-id";
+
+    tdId.innerText = linha.id;
+
+    tr.appendChild(tdId);
+
+    config.colunas.forEach(coluna => {
+
+        const td = document.createElement("td");
+
+        const input =
+            criarCampo(linha[coluna.campo], coluna.campo);
+
+        input.addEventListener(
+            "change",
+            () => salvarCampo(linha, input)
+        );
+
+        td.appendChild(input);
+
+        tr.appendChild(td);
     });
 
-    html += `</tbody></table>`;
+    const tdAcao = document.createElement("td");
 
-    $("infoTabela").innerText =
-        `${modelos.length} modelos · ${cidades.length} cidades · valores em R$`;
+    tdAcao.className = "col-acao";
 
-    return html;
+    const botao = document.createElement("button");
+
+    botao.type = "button";
+
+    botao.className = "btn-excluir";
+
+    botao.title = "Excluir linha";
+
+    botao.innerText = "🗑️";
+
+    botao.addEventListener(
+        "click",
+        () => excluirLinha(linha)
+    );
+
+    tdAcao.appendChild(botao);
+
+    tr.appendChild(tdAcao);
+
+    return tr;
 }
 
 
-function renderizarTabela(){
+function criarLinhaNova(config){
 
-    const aba =
-        abasTabelas[abaAtual];
+    const tr = document.createElement("tr");
 
-    const campoBusca =
-        $("buscaTabela");
+    tr.className = "linha-nova";
 
-    if(!aba) return;
+    const tdId = document.createElement("td");
 
-    const busca =
-        campoBusca.value.trim();
+    tdId.className = "col-id";
 
-    let html;
+    tdId.innerText = "novo";
 
-    if(aba.tipo === "precos"){
+    tr.appendChild(tdId);
 
-        campoBusca.placeholder = "Buscar modelo...";
+    config.colunas.forEach(coluna => {
 
-        html = renderizarPrecos(busca.toUpperCase());
+        const td = document.createElement("td");
 
-    }else{
+        const input =
+            criarCampo("", coluna.campo);
 
-        campoBusca.placeholder = "Buscar cidade...";
+        input.placeholder = coluna.campo;
 
-        html = renderizarFrete(aba.nome, busca);
+        td.appendChild(input);
+
+        tr.appendChild(td);
+    });
+
+    const tdAcao = document.createElement("td");
+
+    tdAcao.className = "col-acao";
+
+    const botao = document.createElement("button");
+
+    botao.type = "button";
+
+    botao.className = "btn-adicionar";
+
+    botao.title = "Adicionar linha";
+
+    botao.innerText = "+";
+
+    botao.addEventListener(
+        "click",
+        () => adicionarLinha(tr)
+    );
+
+    tdAcao.appendChild(botao);
+
+    tr.appendChild(tdAcao);
+
+    return tr;
+}
+
+
+// ======================================
+// SALVAR CAMPO (update)
+// ======================================
+
+async function salvarCampo(linha, input){
+
+    const campo = input.dataset.campo;
+
+    const resultado =
+        tratarValor(tabelaAtual, campo, input.value);
+
+    if(resultado.erro){
+
+        input.classList.add("erro");
+
+        // volta pro valor que estava salvo
+        input.value = linha[campo] ?? "";
+
+        return mostrarToast(resultado.erro, true);
     }
 
-    $("conteudoTabela").innerHTML = html;
+    // nada mudou
+    if(String(resultado.valor ?? "") === String(linha[campo] ?? "")){
+
+        input.value = linha[campo] ?? "";
+
+        input.classList.remove("erro");
+
+        return;
+    }
+
+    input.classList.remove("erro");
+
+    input.classList.add("salvando");
+
+    // .select() devolve as linhas alteradas: se vier vazio,
+    // o RLS bloqueou (sem erro explícito) — não é admin.
+    const { data, error } =
+        await supabaseClient
+            .from(tabelaAtual)
+            .update({ [campo]: resultado.valor })
+            .eq("id", linha.id)
+            .select();
+
+    input.classList.remove("salvando");
+
+    if(error || !data || !data.length){
+
+        console.error("[tabelas] Falha ao salvar:", error);
+
+        input.classList.add("erro");
+
+        input.value = linha[campo] ?? "";
+
+        return mostrarToast(
+            error
+                ? "Erro ao salvar"
+                : "Sem permissão para alterar (entre como admin)",
+            true
+        );
+    }
+
+    linha[campo] = data[0][campo];
+
+    input.value = linha[campo] ?? "";
+
+    mostrarToast("Salvo");
 }
 
 
-function renderizarAvisos(){
+// ======================================
+// ADICIONAR LINHA (insert)
+// ======================================
 
-    $("avisoTabelas").innerHTML =
-        avisosTabelas
-            .map(aviso =>
-                `<div class="aviso-tabelas${aviso.erro ? " erro" : ""}">${aviso.texto}</div>`
-            )
-            .join("");
+async function adicionarLinha(tr){
+
+    const config =
+        TABELAS[tabelaAtual];
+
+    const novo = {};
+
+    for(const coluna of config.colunas){
+
+        const input =
+            tr.querySelector(`input[data-campo="${coluna.campo}"]`);
+
+        const resultado =
+            tratarValor(tabelaAtual, coluna.campo, input.value);
+
+        if(resultado.erro){
+
+            input.classList.add("erro");
+
+            return mostrarToast(resultado.erro, true);
+        }
+
+        input.classList.remove("erro");
+
+        novo[coluna.campo] = resultado.valor;
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from(tabelaAtual)
+            .insert(novo)
+            .select();
+
+    if(error || !data || !data.length){
+
+        console.error("[tabelas] Falha ao adicionar:", error);
+
+        return mostrarToast(
+            error
+                ? "Erro ao adicionar"
+                : "Sem permissão para adicionar (entre como admin)",
+            true
+        );
+    }
+
+    // entra no topo da lista local e redesenha
+    linhasAtuais.unshift(data[0]);
+
+    // o filtro some pra a linha nova aparecer
+    $("filtroTabela").value = "";
+
+    desenharTabela();
+
+    mostrarToast("Linha adicionada");
+}
+
+
+// ======================================
+// EXCLUIR LINHA (delete)
+// ======================================
+
+async function excluirLinha(linha){
+
+    const config =
+        TABELAS[tabelaAtual];
+
+    const descricao =
+        config.colunas
+            .map(coluna => linha[coluna.campo])
+            .join(" / ");
+
+    if(!confirm(`Excluir esta linha?\n\n${descricao}`)) return;
+
+    const { data, error } =
+        await supabaseClient
+            .from(tabelaAtual)
+            .delete()
+            .eq("id", linha.id)
+            .select();
+
+    if(error || !data || !data.length){
+
+        console.error("[tabelas] Falha ao excluir:", error);
+
+        return mostrarToast(
+            error
+                ? "Erro ao excluir"
+                : "Sem permissão para excluir (entre como admin)",
+            true
+        );
+    }
+
+    linhasAtuais =
+        linhasAtuais.filter(item => item.id !== linha.id);
+
+    desenharTabela();
+
+    mostrarToast("Linha excluída");
 }
 
 
@@ -430,46 +570,44 @@ function renderizarAvisos(){
 
 (async function init(){
 
-    const [linhasPrecos, linhasFretes] =
-        await Promise.all([
+    // só admin entra aqui
+    if(!(await ehAdmin())){
 
-            buscarLinhas(
-                async () => {
+        window.location.href = "propostas.html";
 
-                    const { data, error } =
-                        await supabaseClient
-                            .from("tabela_precos")
-                            .select("modelo, dias, valor");
+        return;
+    }
 
-                    if(error) throw error;
+    const select = $("selectTabela");
 
-                    return data || [];
-                },
-                "cacheTabelaPrecos",
-                "Tabela de preços"
-            ),
+    Object.keys(TABELAS).forEach(chave => {
 
-            buscarLinhas(
-                buscarLinhasFretes,
-                "cacheTabelaFretes",
-                "Tabelas de fretes"
-            )
-        ]);
+        const opcao = document.createElement("option");
 
-    processarPrecos(linhasPrecos);
+        opcao.value = chave;
 
-    processarFretes(linhasFretes);
+        opcao.innerText = TABELAS[chave].nome;
 
-    renderizarAvisos();
+        select.appendChild(opcao);
+    });
 
-    montarAbas();
+    select.addEventListener(
+        "change",
+        () => {
 
-    renderizarTabela();
+            tabelaAtual = select.value;
 
-    $("buscaTabela")
-        .addEventListener(
-            "input",
-            renderizarTabela
-        );
+            $("filtroTabela").value = "";
+
+            carregarLinhasTabela();
+        }
+    );
+
+    $("filtroTabela").addEventListener(
+        "input",
+        desenharTabela
+    );
+
+    carregarLinhasTabela();
 
 })();

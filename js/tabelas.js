@@ -1,9 +1,9 @@
 // ======================================
 // TABELAS (ADMIN)
 // ======================================
-// Edição direta das tabelas do Supabase. Só funciona logado
-// como admin (app_metadata.role = "admin"): as policies de RLS
-// bloqueiam insert/update/delete para qualquer outro usuário.
+// Consulta das tabelas do Supabase (qualquer usuário logado) e
+// edição direta só para admin (app_metadata.role = "admin"): as
+// policies de RLS bloqueiam insert/update/delete para os demais.
 // Depende de helpers.js e auth-guard.js (precisam vir antes).
 
 // ======================================
@@ -74,6 +74,9 @@ const LIMITE_LINHAS_TELA = 200;
 let tabelaAtual = "tabela_precos";
 
 let linhasAtuais = [];
+
+// admin edita; os demais só consultam (definido no init)
+let podeEditar = false;
 
 
 // ======================================
@@ -226,7 +229,7 @@ function desenharTabela(){
     const linhaCab =
         document.createElement("tr");
 
-    ["id", ...config.colunas.map(c => c.campo), ""]
+    ["id", ...config.colunas.map(c => c.campo), ...(podeEditar ? [""] : [])]
         .forEach(titulo => {
 
             const th = document.createElement("th");
@@ -245,8 +248,11 @@ function desenharTabela(){
 
     corpo.innerHTML = "";
 
-    // linha de adicionar (sempre no topo)
-    corpo.appendChild(criarLinhaNova(config));
+    // linha de adicionar (sempre no topo, só pra admin)
+    if(podeEditar){
+
+        corpo.appendChild(criarLinhaNova(config));
+    }
 
     const filtradas =
         linhasAtuais.filter(linha => {
@@ -297,15 +303,25 @@ function criarLinhaTabela(config, linha){
         const input =
             criarCampo(linha[coluna.campo], coluna.campo);
 
-        input.addEventListener(
-            "change",
-            () => salvarCampo(linha, input)
-        );
+        if(podeEditar){
+
+            input.addEventListener(
+                "change",
+                () => salvarCampo(linha, input)
+            );
+
+        }else{
+
+            // consulta: dá pra selecionar e copiar, mas não editar
+            input.readOnly = true;
+        }
 
         td.appendChild(input);
 
         tr.appendChild(td);
     });
+
+    if(!podeEditar) return tr;
 
     const tdAcao = document.createElement("td");
 
@@ -570,13 +586,16 @@ async function excluirLinha(linha){
 
 (async function init(){
 
-    // só admin entra aqui
-    if(!(await ehAdmin())){
+    // admin edita; os demais só consultam
+    podeEditar = await ehAdmin();
 
-        window.location.href = "propostas.html";
+    $("tituloTabelas").innerText =
+        podeEditar ? "Editar tabelas" : "Consultar tabelas";
 
-        return;
-    }
+    $("avisoEdicao").innerText =
+        podeEditar
+            ? "A alteração é salva sozinha ao sair do campo."
+            : "Somente consulta.";
 
     const select = $("selectTabela");
 

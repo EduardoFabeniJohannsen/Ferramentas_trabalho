@@ -8,7 +8,7 @@ const contratoWEG = {
     periodoDias: 30,
 
     // a partir de quantos períodos o frete é bonificado
-    periodosFreteBonificado: 4,
+    periodosFreteBonificado: 3,
 
     // ordem dos grupos no documento (2ª e 3ª letra do modelo:
     // ME = mastro, TE = tesoura, AD = articulada diesel, AE = articulada elétrica)

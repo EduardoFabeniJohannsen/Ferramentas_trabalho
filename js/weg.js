@@ -165,6 +165,11 @@ function gerarDocumento() {
 
     let valorLocacao = 0;
 
+    // soma de 1 período (preço x quantidade) e total de unidades escolhidas
+    let valorPorPeriodo = 0;
+
+    let totalUnidades = 0;
+
     let linhasTabela = "";
 
     // Agrupa por tipo de equipamento e numera na ordem exibida (1, 2, 3...)
@@ -197,6 +202,10 @@ function gerarDocumento() {
         if (selecionado) {
 
             valorLocacao += item.preco * quantidade * periodos;
+
+            valorPorPeriodo += item.preco * quantidade;
+
+            totalUnidades += quantidade;
         }
 
         linhasTabela += `
@@ -235,6 +244,18 @@ function gerarDocumento() {
         </div>
         `;
 
+    // 2+ equipamentos por mais de 1 período: mostra também o valor
+    // de cada período, pra o total não parecer maior do que é
+    const linhaValorPeriodo =
+        (totalUnidades >= 2 && periodos > 1)
+            ? `
+        <div class="resumo-linha">
+            <span>Valor por período (30 dias)</span>
+            <span>R$ ${formatarMoedaBR(valorPorPeriodo)}</span>
+        </div>
+        `
+            : "";
+
     $("documentoProposta").innerHTML = `
 
         <h3>Locação de Equipamentos</h3>
@@ -260,6 +281,8 @@ function gerarDocumento() {
             <span>${periodoHtml}</span>
         </div>
 
+        ${linhaValorPeriodo}
+
         <div class="resumo-linha">
             <span>Valor locação</span>
             <span>R$ ${formatarMoedaBR(valorLocacao)}</span>
@@ -271,15 +294,176 @@ function gerarDocumento() {
             <span>Total</span>
             <span>${freteInvalido ? "—" : "R$ " + formatarMoedaBR(total)}</span>
         </div>
-
-        <div class="perguntas">
-            <strong>Para confirmação de Locação enviar:</strong>
-            CNPJ DE FATURAMENTO:<br>
-            DATA DA NECESSIDADE:<br>
-            PRÉDIO E SETOR QUE A MAQUINA VAI FICAR:<br>
-            RESPONSAVEL PELO RECEBIMENTO:
-        </div>
     `;
+}
+
+
+// ======================================
+// CACHE (salvo no navegador)
+// ======================================
+// Salva sozinho no localStorage pra não perder nada se a
+// página recarregar (Ctrl+R) ou o navegador travar.
+
+const CHAVE_CACHE_WEG = "wegCache";
+
+
+function salvarCacheWEG() {
+
+    const quantidades = {};
+
+    contratoWEG.itens.forEach((item) => {
+
+        quantidades[item.modelo] =
+            $(`qtd-${item.modelo}`)?.value || "0";
+    });
+
+    const dados = {
+
+        quantidades: quantidades,
+        valorFrete: $("valorFrete")?.value || "",
+        periodos: $("periodos")?.value || "1",
+        dataInicio: $("dataInicio")?.value || ""
+    };
+
+    try {
+
+        localStorage.setItem(
+            CHAVE_CACHE_WEG,
+            JSON.stringify(dados)
+        );
+
+    } catch (erro) {
+
+        console.error("Erro ao salvar cache WEG:", erro);
+    }
+}
+
+
+function restaurarCacheWEG() {
+
+    let dados;
+
+    try {
+
+        const salvo = localStorage.getItem(CHAVE_CACHE_WEG);
+
+        if (!salvo) return;
+
+        dados = JSON.parse(salvo);
+
+    } catch (erro) {
+
+        console.error("Cache WEG inválido, ignorando:", erro);
+
+        return;
+    }
+
+    if (!dados || typeof dados !== "object") return;
+
+    contratoWEG.itens.forEach((item) => {
+
+        const campo = $(`qtd-${item.modelo}`);
+
+        const quantidade =
+            parseInt(dados.quantidades?.[item.modelo], 10);
+
+        if (campo && Number.isFinite(quantidade) && quantidade > 0) {
+
+            campo.value = quantidade;
+        }
+    });
+
+    $("valorFrete").value = dados.valorFrete || "";
+
+    $("periodos").value = dados.periodos || "1";
+
+    $("periodos").value = obterPeriodos();
+
+    $("dataInicio").value = dados.dataInicio || "";
+}
+
+
+// ======================================
+// TEXTO DE CONFIRMAÇÃO (copiar pro e-mail)
+// ======================================
+// Fica fora da área de print. O botão copia em HTML (cola
+// formatado no Outlook/Gmail) e em texto simples como reserva.
+
+const confirmacaoLocacao = {
+
+    titulo: "Para confirmação da locação, favor enviar:",
+
+    campos: [
+        "CNPJ de faturamento:",
+        "Data da necessidade:",
+        "Prédio e setor onde a máquina ficará:",
+        "Responsável pelo recebimento:"
+    ]
+};
+
+
+function htmlConfirmacaoEmail() {
+
+    const itens =
+        confirmacaoLocacao.campos
+            .map((campo) => `<li><b>${campo}</b>&nbsp;</li>`)
+            .join("");
+
+    return `<div style="font-family:Calibri,Arial,sans-serif;font-size:14px;">` +
+        `<p><b>${confirmacaoLocacao.titulo}</b></p>` +
+        `<ul>${itens}</ul>` +
+        `</div>`;
+}
+
+
+function textoConfirmacaoEmail() {
+
+    const itens =
+        confirmacaoLocacao.campos
+            .map((campo) => `• ${campo} `)
+            .join("\n");
+
+    return `${confirmacaoLocacao.titulo}\n\n${itens}`;
+}
+
+
+function montarTextoEmail() {
+
+    $("textoEmail").innerHTML = htmlConfirmacaoEmail();
+}
+
+
+async function copiarParaEmail() {
+
+    try {
+
+        if (navigator.clipboard && window.ClipboardItem) {
+
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    "text/html": new Blob(
+                        [htmlConfirmacaoEmail()],
+                        { type: "text/html" }
+                    ),
+                    "text/plain": new Blob(
+                        [textoConfirmacaoEmail()],
+                        { type: "text/plain" }
+                    )
+                })
+            ]);
+
+            mostrarToast("Texto copiado");
+
+            return;
+        }
+
+    } catch (erro) {
+
+        console.error("Erro ao copiar em HTML:", erro);
+    }
+
+    // navegador bloqueou o HTML: copia só o texto
+    copiar(textoConfirmacaoEmail(), "Texto copiado (sem formatação)");
 }
 
 
@@ -291,7 +475,19 @@ function gerarDocumento() {
 
     montarListaEquipamentos();
 
+    montarTextoEmail();
+
+    restaurarCacheWEG();
+
     gerarDocumento();
+
+    // qualquer mudança regera o documento e salva no cache
+    const atualizar = () => {
+
+        gerarDocumento();
+
+        salvarCacheWEG();
+    };
 
     document
         .querySelectorAll(".quantidadeEquipamento")
@@ -299,23 +495,23 @@ function gerarDocumento() {
 
             input.addEventListener(
                 "input",
-                gerarDocumento
+                atualizar
             );
         });
 
     $("dataInicio").addEventListener(
         "input",
-        gerarDocumento
+        atualizar
     );
 
     $("valorFrete").addEventListener(
         "input",
-        gerarDocumento
+        atualizar
     );
 
     $("periodos").addEventListener(
         "input",
-        gerarDocumento
+        atualizar
     );
 
     // períodos inválido (vazio, 0, negativo) volta pra 1 ao sair do campo
@@ -325,7 +521,7 @@ function gerarDocumento() {
 
             $("periodos").value = obterPeriodos();
 
-            gerarDocumento();
+            atualizar();
         }
     );
 

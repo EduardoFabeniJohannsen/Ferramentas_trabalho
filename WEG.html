@@ -11,28 +11,19 @@
 <link rel="icon" href="icon.png">
 
 <style>
-/* ===== Texto de confirmação (copiar pro e-mail) ===== */
-.card-email{
-    text-align:left;
+/* ===== Documento + botão de copiar texto pro e-mail ===== */
+.coluna-documento{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+    max-width:100%;
 }
-.card-email h2{
-    text-align:center;
-}
-.texto-email{
-    background:#0f172a;
-    border:1px solid #334155;
-    border-radius:8px;
-    padding:4px 14px 10px;
-    margin-bottom:8px;
-    font-size:14px;
-    line-height:1.6;
-}
-.texto-email ul{
-    margin:6px 0 0;
-    padding-left:20px;
-}
-.card-email button{
-    width:100%;
+.btn-copiar-email{
+    width:auto;
+    margin:0;
+    padding:6px 12px;
+    font-size:13px;
 }
 </style>
 
@@ -62,8 +53,6 @@ CONTAINER
 ========================= -->
 
 <div class="container">
-
-    <div class="coluna-esquerda">
 
     <div class="card">
 
@@ -121,32 +110,26 @@ CONTAINER
 
 
     <!-- =========================
-    TEXTO PRA E-MAIL
-    ========================= -->
-
-    <div class="card card-email">
-
-        <h2>Texto para e-mail</h2>
-
-        <div id="textoEmail" class="texto-email"></div>
-
-        <button type="button" onclick="copiarParaEmail()">
-            📋 Copiar para e-mail
-        </button>
-
-    </div>
-
-    </div>
-
-
-    <!-- =========================
     DOCUMENTO (área pra print)
     ========================= -->
 
-    <div
-        id="documentoProposta"
-        class="documento-proposta"
-    ></div>
+    <div class="coluna-documento">
+
+        <div
+            id="documentoProposta"
+            class="documento-proposta"
+        ></div>
+
+        <button
+            type="button"
+            class="btn-copiar-email"
+            onclick="copiarParaEmail()"
+            title="Copiar texto de confirmação para colar no e-mail"
+        >
+            📋 Copiar p/ e-mail
+        </button>
+
+    </div>
 
 </div>
 

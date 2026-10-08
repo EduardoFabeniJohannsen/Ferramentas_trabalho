@@ -8,7 +8,7 @@ const contratoWEG = {
     periodoDias: 30,
 
     // a partir de quantos períodos o frete é bonificado
-    periodosFreteBonificado: 3,
+    periodosFreteBonificado: 4,
 
     // ordem dos grupos no documento (2ª e 3ª letra do modelo:
     // ME = mastro, TE = tesoura, AD = articulada diesel, AE = articulada elétrica)
@@ -386,7 +386,7 @@ function restaurarCacheWEG() {
 // ======================================
 // TEXTO DE CONFIRMAÇÃO (copiar pro e-mail)
 // ======================================
-// Fica fora da área de print. O botão copia em HTML (cola
+// Fica fora da área de print (botão ao lado do documento). Copia em HTML (cola
 // formatado no Outlook/Gmail) e em texto simples como reserva.
 
 const confirmacaoLocacao = {
@@ -424,12 +424,6 @@ function textoConfirmacaoEmail() {
             .join("\n");
 
     return `${confirmacaoLocacao.titulo}\n\n${itens}`;
-}
-
-
-function montarTextoEmail() {
-
-    $("textoEmail").innerHTML = htmlConfirmacaoEmail();
 }
 
 
@@ -474,8 +468,6 @@ async function copiarParaEmail() {
 (function init() {
 
     montarListaEquipamentos();
-
-    montarTextoEmail();
 
     restaurarCacheWEG();
 

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Estoque</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<style>
+/* ===== Resumo do estoque ===== */
+.estoque-pagina{
+    width:100%;
+    max-width:1200px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+.card-estoque-topo{
+    width:100%;
+    text-align:left;
+}
+.card-estoque-topo h2{
+    margin-bottom:6px;
+}
+.estoque-atualizado{
+    color:#94a3b8;
+    font-size:14px;
+    margin:0 0 10px;
+}
+.barra-upload{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+}
+.barra-upload button{
+    margin:0;
+}
+.barra-upload .dica{
+    color:#94a3b8;
+    font-size:12px;
+}
+.oculto{
+    display:none !important;
+}
+.faixa-previa{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    padding:12px 14px;
+    border-radius:8px;
+    background:#78350f;
+    color:#fde68a;
+    font-size:14px;
+}
+.faixa-previa span{
+    flex:1;
+    min-width:200px;
+}
+.faixa-previa button{
+    margin:0;
+}
+.btn-publicar{
+    background:#16a34a;
+}
+.btn-publicar:hover{
+    background:#15803d;
+}
+.btn-cancelar{
+    background:#475569;
+}
+.btn-cancelar:hover{
+    background:#334155;
+}
+.avisos-estoque{
+    color:#fbbf24;
+    font-size:13px;
+    margin:8px 0 0;
+}
+.grade-estoque{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+    gap:16px;
+    align-items:start;
+}
+.card-status{
+    background:#1e293b;
+    border-radius:12px;
+    border-left:6px solid #64748b;
+    padding:14px 16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    box-sizing:border-box;
+}
+.card-status.disponivel{ border-left-color:#22c55e; }
+.card-status.locado{ border-left-color:#3b82f6; }
+.card-status.locado_manutencao{ border-left-color:#f59e0b; }
+.card-status.manutencao{ border-left-color:#ef4444; }
+.card-status.fora_uso{ border-left-color:#64748b; }
+.card-status.devolvido{ border-left-color:#a855f7; }
+.card-status.a_vender{ border-left-color:#14b8a6; }
+.card-status-topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:8px;
+}
+.card-status-topo h3{
+    margin:0;
+    font-size:17px;
+}
+.card-status-topo .total{
+    font-size:22px;
+    font-weight:bold;
+}
+.grupo-titulo{
+    margin:12px 0 4px;
+    font-size:12px;
+    font-weight:bold;
+    color:#94a3b8;
+    letter-spacing:.5px;
+}
+.modelo-linha{
+    border-radius:6px;
+    font-size:14px;
+}
+div.modelo-linha{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 8px;
+}
+.modelo-linha.zero{
+    color:#64748b;
+}
+details.modelo-linha{
+    display:block;
+}
+details.modelo-linha > summary{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 8px;
+    border-radius:6px;
+    cursor:pointer;
+    list-style:none;
+}
+details.modelo-linha > summary::-webkit-details-marker{
+    display:none;
+}
+details.modelo-linha > summary:hover,
+details.modelo-linha[open] > summary{
+    background:#334155;
+}
+.modelo-linha b{
+    min-width:24px;
+    text-align:right;
+}
+.lista-maquinas{
+    list-style:none;
+    margin:4px 0 8px;
+    padding:0;
+    border-left:2px solid #334155;
+}
+.lista-maquinas li{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    padding:6px 10px;
+    border-bottom:1px solid #273449;
+    font-size:13px;
+}
+.lista-maquinas li:last-child{
+    border-bottom:none;
+}
+.lista-maquinas .pat{
+    font-weight:bold;
+    color:#e5e7eb;
+}
+.lista-maquinas .cli{
+    color:#94a3b8;
+    font-size:12px;
+}
+.lista-maquinas .ret{
+    color:#fbbf24;
+    font-size:12px;
+}
+.vazio-estoque{
+    color:#64748b;
+    font-size:14px;
+    margin:6px 0 0;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <a href="index.html" class="botao-topbar">
+        ⬅ Voltar
+    </a>
+
+    <button onclick="fazerLogout()">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER
+========================= -->
+
+<div class="container">
+
+    <div class="estoque-pagina">
+
+        <div class="card card-estoque-topo">
+
+            <h2>Estoque de plataformas</h2>
+
+            <p class="estoque-atualizado" id="estoqueAtualizado">
+                Carregando...
+            </p>
+
+            <div class="barra-upload">
+
+                <button type="button" id="btnEnviarEstoque">
+                    📤 Enviar planilha do estoque
+                </button>
+
+                <input
+                    type="file"
+                    id="arquivoEstoque"
+                    accept=".xlsx,.xls"
+                    class="oculto"
+                >
+
+                <span class="dica">
+                    Suba o Excel bruto do estoque. Você confere a prévia antes de publicar.
+                </span>
+
+            </div>
+
+            <p class="avisos-estoque oculto" id="avisosEstoque"></p>
+
+        </div>
+
+        <div class="faixa-previa oculto" id="faixaPrevia">
+
+            <span id="textoPrevia"></span>
+
+            <button
+                type="button"
+                class="btn-publicar"
+                id="btnPublicar"
+                onclick="publicarResumo()"
+            >
+                ✅ Publicar
+            </button>
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="cancelarPrevia()"
+            >
+                Cancelar
+            </button>
+
+        </div>
+
+        <div class="grade-estoque" id="resumoEstoque"></div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-guard.js"></script>
+
+<script src="js/helpers.js"></script>
+<script src="js/estoque.js"></script>
+
+</body>
+
+</html>

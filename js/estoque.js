@@ -69,6 +69,19 @@ const ROTULO_MODELO = {};
 
 const TITULO_OUTROS_MODELOS = "OUTROS MODELOS";
 
+// cada filial tem a sua linha na tabela resumo_estoque (coluna id)
+const FILIAIS = {
+
+    ITAJAI: { id: 1, nome: "Itajaí" },
+
+    JOINVILLE: { id: 2, nome: "Joinville" }
+};
+
+// o navegador lembra a última filial escolhida
+const CHAVE_FILIAL_ESTOQUE = "estoqueFilial";
+
+let filialAtual = "ITAJAI";
+
 let resumoPublicado = null;
 
 let previaAtual = null;
@@ -621,7 +634,7 @@ function mostrarPublicado(){
     if(!resumoPublicado){
 
         $("estoqueAtualizado").innerText =
-            "Nenhum resumo publicado ainda.";
+            `Nenhum resumo publicado ainda para ${FILIAIS[filialAtual].nome}.`;
 
         $("resumoEstoque").innerHTML = "";
 
@@ -650,12 +663,17 @@ function mostrarPublicado(){
 
 async function carregarResumoPublicado(silencioso){
 
+    const filial = filialAtual;
+
     const { data, error } =
         await supabaseClient
             .from("resumo_estoque")
             .select("dados, atualizado_em, atualizado_por")
-            .eq("id", 1)
+            .eq("id", FILIAIS[filial].id)
             .maybeSingle();
+
+    // trocou de filial enquanto carregava: descarta esta resposta
+    if(filial !== filialAtual) return;
 
     if(error){
 
@@ -676,6 +694,63 @@ async function carregarResumoPublicado(silencioso){
 
     // não troca a tela se tem uma prévia aberta
     if(!previaAtual) mostrarPublicado();
+}
+
+
+// ======================================
+// FILIAL (switch Itajaí / Joinville)
+// ======================================
+
+function atualizarFilialNaTela(){
+
+    document.querySelectorAll(".btn-filial").forEach(botao => {
+
+        botao.classList.toggle(
+            "ativo",
+            botao.dataset.filial === filialAtual
+        );
+    });
+
+    $("tituloEstoque").innerText =
+        `Estoque de plataformas - ${FILIAIS[filialAtual].nome}`;
+}
+
+
+function trocarFilial(chave){
+
+    if(!FILIAIS[chave] || chave === filialAtual) return;
+
+    // prévia aberta é da filial atual: não deixa misturar
+    if(previaAtual){
+
+        return mostrarToast(
+            "Publique ou cancele a prévia antes de trocar de filial",
+            true
+        );
+    }
+
+    filialAtual = chave;
+
+    try{
+
+        localStorage.setItem(CHAVE_FILIAL_ESTOQUE, chave);
+
+    }catch(erro){
+
+        console.error("[estoque] Erro ao salvar filial:", erro);
+    }
+
+    resumoPublicado = null;
+
+    atualizarFilialNaTela();
+
+    $("estoqueAtualizado").innerText = "Carregando...";
+
+    $("resumoEstoque").innerHTML = "";
+
+    mostrarAvisosEstoque([]);
+
+    carregarResumoPublicado(false);
 }
 
 
@@ -725,7 +800,7 @@ async function lerArquivo(evento){
         "PRÉVIA, ainda não publicada";
 
     $("textoPrevia").innerText =
-        `Arquivo: ${previaAtual.arquivo}. Confira os números e clique em Publicar para todos verem (substitui o resumo atual).`;
+        `Arquivo: ${previaAtual.arquivo}. Será publicado no estoque de ${FILIAIS[filialAtual].nome}. Confira os números e clique em Publicar para todos verem (substitui o resumo atual).`;
 
     $("faixaPrevia").classList.remove("oculto");
 
@@ -753,6 +828,8 @@ async function publicarResumo(){
 
     botao.disabled = true;
 
+    const filial = filialAtual;
+
     try{
 
         const { data: sessao } =
@@ -766,7 +843,7 @@ async function publicarResumo(){
                 .from("resumo_estoque")
                 .upsert(
                     {
-                        id: 1,
+                        id: FILIAIS[filial].id,
                         dados: previaAtual,
                         atualizado_por: email
                     },
@@ -781,7 +858,7 @@ async function publicarResumo(){
 
         mostrarPublicado();
 
-        mostrarToast("Resumo publicado");
+        mostrarToast(`Resumo publicado (${FILIAIS[filial].nome})`);
 
     }catch(erro){
 
@@ -801,6 +878,20 @@ async function publicarResumo(){
 // ======================================
 
 (async function init(){
+
+    try{
+
+        const salva =
+            localStorage.getItem(CHAVE_FILIAL_ESTOQUE);
+
+        if(FILIAIS[salva]) filialAtual = salva;
+
+    }catch(erro){
+
+        filialAtual = "ITAJAI";
+    }
+
+    atualizarFilialNaTela();
 
     $("btnEnviarEstoque").addEventListener(
         "click",

@@ -26,6 +26,38 @@
 .card-estoque-topo h2{
     margin-bottom:6px;
 }
+.estoque-topo-linha{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:6px;
+}
+.estoque-topo-linha h2{
+    margin:0;
+}
+.troca-filial{
+    display:inline-flex;
+    border:1px solid #334155;
+    border-radius:8px;
+    overflow:hidden;
+}
+.troca-filial button{
+    margin:0;
+    border-radius:0;
+    background:#0f172a;
+    color:#94a3b8;
+    padding:8px 18px;
+}
+.troca-filial button:hover{
+    background:#1e3a8a;
+    color:#fff;
+}
+.troca-filial button.ativo{
+    background:#2563eb;
+    color:#fff;
+}
 .estoque-atualizado{
     color:#94a3b8;
     font-size:14px;
@@ -225,7 +257,33 @@ CONTAINER
 
         <div class="card card-estoque-topo">
 
-            <h2>Estoque de plataformas</h2>
+            <div class="estoque-topo-linha">
+
+                <h2 id="tituloEstoque">Estoque de plataformas</h2>
+
+                <div class="troca-filial">
+
+                    <button
+                        type="button"
+                        class="btn-filial ativo"
+                        data-filial="ITAJAI"
+                        onclick="trocarFilial('ITAJAI')"
+                    >
+                        Itajaí
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-filial"
+                        data-filial="JOINVILLE"
+                        onclick="trocarFilial('JOINVILLE')"
+                    >
+                        Joinville
+                    </button>
+
+                </div>
+
+            </div>
 
             <p class="estoque-atualizado" id="estoqueAtualizado">
                 Carregando...

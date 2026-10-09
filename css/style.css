@@ -27,6 +27,8 @@ TOPBAR
 
     align-items:center;
 
+    flex-wrap:wrap;
+
     gap:10px;
 
     padding:12px 20px;
@@ -480,6 +482,15 @@ TOAST
 /* =========================
 RESPONSIVO
 ========================= */
+
+@media(max-width:1200px){
+
+    .container{
+        padding-top:130px;
+    }
+
+}
+
 
 @media(max-width:800px){
 

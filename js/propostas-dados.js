@@ -295,9 +295,14 @@ async function carregarFretes(){
 
     try{
 
-        // uma tabela por transportadora (ver helpers.js)
-        const data =
-            await buscarLinhasFretes();
+        const { data, error } =
+            await supabaseClient
+                .from("tabela_fretes")
+                .select("transportadora, modelo, cidade, valor");
+
+        if(error){
+            throw error;
+        }
 
         processarLinhasFretes(data);
 
@@ -1545,10 +1550,49 @@ function atualizarBotaoCidadeSaida(){
 
 
 // ======================================
+// LINHA EM BRANCO ANTES DO PAGAMENTO (toggle)
+// ======================================
+// Desativado por padrão (nada muda). Ativado, a mensagem
+// "Copiar Proposta Zap" deixa uma linha em branco entre
+// "Cortesia" e "Forma de pagamento".
+
+let separarPagamentoAtivo = false;
+
+
+function alternarSepararPagamento(){
+
+    separarPagamentoAtivo = !separarPagamentoAtivo;
+
+    atualizarBotaoSepararPagamento();
+
+    salvarCache();
+}
+
+
+function atualizarBotaoSepararPagamento(){
+
+    const botao = $("btnSepararPagamento");
+
+    if(!botao) return;
+
+    botao.classList.toggle(
+        "ativo",
+        separarPagamentoAtivo
+    );
+
+    botao.innerText =
+        `Linha em branco antes do pagamento: ${
+            separarPagamentoAtivo ? "Ativada" : "Desativada"
+        }`;
+}
+
+
+// ======================================
 // MODAL DE CONFIGURAÇÕES (engrenagem)
 // ======================================
 // Abre/fecha o modal que guarda os toggles
-// (locação complementar, valor da diária, emojis, cidade de saída).
+// (locação complementar, valor da diária, emojis, cidade de saída,
+// linha em branco antes do pagamento).
 
 function abrirConfiguracoes(){
 
@@ -1616,6 +1660,7 @@ function salvarCache(){
         valorDiariaAtivo: valorDiariaAtivo,
         emojisAtivo: emojisAtivo,
         cidadeSaida: cidadeSaidaAtual,
+        separarPagamentoAtivo: separarPagamentoAtivo,
         equipamentos: equipamentos
     };
 
@@ -1675,6 +1720,10 @@ function restaurarCache(){
             : "ITAJAI";
 
     atualizarBotaoCidadeSaida();
+
+    separarPagamentoAtivo = dados.separarPagamentoAtivo === true;
+
+    atualizarBotaoSepararPagamento();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)

@@ -95,10 +95,6 @@ TOPBAR
 
 <div class="topbar">
 
-    <a href="index.html" class="botao-topbar">
-        🏠 Página inicial
-    </a>
-
     <button onclick="gerarStatus('FreteZOHO')">
         Frete ZOHO
     </button>
@@ -107,15 +103,10 @@ TOPBAR
         Frete ZOHO - Loc Complementar
     </button>
 
-    <a href="tabelas.html" class="botao-topbar">
-        🛠️ Tabelas
+    <a href="index.html" class="botao-topbar">
+        ⬅ Voltar
     </a>
-
-    <a href="estoque.html" class="botao-topbar">
-        📦 Estoque
-    </a>
-
-    <a href="WEG.html" class="botao-topbar">
+        <a href="WEG.html" class="botao-topbar">
         🏢 WEG
     </a>
 
@@ -405,6 +396,18 @@ MODAL DE CONFIGURAÇÕES
         </button>
 
         <p class="dica">Joinville troca a cidade de saída do frete nas mensagens (Proposta Zap e Frete ZOHO).</p>
+
+
+        <button
+            type="button"
+            id="btnSepararPagamento"
+            class="btn-toggle"
+            onclick="alternarSepararPagamento()"
+        >
+            Linha em branco antes do pagamento: Desativada
+        </button>
+
+        <p class="dica">Ativada, deixa uma linha em branco entre "Cortesia" e "Forma de pagamento" na Proposta Zap.</p>
 
     </div>
 

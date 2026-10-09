@@ -493,11 +493,11 @@ function copiarPropostaZap(){
 
 
             blocosEquipamentos +=
-`🟡 *Modelo: ${
+`🟡 Modelo: ${
     quantidade > 1
         ? quantidade + " "
         : ""
-}${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho*
+}${modelo} ${tipo} ${energia} – ${altura} metros de altura de trabalho
 * Altura da plataforma: ${alturaPlataforma} metros
 * Altura de trabalho: ${altura} metros
 * Período de locação: ${periodoExibicao} dias${
@@ -549,9 +549,10 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
             ? "Mediante aprovação cadastral."
             : "28 dias, mediante aprovação cadastral.";
 
-    // Sem emojis há uma linha em branco entre Cortesia e Pagamento
+    // Linha em branco entre Cortesia e Pagamento: sem emojis sempre
+    // tem; com emojis só se o toggle (⚙️ Configurações) estiver ativo
     const separadorFinal =
-        emojisAtivo ? "\n" : "\n";
+        (emojisAtivo && !separarPagamentoAtivo) ? "\n" : "\n\n";
 
 
     // cidade de saída do frete (⚙️ Configurações): Itajai ou Joinville

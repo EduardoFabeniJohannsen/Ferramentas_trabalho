@@ -10,23 +10,6 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="icon.png">
 
-<style>
-/* ===== Documento + botão de copiar texto pro e-mail ===== */
-.coluna-documento{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:8px;
-    max-width:100%;
-}
-.btn-copiar-email{
-    width:auto;
-    margin:0;
-    padding:6px 12px;
-    font-size:13px;
-}
-</style>
-
 </head>
 
 <body>
@@ -37,8 +20,20 @@ TOPBAR
 
 <div class="topbar">
 
+    <a href="index.html" class="botao-topbar">
+        🏠 Página inicial
+    </a>
+
     <a href="propostas.html" class="botao-topbar">
-        ⬅ Voltar
+        📄 Página de Propostas
+    </a>
+
+    <a href="tabelas.html" class="botao-topbar">
+        🛠️ Tabelas
+    </a>
+
+    <a href="estoque.html" class="botao-topbar">
+        📦 Estoque
     </a>
 
     <button onclick="fazerLogout()">Sair</button>
@@ -113,23 +108,10 @@ CONTAINER
     DOCUMENTO (área pra print)
     ========================= -->
 
-    <div class="coluna-documento">
-
-        <div
-            id="documentoProposta"
-            class="documento-proposta"
-        ></div>
-
-        <button
-            type="button"
-            class="btn-copiar-email"
-            onclick="copiarParaEmail()"
-            title="Copiar texto de confirmação para colar no e-mail"
-        >
-            📋 Copiar p/ e-mail
-        </button>
-
-    </div>
+    <div
+        id="documentoProposta"
+        class="documento-proposta"
+    ></div>
 
 </div>
 

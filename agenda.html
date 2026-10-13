@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Agenda</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<style>
+/* ===== Agenda ===== */
+.card-agenda{
+    width:100%;
+    max-width:1700px;
+    text-align:left;
+}
+.barra-agenda{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:10px;
+}
+.barra-agenda select{
+    width:auto;
+    margin:0;
+    flex:1;
+    min-width:140px;
+}
+.barra-agenda button{
+    margin:0;
+}
+.btn-secundario{
+    background:#475569;
+}
+.btn-secundario:hover{
+    background:#334155;
+}
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+}
+.chip{
+    margin:0;
+    padding:8px 14px;
+    background:#334155;
+}
+.chip:hover{
+    background:#475569;
+}
+.chip.ativo{
+    background:#2563eb;
+}
+.contagem-agenda{
+    color:#94a3b8;
+    font-size:13px;
+    margin:0 0 8px;
+}
+.grupo-data{
+    --cor-dia:#94a3b8;
+    margin-bottom:12px;
+}
+.grupo-data h3{
+    margin:0 0 5px;
+    padding:5px 12px;
+    font-size:15px;
+    text-transform:capitalize;
+    background:var(--cor-dia);
+    color:#0f172a;
+    border-radius:6px;
+}
+.ag-item{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 220px;
+    column-gap:28px;
+    align-items:center;
+    background:#0f172a;
+    background:color-mix(in srgb, var(--cor-dia) 16%, #0f172a);
+    border:1px solid var(--cor-dia);
+    border-left:6px solid var(--cor-dia);
+    border-radius:8px;
+    padding:6px 12px;
+    margin-bottom:5px;
+}
+.ag-item p{
+    margin:0;
+}
+.ag-item[data-status="Cancelado"],
+.ag-item[data-status="Concluído"]{
+    opacity:.55;
+}
+.ag-hora{
+    font-weight:bold;
+    font-size:15px;
+    text-align:center;
+    word-break:break-word;
+}
+.ag-hora.ag-hora-texto{
+    font-size:11px;
+}
+/* status: a própria etiqueta troca o status ao clicar */
+.ag-item select.tag-select{
+    -webkit-appearance:none;
+    appearance:none;
+    width:auto;
+    margin:0;
+    padding:2px 10px;
+    border:none;
+    border-radius:999px;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:bold;
+    color:#e5e7eb;
+    text-align:center;
+    cursor:pointer;
+}
+.ag-item select.tag-select option{
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.ag-titulo{
+    font-weight:bold;
+    margin:0 0 4px;
+}
+.tag{
+    padding:2px 8px;
+    border-radius:999px;
+    background:#334155;
+    color:#e5e7eb;
+    font-size:12px;
+    font-weight:bold;
+}
+.tag[data-tipo="Entrega"]{
+    background:#1d4ed8;
+}
+.tag[data-tipo="Coleta"]{
+    background:#b45309;
+}
+.tag[data-tipo="Transferência"]{
+    background:#7e22ce;
+}
+.tag.sem-transp{
+    background:#991b1b;
+}
+.ag-lado{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    width:220px;
+    box-sizing:border-box;
+    padding-left:20px;
+    border-left:2px dashed #334155;
+}
+.ag-lado .btn-zap{
+    background:#16a34a;
+}
+.ag-lado .btn-zap:hover{
+    background:#15803d;
+}
+.ag-lado .btn-excluir-ag{
+    margin-left:12px;
+}
+.ag-lado button{
+    margin:0;
+    padding:6px 10px;
+}
+.agenda-vazia{
+    color:#94a3b8;
+    text-align:center;
+    padding:24px 0;
+}
+
+.modos{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:10px;
+}
+.modo-btn{
+    margin:0;
+    padding:10px 22px;
+    background:#334155;
+}
+.modo-btn:hover{
+    background:#475569;
+}
+.modo-btn.ativo{
+    background:#2563eb;
+}
+.dica-modo{
+    margin:0 0 10px;
+    font-size:12px;
+    color:#94a3b8;
+    text-align:center;
+}
+/* colunas: o cabeçalho e as linhas usam a mesma grade */
+.ag-grade{
+    display:grid;
+    gap:10px;
+    align-items:center;
+}
+.ag-cab{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 220px;
+    column-gap:28px;
+    padding:4px 13px 4px 19px;
+    margin-bottom:6px;
+    font-size:12px;
+    font-weight:bold;
+    text-transform:uppercase;
+    color:#94a3b8;
+    border-bottom:1px solid #334155;
+}
+.ag-cab-titulo:first-child{
+    text-align:center;
+}
+#listaAgenda{
+    overflow-x:auto;
+}
+.lista-transportador .ag-item,
+.lista-transportador .ag-cab{
+    min-width:1250px;
+}
+.lista-expedicao .ag-item,
+.lista-expedicao .ag-cab{
+    min-width:1060px;
+}
+.ag-celula{
+    min-width:0;
+    font-size:14px;
+    overflow-wrap:anywhere;
+}
+.ag-local{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+}
+.ag-local-texto{
+    font-size:14px;
+    font-weight:bold;
+    color:#e5e7eb;
+}
+.ag-link{
+    display:block;
+    margin-top:2px;
+    font-size:12px;
+    color:#60a5fa;
+    word-break:break-all;
+}
+.ag-local-endereco{
+    font-size:14px;
+    color:#cbd5e1;
+}
+.subtitulo-form{
+    margin:10px 0 4px;
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+.ag-extra{
+    font-size:14px;
+    color:#cbd5e1;
+}
+.tag[data-status="A confirmar"]{
+    background:#a16207;
+}
+.tag[data-status="Confirmado"]{
+    background:#1d4ed8;
+}
+.tag[data-status="Em rota"]{
+    background:#c2410c;
+}
+.tag[data-status="Concluído"]{
+    background:#15803d;
+}
+.tag[data-status="Cancelado"]{
+    background:#475569;
+}
+
+/* ===== Cadastro de motoristas ===== */
+.modal-motoristas{
+    max-width:420px;
+}
+.modal-agenda label.rotulo-modal{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:2px;
+}
+.mot-linha{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 10px;
+    margin-bottom:5px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:8px;
+}
+.mot-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.mot-vazio{
+    color:#94a3b8;
+    font-size:13px;
+    padding:8px 0;
+}
+.mot-novo{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+}
+.mot-novo input{
+    margin:0;
+    flex:1;
+}
+.mot-novo button{
+    margin:0;
+}
+
+/* ===== Modal ===== */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1100;
+    background:rgba(0,0,0,.6);
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.modal-overlay.aberto{
+    display:flex;
+}
+.modal-agenda{
+    width:100%;
+    max-width:520px;
+    max-height:90vh;
+    overflow:auto;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:18px 20px 20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.modal-agenda-topo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+.modal-agenda-topo h3{
+    margin:0;
+}
+.modal-agenda .btn-fechar{
+    margin:0;
+    padding:2px 10px;
+    font-size:20px;
+}
+.form-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+}
+.form-grade label{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:2px;
+}
+.form-grade .largo{
+    grid-column:1 / -1;
+}
+.modal-agenda .acoes{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+.modal-agenda .acoes button{
+    margin:0;
+}
+
+@media(max-width:600px){
+    .form-grade{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <a href="index.html" class="botao-topbar">
+        🏠 Página inicial
+    </a>
+
+    <a href="propostas.html" class="botao-topbar">
+        📄 Propostas
+    </a>
+
+    <a href="tabelas.html" class="botao-topbar">
+        🛠️ Tabelas
+    </a>
+
+    <a href="WEG.html" class="botao-topbar">
+        🏢 WEG
+    </a>
+
+    <button onclick="fazerLogout()">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER
+========================= -->
+
+<div class="container">
+
+    <div class="card card-agenda">
+
+        <h2 style="text-align:center">Agenda</h2>
+
+        <div class="modos">
+
+            <button
+                type="button"
+                id="btnModoExpedicao"
+                class="modo-btn"
+                onclick="definirModo('expedicao')"
+            >
+                🏭 Expedição
+            </button>
+
+            <button
+                type="button"
+                id="btnModoTransportador"
+                class="modo-btn"
+                onclick="definirModo('transportador')"
+            >
+                🚚 Transportador
+            </button>
+
+        </div>
+
+        <p class="dica-modo" id="dicaModo"></p>
+
+        <div class="barra-agenda">
+
+            <button type="button" onclick="abrirModalAgenda()">
+                + Novo agendamento
+            </button>
+
+            <button
+                type="button"
+                class="btn-secundario"
+                onclick="abrirModalMotoristas()"
+            >
+                🚚 Motoristas
+            </button>
+
+            <select id="filtroPeriodo">
+                <option value="">Todas as datas</option>
+                <option value="hoje">Hoje</option>
+                <option value="semana">Próximos 7 dias</option>
+            </select>
+
+            <select id="filtroTipo">
+                <option value="">Todos os tipos</option>
+            </select>
+
+            <select id="filtroStatus">
+                <option value="">Todos os status</option>
+            </select>
+
+            <select id="ordemAgenda" title="Ordem dentro de cada data"></select>
+
+            <button
+                type="button"
+                class="btn-secundario"
+                onclick="recarregarAgenda(true)"
+                title="Buscar de novo os agendamentos e motoristas"
+            >
+                ↻ Atualizar
+            </button>
+
+        </div>
+
+        <div class="chips" id="chipsTransportadora"></div>
+
+        <p class="contagem-agenda" id="contagemAgenda"></p>
+
+        <div id="listaAgenda"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+MODAL (novo / editar)
+========================= -->
+
+<div
+    id="modalAgenda"
+    class="modal-overlay"
+    onclick="if(event.target === this) fecharModalAgenda()"
+>
+
+    <div class="modal-agenda">
+
+        <div class="modal-agenda-topo">
+
+            <h3 id="tituloModalAgenda">Novo agendamento</h3>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                onclick="fecharModalAgenda()"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="form-grade">
+
+            <div>
+                <label for="agData">Data</label>
+                <input type="date" id="agData">
+            </div>
+
+            <div>
+                <label for="agHorario">Horário</label>
+                <input type="text" id="agHorario" placeholder="08:00 ou CONFIRMAR">
+            </div>
+
+            <div>
+                <label for="agTipo">Tipo</label>
+                <select id="agTipo"></select>
+            </div>
+
+            <div>
+                <label for="agStatus">Status</label>
+                <select id="agStatus"></select>
+            </div>
+
+            <div>
+                <label for="agPlataforma">Plataforma</label>
+                <input type="text" id="agPlataforma" placeholder="Ex: WAE16010">
+            </div>
+
+            <div>
+                <label for="agTransportadora">Transportadora</label>
+                <select id="agTransportadora"></select>
+            </div>
+
+            <div>
+                <label for="agCliente">Cliente</label>
+                <input type="text" id="agCliente" placeholder="Nome do cliente">
+            </div>
+
+            <div>
+                <label for="agMotorista">Motorista</label>
+                <select id="agMotorista"></select>
+            </div>
+
+            <div>
+                <label for="agProposta">Nº da proposta</label>
+                <input type="text" id="agProposta">
+            </div>
+
+            <div>
+                <label for="agPeriodo">Período</label>
+                <input type="text" id="agPeriodo" placeholder="Ex: 28 dias">
+            </div>
+
+            <p class="largo subtitulo-form">
+                📍 Retirada (vazio em entrega = W Rental)
+            </p>
+
+            <div class="largo">
+                <label for="agOrigemNome">Nome do local</label>
+                <input type="text" id="agOrigemNome" placeholder="Ex: Obra A">
+            </div>
+
+            <div class="largo">
+                <label for="agOrigemEndereco">Endereço completo</label>
+                <input type="text" id="agOrigemEndereco" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
+            </div>
+
+            <div class="largo">
+                <label for="agLinkOrigem">Link (opcional)</label>
+                <input type="text" id="agLinkOrigem" placeholder="https://maps...">
+            </div>
+
+            <p class="largo subtitulo-form">
+                📍 Entrega (vazio em coleta = W Rental)
+            </p>
+
+            <div class="largo">
+                <label for="agDestinoNome">Nome do local</label>
+                <input type="text" id="agDestinoNome" placeholder="Ex: Cliente X">
+            </div>
+
+            <div class="largo">
+                <label for="agDestinoEndereco">Endereço completo</label>
+                <input type="text" id="agDestinoEndereco" placeholder="Ex: Rua B, 200, Centro, Brusque/SC">
+            </div>
+
+            <div class="largo">
+                <label for="agLinkDestino">Link (opcional)</label>
+                <input type="text" id="agLinkDestino" placeholder="https://maps...">
+            </div>
+
+            <div>
+                <label for="agFrete">Frete (R$)</label>
+                <input type="text" id="agFrete" placeholder="Ex: 450,00">
+            </div>
+
+            <div>
+                <label for="agFreteConta">Frete por conta de</label>
+                <select id="agFreteConta">
+                    <option value="nossa">Nossa conta</option>
+                    <option value="cliente">Conta do cliente</option>
+                </select>
+            </div>
+
+            <div class="largo">
+                <label for="agObsExpedicao">Obs. para a expedição</label>
+                <input type="text" id="agObsExpedicao">
+            </div>
+
+            <div class="largo">
+                <label for="agObsEntrega">Obs. para a entrega (transportador)</label>
+                <input type="text" id="agObsEntrega">
+            </div>
+
+            <p class="largo subtitulo-form">
+                💬 Mensagem do Zap
+            </p>
+
+            <div class="largo">
+                <label for="agReferencia">Referência (ficha / proposta — digitada à mão)</label>
+                <input type="text" id="agReferencia" placeholder="Ficha / referência">
+            </div>
+
+            <div class="largo">
+                <label for="agContato">Contato de quem vai receber</label>
+                <input type="text" id="agContato" placeholder="Nome e telefone">
+            </div>
+
+            <div class="largo" id="blocoCard">
+                <label for="agCard">Card</label>
+                <input type="text" id="agCard">
+            </div>
+
+            <div class="largo" id="blocoEmails">
+                <label for="agEmails">E-mails do cliente (financeiro)</label>
+                <input type="text" id="agEmails" placeholder="a@cliente.com; b@cliente.com">
+            </div>
+
+        </div>
+
+        <div class="acoes">
+
+            <button type="button" onclick="salvarAgendamento()">
+                Salvar
+            </button>
+
+            <button
+                type="button"
+                class="btn-secundario"
+                onclick="fecharModalAgenda()"
+            >
+                Cancelar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+MODAL (cadastro de motoristas por transportadora)
+========================= -->
+
+<div
+    id="modalMotoristas"
+    class="modal-overlay"
+    onclick="if(event.target === this) fecharModalMotoristas()"
+>
+
+    <div class="modal-agenda modal-motoristas">
+
+        <div class="modal-agenda-topo">
+
+            <h3>🚚 Motoristas</h3>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                onclick="fecharModalMotoristas()"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <label class="rotulo-modal" for="motTransportadora">Transportadora</label>
+
+        <select id="motTransportadora"></select>
+
+        <div id="listaMotoristasCadastro"></div>
+
+        <div class="mot-novo">
+
+            <input
+                type="text"
+                id="motNome"
+                placeholder="Nome do motorista"
+            >
+
+            <button type="button" onclick="adicionarMotorista()">
+                Adicionar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-guard.js"></script>
+
+<script src="js/helpers.js"></script>
+<script src="js/agenda.js"></script>
+
+</body>
+
+</html>

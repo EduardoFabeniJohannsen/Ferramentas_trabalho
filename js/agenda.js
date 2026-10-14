@@ -11,9 +11,13 @@
 // CONFIGURAÇÃO
 // ======================================
 
-const TRANSPORTADORAS = ["Dionizio", "Magnus", "RR"];
+// nomes das transportadoras (vêm da tabela "transportadoras" do Supabase)
+let TRANSPORTADORAS = [];
 
-const TIPOS = ["Entrega", "Coleta", "Transferência"];
+const TIPOS = ["Entrega", "Coleta", "Transferência", "Troca técnica"];
+
+// horário que já vem preenchido num agendamento novo
+const HORARIO_PADRAO = "08:00";
 
 const STATUS_AGENDA = [
     "A confirmar",
@@ -44,34 +48,39 @@ const CORES_DIAS = [
 const COR_SEM_DATA = "#94a3b8";
 
 // colunas de cada modo, na ordem em que aparecem (id = nome da célula
-// montada em criarCelulasAgenda; largura = coluna da grade)
+// montada em criarCelulasAgenda). maxLargura = largura máxima da coluna
+// (o texto quebra de linha depois dela); sem maxLargura, a coluna se
+// ajusta ao conteúdo.
 const COLUNAS_EXPEDICAO = [
-    { id: "horario", titulo: "Horário", largura: "70px" },
-    { id: "titulo", titulo: "Plataforma / Cliente", largura: "minmax(0,2fr)" },
-    { id: "transportadora", titulo: "Transportadora", largura: "105px" },
-    { id: "motorista", titulo: "Motorista", largura: "90px" },
-    { id: "periodo", titulo: "Período", largura: "80px" },
-    { id: "status", titulo: "Status", largura: "100px" },
-    { id: "obs", titulo: "Observação", largura: "minmax(0,2fr)" }
+    { id: "horario", titulo: "Horário" },
+    { id: "titulo", titulo: "Plataforma / Cliente", maxLargura: "340px" },
+    { id: "transportadora", titulo: "Transportadora" },
+    { id: "motorista", titulo: "Motorista" },
+    { id: "periodo", titulo: "Período" },
+    { id: "status", titulo: "Status" },
+    { id: "obs", titulo: "Observação", maxLargura: "340px" }
 ];
 
 // sem período, e com o frete por último
 const COLUNAS_TRANSPORTADOR = [
-    { id: "horario", titulo: "Horário", largura: "70px" },
-    { id: "tipo", titulo: "Tipo", largura: "100px" },
-    { id: "titulo", titulo: "Plataforma / Cliente", largura: "minmax(0,1.2fr)" },
-    { id: "transportadora", titulo: "Transportadora", largura: "105px" },
-    { id: "motorista", titulo: "Motorista", largura: "90px" },
-    { id: "status", titulo: "Status", largura: "100px" },
-    { id: "retirada", titulo: "Retirada", largura: "minmax(0,1.3fr)" },
-    { id: "entrega", titulo: "Entrega", largura: "minmax(0,1.6fr)" },
-    { id: "obs", titulo: "Observação", largura: "minmax(0,1fr)" },
-    { id: "frete", titulo: "Frete", largura: "84px" }
+    { id: "horario", titulo: "Horário" },
+    { id: "tipo", titulo: "Tipo" },
+    { id: "titulo", titulo: "Plataforma / Cliente", maxLargura: "340px" },
+    { id: "transportadora", titulo: "Transportadora" },
+    { id: "motorista", titulo: "Motorista" },
+    { id: "status", titulo: "Status" },
+    { id: "retirada", titulo: "Retirada", maxLargura: "300px" },
+    { id: "entrega", titulo: "Entrega", maxLargura: "340px" },
+    { id: "obs", titulo: "Observação", maxLargura: "280px" },
+    { id: "frete", titulo: "Frete" }
 ];
 
 const CHAVE_AGENDA_MODO = "agendaModo";
 
 const CHAVE_AGENDA_ORDEM = "agendaOrdem";
+
+// rascunhos do formulário (o que foi digitado e não foi salvo)
+const CHAVE_AGENDA_RASCUNHOS = "agendaRascunhos";
 
 // A agenda sempre fica separada por data. Isso é a ordem DENTRO de
 // cada data (em todas, o desempate final é o horário).
@@ -112,6 +121,19 @@ let ultimoCarregamento = 0;
 
 // evita salvar duas vezes com clique duplo
 let salvandoAgendamento = false;
+
+// cadastro de transportadoras: [{ id, nome }]
+// (vem da tabela "transportadoras" do Supabase)
+let transportadorasCadastradas = [];
+
+// o formulário foi mexido desde que abriu (só então vira rascunho)
+let formularioAlterado = false;
+
+let timerRascunho = null;
+
+// valores que o agendamento tinha ao abrir (valores antigos fora do
+// padrão continuam podendo ser salvos sem mexer neles)
+let valoresOriginais = { horario: "", periodo: "" };
 
 
 // ======================================
@@ -194,6 +216,8 @@ const TABELA_AGENDAMENTOS = "agendamentos";
 
 const TABELA_MOTORISTAS = "motoristas";
 
+const TABELA_TRANSPORTADORAS = "transportadoras";
+
 // quantos dias pra trás a agenda carrega (os sem data vêm sempre)
 const DIAS_PASSADOS_AGENDA = 30;
 
@@ -206,6 +230,7 @@ const CAMPOS_BANCO = {
     tipo: "tipo",
     status: "status",
     plataforma: "plataforma",
+    plataformaRecolha: "plataforma_recolha",
     cliente: "cliente",
     proposta: "proposta",
     transportadora: "transportadora",
@@ -408,8 +433,11 @@ async function recarregarAgenda(manual){
 
     await Promise.all([
         carregarAgenda(),
-        carregarMotoristas()
+        carregarMotoristas(),
+        carregarTransportadoras()
     ]);
+
+    atualizarSelectsTransportadora();
 
     carregandoAgenda = false;
 
@@ -460,7 +488,7 @@ function visivelNoModo(item){
     if(modoVisualizacao === "expedicao"){
 
         return (
-            item.tipo === "Entrega" &&
+            (item.tipo === "Entrega" || item.tipo === "Troca técnica") &&
             !STATUS_OCULTOS_EXPEDICAO.includes(item.status)
         );
     }
@@ -531,7 +559,7 @@ function filtrarAgendamentos(ignorarTransportadora){
 }
 
 
-// Sempre por data (sem data vai pro fim). Dentro de cada data vale a
+// Sempre por data (sem data vem primeiro). Dentro de cada data vale a
 // ordem escolhida; o horário é sempre o desempate, então com
 // "motorista" a rota de cada motorista fica por horário.
 function ordemEfetiva(){
@@ -573,17 +601,17 @@ function ordenarAgendamentos(lista){
 
     const ordemTipos =
         ordem === "coletas"
-            ? ["Coleta", "Entrega", "Transferência"]
-            : ["Entrega", "Coleta", "Transferência"];
+            ? ["Coleta", "Entrega", "Troca técnica", "Transferência"]
+            : ["Entrega", "Troca técnica", "Coleta", "Transferência"];
 
     return lista.sort((a, b) => {
 
         // 1) data
         if(a.data !== b.data){
 
-            if(!a.data) return 1;
+            if(!a.data) return -1;
 
-            if(!b.data) return -1;
+            if(!b.data) return 1;
 
             return a.data < b.data ? -1 : 1;
         }
@@ -800,25 +828,22 @@ function colunasAtuais(){
 }
 
 
-function aplicarGrade(elemento){
-
-    elemento.style.gridTemplateColumns =
-        colunasAtuais()
-            .map(coluna => coluna.largura)
-            .join(" ");
-}
-
-
 // cada informação vai numa célula (coluna) própria; a ordem final
-// vem de colunasAtuais().
-function criarCelula(...filhos){
+// vem de colunasAtuais(). maxLargura = largura máxima da coluna.
+function criarCelula(maxLargura, ...filhos){
 
-    const celula = criar("div", "ag-celula");
+    const celula = criar("td", "ag-celula");
+
+    const conteudo = criar("div", "ag-conteudo");
+
+    if(maxLargura) conteudo.style.maxWidth = maxLargura;
 
     filhos.forEach(filho => {
 
-        if(filho) celula.appendChild(filho);
+        if(filho) conteudo.appendChild(filho);
     });
+
+    celula.appendChild(conteudo);
 
     return celula;
 }
@@ -829,6 +854,14 @@ function criarCelulasAgenda(item){
     const expedicao =
         modoVisualizacao === "expedicao";
 
+    const colunas = colunasAtuais();
+
+    const larguraDe = (id) =>
+        (colunas.find(coluna => coluna.id === id) || {}).maxLargura;
+
+    const celula = (id, ...filhos) =>
+        criarCelula(larguraDe(id), ...filhos);
+
     const celulas = {};
 
     // ---------- horário ----------
@@ -838,8 +871,8 @@ function criarCelulasAgenda(item){
     // horário em texto (ex: CONFIRMAR) usa letra menor pra caber
     celulas.horario =
         criar(
-            "div",
-            "ag-hora" + (
+            "td",
+            "ag-celula ag-hora" + (
                 /^\d/.test(textoHorario) || textoHorario === "—"
                     ? ""
                     : " ag-hora-texto"
@@ -853,43 +886,52 @@ function criarCelulasAgenda(item){
 
     tagTipo.dataset.tipo = item.tipo;
 
-    celulas.tipo = criarCelula(tagTipo);
+    celulas.tipo = celula("tipo", tagTipo);
 
     // ---------- plataforma / cliente ----------
+    // troca técnica mostra as duas máquinas: a que vai e a que volta
+
+    const maquinas =
+        (item.tipo === "Troca técnica" && item.plataformaRecolha)
+            ? `${item.plataforma} ⇄ ${item.plataformaRecolha}`
+            : item.plataforma;
 
     const titulo =
-        [item.plataforma, item.cliente]
+        [maquinas, item.cliente]
             .filter(Boolean)
             .join(" — ") +
         (item.proposta ? `  (${item.proposta})` : "");
 
     celulas.titulo =
-        criarCelula(criar("p", "ag-titulo", titulo));
+        celula("titulo", criar("p", "ag-titulo", titulo));
 
     // ---------- transportadora, motorista, período, status ----------
 
     celulas.transportadora =
-        criarCelula(
+        celula(
+            "transportadora",
             item.transportadora
                 ? criar("span", "tag", item.transportadora)
                 : criar("span", "tag sem-transp", "A definir")
         );
 
     celulas.motorista =
-        criarCelula(
+        celula(
+            "motorista",
             item.motorista
                 ? criar("span", "", item.motorista)
                 : null
         );
 
     celulas.periodo =
-        criarCelula(
+        celula(
+            "periodo",
             item.periodo
                 ? criar("span", "", item.periodo)
                 : null
         );
 
-    celulas.status = criarCelula(criarSeletorStatus(item));
+    celulas.status = celula("status", criarSeletorStatus(item));
 
     // ---------- observação (cada modo tem a sua) ----------
 
@@ -899,7 +941,8 @@ function criarCelulasAgenda(item){
             : item.obsEntrega;
 
     celulas.obs =
-        criarCelula(
+        celula(
+            "obs",
             textoObs
                 ? criar("p", "ag-extra", textoObs)
                 : null
@@ -910,13 +953,14 @@ function criarCelulasAgenda(item){
 
     if(!expedicao){
 
-        // entrega sai da W Rental e coleta volta pra ela, quando o local fica vazio
+        // entrega e troca saem da W Rental e coleta volta pra ela,
+        // quando o local fica vazio
         let origemNome = item.origemNome;
 
         if(
             !origemNome &&
             !item.origemEndereco &&
-            item.tipo === "Entrega"
+            (item.tipo === "Entrega" || item.tipo === "Troca técnica")
         ){
             origemNome = LOCAL_PADRAO;
         }
@@ -932,7 +976,8 @@ function criarCelulasAgenda(item){
         }
 
         celulas.retirada =
-            criarCelula(
+            celula(
+                "retirada",
                 (origemNome || item.origemEndereco || item.linkOrigem)
                     ? criarBlocoLocal(
                         origemNome,
@@ -943,7 +988,8 @@ function criarCelulasAgenda(item){
             );
 
         celulas.entrega =
-            criarCelula(
+            celula(
+                "entrega",
                 (destinoNome || item.destinoEndereco || item.linkDestino)
                     ? criarBlocoLocal(
                         destinoNome,
@@ -956,38 +1002,34 @@ function criarCelulasAgenda(item){
         const frete = brToNumber(item.frete);
 
         celulas.frete =
-            criarCelula(
+            celula(
+                "frete",
                 (Number.isFinite(frete) && frete > 0)
                     ? criar("p", "ag-extra", `R$ ${formatarMoedaBR(frete)}`)
                     : null
             );
     }
 
-    return colunasAtuais().map(coluna => celulas[coluna.id]);
+    return colunas.map(coluna => celulas[coluna.id]);
 }
 
 
 // linha de títulos das colunas (aparece uma vez, no topo da lista)
 function criarCabecalhoAgenda(){
 
-    const cabecalho = criar("div", "ag-cab");
+    const cabecalho = criar("thead");
 
-    const grade =
-        criar("div", "ag-grade " + modoVisualizacao);
-
-    aplicarGrade(grade);
+    const linha = criar("tr");
 
     colunasAtuais().forEach(coluna => {
 
-        grade.appendChild(
-            criar("div", "ag-cab-titulo", coluna.titulo)
-        );
+        linha.appendChild(criar("th", "", coluna.titulo));
     });
 
-    cabecalho.appendChild(grade);
+    // espaço da coluna de botões (zap/editar/excluir)
+    linha.appendChild(criar("th", "ag-cab-lado"));
 
-    // espaço da coluna de controles (editar/excluir)
-    cabecalho.appendChild(criar("div"));
+    cabecalho.appendChild(linha);
 
     return cabecalho;
 }
@@ -995,7 +1037,7 @@ function criarCabecalhoAgenda(){
 
 function criarItemAgenda(item){
 
-    const linha = criar("div", "ag-item");
+    const linha = criar("tr", "ag-item");
 
     linha.dataset.tipo = item.tipo;
 
@@ -1003,21 +1045,16 @@ function criarItemAgenda(item){
 
     // ---------- conteúdo (a parte do print) ----------
 
-    const principal =
-        criar("div", "ag-grade " + modoVisualizacao);
-
-    aplicarGrade(principal);
-
     criarCelulasAgenda(item).forEach(celula => {
 
-        principal.appendChild(celula);
+        linha.appendChild(celula);
     });
-
-    linha.appendChild(principal);
 
     // ---------- controles (fora da área do print) ----------
 
-    const lado = criar("div", "ag-lado");
+    const lado = criar("td", "ag-lado");
+
+    const botoes = criar("div", "ag-botoes");
 
     const botaoZap = criar("button", "btn-zap", "📋");
 
@@ -1030,7 +1067,7 @@ function criarItemAgenda(item){
         () => copiarAgendamentoZap(item)
     );
 
-    lado.appendChild(botaoZap);
+    botoes.appendChild(botaoZap);
 
     const botaoEditar = criar("button", "", "✏️");
 
@@ -1043,7 +1080,7 @@ function criarItemAgenda(item){
         () => abrirModalAgenda(item.id)
     );
 
-    lado.appendChild(botaoEditar);
+    botoes.appendChild(botaoEditar);
 
     const botaoExcluir = criar("button", "btn-secundario btn-excluir-ag", "🗑️");
 
@@ -1056,7 +1093,9 @@ function criarItemAgenda(item){
         () => excluirAgendamento(item.id)
     );
 
-    lado.appendChild(botaoExcluir);
+    botoes.appendChild(botaoExcluir);
+
+    lado.appendChild(botoes);
 
     linha.appendChild(lado);
 
@@ -1126,7 +1165,7 @@ function atualizarControlesModo(){
 
     $("dicaModo").innerText =
         expedicao
-            ? "Só entregas que ainda não saíram, sem endereço e sem valor. Inclui as sem data (preparar)."
+            ? "Só entregas e trocas que ainda não saíram, sem endereço e sem valor. Inclui as sem data (preparar)."
             : "Informação completa. Só o que já tem data definida.";
 }
 
@@ -1164,38 +1203,56 @@ function renderizarAgenda(){
         return;
     }
 
-    lista.appendChild(criarCabecalhoAgenda());
+    const tabela = criar("table", "ag-tabela");
 
-    let grupo = null;
+    tabela.appendChild(criarCabecalhoAgenda());
+
+    const corpo = criar("tbody");
+
+    // +1 = coluna dos botões
+    const totalColunas = colunasAtuais().length + 1;
 
     let dataAtual = null;
 
     filtrados.forEach(item => {
 
+        const corDoItem = corDoDia(item.data);
+
         if(item.data !== dataAtual){
 
             dataAtual = item.data;
 
-            grupo = criar("div", "grupo-data");
+            const linhaDia = criar("tr", "ag-dia");
 
             // cor do dia: o cabeçalho, a borda e o fundo dos itens usam ela
-            grupo.style.setProperty("--cor-dia", corDoDia(item.data));
+            linhaDia.style.setProperty("--cor-dia", corDoItem);
 
-            grupo.appendChild(
+            const cabecalhoDia =
                 criar(
-                    "h3",
+                    "th",
                     "",
                     item.data
                         ? tituloDoDia(item.data)
                         : "📌 Sem data definida — iniciar preparativos"
-                )
-            );
+                );
 
-            lista.appendChild(grupo);
+            cabecalhoDia.colSpan = totalColunas;
+
+            linhaDia.appendChild(cabecalhoDia);
+
+            corpo.appendChild(linhaDia);
         }
 
-        grupo.appendChild(criarItemAgenda(item));
+        const linha = criarItemAgenda(item);
+
+        linha.style.setProperty("--cor-dia", corDoItem);
+
+        corpo.appendChild(linha);
     });
+
+    tabela.appendChild(corpo);
+
+    lista.appendChild(tabela);
 }
 
 
@@ -1204,7 +1261,8 @@ function renderizarAgenda(){
 // ======================================
 // Monta a mensagem de agendamento que vai pro grupo da transportadora.
 // Dois modelos: frete por nossa conta (termina com CARD) e por conta
-// do cliente (termina com os e-mails do financeiro).
+// do cliente (termina com os e-mails do financeiro). A troca técnica
+// tem o seu texto (máquina que vai + máquina recolhida no mesmo local).
 
 const DIAS_SEMANA = [
     "Domingo",
@@ -1242,9 +1300,10 @@ function ehLocalWR(nome){
 
 
 // linhas de um local (saída ou entrega). Local da W Rental sai só
-// como "WR", sem endereço. usarWRSeVazio = entrega (saída) e coleta
-// (entrega) saem da/para a W Rental quando o local fica vazio.
-function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio){
+// como "WR", sem endereço. usarWRSeVazio = entrega e troca (saída) e
+// coleta (entrega) saem da/para a W Rental quando o local fica vazio.
+// linkComRotulo = modelo da troca: "Endereço:" e "Link:" em linhas separadas.
+function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio, linkComRotulo){
 
     const nomeFinal =
         String(nome || "").trim();
@@ -1258,6 +1317,15 @@ function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio){
     }
 
     const linhas = [`${rotulo}: ${nomeFinal}`.trimEnd()];
+
+    if(linkComRotulo){
+
+        if(endereco) linhas.push(`Endereço: ${endereco}`);
+
+        if(link) linhas.push(`Link: ${link}`);
+
+        return linhas;
+    }
 
     if(endereco){
 
@@ -1288,6 +1356,14 @@ function montarTextoZap(item){
         return { erro: "Informe o frete do agendamento" };
     }
 
+    const troca =
+        item.tipo === "Troca técnica";
+
+    if(troca && !item.plataformaRecolha){
+
+        return { erro: "Informe a máquina de recolha da troca" };
+    }
+
     const porCliente =
         item.freteConta === "cliente";
 
@@ -1307,7 +1383,7 @@ function montarTextoZap(item){
 
     const linhas = [
 
-        `🚚 AGENDAMENTO DE ${String(item.tipo).toUpperCase()}`,
+        `🚚 AGENDAMENTO DE ${troca ? "TROCA" : String(item.tipo).toUpperCase()}`,
 
         "",
 
@@ -1322,7 +1398,8 @@ function montarTextoZap(item){
             item.origemNome,
             item.origemEndereco,
             item.linkOrigem,
-            item.tipo === "Entrega"
+            item.tipo === "Entrega" || troca,
+            troca
         ),
 
         ...linhasLocalZap(
@@ -1330,20 +1407,33 @@ function montarTextoZap(item){
             item.destinoNome,
             item.destinoEndereco,
             item.linkDestino,
-            item.tipo === "Coleta"
-        ),
-
-        "",
-
-        `Contato de quem vai receber: ${contato}`.trimEnd(),
-
-        "",
-
-        `* FRETE POR ${porCliente ? "CONTA DO CLIENTE" : "NOSSA CONTA"} - R$ ${formatarMoedaBR(frete)}`,
-
-        // ficha/referência é digitada à mão
-        `* ${item.referencia || ""}`.trimEnd()
+            item.tipo === "Coleta",
+            troca
+        )
     ];
+
+    // troca: a máquina que volta é recolhida no mesmo local da entrega
+    if(troca){
+
+        linhas.push("");
+
+        linhas.push(
+            `🔁 Coleta no mesmo local ${item.plataformaRecolha} e retorna para WR.`
+        );
+    }
+
+    linhas.push("");
+
+    linhas.push(`Contato de quem vai receber: ${contato}`.trimEnd());
+
+    linhas.push("");
+
+    linhas.push(
+        `* FRETE POR ${porCliente ? "CONTA DO CLIENTE" : "NOSSA CONTA"} - R$ ${formatarMoedaBR(frete)}`
+    );
+
+    // ficha/referência é digitada à mão
+    linhas.push(`* ${item.referencia || ""}`.trimEnd());
 
     if(porCliente){
 
@@ -1372,6 +1462,242 @@ function copiarAgendamentoZap(item){
     }
 
     copiar(resultado.texto, "Agendamento copiado");
+}
+
+
+// ======================================
+// TRANSPORTADORAS (cadastro)
+// ======================================
+// A lista não é mais fixa: vem da tabela "transportadoras". Os
+// agendamentos e motoristas guardam só o nome da transportadora.
+
+async function carregarTransportadoras(){
+
+    try{
+
+        const { data, error } =
+            await supabaseClient
+                .from(TABELA_TRANSPORTADORAS)
+                .select("id, nome")
+                .order("nome");
+
+        if(error) throw error;
+
+        definirTransportadoras(data);
+
+    }catch(erro){
+
+        console.error("[transportadoras] Falha ao carregar:", detalhesErro(erro));
+
+        mostrarToast("Falha ao carregar as transportadoras", true);
+    }
+}
+
+
+function definirTransportadoras(lista){
+
+    transportadorasCadastradas =
+        lista
+            .slice()
+            .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+    TRANSPORTADORAS =
+        transportadorasCadastradas.map(item => item.nome);
+}
+
+
+// refaz as listas de transportadora dos formulários (mantém a escolha atual)
+function atualizarSelectsTransportadora(){
+
+    const atual = $("agTransportadora").value;
+
+    garantirOpcaoTransportadora(atual);
+
+    $("agTransportadora").value = atual;
+
+    const atualMotoristas = $("motTransportadora").value;
+
+    preencherSelect("motTransportadora", TRANSPORTADORAS);
+
+    if(TRANSPORTADORAS.includes(atualMotoristas)){
+
+        $("motTransportadora").value = atualMotoristas;
+    }
+
+    desenharTransportadoras();
+
+    desenharMotoristas();
+}
+
+
+function desenharTransportadoras(){
+
+    const lista = $("listaTransportadorasCadastro");
+
+    lista.innerHTML = "";
+
+    if(!transportadorasCadastradas.length){
+
+        lista.appendChild(
+            criar("div", "mot-vazio", "Nenhuma transportadora cadastrada")
+        );
+
+        return;
+    }
+
+    transportadorasCadastradas.forEach(transportadora => {
+
+        const linha = criar("div", "mot-linha");
+
+        linha.appendChild(criar("span", "", transportadora.nome));
+
+        const botao = criar("button", "btn-secundario", "🗑️");
+
+        botao.type = "button";
+
+        botao.title = "Excluir transportadora";
+
+        botao.addEventListener(
+            "click",
+            () => excluirTransportadora(transportadora.id)
+        );
+
+        linha.appendChild(botao);
+
+        lista.appendChild(linha);
+    });
+}
+
+
+async function adicionarTransportadora(){
+
+    const nome =
+        $("transNome").value
+            .trim()
+            .replace(/\s+/g, " ");
+
+    if(!nome){
+
+        return mostrarToast("Informe o nome da transportadora", true);
+    }
+
+    const jaExiste =
+        TRANSPORTADORAS.some(
+            existente =>
+                existente.toLowerCase() === nome.toLowerCase()
+        );
+
+    if(jaExiste){
+
+        return mostrarToast("Essa transportadora já está cadastrada", true);
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from(TABELA_TRANSPORTADORAS)
+            .insert({ nome: nome })
+            .select("id, nome")
+            .single();
+
+    if(error){
+
+        console.error("[transportadoras] Falha ao adicionar:", detalhesErro(error));
+
+        // 23505 = já existe (alguém cadastrou ao mesmo tempo)
+        return mostrarToast(
+            error.code === "23505"
+                ? "Essa transportadora já está cadastrada"
+                : "Erro ao adicionar a transportadora",
+            true
+        );
+    }
+
+    definirTransportadoras([...transportadorasCadastradas, data]);
+
+    $("transNome").value = "";
+
+    atualizarSelectsTransportadora();
+
+    // a nova transportadora vira o filtro/chip da agenda
+    renderizarAgenda();
+
+    mostrarToast("Transportadora adicionada");
+}
+
+
+// só exclui se não tiver motorista cadastrado nem agendamento usando
+// (a consulta no banco pega também os agendamentos antigos)
+async function excluirTransportadora(id){
+
+    const transportadora =
+        transportadorasCadastradas.find(item => item.id === id);
+
+    if(!transportadora) return;
+
+    if(motoristasDe(transportadora.nome).length){
+
+        return mostrarToast(
+            `Exclua antes os motoristas da ${transportadora.nome}`,
+            true
+        );
+    }
+
+    const { count, error: erroContagem } =
+        await supabaseClient
+            .from(TABELA_AGENDAMENTOS)
+            .select("id", { count: "exact", head: true })
+            .eq("transportadora", transportadora.nome);
+
+    if(erroContagem){
+
+        console.error("[transportadoras] Falha ao conferir uso:", detalhesErro(erroContagem));
+
+        return mostrarToast("Erro ao conferir se a transportadora está em uso", true);
+    }
+
+    if(count > 0){
+
+        return mostrarToast(
+            `${transportadora.nome} está em ${count} agendamento(s) e não pode ser excluída`,
+            true
+        );
+    }
+
+    if(!confirm(`Excluir a transportadora ${transportadora.nome}?`)) return;
+
+    const { data, error } =
+        await supabaseClient
+            .from(TABELA_TRANSPORTADORAS)
+            .delete()
+            .eq("id", id)
+            .select();
+
+    if(error){
+
+        console.error("[transportadoras] Falha ao excluir:", detalhesErro(error));
+
+        return mostrarToast("Erro ao excluir a transportadora", true);
+    }
+
+    definirTransportadoras(
+        transportadorasCadastradas.filter(item => item.id !== id)
+    );
+
+    // se era o filtro escolhido, volta pra "Todas"
+    if(filtroTransportadora === transportadora.nome){
+
+        filtroTransportadora = "";
+    }
+
+    atualizarSelectsTransportadora();
+
+    renderizarAgenda();
+
+    mostrarToast(
+        data.length
+            ? "Transportadora excluída"
+            : "Essa transportadora já tinha sido excluída"
+    );
 }
 
 
@@ -1467,9 +1793,11 @@ function abrirModalMotoristas(){
 
     $("modalMotoristas").classList.add("aberto");
 
+    desenharTransportadoras();
+
     desenharMotoristas();
 
-    $("motNome").focus();
+    $("transNome").focus();
 }
 
 
@@ -1535,6 +1863,11 @@ async function adicionarMotorista(){
         $("motNome").value
             .trim()
             .replace(/\s+/g, " ");
+
+    if(!transportadora){
+
+        return mostrarToast("Cadastre uma transportadora primeiro", true);
+    }
 
     if(!nome){
 
@@ -1629,6 +1962,7 @@ const CAMPOS_AGENDA = [
     ["tipo", "agTipo"],
     ["status", "agStatus"],
     ["plataforma", "agPlataforma"],
+    ["plataformaRecolha", "agPlataformaRecolha"],
     ["transportadora", "agTransportadora"],
     ["motorista", "agMotorista"],
     ["cliente", "agCliente"],
@@ -1677,6 +2011,332 @@ function preencherSelect(id, valores, textoVazio){
 }
 
 
+// ======================================
+// CAMPOS DO FORMULÁRIO (máscaras e regras)
+// ======================================
+
+// maiúsculo enquanto digita, sem pular o cursor
+function forcarMaiusculo(evento){
+
+    const campo = evento.target;
+
+    const maiusculo = campo.value.toUpperCase();
+
+    if(campo.value === maiusculo) return;
+
+    const inicio = campo.selectionStart;
+
+    const fim = campo.selectionEnd;
+
+    campo.value = maiusculo;
+
+    try{
+
+        campo.setSelectionRange(inicio, fim);
+
+    }catch(erro){
+
+        // alguns tipos de campo não aceitam seleção
+    }
+}
+
+
+// Horário: número vira HH:MM sozinho (0800 -> 08:00, 830 -> 08:30).
+// Começando com letra vale texto livre (CONFIRMAR / IMEDIATO).
+function mascararHorario(texto){
+
+    const bruto = String(texto || "").toUpperCase();
+
+    if(/^\s*[^\d\s]/.test(bruto)){
+
+        return bruto.replace(/[^A-Z]/g, "").slice(0, 9);
+    }
+
+    let digitos = bruto.replace(/\D/g, "").slice(0, 4);
+
+    // primeiro dígito maior que 2 (ex: 8) é hora de um dígito: vira 08
+    if(digitos.length && Number(digitos[0]) > 2){
+
+        digitos = ("0" + digitos).slice(0, 4);
+    }
+
+    if(digitos.length <= 2) return digitos;
+
+    return digitos.slice(0, 2) + ":" + digitos.slice(2);
+}
+
+
+function mascararCampoHorario(evento){
+
+    const campo = evento.target;
+
+    const mascarado = mascararHorario(campo.value);
+
+    if(campo.value !== mascarado) campo.value = mascarado;
+}
+
+
+function horarioValido(valor){
+
+    return (
+        valor === "" ||
+        valor === "CONFIRMAR" ||
+        valor === "IMEDIATO" ||
+        /^([01]\d|2[0-3]):[0-5]\d$/.test(valor)
+    );
+}
+
+
+// Período: só 3 formatos. "16 dias", "3 períodos" ou "Anual".
+// Só o número vale como dias.
+function textoDias(numero){
+
+    return numero === 1 ? "1 dia" : `${numero} dias`;
+}
+
+
+function textoPeriodos(numero){
+
+    return numero === 1 ? "1 período" : `${numero} períodos`;
+}
+
+
+// devolve { valor } já no formato certo, ou { erro }
+function normalizarPeriodo(texto){
+
+    const valor =
+        String(texto || "").trim().replace(/\s+/g, " ");
+
+    if(!valor) return { valor: "" };
+
+    if(/^anual$/i.test(valor)) return { valor: "Anual" };
+
+    let partes =
+        valor.match(/^(\d+)(?:\s*(?:d|dias?))?$/i);
+
+    if(partes && Number(partes[1]) >= 1){
+
+        return { valor: textoDias(Number(partes[1])) };
+    }
+
+    partes =
+        valor.match(/^(\d+)\s*(?:p|per[ií]odos?)$/i);
+
+    if(partes && Number(partes[1]) >= 1){
+
+        return { valor: textoPeriodos(Number(partes[1])) };
+    }
+
+    return {
+        erro: "Período inválido (use: 16 dias, 3 períodos ou Anual)"
+    };
+}
+
+
+// sugestões enquanto digita: começou um número, oferece "N dias",
+// "N períodos" e os dias de 1 a 30 que começam com o que foi digitado
+function atualizarSugestoesPeriodo(){
+
+    const lista = $("listaPeriodos");
+
+    if(!lista) return;
+
+    const texto =
+        $("agPeriodo").value.trim();
+
+    const opcoes = [];
+
+    const partes = texto.match(/^(\d+)/);
+
+    if(partes){
+
+        const digitos = partes[1];
+
+        const numero = Number(digitos);
+
+        if(numero >= 1){
+
+            opcoes.push(textoDias(numero));
+
+            opcoes.push(textoPeriodos(numero));
+        }
+
+        for(let dia = 1; dia <= 30; dia++){
+
+            if(String(dia).startsWith(digitos) && dia !== numero){
+
+                opcoes.push(textoDias(dia));
+            }
+        }
+
+    }else{
+
+        opcoes.push("Anual");
+
+        for(let dia = 1; dia <= 30; dia++){
+
+            opcoes.push(textoDias(dia));
+        }
+    }
+
+    lista.innerHTML = "";
+
+    opcoes.forEach(opcao => {
+
+        const item = criar("option");
+
+        item.value = opcao;
+
+        lista.appendChild(item);
+    });
+}
+
+
+// troca técnica: aparece a máquina de recolha
+function atualizarCamposTipo(){
+
+    const troca =
+        $("agTipo").value === "Troca técnica";
+
+    $("blocoRecolha").style.display =
+        troca ? "" : "none";
+
+    $("rotuloPlataforma").innerText =
+        troca ? "Máquina de entrega" : "Plataforma";
+}
+
+
+// mantém no select a transportadora do agendamento mesmo que ela não
+// esteja mais no cadastro, pra não perder o dado ao salvar
+function garantirOpcaoTransportadora(nome){
+
+    preencherSelect("agTransportadora", TRANSPORTADORAS, "Sem transportadora");
+
+    if(nome && !TRANSPORTADORAS.includes(nome)){
+
+        const extra =
+            criar("option", "", `${nome} (fora do cadastro)`);
+
+        extra.value = nome;
+
+        $("agTransportadora").appendChild(extra);
+    }
+}
+
+
+// ======================================
+// RASCUNHO DO FORMULÁRIO
+// ======================================
+// O que foi digitado e não foi salvo fica guardado neste navegador
+// (um rascunho pro "novo" e um por agendamento em edição). Ao clicar
+// fora, apertar Esc ou fechar sem querer, nada se perde: ao abrir de
+// novo, o formulário volta de onde parou.
+
+function chaveRascunho(){
+
+    return idEmEdicao ? `edit:${idEmEdicao}` : "novo";
+}
+
+
+function lerRascunhos(){
+
+    try{
+
+        const salvo =
+            localStorage.getItem(CHAVE_AGENDA_RASCUNHOS);
+
+        const dados =
+            salvo ? JSON.parse(salvo) : {};
+
+        return (dados && typeof dados === "object") ? dados : {};
+
+    }catch(erro){
+
+        console.error("Rascunhos inválidos, ignorando:", erro);
+
+        return {};
+    }
+}
+
+
+function gravarRascunhos(dados){
+
+    try{
+
+        localStorage.setItem(
+            CHAVE_AGENDA_RASCUNHOS,
+            JSON.stringify(dados)
+        );
+
+    }catch(erro){
+
+        console.error("Erro ao salvar rascunho:", erro);
+    }
+}
+
+
+function removerRascunho(chave){
+
+    const todos = lerRascunhos();
+
+    if(!(chave in todos)) return;
+
+    delete todos[chave];
+
+    gravarRascunhos(todos);
+}
+
+
+function salvarRascunho(){
+
+    const campos = {};
+
+    CAMPOS_AGENDA.forEach(([campo, idCampo]) => {
+
+        campos[campo] = $(idCampo).value;
+    });
+
+    const todos = lerRascunhos();
+
+    todos[chaveRascunho()] = { campos: campos, salvoEm: Date.now() };
+
+    gravarRascunhos(todos);
+}
+
+
+// chamado a cada digitação: guarda o rascunho (sem travar a digitação)
+function agendarRascunho(){
+
+    if(!$("modalAgenda").classList.contains("aberto")) return;
+
+    formularioAlterado = true;
+
+    clearTimeout(timerRascunho);
+
+    timerRascunho = setTimeout(salvarRascunho, 400);
+}
+
+
+// botões do topo do formulário: novo = descartar rascunho;
+// editando = descartar alterações + excluir o agendamento
+function atualizarBotoesModal(editando, temRascunho){
+
+    $("btnDescartarAgenda").innerText =
+        editando ? "↩ Descartar alterações" : "🗑️ Descartar rascunho";
+
+    $("btnExcluirAgenda").style.display =
+        editando ? "" : "none";
+
+    $("avisoRascunho").innerText =
+        editando
+            ? "📝 Alterações não salvas restauradas"
+            : "📝 Rascunho restaurado";
+
+    $("avisoRascunho").style.display =
+        temRascunho ? "" : "none";
+}
+
+
 function abrirModalAgenda(id){
 
     idEmEdicao = id || null;
@@ -1686,10 +2346,39 @@ function abrirModalAgenda(id){
             ? agendamentos.find(ag => ag.id === id)
             : null;
 
-    // motorista: só os cadastrados na transportadora do agendamento
+    // pediu um agendamento que não existe mais: não abre
+    if(id && !item){
+
+        idEmEdicao = null;
+
+        return;
+    }
+
+    // rascunho guardado de uma edição interrompida
+    const rascunho =
+        lerRascunhos()[chaveRascunho()];
+
+    // de onde vêm os valores: rascunho, senão o agendamento salvo
+    const origem =
+        rascunho
+            ? rascunho.campos
+            : item;
+
+    valoresOriginais = {
+        horario: item ? (item.horario || "") : "",
+        periodo: item ? (item.periodo || "") : ""
+    };
+
+    clearTimeout(timerRascunho);
+
+    formularioAlterado = false;
+
+    // transportadora e motorista: só os cadastrados na transportadora
+    garantirOpcaoTransportadora(origem ? origem.transportadora : "");
+
     atualizarOpcoesMotorista(
-        item ? item.transportadora : "",
-        item ? item.motorista : ""
+        origem ? origem.transportadora : "",
+        origem ? origem.motorista : ""
     );
 
     $("tituloModalAgenda").innerText =
@@ -1697,13 +2386,15 @@ function abrirModalAgenda(id){
 
     CAMPOS_AGENDA.forEach(([campo, idCampo]) => {
 
-        $(idCampo).value = item ? (item[campo] || "") : "";
+        $(idCampo).value = origem ? (origem[campo] || "") : "";
     });
 
-    if(!item){
+    if(!origem){
 
         // data pode ser apagada depois, se ainda não está definida
         $("agData").value = dataISO(0);
+
+        $("agHorario").value = HORARIO_PADRAO;
 
         $("agTipo").value = TIPOS[0];
 
@@ -1720,7 +2411,18 @@ function abrirModalAgenda(id){
 
     atualizarCamposConta();
 
+    atualizarCamposTipo();
+
+    atualizarSugestoesPeriodo();
+
+    atualizarBotoesModal(!!item, !!rascunho);
+
     $("modalAgenda").classList.add("aberto");
+
+    // formulário comprido: sempre abre mostrando o topo
+    const caixa = $("modalAgenda").querySelector(".modal-agenda");
+
+    if(caixa) caixa.scrollTop = 0;
 
     $("agPlataforma").focus();
 }
@@ -1740,7 +2442,23 @@ function atualizarCamposConta(){
 }
 
 
+// fecha guardando onde parou (clique fora, Esc e ×)
 function fecharModalAgenda(){
+
+    clearTimeout(timerRascunho);
+
+    if(formularioAlterado) salvarRascunho();
+
+    encerrarModalAgenda();
+}
+
+
+// fecha de vez, sem guardar nada (depois de salvar, descartar ou excluir)
+function encerrarModalAgenda(){
+
+    clearTimeout(timerRascunho);
+
+    formularioAlterado = false;
 
     $("modalAgenda").classList.remove("aberto");
 
@@ -1765,6 +2483,8 @@ async function salvarAgendamento(){
     // plataforma e horário sempre em maiúsculas (como na planilha)
     dados.plataforma = dados.plataforma.toUpperCase();
 
+    dados.plataformaRecolha = dados.plataformaRecolha.toUpperCase();
+
     dados.horario = dados.horario.toUpperCase();
 
     // data e transportadora são opcionais: máquina pode entrar na
@@ -1784,6 +2504,45 @@ async function salvarAgendamento(){
         !Number.isFinite(brToNumber(dados.frete))
     ){
         return mostrarToast("Frete inválido", true);
+    }
+
+    // troca técnica precisa da máquina de recolha; nos outros tipos não vale
+    if(dados.tipo === "Troca técnica"){
+
+        if(!dados.plataformaRecolha){
+
+            return mostrarToast("Informe a máquina de recolha da troca", true);
+        }
+
+    }else{
+
+        dados.plataformaRecolha = "";
+    }
+
+    // horário: 08:00, CONFIRMAR ou IMEDIATO (valor antigo, sem mexer, passa)
+    if(
+        !horarioValido(dados.horario) &&
+        dados.horario !== valoresOriginais.horario
+    ){
+        return mostrarToast(
+            "Horário inválido (use 08:00, CONFIRMAR ou IMEDIATO)",
+            true
+        );
+    }
+
+    // período: 16 dias, 3 períodos ou Anual (valor antigo, sem mexer, passa)
+    const periodo = normalizarPeriodo(dados.periodo);
+
+    if(periodo.erro){
+
+        if(dados.periodo !== valoresOriginais.periodo){
+
+            return mostrarToast(periodo.erro, true);
+        }
+
+    }else{
+
+        dados.periodo = periodo.valor;
     }
 
     const id = idEmEdicao;
@@ -1828,7 +2587,10 @@ async function salvarAgendamento(){
 
     salvandoAgendamento = false;
 
-    fecharModalAgenda();
+    // salvou: o rascunho não serve mais
+    removerRascunho(id ? `edit:${id}` : "novo");
+
+    encerrarModalAgenda();
 
     renderizarAgenda();
 
@@ -1836,14 +2598,15 @@ async function salvarAgendamento(){
 }
 
 
+// devolve true se o agendamento saiu da lista
 async function excluirAgendamento(id){
 
     const item =
         agendamentos.find(ag => ag.id === id);
 
-    if(!item) return;
+    if(!item) return false;
 
-    if(!confirm(`Excluir ${item.plataforma} — ${item.cliente}?`)) return;
+    if(!confirm(`Excluir ${item.plataforma} — ${item.cliente}?`)) return false;
 
     let excluiu = false;
 
@@ -1855,11 +2618,16 @@ async function excluirAgendamento(id){
 
         console.error("[agenda] Falha ao excluir:", detalhesErro(erro));
 
-        return mostrarToast("Erro ao excluir o agendamento", true);
+        mostrarToast("Erro ao excluir o agendamento", true);
+
+        return false;
     }
 
     agendamentos =
         agendamentos.filter(ag => ag.id !== id);
+
+    // sem agendamento, não sobra rascunho dele
+    removerRascunho(`edit:${id}`);
 
     renderizarAgenda();
 
@@ -1868,6 +2636,58 @@ async function excluirAgendamento(id){
             ? "Agendamento excluído"
             : "Esse agendamento já tinha sido excluído"
     );
+
+    return true;
+}
+
+
+// botão do formulário: novo = descartar rascunho;
+// editando = descartar as alterações (o agendamento salvo continua)
+function descartarRascunho(){
+
+    const editando = !!idEmEdicao;
+
+    const temAlgo =
+        formularioAlterado ||
+        !!lerRascunhos()[chaveRascunho()];
+
+    // só pergunta se tem algo a perder
+    if(
+        temAlgo &&
+        !confirm(
+            editando
+                ? "Descartar as alterações não salvas deste agendamento?"
+                : "Descartar este rascunho?"
+        )
+    ){
+        return;
+    }
+
+    removerRascunho(chaveRascunho());
+
+    encerrarModalAgenda();
+
+    if(temAlgo){
+
+        mostrarToast(
+            editando
+                ? "Alterações descartadas"
+                : "Rascunho descartado"
+        );
+    }
+}
+
+
+// botão do formulário (só ao editar): exclui o agendamento aberto
+async function excluirAgendamentoAberto(){
+
+    const id = idEmEdicao;
+
+    if(!id) return;
+
+    const excluiu = await excluirAgendamento(id);
+
+    if(excluiu) encerrarModalAgenda();
 }
 
 
@@ -1930,6 +2750,49 @@ document.addEventListener("keydown", (evento) => {
     $("agFreteConta").addEventListener(
         "change",
         atualizarCamposConta
+    );
+
+    $("agTipo").addEventListener(
+        "change",
+        atualizarCamposTipo
+    );
+
+    // plataformas sempre em maiúsculo enquanto digita
+    $("agPlataforma").addEventListener("input", forcarMaiusculo);
+
+    $("agPlataformaRecolha").addEventListener("input", forcarMaiusculo);
+
+    // horário: números viram HH:MM sozinhos
+    $("agHorario").addEventListener("input", mascararCampoHorario);
+
+    // período: sugestões enquanto digita e formato certo ao sair do campo
+    $("agPeriodo").addEventListener("input", atualizarSugestoesPeriodo);
+
+    $("agPeriodo").addEventListener(
+        "change",
+        () => {
+
+            const resultado =
+                normalizarPeriodo($("agPeriodo").value);
+
+            if(resultado.valor !== undefined){
+
+                $("agPeriodo").value = resultado.valor;
+            }
+        }
+    );
+
+    // rascunho: guarda sozinho o que for digitado no formulário
+    $("modalAgenda").addEventListener("input", agendarRascunho);
+
+    $("modalAgenda").addEventListener("change", agendarRascunho);
+
+    $("transNome").addEventListener(
+        "keydown",
+        (evento) => {
+
+            if(evento.key === "Enter") adicionarTransportadora();
+        }
     );
 
     $("ordemAgenda").addEventListener(

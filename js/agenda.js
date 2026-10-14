@@ -79,6 +79,8 @@ const CHAVE_AGENDA_MODO = "agendaModo";
 
 const CHAVE_AGENDA_ORDEM = "agendaOrdem";
 
+const CHAVE_AGENDA_TEMA = "agendaTema";
+
 // rascunhos do formulário (o que foi digitado e não foi salvo)
 const CHAVE_AGENDA_RASCUNHOS = "agendaRascunhos";
 
@@ -896,14 +898,17 @@ function criarCelulasAgenda(item){
             ? `${item.plataforma} ⇄ ${item.plataformaRecolha}`
             : item.plataforma;
 
-    const titulo =
-        [maquinas, item.cliente]
-            .filter(Boolean)
-            .join(" — ") +
-        (item.proposta ? `  (${item.proposta})` : "");
+    // patrimônio em negrito; o cliente em peso normal
+    const titulo = criar("p", "ag-titulo");
 
-    celulas.titulo =
-        celula("titulo", criar("p", "ag-titulo", titulo));
+    titulo.appendChild(criar("strong", "ag-patrimonio", maquinas));
+
+    if(item.cliente){
+
+        titulo.appendChild(criar("span", "", ` — ${item.cliente}`));
+    }
+
+    celulas.titulo = celula("titulo", titulo);
 
     // ---------- transportadora, motorista, período, status ----------
 
@@ -1026,7 +1031,9 @@ function criarCabecalhoAgenda(){
         linha.appendChild(criar("th", "", coluna.titulo));
     });
 
-    // espaço da coluna de botões (zap/editar/excluir)
+    // à direita do traço de corte do print: proposta e botões
+    linha.appendChild(criar("th", "ag-cab-proposta", "Proposta"));
+
     linha.appendChild(criar("th", "ag-cab-lado"));
 
     cabecalho.appendChild(linha);
@@ -1050,7 +1057,11 @@ function criarItemAgenda(item){
         linha.appendChild(celula);
     });
 
-    // ---------- controles (fora da área do print) ----------
+    // ---------- proposta e controles (fora da área do print) ----------
+
+    linha.appendChild(
+        criar("td", "ag-proposta", item.proposta || "")
+    );
 
     const lado = criar("td", "ag-lado");
 
@@ -1100,6 +1111,39 @@ function criarItemAgenda(item){
     linha.appendChild(lado);
 
     return linha;
+}
+
+
+// fundo claro (opcional): "claro" ou "escuro" (padrão)
+function aplicarTema(tema){
+
+    const claro = tema === "claro";
+
+    document.body.classList.toggle("tema-claro", claro);
+
+    $("btnTema").innerText =
+        claro ? "🌙 Fundo escuro" : "☀️ Fundo claro";
+}
+
+
+function alternarTema(){
+
+    const claro =
+        !document.body.classList.contains("tema-claro");
+
+    try{
+
+        localStorage.setItem(
+            CHAVE_AGENDA_TEMA,
+            claro ? "claro" : "escuro"
+        );
+
+    }catch(erro){
+
+        console.error("Erro ao salvar tema:", erro);
+    }
+
+    aplicarTema(claro ? "claro" : "escuro");
 }
 
 
@@ -1209,8 +1253,8 @@ function renderizarAgenda(){
 
     const corpo = criar("tbody");
 
-    // +1 = coluna dos botões
-    const totalColunas = colunasAtuais().length + 1;
+    // +2 = coluna da proposta e coluna dos botões
+    const totalColunas = colunasAtuais().length + 2;
 
     let dataAtual = null;
 
@@ -1320,22 +1364,22 @@ function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio, linkComRotu
 
     if(linkComRotulo){
 
-        if(endereco) linhas.push(`*Endereço:* ${endereco}`);
+        if(endereco) linhas.push(`Endereço: ${endereco}`);
 
-        if(link) linhas.push(`*Link:* ${link}`);
+        if(link) linhas.push(`Link: ${link}`);
 
         return linhas;
     }
 
     if(endereco){
 
-        linhas.push(`*Endereço:* ${endereco}`);
+        linhas.push(`Endereço: ${endereco}`);
 
         if(link) linhas.push(link);
 
     }else if(link){
 
-        linhas.push(`*Endereço:* ${link}`);
+        linhas.push(`Endereço: ${link}`);
     }
 
     return linhas;
@@ -1373,8 +1417,8 @@ function montarTextoZap(item){
     // horário vazio fica vazio; "IMEDIATO" vira "Horário imediato"
     const linhaHorario =
         horario.toUpperCase() === "IMEDIATO"
-            ? "*Horário imediato*"
-            : `*Horário:* ${horario}`.trimEnd();
+            ? "Horário imediato"
+            : `Horário: ${horario}`.trimEnd();
 
     // por conta do cliente, sem contato, aponta pros contatos lá embaixo
     const contato =
@@ -1387,14 +1431,14 @@ function montarTextoZap(item){
 
         "",
 
-        `*Data:* ${textoDataZap(item.data)}`,
+        `Data: ${textoDataZap(item.data)}`,
 
         linhaHorario,
 
-        `*Equipamento:* ${item.plataforma}`,
+        `Equipamento: ${item.plataforma}`,
 
         ...linhasLocalZap(
-            "*Local de Saída*",
+            "Local de Saída",
             item.origemNome,
             item.origemEndereco,
             item.linkOrigem,
@@ -1403,7 +1447,7 @@ function montarTextoZap(item){
         ),
 
         ...linhasLocalZap(
-            "*Local de Entrega*",
+            "Local de Entrega",
             item.destinoNome,
             item.destinoEndereco,
             item.linkDestino,
@@ -1437,7 +1481,7 @@ function montarTextoZap(item){
 
     if(porCliente){
 
-        linhas.push("* *Contatos:* ⤵️");
+        linhas.push("* Contatos: ⤵️");
 
         linhas.push("📍Financeiro:");
 
@@ -2806,6 +2850,8 @@ document.addEventListener("keydown", (evento) => {
 
             modoVisualizacao = "expedicao";
         }
+
+        aplicarTema(localStorage.getItem(CHAVE_AGENDA_TEMA));
 
         const ordemSalva =
             localStorage.getItem(CHAVE_AGENDA_ORDEM);

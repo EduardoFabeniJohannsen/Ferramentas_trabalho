@@ -1320,22 +1320,22 @@ function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio, linkComRotu
 
     if(linkComRotulo){
 
-        if(endereco) linhas.push(`Endereço: ${endereco}`);
+        if(endereco) linhas.push(`*Endereço:* ${endereco}`);
 
-        if(link) linhas.push(`Link: ${link}`);
+        if(link) linhas.push(`*Link:* ${link}`);
 
         return linhas;
     }
 
     if(endereco){
 
-        linhas.push(`Endereço: ${endereco}`);
+        linhas.push(`*Endereço:* ${endereco}`);
 
         if(link) linhas.push(link);
 
     }else if(link){
 
-        linhas.push(`Endereço: ${link}`);
+        linhas.push(`*Endereço:* ${link}`);
     }
 
     return linhas;
@@ -1373,8 +1373,8 @@ function montarTextoZap(item){
     // horário vazio fica vazio; "IMEDIATO" vira "Horário imediato"
     const linhaHorario =
         horario.toUpperCase() === "IMEDIATO"
-            ? "Horário imediato"
-            : `Horário: ${horario}`.trimEnd();
+            ? "*Horário imediato*"
+            : `*Horário:* ${horario}`.trimEnd();
 
     // por conta do cliente, sem contato, aponta pros contatos lá embaixo
     const contato =
@@ -1387,14 +1387,14 @@ function montarTextoZap(item){
 
         "",
 
-        `Data: ${textoDataZap(item.data)}`,
+        `*Data:* ${textoDataZap(item.data)}`,
 
         linhaHorario,
 
-        `Equipamento: ${item.plataforma}`,
+        `*Equipamento:* ${item.plataforma}`,
 
         ...linhasLocalZap(
-            "Local de Saída",
+            "*Local de Saída*",
             item.origemNome,
             item.origemEndereco,
             item.linkOrigem,
@@ -1403,7 +1403,7 @@ function montarTextoZap(item){
         ),
 
         ...linhasLocalZap(
-            "Local de Entrega",
+            "*Local de Entrega*",
             item.destinoNome,
             item.destinoEndereco,
             item.linkDestino,
@@ -1437,7 +1437,7 @@ function montarTextoZap(item){
 
     if(porCliente){
 
-        linhas.push("* Contatos: ⤵️");
+        linhas.push("* *Contatos:* ⤵️");
 
         linhas.push("📍Financeiro:");
 

@@ -16,8 +16,10 @@ let TRANSPORTADORAS = [];
 
 const TIPOS = ["Entrega", "Coleta", "Transferência", "Troca técnica"];
 
-// horário que já vem preenchido num agendamento novo
+// horário e status que já vêm preenchidos num agendamento novo
 const HORARIO_PADRAO = "08:00";
+
+const STATUS_PADRAO = "Confirmado";
 
 const STATUS_AGENDA = [
     "A confirmar",
@@ -133,6 +135,10 @@ let transportadorasCadastradas = [];
 let formularioAlterado = false;
 
 let timerRascunho = null;
+
+// filtro de datas (estilo Excel): as datas DESMARCADAS ficam aqui
+// ("" = agendamentos sem data). Vazio = todas as datas aparecem.
+let datasOcultas = new Set();
 
 // valores que o agendamento tinha ao abrir (valores antigos fora do
 // padrão continuam podendo ser salvos sem mexer neles)
@@ -506,17 +512,11 @@ function visivelNoModo(item){
 // ignorarTransportadora = usado pra contar os botões das
 // transportadoras respeitando os outros filtros.
 
-function filtrarAgendamentos(ignorarTransportadora){
+function filtrarAgendamentos(ignorarTransportadora, ignorarData){
 
     const tipo = $("filtroTipo").value;
 
     const status = $("filtroStatus").value;
-
-    const periodo = $("filtroPeriodo").value;
-
-    const hoje = dataISO(0);
-
-    const limite = dataISO(7);
 
     const expedicao =
         modoVisualizacao === "expedicao";
@@ -548,17 +548,218 @@ function filtrarAgendamentos(ignorarTransportadora){
 
         if(status && item.status !== status) return false;
 
-        if(periodo === "hoje" && item.data !== hoje) return false;
-
-        if(
-            periodo === "semana" &&
-            (!item.data || item.data < hoje || item.data > limite)
-        ){
-            return false;
-        }
+        // filtro de datas: as desmarcadas não aparecem
+        if(!ignorarData && datasOcultas.has(item.data || "")) return false;
 
         return true;
     });
+}
+
+
+// ======================================
+// FILTRO DE DATAS (estilo Excel)
+// ======================================
+// Ao abrir a página todas as datas aparecem. No botão "📅 Datas" você
+// vê a lista de datas (com caixinhas) e desmarca as que não quer ver.
+
+function semAcentoMinusculo(texto){
+
+    return String(texto || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+
+// datas da lista: as dos agendamentos que aparecem no modo atual (respeitando
+// os outros filtros), sem data primeiro e depois em ordem. As desmarcadas
+// ficam na lista mesmo que sumam dos outros filtros, pra dar pra marcar de novo.
+function datasDoFiltro(){
+
+    const datas = new Set();
+
+    filtrarAgendamentos(false, true).forEach(item => {
+
+        datas.add(item.data || "");
+    });
+
+    datasOcultas.forEach(data => datas.add(data));
+
+    return [...datas].sort((a, b) => {
+
+        if(a === b) return 0;
+
+        if(!a) return -1;
+
+        if(!b) return 1;
+
+        return a < b ? -1 : 1;
+    });
+}
+
+
+// 14/10/2026 — quarta-feira (hoje)
+function rotuloDataFiltro(iso){
+
+    if(!iso) return "(Sem data definida)";
+
+    const data = new Date(iso + "T00:00:00");
+
+    let rotulo =
+        `${formatarData(data)} — ${DIAS_SEMANA[data.getDay()].toLowerCase()}`;
+
+    if(iso === dataISO(0)) rotulo += " (hoje)";
+
+    if(iso === dataISO(1)) rotulo += " (amanhã)";
+
+    return rotulo;
+}
+
+
+// texto do botão: mostra quando tem data desmarcada
+function atualizarBotaoDatas(){
+
+    const botao = $("btnDatas");
+
+    const datas = datasDoFiltro();
+
+    const ocultas =
+        datas.filter(data => datasOcultas.has(data)).length;
+
+    botao.innerText =
+        ocultas
+            ? `📅 Datas: ${datas.length - ocultas} de ${datas.length} ▾`
+            : "📅 Todas as datas ▾";
+
+    botao.classList.toggle("filtrando", ocultas > 0);
+}
+
+
+function desenharPainelDatas(){
+
+    const lista = $("listaDatasFiltro");
+
+    const rolagem = lista.scrollTop;
+
+    lista.innerHTML = "";
+
+    const datas = datasDoFiltro();
+
+    // "(Selecionar tudo)": marcado, desmarcado ou meio-termo
+    const marcadas =
+        datas.filter(data => !datasOcultas.has(data)).length;
+
+    const todas = $("marcarTodasDatas");
+
+    todas.checked = datas.length > 0 && marcadas === datas.length;
+
+    todas.indeterminate = marcadas > 0 && marcadas < datas.length;
+
+    const busca = semAcentoMinusculo($("buscaDatas").value.trim());
+
+    datas.forEach(data => {
+
+        const texto = rotuloDataFiltro(data);
+
+        if(busca && !semAcentoMinusculo(texto).includes(busca)) return;
+
+        const rotulo = criar("label", "data-opcao");
+
+        const caixa = criar("input");
+
+        caixa.type = "checkbox";
+
+        caixa.checked = !datasOcultas.has(data);
+
+        caixa.addEventListener(
+            "change",
+            () => {
+
+                if(caixa.checked){
+
+                    datasOcultas.delete(data);
+
+                }else{
+
+                    datasOcultas.add(data);
+                }
+
+                renderizarAgenda();
+
+                desenharPainelDatas();
+            }
+        );
+
+        rotulo.appendChild(caixa);
+
+        rotulo.appendChild(criar("span", "", texto));
+
+        lista.appendChild(rotulo);
+    });
+
+    lista.scrollTop = rolagem;
+}
+
+
+function alternarPainelDatas(){
+
+    const painel = $("painelDatas");
+
+    if(painel.classList.contains("aberto")){
+
+        fecharPainelDatas();
+
+        return;
+    }
+
+    $("buscaDatas").value = "";
+
+    desenharPainelDatas();
+
+    painel.classList.add("aberto");
+}
+
+
+function fecharPainelDatas(){
+
+    $("painelDatas").classList.remove("aberto");
+}
+
+
+// "(Selecionar tudo)": marca todas as datas ou desmarca todas
+function alternarTodasDatas(){
+
+    if($("marcarTodasDatas").checked){
+
+        datasOcultas.clear();
+
+    }else{
+
+        datasDoFiltro().forEach(data => datasOcultas.add(data));
+    }
+
+    renderizarAgenda();
+
+    desenharPainelDatas();
+}
+
+
+// atalhos: marca só as datas de hoje até daqui a N dias (0 = só hoje)
+function selecionarProximosDias(dias){
+
+    const hoje = dataISO(0);
+
+    const limite = dataISO(dias);
+
+    datasOcultas = new Set(
+        datasDoFiltro().filter(data =>
+            !data || data < hoje || data > limite
+        )
+    );
+
+    renderizarAgenda();
+
+    desenharPainelDatas();
 }
 
 
@@ -1233,6 +1434,8 @@ function renderizarAgenda(){
     atualizarControlesModo();
 
     desenharChips();
+
+    atualizarBotaoDatas();
 
     const lista = $("listaAgenda");
 
@@ -2519,7 +2722,7 @@ function abrirModalAgenda(id){
 
         $("agTipo").value = TIPOS[0];
 
-        $("agStatus").value = STATUS_AGENDA[0];
+        $("agStatus").value = STATUS_PADRAO;
 
         $("agTransportadora").value = "";
     }
@@ -2711,6 +2914,9 @@ async function salvarAgendamento(){
     // salvou: o rascunho não serve mais
     removerRascunho(id ? `edit:${id}` : "novo");
 
+    // a data do agendamento salvo precisa aparecer (se estava desmarcada, volta)
+    datasOcultas.delete(dados.data || "");
+
     encerrarModalAgenda();
 
     renderizarAgenda();
@@ -2819,6 +3025,8 @@ document.addEventListener("keydown", (evento) => {
         fecharModalAgenda();
 
         fecharModalMotoristas();
+
+        fecharPainelDatas();
     }
 });
 
@@ -2841,7 +3049,7 @@ document.addEventListener("keydown", (evento) => {
 
     preencherSelect("motTransportadora", TRANSPORTADORAS);
 
-    ["filtroPeriodo", "filtroTipo", "filtroStatus"].forEach(id => {
+    ["filtroTipo", "filtroStatus"].forEach(id => {
 
         $(id).addEventListener(
             "change",
@@ -2872,6 +3080,19 @@ document.addEventListener("keydown", (evento) => {
         "change",
         atualizarCamposConta
     );
+
+    // filtro de datas: busca, "selecionar tudo" e fechar ao clicar fora
+    $("buscaDatas").addEventListener("input", desenharPainelDatas);
+
+    $("marcarTodasDatas").addEventListener("change", alternarTodasDatas);
+
+    document.addEventListener("click", (evento) => {
+
+        if(!evento.target.closest(".filtro-datas")){
+
+            fecharPainelDatas();
+        }
+    });
 
     $("agTipo").addEventListener(
         "change",

@@ -47,6 +47,73 @@
 .btn-perigo:hover{
     background:#b91c1c;
 }
+/* ===== Filtro de datas (estilo Excel) ===== */
+.filtro-datas{
+    position:relative;
+}
+.filtro-datas > button.filtrando{
+    background:#2563eb;
+}
+.painel-datas{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:60;
+    width:300px;
+    max-width:90vw;
+    padding:10px;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.painel-datas.aberto{
+    display:block;
+}
+.atalhos-datas{
+    display:flex;
+    gap:6px;
+    margin-bottom:8px;
+}
+.atalhos-datas button{
+    margin:0;
+    padding:6px 10px;
+    font-size:12px;
+}
+.painel-datas input[type="text"]{
+    margin:0 0 8px;
+    padding:6px 8px;
+    font-size:13px;
+}
+.data-opcao{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:4px 6px;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+}
+.data-opcao:hover{
+    background:#334155;
+}
+.data-opcao input{
+    width:auto;
+    margin:0;
+    padding:0;
+}
+.data-todas{
+    font-weight:bold;
+    border-bottom:1px solid #334155;
+    border-radius:6px 6px 0 0;
+}
+.lista-datas{
+    max-height:260px;
+    overflow-y:auto;
+    padding-top:4px;
+}
+
 .chips{
     display:flex;
     flex-wrap:wrap;
@@ -565,6 +632,16 @@ body.tema-claro .mot-linha{
     background:var(--claro-campo);
     border-color:var(--claro-linha);
 }
+body.tema-claro .painel-datas{
+    background:var(--claro-card);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .data-opcao:hover{
+    background:var(--claro-botao);
+}
+body.tema-claro .data-todas{
+    border-bottom-color:var(--claro-linha);
+}
 body.tema-claro .sep-modal{
     border-top-color:var(--claro-linha);
 }
@@ -636,11 +713,57 @@ CONTAINER
                 🚚 Transportadoras e motoristas
             </button>
 
-            <select id="filtroPeriodo">
-                <option value="">Todas as datas</option>
-                <option value="hoje">Hoje</option>
-                <option value="semana">Próximos 7 dias</option>
-            </select>
+            <!-- filtro de datas estilo Excel: lista com caixinhas -->
+            <div class="filtro-datas">
+
+                <button
+                    type="button"
+                    id="btnDatas"
+                    class="btn-secundario"
+                    onclick="alternarPainelDatas()"
+                >
+                    📅 Todas as datas ▾
+                </button>
+
+                <div class="painel-datas" id="painelDatas">
+
+                    <div class="atalhos-datas">
+
+                        <button
+                            type="button"
+                            class="btn-secundario"
+                            onclick="selecionarProximosDias(0)"
+                        >
+                            Só hoje
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-secundario"
+                            onclick="selecionarProximosDias(7)"
+                        >
+                            Próximos 7 dias
+                        </button>
+
+                    </div>
+
+                    <input
+                        type="text"
+                        id="buscaDatas"
+                        placeholder="Buscar data..."
+                        autocomplete="off"
+                    >
+
+                    <label class="data-opcao data-todas">
+                        <input type="checkbox" id="marcarTodasDatas">
+                        <span>(Selecionar tudo)</span>
+                    </label>
+
+                    <div class="lista-datas" id="listaDatasFiltro"></div>
+
+                </div>
+
+            </div>
 
             <select id="filtroTipo">
                 <option value="">Todos os tipos</option>

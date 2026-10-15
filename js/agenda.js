@@ -48,31 +48,32 @@ const CORES_DIAS = [
 const COR_SEM_DATA = "#94a3b8";
 
 // colunas de cada modo, na ordem em que aparecem (id = nome da célula
-// montada em criarCelulasAgenda). maxLargura = largura máxima da coluna
-// (o texto quebra de linha depois dela); sem maxLargura, a coluna se
-// ajusta ao conteúdo.
+// montada em criarCelulasAgenda).
+// semQuebra = o texto nunca quebra de linha (colunas curtas).
+// maxLargura = largura máxima das colunas de texto comprido: o texto só
+// quebra de linha se passar dela (ou se a tela não couber a tabela).
 const COLUNAS_EXPEDICAO = [
     { id: "horario", titulo: "Horário" },
-    { id: "titulo", titulo: "Plataforma / Cliente", maxLargura: "340px" },
-    { id: "transportadora", titulo: "Transportadora" },
-    { id: "motorista", titulo: "Motorista" },
-    { id: "periodo", titulo: "Período" },
-    { id: "status", titulo: "Status" },
-    { id: "obs", titulo: "Observação", maxLargura: "340px" }
+    { id: "titulo", titulo: "Plataforma / Cliente", maxLargura: "480px" },
+    { id: "transportadora", titulo: "Transportadora", semQuebra: true },
+    { id: "motorista", titulo: "Motorista", semQuebra: true },
+    { id: "periodo", titulo: "Período", semQuebra: true },
+    { id: "status", titulo: "Status", semQuebra: true },
+    { id: "obs", titulo: "Observação", maxLargura: "480px" }
 ];
 
 // sem período, e com o frete por último
 const COLUNAS_TRANSPORTADOR = [
     { id: "horario", titulo: "Horário" },
-    { id: "tipo", titulo: "Tipo" },
-    { id: "titulo", titulo: "Plataforma / Cliente", maxLargura: "340px" },
-    { id: "transportadora", titulo: "Transportadora" },
-    { id: "motorista", titulo: "Motorista" },
-    { id: "status", titulo: "Status" },
-    { id: "retirada", titulo: "Retirada", maxLargura: "300px" },
-    { id: "entrega", titulo: "Entrega", maxLargura: "340px" },
-    { id: "obs", titulo: "Observação", maxLargura: "280px" },
-    { id: "frete", titulo: "Frete" }
+    { id: "tipo", titulo: "Tipo", semQuebra: true },
+    { id: "titulo", titulo: "Plataforma / Cliente", maxLargura: "480px" },
+    { id: "transportadora", titulo: "Transportadora", semQuebra: true },
+    { id: "motorista", titulo: "Motorista", semQuebra: true },
+    { id: "status", titulo: "Status", semQuebra: true },
+    { id: "retirada", titulo: "Retirada", maxLargura: "520px" },
+    { id: "entrega", titulo: "Entrega", maxLargura: "560px" },
+    { id: "obs", titulo: "Observação", maxLargura: "420px" },
+    { id: "frete", titulo: "Frete", semQuebra: true }
 ];
 
 const CHAVE_AGENDA_MODO = "agendaModo";
@@ -722,23 +723,32 @@ function desenharChips(){
 }
 
 
-// local de entrega/retirada: nome, endereço completo e link (se tiver)
+// local de entrega/retirada: nome e endereço completo na mesma linha
+// (pra gastar pouca altura) e o link embaixo, se tiver
 function criarBlocoLocal(nome, endereco, link){
 
     const bloco = criar("div", "ag-local");
 
-    if(nome){
+    if(nome || endereco){
 
-        bloco.appendChild(
-            criar("p", "ag-local-texto", nome)
-        );
-    }
+        const linha = criar("p", "ag-local-linha");
 
-    if(endereco){
+        if(nome){
 
-        bloco.appendChild(
-            criar("p", "ag-local-endereco", endereco)
-        );
+            linha.appendChild(criar("strong", "ag-local-texto", nome));
+        }
+
+        if(nome && endereco){
+
+            linha.appendChild(criar("span", "", " — "));
+        }
+
+        if(endereco){
+
+            linha.appendChild(criar("span", "ag-local-endereco", endereco));
+        }
+
+        bloco.appendChild(linha);
     }
 
     if(link){
@@ -831,14 +841,18 @@ function colunasAtuais(){
 
 
 // cada informação vai numa célula (coluna) própria; a ordem final
-// vem de colunasAtuais(). maxLargura = largura máxima da coluna.
-function criarCelula(maxLargura, ...filhos){
+// vem de colunasAtuais(). coluna = { maxLargura, semQuebra } (ver COLUNAS_*).
+function criarCelula(coluna, ...filhos){
 
-    const celula = criar("td", "ag-celula");
+    const celula =
+        criar(
+            "td",
+            "ag-celula" + (coluna.semQuebra ? " ag-sem-quebra" : "")
+        );
 
     const conteudo = criar("div", "ag-conteudo");
 
-    if(maxLargura) conteudo.style.maxWidth = maxLargura;
+    if(coluna.maxLargura) conteudo.style.maxWidth = coluna.maxLargura;
 
     filhos.forEach(filho => {
 
@@ -858,11 +872,11 @@ function criarCelulasAgenda(item){
 
     const colunas = colunasAtuais();
 
-    const larguraDe = (id) =>
-        (colunas.find(coluna => coluna.id === id) || {}).maxLargura;
-
     const celula = (id, ...filhos) =>
-        criarCelula(larguraDe(id), ...filhos);
+        criarCelula(
+            colunas.find(coluna => coluna.id === id) || {},
+            ...filhos
+        );
 
     const celulas = {};
 
@@ -1343,10 +1357,75 @@ function ehLocalWR(nome){
 }
 
 
+// Modelo a partir do patrimônio: 3 letras + altura (WAE18R001 -> WAE18,
+// WTE14L076 -> WTE14, WAD16060 -> WAD16). Mesma regra do estoque.
+function modeloDaPlataforma(plataforma){
+
+    const texto =
+        String(plataforma || "").trim().toUpperCase();
+
+    const partes =
+        texto.match(/^([A-Z]+?)(\d+)/);
+
+    if(!partes) return texto;
+
+    const digitos = partes[2];
+
+    return partes[1] + (
+        digitos.length > 2
+            ? digitos.slice(0, 2)
+            : digitos
+    );
+}
+
+
+// período na linha de referência: maiúsculo e sem acento
+// (3 períodos -> 3 PERIODOS). Um dia só vira DIÁRIA.
+function textoPeriodoReferencia(periodo){
+
+    const texto =
+        String(periodo || "").trim();
+
+    if(/^1 dias?$/i.test(texto)) return "DIÁRIA";
+
+    return texto
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+
+// Linha de referência da mensagem. Se a referência (ficha) foi digitada
+// à mão, vale ela. Senão monta o nome da proposta:
+// CLIENTE_MODELO_PERÍODO - Proposta: 712804
+// (troca técnica não monta sozinha: tem a ficha própria, digitada à mão)
+function referenciaZap(item){
+
+    const manual =
+        String(item.referencia || "").trim();
+
+    if(manual) return manual;
+
+    if(item.tipo === "Troca técnica") return "";
+
+    const nome =
+        [
+            String(item.cliente || "").trim().toUpperCase(),
+            modeloDaPlataforma(item.plataforma),
+            textoPeriodoReferencia(item.periodo)
+        ]
+            .filter(Boolean)
+            .join("_");
+
+    return `${nome} - Proposta: ${String(item.proposta || "").trim()}`.trimEnd();
+}
+
+
 // linhas de um local (saída ou entrega). Local da W Rental sai só
 // como "WR", sem endereço. usarWRSeVazio = entrega e troca (saída) e
 // coleta (entrega) saem da/para a W Rental quando o local fica vazio.
 // linkComRotulo = modelo da troca: "Endereço:" e "Link:" em linhas separadas.
+// Os rótulos saem em negrito do WhatsApp (entre asteriscos).
 function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio, linkComRotulo){
 
     const nomeFinal =
@@ -1357,29 +1436,29 @@ function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio, linkComRotu
 
     if(ehLocalWR(nomeFinal) || (vazio && usarWRSeVazio)){
 
-        return [`${rotulo}: WR`];
+        return [`*${rotulo}:* WR`];
     }
 
-    const linhas = [`${rotulo}: ${nomeFinal}`.trimEnd()];
+    const linhas = [`*${rotulo}:* ${nomeFinal}`.trimEnd()];
 
     if(linkComRotulo){
 
-        if(endereco) linhas.push(`Endereço: ${endereco}`);
+        if(endereco) linhas.push(`*Endereço:* ${endereco}`);
 
-        if(link) linhas.push(`Link: ${link}`);
+        if(link) linhas.push(`*Link:* ${link}`);
 
         return linhas;
     }
 
     if(endereco){
 
-        linhas.push(`Endereço: ${endereco}`);
+        linhas.push(`*Endereço:* ${endereco}`);
 
         if(link) linhas.push(link);
 
     }else if(link){
 
-        linhas.push(`Endereço: ${link}`);
+        linhas.push(`*Endereço:* ${link}`);
     }
 
     return linhas;
@@ -1414,11 +1493,9 @@ function montarTextoZap(item){
     const horario =
         String(item.horario || "").trim();
 
-    // horário vazio fica vazio; "IMEDIATO" vira "Horário imediato"
+    // horário vazio fica vazio; "IMEDIATO" sai como "imediato"
     const linhaHorario =
-        horario.toUpperCase() === "IMEDIATO"
-            ? "Horário imediato"
-            : `Horário: ${horario}`.trimEnd();
+        `*Horário:* ${horario.toUpperCase() === "IMEDIATO" ? "imediato" : horario}`.trimEnd();
 
     // por conta do cliente, sem contato, aponta pros contatos lá embaixo
     const contato =
@@ -1431,11 +1508,11 @@ function montarTextoZap(item){
 
         "",
 
-        `Data: ${textoDataZap(item.data)}`,
+        `*Data:* ${textoDataZap(item.data)}`,
 
         linhaHorario,
 
-        `Equipamento: ${item.plataforma}`,
+        `*Equipamento:* ${item.plataforma}`,
 
         ...linhasLocalZap(
             "Local de Saída",
@@ -1476,8 +1553,8 @@ function montarTextoZap(item){
         `* FRETE POR ${porCliente ? "CONTA DO CLIENTE" : "NOSSA CONTA"} - R$ ${formatarMoedaBR(frete)}`
     );
 
-    // ficha/referência é digitada à mão
-    linhas.push(`* ${item.referencia || ""}`.trimEnd());
+    // ficha digitada à mão, ou o nome da proposta montado sozinho
+    linhas.push(`* ${referenciaZap(item)}`.trimEnd());
 
     if(porCliente){
 
@@ -1489,7 +1566,7 @@ function montarTextoZap(item){
 
     }else{
 
-        linhas.push(`* CARD: ${item.card || ""}`.trimEnd());
+        linhas.push(`* CARD:${item.card || ""}`.trimEnd());
     }
 
     return { texto: linhas.join("\n") };

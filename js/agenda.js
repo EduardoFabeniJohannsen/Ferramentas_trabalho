@@ -153,6 +153,10 @@ let colunaArrastada = null;
 // ("" = agendamentos sem data). Vazio = todas as datas aparecem.
 let datasOcultas = new Set();
 
+// filtro de status (igual ao de datas): os status DESMARCADOS ficam aqui.
+// Vazio = todos os status aparecem.
+let statusOcultos = new Set();
+
 // valores que o agendamento tinha ao abrir (valores antigos fora do
 // padrão continuam podendo ser salvos sem mexer neles)
 let valoresOriginais = { horario: "", periodo: "" };
@@ -525,11 +529,9 @@ function visivelNoModo(item){
 // ignorarTransportadora = usado pra contar os botões das
 // transportadoras respeitando os outros filtros.
 
-function filtrarAgendamentos(ignorarTransportadora, ignorarData){
+function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
 
     const tipo = $("filtroTipo").value;
-
-    const status = $("filtroStatus").value;
 
     const expedicao =
         modoVisualizacao === "expedicao";
@@ -559,7 +561,8 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData){
         // na expedição só tem entrega, então o filtro de tipo não vale
         if(!expedicao && tipo && item.tipo !== tipo) return false;
 
-        if(status && item.status !== status) return false;
+        // filtro de status: os desmarcados não aparecem
+        if(!ignorarStatus && statusOcultos.has(item.status)) return false;
 
         // filtro de datas: as desmarcadas não aparecem
         if(!ignorarData && datasOcultas.has(item.data || "")) return false;
@@ -727,6 +730,9 @@ function alternarPainelDatas(){
 
     $("buscaDatas").value = "";
 
+    // um painel de cada vez
+    fecharPainelStatus();
+
     desenharPainelDatas();
 
     painel.classList.add("aberto");
@@ -754,6 +760,179 @@ function alternarTodasDatas(){
     renderizarAgenda();
 
     desenharPainelDatas();
+}
+
+
+// ======================================
+// FILTRO DE STATUS (igual ao de datas)
+// ======================================
+// No botão "Status" você vê a lista com caixinhas e marca a combinação
+// que quer ver (ex: Confirmado + Em rota).
+
+// status da lista: os que existem nos agendamentos que aparecem no modo atual
+// (respeitando os outros filtros), na ordem de STATUS_AGENDA. Os desmarcados
+// ficam na lista pra dar pra marcar de novo.
+function statusDoFiltro(){
+
+    const existentes = new Set();
+
+    filtrarAgendamentos(false, false, true).forEach(item => {
+
+        existentes.add(item.status);
+    });
+
+    statusOcultos.forEach(nome => existentes.add(nome));
+
+    return STATUS_AGENDA.filter(nome => existentes.has(nome));
+}
+
+
+// quantos agendamentos tem em cada status (sem aplicar o próprio filtro de status)
+function contagemPorStatus(){
+
+    const contagem = {};
+
+    filtrarAgendamentos(false, false, true).forEach(item => {
+
+        contagem[item.status] = (contagem[item.status] || 0) + 1;
+    });
+
+    return contagem;
+}
+
+
+// texto do botão: tudo marcado, um só status ou "N de M"
+function atualizarBotaoStatus(){
+
+    const botao = $("btnStatus");
+
+    const todos = statusDoFiltro();
+
+    const marcados = todos.filter(nome => !statusOcultos.has(nome));
+
+    let texto = "🏷️ Todos os status ▾";
+
+    if(marcados.length < todos.length){
+
+        texto =
+            marcados.length === 1
+                ? `🏷️ Status: ${marcados[0]} ▾`
+                : `🏷️ Status: ${marcados.length} de ${todos.length} ▾`;
+    }
+
+    botao.innerText = texto;
+
+    botao.classList.toggle("filtrando", marcados.length < todos.length);
+}
+
+
+function desenharPainelStatus(){
+
+    const lista = $("listaStatusFiltro");
+
+    lista.innerHTML = "";
+
+    const todos = statusDoFiltro();
+
+    const contagem = contagemPorStatus();
+
+    // "(Selecionar tudo)": marcado, desmarcado ou meio-termo
+    const marcados =
+        todos.filter(nome => !statusOcultos.has(nome)).length;
+
+    const caixaTodos = $("marcarTodosStatus");
+
+    caixaTodos.checked = todos.length > 0 && marcados === todos.length;
+
+    caixaTodos.indeterminate = marcados > 0 && marcados < todos.length;
+
+    todos.forEach(nome => {
+
+        const rotulo = criar("label", "data-opcao");
+
+        const caixa = criar("input");
+
+        caixa.type = "checkbox";
+
+        caixa.checked = !statusOcultos.has(nome);
+
+        caixa.addEventListener(
+            "change",
+            () => {
+
+                if(caixa.checked){
+
+                    statusOcultos.delete(nome);
+
+                }else{
+
+                    statusOcultos.add(nome);
+                }
+
+                renderizarAgenda();
+
+                desenharPainelStatus();
+            }
+        );
+
+        rotulo.appendChild(caixa);
+
+        const tag = criar("span", "tag", nome);
+
+        tag.dataset.status = nome;
+
+        rotulo.appendChild(tag);
+
+        rotulo.appendChild(
+            criar("span", "contagem-status", `(${contagem[nome] || 0})`)
+        );
+
+        lista.appendChild(rotulo);
+    });
+}
+
+
+function alternarPainelStatus(){
+
+    const painel = $("painelStatus");
+
+    if(painel.classList.contains("aberto")){
+
+        fecharPainelStatus();
+
+        return;
+    }
+
+    // um painel de cada vez
+    fecharPainelDatas();
+
+    desenharPainelStatus();
+
+    painel.classList.add("aberto");
+}
+
+
+function fecharPainelStatus(){
+
+    $("painelStatus").classList.remove("aberto");
+}
+
+
+// "(Selecionar tudo)": marca todos os status ou desmarca todos
+function alternarTodosStatus(){
+
+    if($("marcarTodosStatus").checked){
+
+        statusOcultos.clear();
+
+    }else{
+
+        statusDoFiltro().forEach(nome => statusOcultos.add(nome));
+    }
+
+    renderizarAgenda();
+
+    desenharPainelStatus();
 }
 
 
@@ -1569,6 +1748,30 @@ function criarItemAgenda(item){
 
     botoes.appendChild(botaoZap);
 
+    // entrega: cria uma coleta a partir dela. Nos outros tipos fica um
+    // botão invisível, só pra os botões da direita ficarem alinhados.
+    const botaoColeta = criar("button", "btn-coleta", "↩️");
+
+    botaoColeta.type = "button";
+
+    if(item.tipo === "Entrega"){
+
+        botaoColeta.title = "Criar uma coleta a partir desta entrega";
+
+        botaoColeta.addEventListener(
+            "click",
+            () => copiarEntregaParaColeta(item)
+        );
+
+    }else{
+
+        botaoColeta.style.visibility = "hidden";
+
+        botaoColeta.tabIndex = -1;
+    }
+
+    botoes.appendChild(botaoColeta);
+
     const botaoEditar = criar("button", "", "✏️");
 
     botaoEditar.type = "button";
@@ -1714,6 +1917,8 @@ function renderizarAgenda(){
     desenharChips();
 
     atualizarBotaoDatas();
+
+    atualizarBotaoStatus();
 
     const lista = $("listaAgenda");
 
@@ -2939,7 +3144,9 @@ function atualizarBotoesModal(editando, temRascunho){
 }
 
 
-function abrirModalAgenda(id){
+// valoresIniciais = formulário novo já preenchido (ex: coleta copiada de uma
+// entrega); aviso = texto mostrado no topo do formulário.
+function abrirModalAgenda(id, valoresIniciais, aviso){
 
     idEmEdicao = id || null;
 
@@ -2956,19 +3163,26 @@ function abrirModalAgenda(id){
         return;
     }
 
-    // rascunho guardado de uma edição interrompida
+    // rascunho guardado de uma edição interrompida (cópia não usa rascunho)
     const rascunho =
-        lerRascunhos()[chaveRascunho()];
+        valoresIniciais
+            ? undefined
+            : lerRascunhos()[chaveRascunho()];
 
-    // de onde vêm os valores: rascunho, senão o agendamento salvo
+    // de onde vêm os valores: rascunho, senão o agendamento salvo,
+    // senão os valores iniciais da cópia
     const origem =
         rascunho
             ? rascunho.campos
-            : item;
+            : (item || valoresIniciais || null);
+
+    // valor antigo fora do padrão (ex: período "6 meses") copiado ou aberto
+    // sem mexer continua podendo ser salvo
+    const base = item || valoresIniciais;
 
     valoresOriginais = {
-        horario: item ? (item.horario || "") : "",
-        periodo: item ? (item.periodo || "") : ""
+        horario: base ? (base.horario || "") : "",
+        periodo: base ? (base.periodo || "") : ""
     };
 
     clearTimeout(timerRascunho);
@@ -3018,6 +3232,13 @@ function abrirModalAgenda(id){
     atualizarSugestoesPeriodo();
 
     atualizarBotoesModal(!!item, !!rascunho);
+
+    if(aviso){
+
+        $("avisoRascunho").innerText = aviso;
+
+        $("avisoRascunho").style.display = "";
+    }
 
     $("modalAgenda").classList.add("aberto");
 
@@ -3192,8 +3413,11 @@ async function salvarAgendamento(){
     // salvou: o rascunho não serve mais
     removerRascunho(id ? `edit:${id}` : "novo");
 
-    // a data do agendamento salvo precisa aparecer (se estava desmarcada, volta)
+    // a data e o status do agendamento salvo precisam aparecer
+    // (se estavam desmarcados, voltam)
     datasOcultas.delete(dados.data || "");
+
+    statusOcultos.delete(dados.status);
 
     encerrarModalAgenda();
 
@@ -3243,6 +3467,69 @@ async function excluirAgendamento(id){
     );
 
     return true;
+}
+
+
+// ======================================
+// COLETA A PARTIR DE UMA ENTREGA
+// ======================================
+// A coleta volta pelo mesmo caminho: o local da entrega vira a retirada e
+// o que era a saída (W Rental) vira o local de entrega. Data e motorista
+// ficam em branco (são novos); o resto é copiado.
+
+function valoresColetaDaEntrega(item){
+
+    return {
+        data: "",
+        horario: HORARIO_PADRAO,
+        tipo: "Coleta",
+        status: STATUS_PADRAO,
+        plataforma: item.plataforma,
+        plataformaRecolha: "",
+        transportadora: item.transportadora,
+        motorista: "",
+        cliente: item.cliente,
+        proposta: item.proposta,
+        periodo: item.periodo,
+        origemNome: item.destinoNome,
+        origemEndereco: item.destinoEndereco,
+        linkOrigem: item.linkDestino,
+        destinoNome: item.origemNome,
+        destinoEndereco: item.origemEndereco,
+        linkDestino: item.linkOrigem,
+        frete: item.frete,
+        freteConta: item.freteConta,
+        obsExpedicao: "",
+        obsEntrega: item.obsEntrega,
+        referencia: item.referencia,
+        contato: item.contato,
+        card: "",
+        emails: item.emails
+    };
+}
+
+
+// abre o formulário de novo agendamento já preenchido como coleta.
+// Nada é salvo até clicar em Salvar.
+function copiarEntregaParaColeta(item){
+
+    if(item.tipo !== "Entrega") return;
+
+    // já tem um rascunho de agendamento novo: não apaga sem perguntar
+    if(
+        lerRascunhos().novo &&
+        !confirm("Existe um rascunho de novo agendamento. Substituir por esta coleta?")
+    ){
+        return;
+    }
+
+    removerRascunho("novo");
+
+    abrirModalAgenda(
+        null,
+        valoresColetaDaEntrega(item),
+        `📋 Coleta criada a partir da entrega de ${item.plataforma}. Informe a data, o horário e o motorista.`
+    );
 }
 
 
@@ -3305,6 +3592,8 @@ document.addEventListener("keydown", (evento) => {
         fecharModalMotoristas();
 
         fecharPainelDatas();
+
+        fecharPainelStatus();
     }
 });
 
@@ -3317,8 +3606,6 @@ document.addEventListener("keydown", (evento) => {
 
     preencherSelect("filtroTipo", TIPOS, "Todos os tipos");
 
-    preencherSelect("filtroStatus", STATUS_AGENDA, "Todos os status");
-
     preencherSelect("agTipo", TIPOS);
 
     preencherSelect("agStatus", STATUS_AGENDA);
@@ -3327,7 +3614,7 @@ document.addEventListener("keydown", (evento) => {
 
     preencherSelect("motTransportadora", TRANSPORTADORAS);
 
-    ["filtroTipo", "filtroStatus"].forEach(id => {
+    ["filtroTipo"].forEach(id => {
 
         $(id).addEventListener(
             "change",
@@ -3364,11 +3651,18 @@ document.addEventListener("keydown", (evento) => {
 
     $("marcarTodasDatas").addEventListener("change", alternarTodasDatas);
 
+    $("marcarTodosStatus").addEventListener("change", alternarTodosStatus);
+
     document.addEventListener("click", (evento) => {
 
         if(!evento.target.closest(".filtro-datas")){
 
             fecharPainelDatas();
+        }
+
+        if(!evento.target.closest(".filtro-status")){
+
+            fecharPainelStatus();
         }
     });
 

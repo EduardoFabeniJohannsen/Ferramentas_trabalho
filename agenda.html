@@ -48,13 +48,16 @@
     background:#b91c1c;
 }
 /* ===== Filtro de datas (estilo Excel) ===== */
-.filtro-datas{
+.filtro-datas,
+.filtro-status{
     position:relative;
 }
-.filtro-datas > button.filtrando{
+.filtro-datas > button.filtrando,
+.filtro-status > button.filtrando{
     background:#2563eb;
 }
-.painel-datas{
+.painel-datas,
+.painel-status{
     display:none;
     position:absolute;
     top:calc(100% + 6px);
@@ -68,8 +71,17 @@
     border-radius:10px;
     box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
-.painel-datas.aberto{
+.painel-datas.aberto,
+.painel-status.aberto{
     display:block;
+}
+.painel-status{
+    width:250px;
+}
+.contagem-status{
+    margin-left:auto;
+    font-size:12px;
+    color:#94a3b8;
 }
 .atalhos-datas{
     display:flex;
@@ -400,6 +412,12 @@ tr.ag-item td.ag-lado{
 .ag-botoes .btn-zap:hover{
     background:#15803d;
 }
+.ag-botoes .btn-coleta{
+    background:#b45309;
+}
+.ag-botoes .btn-coleta:hover{
+    background:#92400e;
+}
 .ag-botoes .btn-excluir-ag{
     margin-left:12px;
 }
@@ -649,7 +667,11 @@ body.tema-claro .mot-linha{
     background:var(--claro-campo);
     border-color:var(--claro-linha);
 }
-body.tema-claro .painel-datas{
+body.tema-claro .contagem-status{
+    color:#52617a;
+}
+body.tema-claro .painel-datas,
+body.tema-claro .painel-status{
     background:var(--claro-card);
     border-color:var(--claro-linha);
 }
@@ -789,9 +811,30 @@ CONTAINER
                 <option value="">Todos os tipos</option>
             </select>
 
-            <select id="filtroStatus">
-                <option value="">Todos os status</option>
-            </select>
+            <!-- filtro de status igual ao de datas: lista com caixinhas -->
+            <div class="filtro-status">
+
+                <button
+                    type="button"
+                    id="btnStatus"
+                    class="btn-secundario"
+                    onclick="alternarPainelStatus()"
+                >
+                    🏷️ Todos os status ▾
+                </button>
+
+                <div class="painel-status" id="painelStatus">
+
+                    <label class="data-opcao data-todas">
+                        <input type="checkbox" id="marcarTodosStatus">
+                        <span>(Selecionar tudo)</span>
+                    </label>
+
+                    <div class="lista-datas" id="listaStatusFiltro"></div>
+
+                </div>
+
+            </div>
 
             <select id="ordemAgenda" title="Ordem dentro de cada data"></select>
 

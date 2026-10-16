@@ -192,8 +192,25 @@
 .ag-tabela thead th + th{
     border-left:1px dashed #475569;
 }
-.ag-tabela thead th:first-child{
+.ag-tabela thead th.ag-cab-horario{
     text-align:center;
+}
+/* título arrastável (muda a ordem das colunas) */
+.ag-tabela thead th.ag-cab-coluna{
+    cursor:grab;
+    user-select:none;
+}
+.ag-tabela thead th.ag-cab-coluna:hover{
+    color:#e5e7eb;
+}
+.ag-tabela thead th.arrastando{
+    opacity:.4;
+}
+.ag-tabela thead th.solta-antes{
+    box-shadow:inset 3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.solta-depois{
+    box-shadow:inset -3px 0 0 #3b82f6;
 }
 .ag-tabela thead th.ag-cab-proposta{
     border-left:2px dashed #334155;
@@ -642,6 +659,9 @@ body.tema-claro .data-opcao:hover{
 body.tema-claro .data-todas{
     border-bottom-color:var(--claro-linha);
 }
+body.tema-claro .ag-tabela thead th.ag-cab-coluna:hover{
+    color:#0f172a;
+}
 body.tema-claro .sep-modal{
     border-top-color:var(--claro-linha);
 }
@@ -782,6 +802,17 @@ CONTAINER
                 title="Buscar de novo os agendamentos e motoristas"
             >
                 ↻ Atualizar
+            </button>
+
+            <button
+                type="button"
+                class="btn-secundario"
+                id="btnColunasPadrao"
+                style="display:none"
+                onclick="restaurarOrdemColunas()"
+                title="Voltar as colunas para a ordem padrão"
+            >
+                ↺ Colunas padrão
             </button>
 
             <button

@@ -84,6 +84,9 @@ const CHAVE_AGENDA_ORDEM = "agendaOrdem";
 
 const CHAVE_AGENDA_TEMA = "agendaTema";
 
+// ordem das colunas de cada usuário (uma por modo), neste navegador
+const CHAVE_AGENDA_COLUNAS = "agendaColunas";
+
 // rascunhos do formulário (o que foi digitado e não foi salvo)
 const CHAVE_AGENDA_RASCUNHOS = "agendaRascunhos";
 
@@ -135,6 +138,16 @@ let transportadorasCadastradas = [];
 let formularioAlterado = false;
 
 let timerRascunho = null;
+
+// quem está logado (a ordem das colunas é de cada usuário)
+let usuarioAgenda = "";
+
+// ordem das colunas escolhida: { expedicao: [ids], transportador: [ids] }
+// (vazio = ordem padrão)
+let ordemColunas = { expedicao: [], transportador: [] };
+
+// coluna que está sendo arrastada pelo título
+let colunaArrastada = null;
 
 // filtro de datas (estilo Excel): as datas DESMARCADAS ficam aqui
 // ("" = agendamentos sem data). Vazio = todas as datas aparecem.
@@ -1023,21 +1036,282 @@ function criarSeletorStatus(item){
 }
 
 
-// colunas visíveis agora. No transportador a coluna da transportadora
-// some quando já tem uma transportadora filtrada (ou "sem transportadora").
+// colunas do modo atual, na ordem padrão
+function colunasDoModo(){
+
+    return modoVisualizacao === "expedicao"
+        ? COLUNAS_EXPEDICAO
+        : COLUNAS_TRANSPORTADOR;
+}
+
+
+// aplica a ordem escolhida pelo usuário. Coluna que não está na ordem
+// salva (ex: coluna nova) vai pro fim, na ordem padrão.
+function ordenarColunas(lista){
+
+    const salva = ordemColunas[modoVisualizacao] || [];
+
+    if(!salva.length) return lista;
+
+    const posicao = (id) => {
+
+        const indice = salva.indexOf(id);
+
+        return indice === -1 ? salva.length : indice;
+    };
+
+    return lista
+        .map((coluna, padrao) => ({ coluna, padrao }))
+        .sort((a, b) =>
+            (posicao(a.coluna.id) - posicao(b.coluna.id)) ||
+            (a.padrao - b.padrao)
+        )
+        .map(item => item.coluna);
+}
+
+
+// colunas visíveis agora, na ordem do usuário. No transportador a coluna
+// da transportadora some quando já tem uma transportadora filtrada
+// (ou "sem transportadora").
 function colunasAtuais(){
 
-    if(modoVisualizacao === "expedicao"){
+    const lista = ordenarColunas(colunasDoModo());
 
-        return COLUNAS_EXPEDICAO;
-    }
+    if(modoVisualizacao === "expedicao") return lista;
 
-    return COLUNAS_TRANSPORTADOR.filter(coluna =>
+    return lista.filter(coluna =>
         !(
             coluna.id === "transportadora" &&
             filtroTransportadora !== ""
         )
     );
+}
+
+
+// ======================================
+// ORDEM DAS COLUNAS (arrastar o título)
+// ======================================
+// Cada usuário arruma as colunas como quiser; fica salvo neste navegador
+// (separado por usuário e por modo). Proposta e botões ficam sempre à direita.
+
+async function obterUsuarioAgenda(){
+
+    try{
+
+        const { data } =
+            await supabaseClient.auth.getSession();
+
+        return data?.session?.user?.id || "";
+
+    }catch(erro){
+
+        return "";
+    }
+}
+
+
+function chaveOrdemColunas(){
+
+    return `${CHAVE_AGENDA_COLUNAS}:${usuarioAgenda || "local"}`;
+}
+
+
+function carregarOrdemColunas(){
+
+    const limpa = (lista) =>
+        Array.isArray(lista)
+            ? lista.filter(id => typeof id === "string")
+            : [];
+
+    try{
+
+        const salvo =
+            localStorage.getItem(chaveOrdemColunas());
+
+        const dados =
+            salvo ? JSON.parse(salvo) : {};
+
+        ordemColunas = {
+            expedicao: limpa(dados?.expedicao),
+            transportador: limpa(dados?.transportador)
+        };
+
+    }catch(erro){
+
+        console.error("Ordem das colunas inválida, ignorando:", erro);
+
+        ordemColunas = { expedicao: [], transportador: [] };
+    }
+}
+
+
+function salvarOrdemColunas(){
+
+    try{
+
+        localStorage.setItem(
+            chaveOrdemColunas(),
+            JSON.stringify(ordemColunas)
+        );
+
+    }catch(erro){
+
+        console.error("Erro ao salvar a ordem das colunas:", erro);
+    }
+}
+
+
+// move a coluna "origem" pra antes/depois da coluna "destino". Mexe na lista
+// completa do modo (inclusive coluna escondida, como a da transportadora
+// quando filtrada), pra ela voltar no lugar certo depois.
+function moverColuna(idOrigem, idDestino, depois){
+
+    if(idOrigem === idDestino) return;
+
+    const ids =
+        ordenarColunas(colunasDoModo()).map(coluna => coluna.id);
+
+    if(!ids.includes(idOrigem) || !ids.includes(idDestino)) return;
+
+    ids.splice(ids.indexOf(idOrigem), 1);
+
+    ids.splice(ids.indexOf(idDestino) + (depois ? 1 : 0), 0, idOrigem);
+
+    ordemColunas[modoVisualizacao] = ids;
+
+    salvarOrdemColunas();
+
+    renderizarAgenda();
+}
+
+
+function ordemColunasPersonalizada(){
+
+    const atual =
+        ordenarColunas(colunasDoModo()).map(coluna => coluna.id).join();
+
+    const padrao =
+        colunasDoModo().map(coluna => coluna.id).join();
+
+    return atual !== padrao;
+}
+
+
+function restaurarOrdemColunas(){
+
+    ordemColunas[modoVisualizacao] = [];
+
+    salvarOrdemColunas();
+
+    renderizarAgenda();
+
+    mostrarToast("Colunas na ordem padrão");
+}
+
+
+// tira os traços azuis de "solta aqui" de todos os títulos
+function limparIndicadoresColunas(){
+
+    document
+        .querySelectorAll(".ag-cab-coluna")
+        .forEach(titulo => {
+
+            titulo.classList.remove("solta-antes", "solta-depois", "arrastando");
+        });
+}
+
+
+// metade esquerda do título = solta antes; direita = solta depois
+function soltaDepois(evento, titulo){
+
+    const retangulo = titulo.getBoundingClientRect();
+
+    return evento.clientX > retangulo.left + retangulo.width / 2;
+}
+
+
+function criarTituloColuna(coluna){
+
+    const titulo =
+        criar(
+            "th",
+            `ag-cab-coluna ag-cab-${coluna.id}`,
+            coluna.titulo
+        );
+
+    titulo.draggable = true;
+
+    titulo.title = "Arraste para mudar a ordem da coluna";
+
+    titulo.addEventListener(
+        "dragstart",
+        (evento) => {
+
+            colunaArrastada = coluna.id;
+
+            titulo.classList.add("arrastando");
+
+            evento.dataTransfer.effectAllowed = "move";
+
+            // o Firefox só começa a arrastar se tiver algum dado
+            evento.dataTransfer.setData("text/plain", coluna.id);
+        }
+    );
+
+    titulo.addEventListener(
+        "dragend",
+        () => {
+
+            colunaArrastada = null;
+
+            limparIndicadoresColunas();
+        }
+    );
+
+    titulo.addEventListener(
+        "dragover",
+        (evento) => {
+
+            if(!colunaArrastada || colunaArrastada === coluna.id) return;
+
+            // sem isso o navegador não deixa soltar aqui
+            evento.preventDefault();
+
+            const depois = soltaDepois(evento, titulo);
+
+            titulo.classList.toggle("solta-antes", !depois);
+
+            titulo.classList.toggle("solta-depois", depois);
+        }
+    );
+
+    titulo.addEventListener(
+        "dragleave",
+        () => {
+
+            titulo.classList.remove("solta-antes", "solta-depois");
+        }
+    );
+
+    titulo.addEventListener(
+        "drop",
+        (evento) => {
+
+            evento.preventDefault();
+
+            const origem = colunaArrastada;
+
+            const depois = soltaDepois(evento, titulo);
+
+            colunaArrastada = null;
+
+            limparIndicadoresColunas();
+
+            if(origem) moverColuna(origem, coluna.id, depois);
+        }
+    );
+
+    return titulo;
 }
 
 
@@ -1243,7 +1517,7 @@ function criarCabecalhoAgenda(){
 
     colunasAtuais().forEach(coluna => {
 
-        linha.appendChild(criar("th", "", coluna.titulo));
+        linha.appendChild(criarTituloColuna(coluna));
     });
 
     // à direita do traço de corte do print: proposta e botões
@@ -1422,10 +1696,14 @@ function atualizarControlesModo(){
 
     atualizarSelectOrdem();
 
+    // só aparece quando as colunas estão fora da ordem padrão
+    $("btnColunasPadrao").style.display =
+        ordemColunasPersonalizada() ? "" : "none";
+
     $("dicaModo").innerText =
         expedicao
-            ? "Só entregas e trocas que ainda não saíram, sem endereço e sem valor. Inclui as sem data (preparar)."
-            : "Informação completa. Só o que já tem data definida.";
+            ? "Só entregas e trocas que ainda não saíram, sem endereço e sem valor. Inclui as sem data (preparar). Arraste os títulos das colunas para mudar a ordem."
+            : "Informação completa. Só o que já tem data definida. Arraste os títulos das colunas para mudar a ordem.";
 }
 
 
@@ -3164,10 +3442,18 @@ document.addEventListener("keydown", (evento) => {
         console.error("Erro ao ler modo/ordem:", erro);
     }
 
-    // mostra "Carregando..." e busca tudo no Supabase
+    // mostra "Carregando...", descobre quem está logado (a ordem das colunas
+    // é de cada usuário) e busca tudo no Supabase
     renderizarAgenda();
 
-    recarregarAgenda(false);
+    obterUsuarioAgenda().then(usuario => {
+
+        usuarioAgenda = usuario;
+
+        carregarOrdemColunas();
+
+        recarregarAgenda(false);
+    });
 
     // várias pessoas usam: ao voltar pra aba, atualiza se passou um tempo
     document.addEventListener("visibilitychange", () => {

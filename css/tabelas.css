@@ -1,0 +1,107 @@
+/* ===== Editor de tabelas (admin) ===== */
+.card-tabelas{
+    width:100%;
+    max-width:1000px;
+    text-align:left;
+}
+.barra-tabelas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:12px;
+}
+.barra-tabelas select,
+.barra-tabelas input{
+    width:auto;
+    margin:0;
+    flex:1;
+    min-width:160px;
+}
+.barra-tabelas .contagem{
+    color:#94a3b8;
+    font-size:13px;
+}
+.area-tabela{
+    max-height:60vh;
+    overflow:auto;
+    border:1px solid #334155;
+    border-radius:8px;
+}
+.tabela-editor{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+.tabela-editor th{
+    position:sticky;
+    top:0;
+    background:#0f172a;
+    text-align:left;
+    padding:8px;
+    border-bottom:1px solid #334155;
+}
+.tabela-editor td{
+    padding:4px;
+    border-bottom:1px solid #334155;
+}
+.tabela-editor input{
+    margin:0;
+    padding:6px 8px;
+    font-size:14px;
+}
+.tabela-editor input.salvando{
+    border-color:#eab308;
+}
+.tabela-editor input.erro{
+    border-color:#ef4444;
+}
+.tabela-editor .col-id{
+    width:60px;
+    color:#94a3b8;
+}
+.tabela-editor .col-acao{
+    width:50px;
+    text-align:center;
+}
+.tabela-editor .btn-excluir{
+    margin:0;
+    padding:4px 10px;
+    background:#dc2626;
+}
+.tabela-editor .btn-excluir:hover{
+    background:#b91c1c;
+}
+/* ----- consulta (matriz) ----- */
+.tabela-matriz th,
+.tabela-matriz td{
+    text-align:center;
+    white-space:nowrap;
+    padding:8px 12px;
+}
+.tabela-matriz .col-rotulo{
+    position:sticky;
+    left:0;
+    text-align:left;
+    font-weight:bold;
+    background:#1e293b;
+    border-right:1px solid #334155;
+}
+.tabela-matriz th.col-rotulo{
+    z-index:2;
+    background:#0f172a;
+}
+.tabela-matriz tbody tr:hover td{
+    background:#334155;
+}
+.tabela-editor tr.linha-nova td{
+    background:#1e3a2f;
+}
+.tabela-editor .btn-adicionar{
+    margin:0;
+    padding:6px 10px;
+    background:#16a34a;
+}
+.tabela-editor .btn-adicionar:hover{
+    background:#15803d;
+}

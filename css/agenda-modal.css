@@ -1,0 +1,143 @@
+/* ===== Modal ===== */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1100;
+    background:rgba(0,0,0,.6);
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.modal-overlay.aberto{
+    display:flex;
+}
+.modal-agenda{
+    width:100%;
+    max-width:600px;
+    max-height:90vh;
+    overflow:auto;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+/* cabeçalho fixo: o Salvar acompanha quando o formulário rola */
+.modal-agenda-topo{
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 20px;
+    background:#1e293b;
+    border-bottom:1px solid #334155;
+}
+.modal-agenda-topo h3{
+    margin:0;
+}
+.modal-titulo{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 12px;
+    align-items:baseline;
+}
+.aviso-rascunho{
+    font-size:12px;
+    color:#fbbf24;
+}
+.modal-acoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+}
+.modal-acoes button{
+    margin:0;
+    padding:8px 14px;
+}
+.modal-agenda .btn-fechar{
+    margin:0;
+    padding:2px 10px;
+    font-size:20px;
+}
+.modal-corpo{
+    padding:14px 20px 20px;
+}
+.form-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+    padding:14px 20px 20px;
+}
+.form-grade label{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:2px;
+}
+.form-grade .largo{
+    grid-column:1 / -1;
+}
+.subtitulo-form{
+    margin:10px 0 4px;
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+
+/* ===== Cadastro de transportadoras e motoristas ===== */
+.modal-motoristas{
+    max-width:440px;
+}
+.modal-agenda label.rotulo-modal{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:2px;
+}
+.sep-modal{
+    margin:14px 0;
+    border:none;
+    border-top:1px solid #334155;
+}
+.mot-linha{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 10px;
+    margin-bottom:5px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:8px;
+}
+.mot-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.mot-vazio{
+    color:#94a3b8;
+    font-size:13px;
+    padding:8px 0;
+}
+.mot-novo{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+}
+.mot-novo input{
+    margin:0;
+    flex:1;
+}
+.mot-novo button{
+    margin:0;
+}
+
+@media(max-width:600px){
+    .form-grade{
+        grid-template-columns:1fr;
+    }
+}

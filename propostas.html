@@ -10,79 +10,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="icon.png">
 
-<style>
-/* ===== Engrenagem + modal de configurações ===== */
-.card-com-engrenagem{
-    position:relative;
-}
-.btn-engrenagem{
-    position:absolute;
-    top:12px;
-    right:12px;
-    width:auto;
-    margin:0;
-    padding:4px 8px;
-    font-size:18px;
-    line-height:1;
-    background:transparent;
-    border:1px solid transparent;
-    border-radius:8px;
-    cursor:pointer;
-}
-.btn-engrenagem:hover{
-    background:rgba(148,163,184,.2);
-}
-.modal-overlay{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:1000;
-    background:rgba(0,0,0,.6);
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-}
-.modal-overlay.aberto{
-    display:flex;
-}
-.modal-config{
-    width:100%;
-    max-width:380px;
-    background:#1e293b;
-    color:#e2e8f0;
-    border:1px solid #334155;
-    border-radius:12px;
-    padding:18px 20px 20px;
-    box-shadow:0 10px 30px rgba(0,0,0,.5);
-}
-.modal-config-topo{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:10px;
-}
-.modal-config-topo h3{
-    margin:0;
-}
-.modal-config .btn-fechar{
-    width:auto;
-    margin:0;
-    padding:2px 10px;
-    font-size:20px;
-    line-height:1.2;
-}
-.modal-config .btn-toggle{
-    display:block;
-    width:100%;
-    margin:10px 0 2px;
-    text-align:left;
-}
-.modal-config .dica{
-    margin:0 0 6px;
-    font-size:12px;
-    color:#94a3b8;
-}
-</style>
+<link rel="stylesheet" href="css/propostas.css">
 
 
 </head>
@@ -415,9 +343,24 @@ MODAL DE CONFIGURAÇÕES
 <script src="js/auth-guard.js"></script>
 
 <script src="js/helpers.js"></script>
+<script src="js/busca-fretes.js"></script>
+<script src="js/status.js"></script>
 <script src="js/menu.js"></script>
-<script src="js/propostas-dados.js"></script>
+<script src="js/propostas-estado.js"></script>
+<script src="js/propostas-tabelas-precos.js"></script>
+<script src="js/propostas-tabelas-fretes.js"></script>
+<script src="js/propostas-avisos.js"></script>
+<script src="js/propostas-equipamentos.js"></script>
+<script src="js/propostas-valor-tabela.js"></script>
+<script src="js/propostas-fretes-painel.js"></script>
+<script src="js/propostas-desconto.js"></script>
+<script src="js/propostas-desconto-calculo.js"></script>
+<script src="js/propostas-cache.js"></script>
+<script src="js/propostas-config.js"></script>
+<script src="js/proposta-zap.js"></script>
 <script src="js/propostas-textos.js"></script>
+<script src="js/proposta-zap.js"></script>
+<script src="js/propostas-init.js"></script>
 
 </body>
 

@@ -1,0 +1,410 @@
+/* ===== Agenda ===== */
+/* o card se ajusta ao conteúdo (não estica em tela grande) */
+.card-agenda{
+    width:fit-content;
+    min-width:min(100%, 900px);
+    max-width:100%;
+    text-align:left;
+}
+.barra-agenda{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:10px;
+}
+.barra-agenda select{
+    width:auto;
+    margin:0;
+    flex:1;
+    min-width:140px;
+}
+.barra-agenda button{
+    margin:0;
+}
+.btn-secundario{
+    background:#475569;
+}
+.btn-secundario:hover{
+    background:#334155;
+}
+.btn-perigo{
+    background:#dc2626;
+}
+.btn-perigo:hover{
+    background:#b91c1c;
+}
+/* ===== Filtro de datas (estilo Excel) ===== */
+.filtro-datas,
+.filtro-status{
+    position:relative;
+}
+.filtro-datas > button.filtrando,
+.filtro-status > button.filtrando{
+    background:#2563eb;
+}
+.painel-datas,
+.painel-status{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:60;
+    width:300px;
+    max-width:90vw;
+    padding:10px;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.painel-datas.aberto,
+.painel-status.aberto{
+    display:block;
+}
+.painel-status{
+    width:250px;
+}
+.contagem-status{
+    margin-left:auto;
+    font-size:12px;
+    color:#94a3b8;
+}
+.atalhos-datas{
+    display:flex;
+    gap:6px;
+    margin-bottom:8px;
+}
+.atalhos-datas button{
+    margin:0;
+    padding:6px 10px;
+    font-size:12px;
+}
+.painel-datas input[type="text"]{
+    margin:0 0 8px;
+    padding:6px 8px;
+    font-size:13px;
+}
+.data-opcao{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:4px 6px;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+}
+.data-opcao:hover{
+    background:#334155;
+}
+.data-opcao input{
+    width:auto;
+    margin:0;
+    padding:0;
+}
+.data-todas{
+    font-weight:bold;
+    border-bottom:1px solid #334155;
+    border-radius:6px 6px 0 0;
+}
+.lista-datas{
+    max-height:260px;
+    overflow-y:auto;
+    padding-top:4px;
+}
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+}
+.chip{
+    margin:0;
+    padding:8px 14px;
+    background:#334155;
+}
+.chip:hover{
+    background:#475569;
+}
+.chip.ativo{
+    background:#2563eb;
+}
+.contagem-agenda{
+    color:#94a3b8;
+    font-size:13px;
+    margin:0 0 8px;
+}
+.agenda-vazia{
+    color:#94a3b8;
+    text-align:center;
+    padding:24px 0;
+}
+
+.modos{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:10px;
+}
+.modo-btn{
+    margin:0;
+    padding:10px 22px;
+    background:#334155;
+}
+.modo-btn:hover{
+    background:#475569;
+}
+.modo-btn.ativo{
+    background:#2563eb;
+}
+.dica-modo{
+    margin:0 0 10px;
+    font-size:12px;
+    color:#94a3b8;
+    text-align:center;
+}
+
+/* ===== Lista (tabela: as colunas se ajustam ao texto e ficam alinhadas) ===== */
+#listaAgenda{
+    overflow-x:auto;
+}
+.ag-tabela{
+    border-collapse:separate;
+    border-spacing:0 3px;
+    width:auto;
+    max-width:100%;
+}
+.ag-tabela p{
+    margin:0;
+}
+.ag-tabela thead th{
+    padding:4px 10px;
+    font-size:11px;
+    font-weight:bold;
+    text-align:left;
+    text-transform:uppercase;
+    color:#94a3b8;
+    border-bottom:1px solid #334155;
+    white-space:nowrap;
+}
+.ag-tabela thead th + th{
+    border-left:1px dashed #475569;
+}
+.ag-tabela thead th.ag-cab-horario{
+    text-align:center;
+}
+/* título arrastável (muda a ordem das colunas) */
+.ag-tabela thead th.ag-cab-coluna{
+    cursor:grab;
+    user-select:none;
+}
+.ag-tabela thead th.ag-cab-coluna:hover{
+    color:#e5e7eb;
+}
+.ag-tabela thead th.arrastando{
+    opacity:.4;
+}
+.ag-tabela thead th.solta-antes{
+    box-shadow:inset 3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.solta-depois{
+    box-shadow:inset -3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.ag-cab-proposta{
+    border-left:2px dashed #334155;
+    text-align:center;
+}
+.ag-tabela thead th.ag-cab-lado{
+    border:none;
+}
+
+/* cabeçalho de cada dia (a cor do dia vem da variável --cor-dia) */
+tr.ag-dia{
+    --cor-dia:#94a3b8;
+}
+tr.ag-dia th{
+    padding:3px 12px;
+    font-size:14px;
+    text-align:left;
+    text-transform:capitalize;
+    background:var(--cor-dia);
+    color:#0f172a;
+    border-radius:6px;
+    background-clip:padding-box;
+}
+tr.ag-dia:not(:first-child) th{
+    border-top:8px solid transparent;
+}
+
+/* linha de cada agendamento */
+tr.ag-item{
+    --cor-dia:#94a3b8;
+}
+tr.ag-item td{
+    padding:2px 10px;
+    font-size:13px;
+    line-height:1.25;
+    vertical-align:middle;
+    background:#0f172a;
+    background:color-mix(in srgb, var(--cor-dia) 16%, #0f172a);
+    border-top:1px solid var(--cor-dia);
+    border-bottom:1px solid var(--cor-dia);
+}
+tr.ag-item td + td{
+    border-left:1px dashed #475569;
+}
+tr.ag-item td:first-child{
+    border-left:6px solid var(--cor-dia);
+    border-radius:8px 0 0 8px;
+}
+tr.ag-item td:last-child{
+    border-right:1px solid var(--cor-dia);
+    border-radius:0 8px 8px 0;
+}
+tr.ag-item[data-status="Cancelado"] td,
+tr.ag-item[data-status="Concluído"] td{
+    opacity:.55;
+}
+.ag-conteudo{
+    overflow-wrap:anywhere;
+}
+/* colunas curtas (período, status, motorista...): nunca quebram de linha */
+.ag-sem-quebra{
+    white-space:nowrap;
+}
+.ag-hora{
+    font-weight:bold;
+    font-size:14px;
+    text-align:center;
+    white-space:nowrap;
+}
+.ag-hora.ag-hora-texto{
+    font-size:11px;
+}
+.ag-patrimonio{
+    font-weight:bold;
+}
+
+/* status: a própria etiqueta troca o status ao clicar */
+tr.ag-item select.tag-select{
+    -webkit-appearance:none;
+    appearance:none;
+    width:auto;
+    margin:0;
+    padding:1px 9px;
+    border:none;
+    border-radius:999px;
+    font-family:inherit;
+    font-size:11px;
+    font-weight:bold;
+    color:#e5e7eb;
+    text-align:center;
+    cursor:pointer;
+}
+tr.ag-item select.tag-select option{
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.tag{
+    display:inline-block;
+    padding:1px 8px;
+    border-radius:999px;
+    background:#334155;
+    color:#e5e7eb;
+    font-size:11px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+.tag[data-tipo="Entrega"]{
+    background:#1d4ed8;
+}
+.tag[data-tipo="Coleta"]{
+    background:#b45309;
+}
+.tag[data-tipo="Transferência"]{
+    background:#7e22ce;
+}
+.tag[data-tipo="Troca técnica"]{
+    background:#0f766e;
+}
+.tag.sem-transp{
+    background:#991b1b;
+}
+.tag[data-status="A confirmar"]{
+    background:#a16207;
+}
+.tag[data-status="Confirmado"]{
+    background:#1d4ed8;
+}
+.tag[data-status="Em rota"]{
+    background:#c2410c;
+}
+.tag[data-status="Concluído"]{
+    background:#15803d;
+}
+.tag[data-status="Cancelado"]{
+    background:#475569;
+}
+
+.ag-local{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+}
+.ag-local-texto{
+    font-weight:bold;
+    color:#e5e7eb;
+}
+.ag-local-endereco{
+    color:#cbd5e1;
+}
+.ag-link{
+    display:block;
+    font-size:11px;
+    color:#60a5fa;
+    word-break:break-all;
+}
+.ag-extra{
+    color:#cbd5e1;
+}
+
+/* proposta e botões da linha: ficam à direita do traço de corte,
+   fora da área do print */
+tr.ag-item td.ag-proposta{
+    padding-left:14px;
+    padding-right:14px;
+    font-size:12px;
+    color:#cbd5e1;
+    text-align:center;
+    white-space:nowrap;
+    border-left:2px dashed #334155;
+}
+tr.ag-item td.ag-lado{
+    padding-left:14px;
+    border-left:1px dashed #475569;
+}
+.ag-botoes{
+    display:flex;
+    gap:16px;
+    align-items:center;
+}
+.ag-botoes button{
+    margin:0;
+    padding:5px 10px;
+}
+.ag-botoes .btn-zap{
+    background:#16a34a;
+}
+.ag-botoes .btn-zap:hover{
+    background:#15803d;
+}
+.ag-botoes .btn-coleta{
+    background:#b45309;
+}
+.ag-botoes .btn-coleta:hover{
+    background:#92400e;
+}
+.ag-botoes .btn-excluir-ag{
+    margin-left:12px;
+}

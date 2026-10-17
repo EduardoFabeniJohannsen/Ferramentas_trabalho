@@ -1,0 +1,121 @@
+/* ===== Fundo claro (opção, escolhida no botão da barra) ===== */
+/* tons pastéis: se quiser mais claro ou mais escuro, é só mexer nestas cores */
+body.tema-claro{
+    --claro-fundo:#d3deed;      /* fundo da página */
+    --claro-card:#e3ebf6;       /* card, formulários e modais */
+    --claro-campo:#f1f5fb;      /* campos de digitação */
+    --claro-linha:#9db0ca;      /* bordas e traços */
+    --claro-botao:#bccbe1;      /* botões neutros (filtros, modos) */
+    --claro-mistura:42%;        /* quanto da cor do dia entra no fundo da linha */
+    background:var(--claro-fundo);
+    color:#0f172a;
+}
+body.tema-claro .card{
+    background:var(--claro-card);
+    box-shadow:0 8px 22px rgba(30,41,59,.14);
+}
+body.tema-claro input,
+body.tema-claro select{
+    background:var(--claro-campo);
+    color:#0f172a;
+    border-color:var(--claro-linha);
+}
+body.tema-claro .contagem-agenda,
+body.tema-claro .dica-modo,
+body.tema-claro .agenda-vazia,
+body.tema-claro .mot-vazio{
+    color:#52617a;
+}
+body.tema-claro .chip,
+body.tema-claro .modo-btn{
+    background:var(--claro-botao);
+    color:#0f172a;
+}
+body.tema-claro .chip:hover,
+body.tema-claro .modo-btn:hover{
+    background:var(--claro-linha);
+}
+body.tema-claro .chip.ativo,
+body.tema-claro .modo-btn.ativo{
+    background:#2563eb;
+    color:#ffffff;
+}
+body.tema-claro .ag-tabela thead th{
+    color:#3b4a63;
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .ag-tabela thead th + th,
+body.tema-claro tr.ag-item td + td,
+body.tema-claro .ag-tabela thead th.ag-cab-proposta,
+body.tema-claro tr.ag-item td.ag-proposta,
+body.tema-claro tr.ag-item td.ag-lado{
+    border-left-color:var(--claro-linha);
+}
+body.tema-claro tr.ag-dia th{
+    background:var(--cor-dia);
+    background:color-mix(in srgb, var(--cor-dia) 78%, var(--claro-card));
+}
+body.tema-claro tr.ag-item td{
+    background:var(--claro-card);
+    background:color-mix(in srgb, var(--cor-dia) var(--claro-mistura), var(--claro-card));
+    color:#0f172a;
+}
+body.tema-claro tr.ag-item td.ag-proposta{
+    color:#3b4a63;
+}
+body.tema-claro tr.ag-item select.tag-select option{
+    background:var(--claro-campo);
+    color:#0f172a;
+}
+body.tema-claro .ag-local-texto{
+    color:#0f172a;
+}
+body.tema-claro .ag-local-endereco,
+body.tema-claro .ag-extra{
+    color:#2c3a52;
+}
+body.tema-claro .ag-link{
+    color:#1d4ed8;
+}
+body.tema-claro .modal-agenda{
+    background:var(--claro-card);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .modal-agenda-topo{
+    background:var(--claro-card);
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .form-grade label,
+body.tema-claro .modal-agenda label.rotulo-modal{
+    color:#3b4a63;
+}
+body.tema-claro .subtitulo-form{
+    color:#2c3a52;
+}
+body.tema-claro .aviso-rascunho{
+    color:#a14a09;
+}
+body.tema-claro .mot-linha{
+    background:var(--claro-campo);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .contagem-status{
+    color:#52617a;
+}
+body.tema-claro .painel-datas,
+body.tema-claro .painel-status{
+    background:var(--claro-card);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .data-opcao:hover{
+    background:var(--claro-botao);
+}
+body.tema-claro .data-todas{
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .ag-tabela thead th.ag-cab-coluna:hover{
+    color:#0f172a;
+}
+body.tema-claro .sep-modal{
+    border-top-color:var(--claro-linha);
+}

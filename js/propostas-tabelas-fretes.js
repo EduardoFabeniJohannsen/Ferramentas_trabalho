@@ -53,6 +53,26 @@ async function carregarFretes(){
 
     tabelaFretesSalvaEm = "";
 
+    // Frete só pra quem tem a permissão "fretes" (o RLS também barra).
+    // Sem ela, nem consulta nem usa a cópia offline: o painel some e
+    // cidade e frete são digitados à mão, sem aviso de erro.
+    await carregarPerfil();
+
+    if(!temAcesso("fretes")){
+
+        tabelasFrete = {};
+
+        nomesCidades = {};
+
+        const painel = $("painelFretes");
+
+        if(painel) painel.style.display = "none";
+
+        preencherListaCidades();
+
+        return;
+    }
+
     try{
 
         const { data, error } =

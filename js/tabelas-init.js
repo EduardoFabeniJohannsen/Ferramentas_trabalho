@@ -54,6 +54,8 @@ function alternarModoEdicao(){
     // todo mundo consulta; só o admin vê o botão de editar
     ehAdminLogado = await ehAdmin();
 
+    await carregarPerfil();
+
     if(ehAdminLogado){
 
         $("btnModoEdicao").style.display = "";
@@ -61,7 +63,10 @@ function alternarModoEdicao(){
 
     const select = $("selectTabela");
 
-    Object.keys(TABELAS).forEach(chave => {
+    // só as tabelas que o usuário pode ver (fretes exigem a permissão)
+    Object.keys(TABELAS)
+        .filter(chave => !TABELAS[chave].recurso || temAcesso(TABELAS[chave].recurso))
+        .forEach(chave => {
 
         const opcao = document.createElement("option");
 

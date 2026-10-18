@@ -18,6 +18,8 @@
 // ======================================
 // obrigatorio = não aceita vazio
 // tipo "numeric" = número (aceita vírgula, ex: 1.234,56)
+// recurso = permissão necessária pra ver a tabela (ver perfis /
+// auth-guard.js); sem "recurso", todo usuário com acesso à página vê
 
 const TABELAS = {
 
@@ -39,6 +41,8 @@ const TABELAS = {
 
         nome: "Fretes (tabela_fretes)",
 
+        recurso: "fretes",
+
         colunas: [
             { campo: "transportadora", tipo: "text", obrigatorio: true },
             { campo: "modelo", tipo: "text", obrigatorio: true },
@@ -54,6 +58,8 @@ const TABELAS = {
 
         nome: "Frete Dionizio (frete_dionizio)",
 
+        recurso: "fretes",
+
         colunas: [
             { campo: "modelo", tipo: "text", obrigatorio: true },
             { campo: "cidade", tipo: "text", obrigatorio: true },
@@ -67,6 +73,8 @@ const TABELAS = {
     frete_magnus: {
 
         nome: "Frete Magnus (frete_magnus)",
+
+        recurso: "fretes",
 
         colunas: [
             { campo: "modelo", tipo: "text", obrigatorio: true },

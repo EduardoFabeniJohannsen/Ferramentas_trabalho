@@ -10,6 +10,24 @@
 
 (async function init(){
 
+    // filiais que o usuário pode ver (tabela "perfis")
+    await carregarPerfil();
+
+    const liberadas =
+        Object.keys(FILIAIS).filter(chave => temFilial(chave));
+
+    if(!liberadas.length){
+
+        $("estoqueAtualizado").innerText =
+            "Sem acesso a nenhuma filial do estoque. Fale com o administrador.";
+
+        document.querySelector(".troca-filial").style.display = "none";
+
+        document.querySelector(".barra-upload").style.display = "none";
+
+        return;
+    }
+
     try{
 
         const salva =
@@ -22,6 +40,23 @@
         filialAtual = "ITAJAI";
     }
 
+    // filial salva (ou padrão) sem acesso: usa a primeira liberada
+    if(!liberadas.includes(filialAtual)) filialAtual = liberadas[0];
+
+    // esconde o botão das filiais sem acesso (e a troca, se sobrou só uma)
+    document.querySelectorAll(".btn-filial").forEach(botao => {
+
+        if(!liberadas.includes(botao.dataset.filial)){
+
+            botao.style.display = "none";
+        }
+    });
+
+    if(liberadas.length === 1){
+
+        document.querySelector(".troca-filial").style.display = "none";
+    }
+
     atualizarFilialNaTela();
 
     $("btnEnviarEstoque").addEventListener(
@@ -32,18 +67,6 @@
     $("arquivoEstoque").addEventListener(
         "change",
         lerArquivo
-    );
-
-    // busca por modelo: redesenha a tela com o que já está carregado
-    $("buscaModelo").addEventListener(
-        "input",
-        () => {
-
-            if(dadosExibidos && $("resumoEstoque").innerHTML){
-
-                desenharResumo(dadosExibidos);
-            }
-        }
     );
 
     await carregarResumoPublicado(false);

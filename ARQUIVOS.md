@@ -11,14 +11,22 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **agenda.html**: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-banco → agenda-filtros → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-rascunho → agenda-modal → agenda-salvar → agenda-coleta → agenda-init
 
-**estoque.html**: supabase-config → auth-guard → helpers → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
+**estoque.html**: supabase-config → auth-guard → helpers → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-dados → estoque-upload → estoque-init
 
 **tabelas.html**: supabase-config → auth-guard → helpers → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
 **WEG.html**: supabase-config → auth-guard → helpers → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
+**admin.html**: supabase-config → auth-guard → helpers → menu → admin-config → admin-dados → admin-tela → admin-init
+
 ## Arquivos (responsabilidade e funções)
 
+- `admin-config.js` (42 linhas): Acessos e filiais que o admin pode liberar; estado da tela.
+- `admin-dados.js` (66 linhas): Ler e salvar os perfis (tabela perfis).
+  - carregarPerfisAdmin, salvarPerfilAdmin
+- `admin-init.js` (18 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `admin-tela.js` (179 linhas): Tabela de usuários com caixinhas de acesso e filial.
+  - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis
 - `agenda-banco.js` (250 linhas): Leitura/gravação dos agendamentos e recarga geral (agendamentos, motoristas, transportadoras).
   - doBanco, paraBanco, detalhesErro, carregarAgenda, inserirAgendamento, atualizarAgendamento, excluirAgendamentoBanco, recarregarAgenda
 - `agenda-coleta.js` (67 linhas): Cria uma coleta já preenchida a partir de uma entrega.
@@ -57,25 +65,26 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - criar, dataISO, corDoDia, tituloDoDia
 - `agenda-zap.js` (276 linhas): Texto de agendamento copiado para o grupo da transportadora.
   - textoDataZap, ehLocalWR, modeloDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
+- `auth-guard.js` (376 linhas): Login obrigatório, perfil/permissões do usuário e bloqueio de página sem acesso. Carregado logo depois do supabase-config.
+  - existeLoginSalvo, ehAdmin, carregarPerfil, buscarPerfil, salvarPerfilCache, lerPerfilCache, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES e buscarLinhasFretes().
   - buscarLinhasFretes
-- `estoque-busca.js` (114 linhas): Barra de pesquisa por modelo (um card com todos os patrimônios e status).
-  - textoBusca, modelosDaBusca, htmlCardBusca, htmlBusca
-- `estoque-config.js` (95 linhas): Status, tipos (letras do patrimônio: 2ª = A/T/TL/Q/M, 3ª = E/D), filiais e estado.
+- `estoque-config.js` (94 linhas): Status, tipos, listas fixas, filiais e estado.
 - `estoque-dados.js` (101 linhas): Carregar resumo publicado e trocar de filial.
   - carregarResumoPublicado, atualizarFilialNaTela, trocarFilial
-- `estoque-grupos.js` (94 linhas): Agrupa modelos por tipo (letras do patrimônio) para cada status.
-  - tipoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
-- `estoque-init.js` (63 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `estoque-grupos.js` (107 linhas): Agrupa modelos por tipo para cada status.
+  - prefixoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
+- `estoque-init.js` (86 linhas): Ligações iniciais e filiais liberadas pro usuário. Sempre o ÚLTIMO script da página.
 - `estoque-parser.js` (296 linhas): Relatório bruto -> resumo (resumirEstoque).
   - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, resumirEstoque
-- `estoque-render.js` (223 linhas): HTML dos cards de status e avisos; patrimônios dos locados por previsão de retorno.
-  - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
+- `estoque-render.js` (179 linhas): HTML dos cards de status e avisos.
+  - escaparHtml, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (123 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
 - `helpers.js` (178 linhas): Versão do sistema, $, formatadores, copiar() e mostrarToast().
 - `index-ferramentas.js` (274 linhas): Ferramentas da página inicial.
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
+- `menu.js` (94 linhas): Links da topbar (lista única de páginas), só as liberadas pro usuário; Admin só pra admin.
 - `proposta-zap.js` (428 linhas): copiarPropostaZap(): mensagem completa para WhatsApp.
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
@@ -95,7 +104,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
 - `propostas-init.js` (105 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página.
-- `propostas-tabelas-fretes.js` (131 linhas): Carregamento de tabela_fretes.
+- `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes (só com a permissão "fretes").
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (191 linhas): Cópia offline (localStorage) e carregamento de tabela_precos.
   - salvarCopiaTabela, lerCopiaTabela, processarLinhasPrecos, carregarTabela
@@ -105,14 +114,14 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - preencherValorTabela
 - `status.js` (115 linhas): obterCidadeSaida() e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
   - obterCidadeSaida, gerarStatus
-- `tabelas-config.js` (101 linhas): Definição das tabelas editáveis e estado.
+- `tabelas-config.js` (109 linhas): Definição das tabelas editáveis (recurso = permissão necessária) e estado.
 - `tabelas-dados.js` (115 linhas): tratarValor() e carregarLinhasTabela().
   - tratarValor, carregarLinhasTabela
 - `tabelas-desenho.js` (242 linhas): desenharTabela() e matriz de consulta.
   - criarCampo, desenharTabela, desenharMatriz
 - `tabelas-editor.js` (292 linhas): Linhas editáveis, salvar, adicionar e excluir.
   - criarLinhaTabela, criarLinhaNova, salvarCampo, adicionarLinha, excluirLinha
-- `tabelas-init.js` (96 linhas): Alternar consulta/edição e início. Sempre o ÚLTIMO script da página.
+- `tabelas-init.js` (101 linhas): Alternar consulta/edição e início. Sempre o ÚLTIMO script da página.
   - atualizarModo, alternarModoEdicao
 - `weg-cache.js` (89 linhas): Salva/restaura o preenchimento no navegador.
   - salvarCacheWEG, restaurarCacheWEG
@@ -127,5 +136,6 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 ## CSS
 
 - `style.css`: base comum (inalterado)
+- `admin.css`: estilos da página de usuários e acessos
 - `propostas.css`, `estoque.css`, `tabelas.css`: estilos que ficavam dentro do HTML de cada página
 - `agenda.css`, `agenda-modal.css`, `agenda-tema-claro.css`: estilos da agenda (lista / formulários e modais / fundo claro)

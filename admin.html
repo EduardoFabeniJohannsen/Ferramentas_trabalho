@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Admin</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<link rel="stylesheet" href="css/admin.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <!-- links das outras páginas: montados pelo js/menu.js -->
+
+    <button onclick="fazerLogout()">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER
+========================= -->
+
+<div class="container">
+
+    <div class="card card-admin">
+
+        <h2>Usuários e acessos</h2>
+
+        <p class="dica-admin">
+            Marque as páginas e filiais de cada usuário. A alteração é salva sozinha
+            e vale no próximo carregamento da página dele. Admin sempre tem acesso a tudo.
+        </p>
+
+        <p class="dica-admin">
+            Para criar um usuário: Supabase, Authentication, Add user. Ele aparece
+            aqui só com Propostas liberada.
+        </p>
+
+        <div class="barra-admin">
+
+            <input
+                type="text"
+                id="filtroUsuarios"
+                placeholder="Filtrar por e-mail"
+                autocomplete="off"
+            >
+
+            <button type="button" onclick="carregarPerfisAdmin()">
+                ↻ Atualizar
+            </button>
+
+            <span class="contagem" id="contagemUsuarios"></span>
+
+        </div>
+
+        <div class="area-admin">
+
+            <table class="tabela-admin">
+
+                <thead id="cabecalhoAdmin"></thead>
+
+                <tbody id="corpoAdmin"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-guard.js"></script>
+
+<script src="js/helpers.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/admin-config.js"></script>
+<script src="js/admin-dados.js"></script>
+<script src="js/admin-tela.js"></script>
+<script src="js/admin-init.js"></script>
+
+</body>
+
+</html>

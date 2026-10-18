@@ -1,0 +1,72 @@
+/* ===== Admin (usuários e acessos) ===== */
+.card-admin{
+    width:100%;
+    max-width:1100px;
+    text-align:left;
+}
+.dica-admin{
+    color:#94a3b8;
+    font-size:13px;
+}
+.barra-admin{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin:12px 0;
+}
+.barra-admin input{
+    width:auto;
+    margin:0;
+    flex:1;
+    min-width:160px;
+}
+.barra-admin button{
+    margin:0;
+}
+.barra-admin .contagem{
+    color:#94a3b8;
+    font-size:13px;
+}
+.area-admin{
+    overflow:auto;
+    border:1px solid #334155;
+    border-radius:8px;
+}
+.tabela-admin{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+.tabela-admin th{
+    background:#0f172a;
+    padding:8px 10px;
+    text-align:center;
+    font-size:12px;
+    white-space:nowrap;
+    border-bottom:1px solid #334155;
+}
+.tabela-admin td{
+    padding:6px 10px;
+    text-align:center;
+    border-bottom:1px solid #334155;
+}
+.tabela-admin th.col-usuario,
+.tabela-admin td.col-usuario{
+    text-align:left;
+}
+.tabela-admin td.col-usuario{
+    font-weight:bold;
+}
+.tabela-admin .inicio-grupo{
+    border-left:2px solid #334155;
+}
+.tabela-admin input[type="checkbox"]{
+    width:auto;
+    margin:0;
+    padding:0;
+    cursor:pointer;
+}
+.tabela-admin tr.inativo td{
+    opacity:.5;
+}

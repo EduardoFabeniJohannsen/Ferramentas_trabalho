@@ -5,9 +5,11 @@
 // Em cada página aparecem todos, menos o dela mesma.
 // Os links digitados na mão em cada HTML são trocados por estes.
 // Página nova? É só somar uma linha na lista abaixo.
+// Cada usuário vê só as páginas que tem liberadas (tabela "perfis",
+// ver auth-guard.js); o link do Admin aparece só pra admin.
 // Carregar depois de helpers.js, em toda página que tem a topbar.
 
-(function montarMenuTopbar(){
+(async function montarMenuTopbar(){
 
     const PAGINAS_MENU = [
 
@@ -21,7 +23,9 @@
 
         { arquivo: "tabelas.html", rotulo: "🛠️ Tabelas" },
 
-        { arquivo: "WEG.html", rotulo: "🏢 WEG" }
+        { arquivo: "WEG.html", rotulo: "🏢 WEG" },
+
+        { arquivo: "admin.html", rotulo: "🔐 Admin" }
     ];
 
 
@@ -67,8 +71,12 @@
     }
 
 
+    // só as páginas liberadas pro usuário
+    await carregarPerfil();
+
     PAGINAS_MENU
         .filter(pagina => pagina.arquivo.toLowerCase() !== atual)
+        .filter(pagina => temAcesso(recursoDaPagina(pagina.arquivo)))
         .forEach(pagina => {
 
             const link =

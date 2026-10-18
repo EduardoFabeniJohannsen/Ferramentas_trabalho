@@ -22,6 +22,39 @@ function escaparHtml(texto){
 const STATUS_COM_PREVISAO = ["locado", "locado_manutencao"];
 
 
+// dados que estão na tela (a busca redesenha com eles)
+let dadosExibidos = null;
+
+
+// dd/mm/aaaa -> número comparável (aaaammdd). Sem data (ex: "Sem
+// previsão") vai pro fim.
+function chaveDataPrevisao(texto){
+
+    const partes =
+        String(texto || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+    return partes
+        ? Number(partes[3] + partes[2] + partes[1])
+        : 99999999;
+}
+
+
+// locados: previsão de retorno mais cedo primeiro; os demais (e o
+// desempate) por patrimônio
+function compararMaquinas(a, b, chaveStatus){
+
+    if(STATUS_COM_PREVISAO.includes(chaveStatus)){
+
+        const diferenca =
+            chaveDataPrevisao(a.r) - chaveDataPrevisao(b.r);
+
+        if(diferenca) return diferenca;
+    }
+
+    return a.p.localeCompare(b.p, "pt-BR", { numeric: true });
+}
+
+
 function htmlItemModelo(item, chaveStatus){
 
     const quantidade = item.lista.length;
@@ -39,7 +72,7 @@ function htmlItemModelo(item, chaveStatus){
     const maquinas =
         item.lista
             .slice()
-            .sort((a, b) => a.p.localeCompare(b.p, "pt-BR", { numeric: true }))
+            .sort((a, b) => compararMaquinas(a, b, chaveStatus))
             .map(maquina =>
                 `<li>
                     <span class="pat">${escaparHtml(maquina.p)}</span>${
@@ -70,6 +103,17 @@ function htmlItemModelo(item, chaveStatus){
 function desenharResumo(dados){
 
     const area = $("resumoEstoque");
+
+    dadosExibidos = dados;
+
+    const busca = textoBusca();
+
+    if(busca){
+
+        area.innerHTML = htmlBusca(dados, busca);
+
+        return;
+    }
 
     area.innerHTML =
         STATUS_ESTOQUE.map(status => {

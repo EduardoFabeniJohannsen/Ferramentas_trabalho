@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "14.1.0";
+const VERSAO_SISTEMA = "14.2.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;

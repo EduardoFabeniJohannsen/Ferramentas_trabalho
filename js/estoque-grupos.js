@@ -1,18 +1,24 @@
 // ======================================
 // ESTOQUE - MONTAR GRUPOS
 // ======================================
-// Agrupa modelos por tipo para cada status.
+// Agrupa modelos por tipo (letras do patrimônio) para cada status.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
 // MONTAR GRUPOS (por status)
 // ======================================
 
-function prefixoDoModelo(modelo){
+// tipo = letras depois do W (WAE18 -> AE, WTLD25 -> TLD, WQ12 -> Q).
+// SUB e INUTI são tipos à parte. Vazio = tipo desconhecido.
+function tipoDoModelo(modelo){
 
     if(modelo.startsWith("INUTI")) return "INUTI";
 
-    return modelo.slice(0, 3);
+    if(modelo.startsWith("SUB")) return "SUB";
+
+    const partes = modelo.match(/^W(TL|A|T|Q|M)([ED]?)\d/);
+
+    return partes ? partes[1] + partes[2] : "";
 }
 
 
@@ -46,35 +52,19 @@ function montarGrupos(chave, mapaModelos){
 
         const itens = [];
 
-        // Disponível: lista fixa primeiro (mostra 0)
-        if(chave === "disponivel"){
+        // só entram modelos com máquina (quantidade 0 não aparece)
+        Object.keys(mapaModelos)
+            .filter(modelo => tipoDoModelo(modelo) === tipo.codigo)
+            .sort(ordenarModelos)
+            .forEach(modelo => {
 
-            (LISTA_FIXA_DISPONIVEL[tipo.prefixo] || [])
-                .forEach(modelo => {
+                usados.add(modelo);
 
-                    usados.add(modelo);
-
-                    itens.push({
-                        rotulo: rotulo(modelo),
-                        lista: mapaModelos[modelo] || []
-                    });
+                itens.push({
+                    rotulo: rotulo(modelo),
+                    lista: mapaModelos[modelo]
                 });
-
-        }else{
-
-            Object.keys(mapaModelos)
-                .filter(modelo => prefixoDoModelo(modelo) === tipo.prefixo)
-                .sort(ordenarModelos)
-                .forEach(modelo => {
-
-                    usados.add(modelo);
-
-                    itens.push({
-                        rotulo: rotulo(modelo),
-                        lista: mapaModelos[modelo]
-                    });
-                });
-        }
+            });
 
         if(itens.length){
 
@@ -82,7 +72,7 @@ function montarGrupos(chave, mapaModelos){
         }
     });
 
-    // o que sobrou (modelos fora dos tipos conhecidos ou fora da lista fixa)
+    // o que sobrou (tipos desconhecidos)
     const restantes =
         Object.keys(mapaModelos)
             .filter(modelo => !usados.has(modelo))
@@ -95,10 +85,7 @@ function montarGrupos(chave, mapaModelos){
     if(restantes.length){
 
         grupos.push({
-            titulo:
-                chave === "disponivel"
-                    ? TITULO_OUTROS_MODELOS
-                    : TITULO_OUTROS,
+            titulo: TITULO_OUTROS,
             itens: restantes
         });
     }

@@ -34,6 +34,18 @@
         lerArquivo
     );
 
+    // busca por modelo: redesenha a tela com o que já está carregado
+    $("buscaModelo").addEventListener(
+        "input",
+        () => {
+
+            if(dadosExibidos && $("resumoEstoque").innerHTML){
+
+                desenharResumo(dadosExibidos);
+            }
+        }
+    );
+
     await carregarResumoPublicado(false);
 
     // ao voltar pra aba, puxa o resumo mais novo de quem publicou

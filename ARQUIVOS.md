@@ -11,7 +11,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **agenda.html**: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-banco → agenda-filtros → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-rascunho → agenda-modal → agenda-salvar → agenda-coleta → agenda-init
 
-**estoque.html**: supabase-config → auth-guard → helpers → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-dados → estoque-upload → estoque-init
+**estoque.html**: supabase-config → auth-guard → helpers → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
 
 **tabelas.html**: supabase-config → auth-guard → helpers → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
@@ -59,16 +59,18 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - textoDataZap, ehLocalWR, modeloDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES e buscarLinhasFretes().
   - buscarLinhasFretes
-- `estoque-config.js` (94 linhas): Status, tipos, listas fixas, filiais e estado.
+- `estoque-busca.js` (114 linhas): Barra de pesquisa por modelo (um card com todos os patrimônios e status).
+  - textoBusca, modelosDaBusca, htmlCardBusca, htmlBusca
+- `estoque-config.js` (95 linhas): Status, tipos (letras do patrimônio: 2ª = A/T/TL/Q/M, 3ª = E/D), filiais e estado.
 - `estoque-dados.js` (101 linhas): Carregar resumo publicado e trocar de filial.
   - carregarResumoPublicado, atualizarFilialNaTela, trocarFilial
-- `estoque-grupos.js` (107 linhas): Agrupa modelos por tipo para cada status.
-  - prefixoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
-- `estoque-init.js` (51 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `estoque-grupos.js` (94 linhas): Agrupa modelos por tipo (letras do patrimônio) para cada status.
+  - tipoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
+- `estoque-init.js` (63 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
 - `estoque-parser.js` (296 linhas): Relatório bruto -> resumo (resumirEstoque).
   - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, resumirEstoque
-- `estoque-render.js` (179 linhas): HTML dos cards de status e avisos.
-  - escaparHtml, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
+- `estoque-render.js` (223 linhas): HTML dos cards de status e avisos; patrimônios dos locados por previsão de retorno.
+  - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (123 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
 - `helpers.js` (178 linhas): Versão do sistema, $, formatadores, copiar() e mostrarToast().

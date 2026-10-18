@@ -37,44 +37,45 @@ const STATUS_ESTOQUE = [
     { chave: "a_vender", nome: "A vender", excel: "A Vender" }
 ];
 
-// tipo do equipamento = 3 primeiras letras do patrimônio
-// (a ordem aqui é a ordem dos grupos na tela)
+// tipo do equipamento = letras do patrimônio depois do W:
+// 1ª letra: W (logo da empresa, não significa nada)
+// 2ª letra: A articulada, T tesoura, TL telescópica, Q quick up, M mastro
+// 3ª letra: motor, E elétrico ou D diesel (quick up pode vir sem motor)
+// Depois vêm os números (altura). Ex: WAE18 -> AE, WTLD25 -> TLD.
+// "codigo" = essas letras. A ordem aqui é a ordem dos grupos na tela.
 const TIPOS_ESTOQUE = [
 
-    { prefixo: "WTE", titulo: "TESOURAS ELÉTRICAS" },
+    { codigo: "TE", titulo: "TESOURAS ELÉTRICAS" },
 
-    { prefixo: "WAE", titulo: "ARTICULADAS ELÉTRICAS" },
+    { codigo: "AE", titulo: "ARTICULADAS ELÉTRICAS" },
 
-    { prefixo: "WME", titulo: "MASTRO ELÉTRICO" },
+    { codigo: "ME", titulo: "MASTRO ELÉTRICO" },
 
-    { prefixo: "WAD", titulo: "ARTICULADAS A DIESEL" },
+    { codigo: "AD", titulo: "ARTICULADAS A DIESEL" },
+
+    { codigo: "TD", titulo: "TESOURAS A DIESEL" },
+
+    { codigo: "TLE", titulo: "TELESCÓPICAS ELÉTRICAS" },
+
+    { codigo: "TLD", titulo: "TELESCÓPICAS A DIESEL" },
+
+    { codigo: "MD", titulo: "MASTRO A DIESEL" },
+
+    { codigo: "QE", titulo: "QUICK UP ELÉTRICO" },
+
+    { codigo: "Q", titulo: "QUICK UP" },
 
     // prefixos que NÃO são o mesmo modelo do normal (SUBWAD20 != WAD20)
-    { prefixo: "SUB", titulo: "SUB" },
+    { codigo: "SUB", titulo: "SUB" },
 
-    { prefixo: "INUTI", titulo: "INUTI" }
+    { codigo: "INUTI", titulo: "INUTI" }
 ];
 
 const TITULO_OUTROS = "OUTROS";
 
-// bloco "Disponível": lista fixa (aparece mesmo com 0), igual
-// ao resumo manual. Modelo fora daqui entra em "OUTROS MODELOS".
-const LISTA_FIXA_DISPONIVEL = {
-
-    WTE: ["WTE8", "WTE10", "WTE12", "WTE14", "WTE16"],
-
-    WAE: ["WAE12", "WAE14", "WAE15", "WAE16", "WAE18"],
-
-    WME: ["WME10"],
-
-    WAD: ["WAD16", "WAD20", "WAD26"]
-};
-
 // nome mostrado na tela quando difere do modelo calculado
 // (vazio: mostra o modelo como foi calculado)
 const ROTULO_MODELO = {};
-
-const TITULO_OUTROS_MODELOS = "OUTROS MODELOS";
 
 // cada filial tem a sua linha na tabela resumo_estoque (coluna id)
 const FILIAIS = {

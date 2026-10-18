@@ -70,3 +70,23 @@
 .tabela-admin tr.inativo td{
     opacity:.5;
 }
+.novo-usuario{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    padding:12px;
+    margin:12px 0 4px;
+    border:1px solid #334155;
+    border-radius:8px;
+    background:#0f172a;
+}
+.novo-usuario input{
+    width:auto;
+    margin:0;
+    flex:1;
+    min-width:200px;
+}
+.novo-usuario button{
+    margin:0;
+}

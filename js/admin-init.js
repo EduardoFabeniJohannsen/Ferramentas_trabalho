@@ -11,6 +11,18 @@
         desenharPerfis
     );
 
+    // Enter no e-mail ou na senha cria o usuário
+    ["novoEmail", "novaSenha"].forEach(id => {
+
+        $(id).addEventListener(
+            "keydown",
+            (evento) => {
+
+                if(evento.key === "Enter") criarUsuario();
+            }
+        );
+    });
+
     desenharPerfis();
 
     await carregarPerfisAdmin();

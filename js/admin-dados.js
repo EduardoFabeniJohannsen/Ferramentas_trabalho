@@ -64,3 +64,39 @@ async function salvarPerfilAdmin(perfil, dados){
 
     return true;
 }
+
+
+// Cria o usuário pela Edge Function "criar-usuario" (só admin; a
+// service_role fica no servidor). Nasce só com "propostas".
+// Devolve { id, email } ou { erro }.
+async function criarUsuarioAdmin(email, senha){
+
+    const { data, error } =
+        await supabaseClient.functions.invoke(
+            "criar-usuario",
+            { body: { email: email, senha: senha } }
+        );
+
+    if(error){
+
+        console.error("[admin] Falha ao criar usuário:", error);
+
+        let mensagem = "Erro ao criar o usuário";
+
+        // a função devolve { erro } no corpo da resposta
+        try{
+
+            const corpo = await error.context.json();
+
+            if(corpo?.erro) mensagem = corpo.erro;
+
+        }catch(erroLeitura){
+
+            // sem corpo legível: fica a mensagem padrão
+        }
+
+        return { erro: mensagem };
+    }
+
+    return { id: data.id, email: data.email };
+}

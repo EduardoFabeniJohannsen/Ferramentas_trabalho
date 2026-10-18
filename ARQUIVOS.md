@@ -22,11 +22,11 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 ## Arquivos (responsabilidade e funções)
 
 - `admin-config.js` (42 linhas): Acessos e filiais que o admin pode liberar; estado da tela.
-- `admin-dados.js` (66 linhas): Ler e salvar os perfis (tabela perfis).
-  - carregarPerfisAdmin, salvarPerfilAdmin
-- `admin-init.js` (18 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
-- `admin-tela.js` (179 linhas): Tabela de usuários com caixinhas de acesso e filial.
-  - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis
+- `admin-dados.js` (102 linhas): Ler e salvar os perfis (tabela perfis) e criar usuário (Edge Function criar-usuario).
+  - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
+- `admin-init.js` (30 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `admin-tela.js` (229 linhas): Tabela de usuários com caixinhas de acesso e filial e o formulário de novo usuário.
+  - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (250 linhas): Leitura/gravação dos agendamentos e recarga geral (agendamentos, motoristas, transportadoras).
   - doBanco, paraBanco, detalhesErro, carregarAgenda, inserirAgendamento, atualizarAgendamento, excluirAgendamentoBanco, recarregarAgenda
 - `agenda-coleta.js` (67 linhas): Cria uma coleta já preenchida a partir de uma entrega.
@@ -139,3 +139,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `admin.css`: estilos da página de usuários e acessos
 - `propostas.css`, `estoque.css`, `tabelas.css`: estilos que ficavam dentro do HTML de cada página
 - `agenda.css`, `agenda-modal.css`, `agenda-tema-claro.css`: estilos da agenda (lista / formulários e modais / fundo claro)
+
+## Supabase (Edge Functions)
+
+- `supabase/functions/criar-usuario/index.ts`: cria usuário (e-mail + senha, já confirmado). Só admin chama; a service_role fica nos segredos do Supabase, nunca no frontend. O trigger `ao_criar_usuario` cria o perfil só com "propostas". Cópia do código publicado no Supabase; não é carregada pelo site.

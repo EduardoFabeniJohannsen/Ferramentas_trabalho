@@ -177,3 +177,53 @@ function desenharPerfis(){
     $("contagemUsuarios").innerText =
         `${visiveis.length} usuário(s)`;
 }
+
+
+// ======================================
+// NOVO USUÁRIO
+// ======================================
+
+async function criarUsuario(){
+
+    const campoEmail = $("novoEmail");
+
+    const campoSenha = $("novaSenha");
+
+    const botao = $("btnCriarUsuario");
+
+    const email = campoEmail.value.trim().toLowerCase();
+
+    const senha = campoSenha.value;
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+
+        return mostrarToast("Informe um e-mail válido", true);
+    }
+
+    if(senha.length < 8){
+
+        return mostrarToast("A senha precisa ter pelo menos 8 caracteres", true);
+    }
+
+    botao.disabled = true;
+
+    const resultado = await criarUsuarioAdmin(email, senha);
+
+    botao.disabled = false;
+
+    if(resultado.erro){
+
+        return mostrarToast(resultado.erro, true);
+    }
+
+    campoEmail.value = "";
+
+    campoSenha.value = "";
+
+    // o filtro some pra o usuário novo aparecer
+    $("filtroUsuarios").value = "";
+
+    mostrarToast("Usuário criado (só Propostas liberada)");
+
+    await carregarPerfisAdmin();
+}

@@ -46,9 +46,32 @@ CONTAINER
             e vale no próximo carregamento da página dele. Admin sempre tem acesso a tudo.
         </p>
 
+        <div class="novo-usuario">
+
+            <input
+                type="text"
+                id="novoEmail"
+                placeholder="E-mail do novo usuário"
+                autocomplete="off"
+            >
+
+            <input
+                type="text"
+                id="novaSenha"
+                placeholder="Senha (mínimo 8 caracteres)"
+                autocomplete="off"
+            >
+
+            <button type="button" id="btnCriarUsuario" onclick="criarUsuario()">
+                + Criar usuário
+            </button>
+
+        </div>
+
         <p class="dica-admin">
-            Para criar um usuário: Supabase, Authentication, Add user. Ele aparece
-            aqui só com Propostas liberada.
+            O usuário nasce só com Propostas liberada e já pode entrar. Marque os
+            outros acessos na tabela. Anote a senha para passar à filial: ela não
+            aparece de novo.
         </p>
 
         <div class="barra-admin">

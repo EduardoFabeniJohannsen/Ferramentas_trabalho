@@ -1,7 +1,7 @@
 // ======================================
 // PROPOSTAS - CONFIGURAÇÕES (toggles e modal)
 // ======================================
-// Locação complementar, diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
+// Locação complementar, bitributação, diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -9,7 +9,7 @@
 // ======================================
 // Desativado por padrão. Quando ativado, muda o cálculo
 // da mensagem "Copiar Proposta Zap" (ver copiarPropostaZap
-// em propostas-textos.js).
+// em propostas-textos.js) e libera o toggle da bitributação.
 
 let locacaoComplementarAtiva = false;
 
@@ -38,6 +38,56 @@ function atualizarBotaoLocacaoComplementar(){
     botao.innerText =
         `Locação complementar: ${
             locacaoComplementarAtiva ? "Ativada" : "Desativada"
+        }`;
+
+    // o toggle da bitributação só aparece com a locação complementar
+    atualizarBotaoBitributacao();
+}
+
+
+// ======================================
+// BITRIBUTAÇÃO +20% (toggle)
+// ======================================
+// Só aparece com a locação complementar ativada. Ativada por
+// padrão (frete x 2 x 1,2). Desativada, a locação complementar
+// fica sem o acréscimo de 20% (frete x 2), e os rótulos da
+// "Copiar Proposta Zap" saem sem o "(+20%)".
+
+let bitributacaoAtiva = true;
+
+
+function alternarBitributacao(){
+
+    bitributacaoAtiva = !bitributacaoAtiva;
+
+    atualizarBotaoBitributacao();
+
+    salvarCache();
+}
+
+
+function atualizarBotaoBitributacao(){
+
+    const bloco = $("blocoBitributacao");
+
+    if(bloco){
+
+        bloco.style.display =
+            locacaoComplementarAtiva ? "" : "none";
+    }
+
+    const botao = $("btnBitributacao");
+
+    if(!botao) return;
+
+    botao.classList.toggle(
+        "ativo",
+        bitributacaoAtiva
+    );
+
+    botao.innerText =
+        `Bitributação (+20%): ${
+            bitributacaoAtiva ? "Ativada" : "Desativada"
         }`;
 }
 
@@ -203,8 +253,8 @@ function atualizarBotaoSepararPagamento(){
 // MODAL DE CONFIGURAÇÕES (engrenagem)
 // ======================================
 // Abre/fecha o modal que guarda os toggles
-// (locação complementar, valor da diária, emojis, cidade de saída,
-// linha em branco antes do pagamento).
+// (locação complementar, bitributação, valor da diária, emojis,
+// cidade de saída, linha em branco antes do pagamento).
 
 function abrirConfiguracoes(){
 

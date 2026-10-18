@@ -50,6 +50,20 @@ function copiarPropostaZap(){
     }
 
 
+    // período + campo Períodos (ver obterPeriodoProposta)
+    const infoPeriodo =
+        obterPeriodoProposta();
+
+
+    if(infoPeriodo.erro){
+
+        return mostrarToast(
+            infoPeriodo.erro,
+            true
+        );
+    }
+
+
     if(!cidade){
 
         return mostrarToast(
@@ -157,30 +171,19 @@ function copiarPropostaZap(){
     // ==================================
     // PERÍODO
     // ==================================
+    // Total de dias (usado na diária): 60 = 60; 28 + 3 períodos = 84.
+    // Dias exibidos e quantidade de períodos vêm do mesmo cálculo.
 
     const diasNumero =
-        Number(periodo);
+        infoPeriodo.diasTotal;
 
 
-    let periodoExibicao =
-        periodo;
+    const periodoExibicao =
+        infoPeriodo.diasBusca;
 
 
-    let multiplicadorPeriodo =
-        1;
-
-
-    if(
-        diasNumero > 30 &&
-        diasNumero % 30 === 0
-    ){
-
-        multiplicadorPeriodo =
-            diasNumero / 30;
-
-        periodoExibicao =
-            "30";
-    }
+    const multiplicadorPeriodo =
+        infoPeriodo.multiplicador;
 
 
     // ==================================
@@ -200,11 +203,19 @@ function copiarPropostaZap(){
     // ==================================
     // LOCAÇÃO COMPLEMENTAR (frete)
     // ==================================
+    // Frete x 2, com +20% (bitributação) quando ativada.
 
     const valorComplementar =
         locacaoComplementarAtiva
-            ? (valorFreteNumero * 2) * 1.2
+            ? (valorFreteNumero * 2) * (bitributacaoAtiva ? 1.2 : 1)
             : 0;
+
+
+    // sufixo dos rótulos: só aparece com a bitributação ativada
+    const sufixoBitributacao =
+        bitributacaoAtiva
+            ? "(+20%)"
+            : "";
 
 
     // ==================================
@@ -329,7 +340,7 @@ function copiarPropostaZap(){
 
             const rotuloTotal =
                 complementarNesteItem > 0
-                    ? "Total máquina + seguro + Frete com locação complementar(+20%)"
+                    ? `Total máquina + seguro + Frete com locação complementar${sufixoBitributacao}`
                     : "Total máquina + seguro";
 
 
@@ -379,7 +390,7 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 
     const rotuloValorFinal =
         complementarNoTotalGeral > 0
-            ? "Valor final da proposta (tudo incluso + Frete com locação complementar(+20%))"
+            ? `Valor final da proposta (tudo incluso + Frete com locação complementar${sufixoBitributacao})`
             : "Valor final da proposta (tudo incluso)";
 
 

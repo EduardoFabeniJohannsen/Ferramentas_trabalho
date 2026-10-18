@@ -50,9 +50,11 @@ function salvarCache(){
 
         nomeCliente: $("nomeCliente")?.value || "",
         periodo: $("periodo")?.value || "",
+        periodos: $("periodos")?.value || "",
         cidade: $("cidade")?.value || "",
         valorFrete: $("valorFrete")?.value || "",
         locacaoComplementarAtiva: locacaoComplementarAtiva,
+        bitributacaoAtiva: bitributacaoAtiva,
         valorDiariaAtivo: valorDiariaAtivo,
         emojisAtivo: emojisAtivo,
         cidadeSaida: cidadeSaidaAtual,
@@ -95,11 +97,16 @@ function restaurarCache(){
 
     if($("nomeCliente")) $("nomeCliente").value = dados.nomeCliente || "";
     if($("periodo")) $("periodo").value = dados.periodo || "";
+    if($("periodos")) $("periodos").value = dados.periodos || "";
     if($("cidade")) $("cidade").value = dados.cidade || "";
     if($("valorFrete")) $("valorFrete").value = dados.valorFrete || "";
 
     locacaoComplementarAtiva = dados.locacaoComplementarAtiva === true;
 
+    // ativada por padrão (cache antigo, sem o campo, fica ativada)
+    bitributacaoAtiva = dados.bitributacaoAtiva !== false;
+
+    // também mostra/esconde o botão da bitributação
     atualizarBotaoLocacaoComplementar();
 
     valorDiariaAtivo = dados.valorDiariaAtivo === true;
@@ -247,6 +254,7 @@ function limparTudo(){
 
     if($("nomeCliente")) $("nomeCliente").value = "";
     if($("periodo")) $("periodo").value = "";
+    if($("periodos")) $("periodos").value = "";
     if($("cidade")) $("cidade").value = "";
     if($("valorFrete")) $("valorFrete").value = "";
 

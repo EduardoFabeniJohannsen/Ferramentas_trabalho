@@ -69,3 +69,21 @@
     font-size:12px;
     color:#94a3b8;
 }
+
+/* ===== Período + Períodos (lado a lado) ===== */
+.periodo-linha{
+    display:flex;
+    gap:6px;
+    width:100%;
+}
+.periodo-linha input{
+    min-width:0;
+}
+.periodo-linha #periodo{
+    flex:1;
+}
+.periodo-linha #periodos{
+    width:96px;
+    flex:none;
+    text-align:center;
+}

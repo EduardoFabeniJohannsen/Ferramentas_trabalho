@@ -70,6 +70,54 @@
 
 
     // ==================================
+    // PERÍODOS (quantidade; vazio = 1)
+    // ==================================
+
+    if($("periodos")){
+
+        $("periodos")
+            .addEventListener(
+                "input",
+                () => {
+
+                    gerarTextos();
+
+                    mostrarFretes();
+
+                }
+            );
+
+        // valor inválido (letra, 0, negativo) é apagado ao
+        // sair do campo (vazio = 1 período)
+        $("periodos")
+            .addEventListener(
+                "blur",
+                () => {
+
+                    const campo = $("periodos");
+
+                    const numero =
+                        parseInt(campo.value, 10);
+
+                    if(
+                        campo.value.trim() &&
+                        (!Number.isFinite(numero) || numero < 1)
+                    ){
+
+                        campo.value = "";
+
+                        gerarTextos();
+
+                        mostrarFretes();
+
+                        salvarCache();
+                    }
+                }
+            );
+    }
+
+
+    // ==================================
     // CIDADE
     // ==================================
 

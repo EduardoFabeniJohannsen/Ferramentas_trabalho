@@ -146,13 +146,26 @@ CONTAINER
             <datalist id="listaEquipamentos"></datalist>
 
 
-            <!-- PERÍODO -->
+            <!-- PERÍODO + PERÍODOS
+                 Períodos vazio = 1. Ex: 28 + 3 = 3 períodos de 28 dias -->
 
-            <input
-                type="text"
-                id="periodo"
-                placeholder="Período"
-            >
+            <div class="periodo-linha">
+
+                <input
+                    type="text"
+                    id="periodo"
+                    placeholder="Período"
+                >
+
+                <input
+                    type="text"
+                    id="periodos"
+                    placeholder="Períodos"
+                    inputmode="numeric"
+                    title="Quantidade de períodos (vazio = 1)"
+                >
+
+            </div>
 
 
             <!-- CIDADE -->
@@ -281,6 +294,23 @@ MODAL DE CONFIGURAÇÕES
         </button>
 
         <p class="dica">Frete entra como "Locação Complementar" (+20%).</p>
+
+
+        <!-- só aparece com a locação complementar ativada -->
+        <div id="blocoBitributacao" style="display:none">
+
+            <button
+                type="button"
+                id="btnBitributacao"
+                class="btn-toggle ativo"
+                onclick="alternarBitributacao()"
+            >
+                Bitributação (+20%): Ativada
+            </button>
+
+            <p class="dica">Desativada, o frete como locação complementar entra sem o acréscimo de 20% (frete x 2).</p>
+
+        </div>
 
 
         <button

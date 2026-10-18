@@ -39,12 +39,23 @@ function gerarTextos(){
         $("periodo")?.value.trim();
 
 
+    // campo Períodos (1 = vazio)
+    const periodosCampo =
+        obterPeriodoProposta().periodosCampo;
+
+
     let periodo = "";
 
 
     if(periodoInput){
 
-        if(isNaN(periodoInput)){
+        if(periodosCampo > 1){
+
+            // 28 + 3, 30 + 2...: só a quantidade de períodos
+            periodo =
+                `${periodosCampo} PERIODOS`;
+
+        }else if(isNaN(periodoInput)){
 
             periodo =
                 periodoInput.toUpperCase();

@@ -15,18 +15,12 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **tabelas.html**: supabase-config → auth-guard → helpers → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
-**WEG.html**: supabase-config → auth-guard → helpers → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
+**transportadoras.html** (só admin): supabase-config → auth-guard → helpers → menu → transp-config → transp-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-init
 
-**admin.html**: supabase-config → auth-guard → helpers → menu → admin-config → admin-dados → admin-tela → admin-init
+**WEG.html**: supabase-config → auth-guard → helpers → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
 ## Arquivos (responsabilidade e funções)
 
-- `admin-config.js` (42 linhas): Acessos e filiais que o admin pode liberar; estado da tela.
-- `admin-dados.js` (102 linhas): Ler e salvar os perfis (tabela perfis) e criar usuário (Edge Function criar-usuario).
-  - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
-- `admin-init.js` (30 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
-- `admin-tela.js` (229 linhas): Tabela de usuários com caixinhas de acesso e filial e o formulário de novo usuário.
-  - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (250 linhas): Leitura/gravação dos agendamentos e recarga geral (agendamentos, motoristas, transportadoras).
   - doBanco, paraBanco, detalhesErro, carregarAgenda, inserirAgendamento, atualizarAgendamento, excluirAgendamentoBanco, recarregarAgenda
 - `agenda-coleta.js` (67 linhas): Cria uma coleta já preenchida a partir de uma entrega.
@@ -47,8 +41,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarCelulasAgenda, criarCabecalhoAgenda, criarItemAgenda
 - `agenda-modal.js` (214 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal.
   - abrirModalAgenda, atualizarCamposConta, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
-- `agenda-motoristas.js` (255 linhas): Carregar, adicionar e excluir motoristas; modal de cadastro.
-  - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista, abrirModalMotoristas, fecharModalMotoristas, desenharMotoristas, adicionarMotorista, excluirMotorista
+- `agenda-motoristas.js` (205 linhas): Carregar e adicionar motoristas; modal de cadastro. Excluir motorista é só admin, em transportadoras.html.
+  - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista, abrirModalMotoristas, fecharModalMotoristas, desenharMotoristas, adicionarMotorista
 - `agenda-ordem.js` (106 linhas): Ordem dentro de cada data (horário, motorista, entregas/coletas).
   - ordemEfetiva, compararHorario, ordenarAgendamentos
 - `agenda-rascunho.js` (117 linhas): Guarda no navegador o que foi digitado e não salvo.
@@ -65,8 +59,6 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - criar, dataISO, corDoDia, tituloDoDia
 - `agenda-zap.js` (276 linhas): Texto de agendamento copiado para o grupo da transportadora.
   - textoDataZap, ehLocalWR, modeloDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
-- `auth-guard.js` (376 linhas): Login obrigatório, perfil/permissões do usuário e bloqueio de página sem acesso. Carregado logo depois do supabase-config.
-  - existeLoginSalvo, ehAdmin, carregarPerfil, buscarPerfil, salvarPerfilCache, lerPerfilCache, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES e buscarLinhasFretes().
   - buscarLinhasFretes
 - `estoque-config.js` (94 linhas): Status, tipos, listas fixas, filiais e estado.
@@ -74,7 +66,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - carregarResumoPublicado, atualizarFilialNaTela, trocarFilial
 - `estoque-grupos.js` (107 linhas): Agrupa modelos por tipo para cada status.
   - prefixoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
-- `estoque-init.js` (86 linhas): Ligações iniciais e filiais liberadas pro usuário. Sempre o ÚLTIMO script da página.
+- `estoque-init.js` (51 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
 - `estoque-parser.js` (296 linhas): Relatório bruto -> resumo (resumirEstoque).
   - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, resumirEstoque
 - `estoque-render.js` (179 linhas): HTML dos cards de status e avisos.
@@ -84,7 +76,6 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `helpers.js` (178 linhas): Versão do sistema, $, formatadores, copiar() e mostrarToast().
 - `index-ferramentas.js` (274 linhas): Ferramentas da página inicial.
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
-- `menu.js` (94 linhas): Links da topbar (lista única de páginas), só as liberadas pro usuário; Admin só pra admin.
 - `proposta-zap.js` (428 linhas): copiarPropostaZap(): mensagem completa para WhatsApp.
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
@@ -104,7 +95,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
 - `propostas-init.js` (105 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página.
-- `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes (só com a permissão "fretes").
+- `propostas-tabelas-fretes.js` (131 linhas): Carregamento de tabela_fretes.
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (191 linhas): Cópia offline (localStorage) e carregamento de tabela_precos.
   - salvarCopiaTabela, lerCopiaTabela, processarLinhasPrecos, carregarTabela
@@ -114,15 +105,29 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - preencherValorTabela
 - `status.js` (115 linhas): obterCidadeSaida() e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
   - obterCidadeSaida, gerarStatus
-- `tabelas-config.js` (109 linhas): Definição das tabelas editáveis (recurso = permissão necessária) e estado.
+- `tabelas-config.js` (101 linhas): Definição das tabelas editáveis e estado.
 - `tabelas-dados.js` (115 linhas): tratarValor() e carregarLinhasTabela().
   - tratarValor, carregarLinhasTabela
 - `tabelas-desenho.js` (242 linhas): desenharTabela() e matriz de consulta.
   - criarCampo, desenharTabela, desenharMatriz
 - `tabelas-editor.js` (292 linhas): Linhas editáveis, salvar, adicionar e excluir.
   - criarLinhaTabela, criarLinhaNova, salvarCampo, adicionarLinha, excluirLinha
-- `tabelas-init.js` (101 linhas): Alternar consulta/edição e início. Sempre o ÚLTIMO script da página.
+- `tabelas-init.js` (96 linhas): Alternar consulta/edição e início. Sempre o ÚLTIMO script da página.
   - atualizarModo, alternarModoEdicao
+- `transp-banco.js` (259 linhas): Supabase da página de transportadoras: lista, dados por transportadora, veículos e motoristas.
+  - exigirDados, detalhesErroTransp, carregarListaTransportadoras, carregarDadosTransportadora, salvarVeiculoBanco, excluirVeiculoBanco, adicionarMotoristaBanco, salvarDadosMotoristaBanco, excluirMotoristaBanco
+- `transp-config.js` (78 linhas): Tabelas, bucket, medidas, rótulos de documento e estado da página de transportadoras.
+- `transp-docs.js` (308 linhas): PDFs de veículos e motoristas (Storage privado, link temporário) e bloco de documentos do formulário.
+  - docsDoDono, removerArquivosStorage, enviarDocumento, abrirDocumento, excluirDocumento, criarBlocoDocumentos, desenharBlocoDocumentos
+- `transp-form.js` (117 linhas): Campos do formulário, máscara/validação de CPF, abrir/fechar modal e salvar.
+  - criarCampoForm, maiusculoCampoTransp, formatarCPF, cpfValido, abrirModalTransp, fecharModalTransp, salvarModalTransp
+- `transp-form-motorista.js` (248 linhas): Formulário do motorista (nome, CPF, nascimento, CNH), salvar e excluir.
+  - abrirModalMotorista, salvarMotoristaTransp, excluirMotoristaTransp
+- `transp-form-veiculo.js` (257 linhas): Formulário do veículo (prancha 1 placa / carreta 2 placas, medidas), salvar e excluir.
+  - atualizarCamposPlaca, abrirModalVeiculo, salvarVeiculoTransp, excluirVeiculoTransp
+- `transp-init.js` (76 linhas): Confere admin, liga eventos e carga inicial. Sempre o ÚLTIMO script da página.
+- `transp-render.js` (374 linhas): Select da transportadora, abas, cartões de veículos/motoristas e recarga.
+  - criarElemento, criarBotao, numeroBR, dataBR, placasDoVeiculo, desenharSelectTransportadora, definirAbaTransp, abrirNovoItemTransp, desenharListaTransp, textoQuantidadeDocs, criarItemVeiculo, criarItemMotorista, recarregarTransp
 - `weg-cache.js` (89 linhas): Salva/restaura o preenchimento no navegador.
   - salvarCacheWEG, restaurarCacheWEG
 - `weg-dados.js` (140 linhas): contratoWEG, lista de equipamentos, períodos, datas e grupos.
@@ -136,10 +141,6 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 ## CSS
 
 - `style.css`: base comum (inalterado)
-- `admin.css`: estilos da página de usuários e acessos
 - `propostas.css`, `estoque.css`, `tabelas.css`: estilos que ficavam dentro do HTML de cada página
+- `transportadoras.css`: estilos da página de transportadoras (lista, modal e documentos)
 - `agenda.css`, `agenda-modal.css`, `agenda-tema-claro.css`: estilos da agenda (lista / formulários e modais / fundo claro)
-
-## Supabase (Edge Functions)
-
-- `supabase/functions/criar-usuario/index.ts`: cria usuário (e-mail + senha, já confirmado). Só admin chama; a service_role fica nos segredos do Supabase, nunca no frontend. O trigger `ao_criar_usuario` cria o perfil só com "propostas". Cópia do código publicado no Supabase; não é carregada pelo site.

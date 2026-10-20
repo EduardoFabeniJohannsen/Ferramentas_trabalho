@@ -1,0 +1,256 @@
+/* ===== Transportadoras (admin) ===== */
+.card-transp{
+    width:100%;
+    max-width:1000px;
+    text-align:left;
+}
+.dica-transp{
+    margin:0 0 12px;
+    text-align:center;
+    font-size:12px;
+    color:#94a3b8;
+}
+.barra-transp{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:10px;
+}
+.barra-transp select{
+    width:auto;
+    flex:1;
+    min-width:200px;
+    margin:0;
+}
+.barra-transp button{
+    margin:0;
+}
+.barra-transp button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+.abas-transp{
+    display:flex;
+    gap:8px;
+    margin-bottom:10px;
+}
+.aba-btn{
+    margin:0;
+    padding:10px 22px;
+    background:#334155;
+}
+.aba-btn:hover{
+    background:#475569;
+}
+.aba-btn.ativo{
+    background:#2563eb;
+}
+.contagem-transp{
+    margin:0 0 8px;
+    font-size:13px;
+    color:#94a3b8;
+}
+.vazio-transp{
+    padding:18px 0;
+    text-align:center;
+    font-size:13px;
+    color:#94a3b8;
+}
+.btn-secundario{
+    background:#475569;
+}
+.btn-secundario:hover{
+    background:#334155;
+}
+.btn-perigo{
+    background:#dc2626;
+}
+.btn-perigo:hover{
+    background:#b91c1c;
+}
+
+/* ----- itens da lista ----- */
+.item-transp{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 16px;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+    padding:10px 14px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:10px;
+}
+.item-transp-info{
+    flex:1;
+    min-width:240px;
+}
+.item-transp-titulo{
+    font-size:15px;
+    font-weight:bold;
+}
+.item-transp-detalhe{
+    margin-top:2px;
+    font-size:13px;
+    color:#cbd5e1;
+}
+.item-transp-docs{
+    margin-top:2px;
+    font-size:12px;
+    color:#94a3b8;
+}
+.item-transp-acoes{
+    display:flex;
+    gap:8px;
+}
+.item-transp-acoes button{
+    margin:0;
+    padding:6px 12px;
+}
+.tag-transp{
+    display:inline-block;
+    margin-left:8px;
+    padding:1px 8px;
+    border-radius:999px;
+    background:#1d4ed8;
+    font-size:11px;
+    font-weight:bold;
+}
+.tag-transp.carreta{
+    background:#7e22ce;
+}
+
+/* ----- modal ----- */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1100;
+    background:rgba(0,0,0,.6);
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.modal-overlay.aberto{
+    display:flex;
+}
+.modal-transp{
+    width:100%;
+    max-width:640px;
+    max-height:90vh;
+    overflow:auto;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.modal-transp-topo{
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 20px;
+    background:#1e293b;
+    border-bottom:1px solid #334155;
+}
+.modal-transp-topo h3{
+    margin:0;
+}
+.modal-acoes{
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+.modal-acoes button{
+    margin:0;
+    padding:8px 14px;
+}
+.modal-transp .btn-fechar{
+    padding:2px 10px;
+    font-size:20px;
+}
+.modal-transp-corpo{
+    padding:14px 20px 20px;
+}
+.grade-transp{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+}
+.campo-form label{
+    display:block;
+    margin-bottom:2px;
+    font-size:12px;
+    color:#94a3b8;
+}
+.campo-form.largo{
+    grid-column:1 / -1;
+}
+.nota-form{
+    grid-column:1 / -1;
+    margin:-4px 0 8px;
+    font-size:12px;
+    color:#94a3b8;
+}
+
+/* ----- documentos (PDF) ----- */
+.docs-transp{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid #334155;
+}
+.subtitulo-transp{
+    margin:0 0 8px;
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+.doc-linha{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:5px;
+    padding:6px 10px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:8px;
+    font-size:13px;
+}
+.doc-linha .doc-nome{
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#94a3b8;
+}
+.doc-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.doc-novo{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+.doc-novo input{
+    margin:0;
+    width:auto;
+    flex:1;
+    min-width:160px;
+    font-size:14px;
+}
+.doc-novo button{
+    margin:0;
+}
+
+@media(max-width:600px){
+    .grade-transp{
+        grid-template-columns:1fr;
+    }
+}

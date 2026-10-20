@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Transportadoras</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<link rel="stylesheet" href="css/transportadoras.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <!-- links das outras páginas: montados pelo js/menu.js -->
+
+    <button onclick="fazerLogout()">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER (só aparece depois de confirmar que é admin)
+========================= -->
+
+<div class="container" id="conteudoTransp" style="display:none">
+
+    <div class="card card-transp">
+
+        <h2 style="text-align:center">Transportadoras</h2>
+
+        <p class="dica-transp">
+            Área restrita ao admin. Veículos, motoristas e PDFs da documentação.
+        </p>
+
+        <div class="barra-transp">
+
+            <select id="selectTransportadora"></select>
+
+            <button type="button" id="btnNovoItem" onclick="abrirNovoItemTransp()">
+                + Novo veículo
+            </button>
+
+        </div>
+
+        <div class="abas-transp">
+
+            <button
+                type="button"
+                id="abaVeiculos"
+                class="aba-btn"
+                onclick="definirAbaTransp('veiculos')"
+            >
+                🚛 Veículos
+            </button>
+
+            <button
+                type="button"
+                id="abaMotoristas"
+                class="aba-btn"
+                onclick="definirAbaTransp('motoristas')"
+            >
+                🧑 Motoristas
+            </button>
+
+        </div>
+
+        <p class="contagem-transp" id="contagemTransp"></p>
+
+        <div id="listaTransp"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+MODAL (veículo / motorista)
+========================= -->
+
+<div
+    id="modalTransp"
+    class="modal-overlay"
+    onclick="if(event.target === this) fecharModalTransp()"
+>
+
+    <div class="modal-transp">
+
+        <div class="modal-transp-topo">
+
+            <h3 id="tituloModalTransp"></h3>
+
+            <div class="modal-acoes">
+
+                <button type="button" id="btnSalvarTransp" onclick="salvarModalTransp()">
+                    💾 Salvar
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-fechar"
+                    onclick="fecharModalTransp()"
+                    title="Fechar"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="modal-transp-corpo" id="corpoModalTransp"></div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/auth-guard.js"></script>
+
+<script src="js/helpers.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/transp-config.js"></script>
+<script src="js/transp-banco.js"></script>
+<script src="js/transp-docs.js"></script>
+<script src="js/transp-render.js"></script>
+<script src="js/transp-form.js"></script>
+<script src="js/transp-form-veiculo.js"></script>
+<script src="js/transp-form-motorista.js"></script>
+<script src="js/transp-init.js"></script>
+
+</body>
+
+</html>

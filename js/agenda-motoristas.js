@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - CADASTRO DE MOTORISTAS
 // ======================================
-// Carregar, adicionar e excluir motoristas; modal de cadastro.
+// Carregar e adicionar motoristas; modal de cadastro. Excluir motorista: só admin, em transportadoras.html.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -139,19 +139,6 @@ function desenharMotoristas(){
 
         linha.appendChild(criar("span", "", motorista.nome));
 
-        const botao = criar("button", "btn-secundario", "🗑️");
-
-        botao.type = "button";
-
-        botao.title = "Excluir motorista";
-
-        botao.addEventListener(
-            "click",
-            () => excluirMotorista(motorista.id)
-        );
-
-        linha.appendChild(botao);
-
         lista.appendChild(linha);
     });
 }
@@ -215,41 +202,4 @@ async function adicionarMotorista(){
     desenharMotoristas();
 
     mostrarToast("Motorista adicionado");
-}
-
-
-// os agendamentos que já usam o motorista continuam com o nome
-async function excluirMotorista(id){
-
-    const motorista =
-        motoristasCadastrados.find(item => item.id === id);
-
-    if(!motorista) return;
-
-    if(!confirm(`Excluir ${motorista.nome} (${motorista.transportadora})?`)) return;
-
-    const { data, error } =
-        await supabaseClient
-            .from(TABELA_MOTORISTAS)
-            .delete()
-            .eq("id", id)
-            .select();
-
-    if(error){
-
-        console.error("[motoristas] Falha ao excluir:", detalhesErro(error));
-
-        return mostrarToast("Erro ao excluir o motorista", true);
-    }
-
-    motoristasCadastrados =
-        motoristasCadastrados.filter(item => item.id !== id);
-
-    desenharMotoristas();
-
-    mostrarToast(
-        data.length
-            ? "Motorista excluído"
-            : "Esse motorista já tinha sido excluído"
-    );
 }

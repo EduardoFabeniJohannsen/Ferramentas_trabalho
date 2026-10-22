@@ -295,6 +295,19 @@ tr.ag-item[data-status="Concluído"] td{
 .ag-hora.ag-hora-texto{
     font-size:11px;
 }
+/* horário em destaque: branco no fundo vermelho */
+.ag-hora-pilula{
+    display:inline-block;
+    padding:1px 10px;
+    border-radius:999px;
+    background:#991b1b;
+    color:#ffffff;
+}
+/* sem horário: discreto */
+.ag-hora-vazio{
+    color:#94a3b8;
+    font-weight:normal;
+}
 .ag-patrimonio{
     font-weight:bold;
 }
@@ -341,8 +354,12 @@ tr.ag-item select.tag-select option{
 .tag[data-tipo="Troca técnica"]{
     background:#0f766e;
 }
+/* transportadora "A definir": discreto, só o texto (sem etiqueta colorida) */
 .tag.sem-transp{
-    background:#991b1b;
+    padding:0;
+    background:transparent;
+    color:#94a3b8;
+    font-weight:normal;
 }
 .tag[data-status="A confirmar"]{
     background:#a16207;
@@ -666,6 +683,10 @@ body.tema-claro .aviso-rascunho{
 body.tema-claro .mot-linha{
     background:var(--claro-campo);
     border-color:var(--claro-linha);
+}
+body.tema-claro .tag.sem-transp,
+body.tema-claro .ag-hora-vazio{
+    color:#64748b;
 }
 body.tema-claro .contagem-status{
     color:#52617a;

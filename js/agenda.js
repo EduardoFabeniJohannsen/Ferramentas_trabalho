@@ -1539,16 +1539,26 @@ function criarCelulasAgenda(item){
     const textoHorario = item.horario || "—";
 
     // horário em texto (ex: CONFIRMAR) usa letra menor pra caber
-    celulas.horario =
+    const celulaHorario =
         criar(
             "td",
             "ag-celula ag-hora" + (
                 /^\d/.test(textoHorario) || textoHorario === "—"
                     ? ""
                     : " ag-hora-texto"
-            ),
-            textoHorario
+            )
         );
+
+    // horário em destaque (branco no fundo vermelho); sem horário fica discreto
+    celulaHorario.appendChild(
+        criar(
+            "span",
+            textoHorario === "—" ? "ag-hora-vazio" : "ag-hora-pilula",
+            textoHorario
+        )
+    );
+
+    celulas.horario = celulaHorario;
 
     // ---------- tipo ----------
 

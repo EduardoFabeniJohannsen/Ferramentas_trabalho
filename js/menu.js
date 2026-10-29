@@ -24,7 +24,9 @@
         { arquivo: "WEG.html", rotulo: "🏢 WEG" },
 
         // soAdmin: o link só aparece para admin
-        { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras", soAdmin: true }
+        { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras", soAdmin: true },
+
+        { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
     ];
 
 

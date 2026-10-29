@@ -94,6 +94,12 @@ const CHAVE_AGENDA_TEMA = "agendaTema";
 // ordem das colunas de cada usuário (uma por modo), neste navegador
 const CHAVE_AGENDA_COLUNAS = "agendaColunas";
 
+// largura das colunas de cada usuário (uma por modo), neste navegador
+const CHAVE_AGENDA_LARGURAS = "agendaLarguras";
+
+// etapas do formulário que cada usuário deixou recolhidas, neste navegador
+const CHAVE_AGENDA_ETAPAS = "agendaEtapas";
+
 // rascunhos do formulário (o que foi digitado e não foi salvo)
 const CHAVE_AGENDA_RASCUNHOS = "agendaRascunhos";
 
@@ -155,6 +161,19 @@ let ordemColunas = { expedicao: [], transportador: [] };
 
 // coluna que está sendo arrastada pelo título
 let colunaArrastada = null;
+
+// largura das colunas em pixels: { expedicao: { id: px }, transportador: { id: px } }
+// (vazio = largura automática). larguraColunasChave diz de quem são os
+// valores carregados (só relê quando o usuário muda).
+let larguraColunas = { expedicao: {}, transportador: {} };
+
+let larguraColunasChave = "";
+
+// etapas do formulário recolhidas: { demanda: true, local: true, ... }
+// etapasChave diz de quem são os valores carregados.
+let etapasRecolhidas = {};
+
+let etapasChave = "";
 
 // filtro de datas (estilo Excel): as datas DESMARCADAS ficam aqui
 // ("" = agendamentos sem data). Vazio = todas as datas aparecem.

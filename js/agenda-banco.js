@@ -47,7 +47,14 @@ const CAMPOS_BANCO = {
     card: "card",
     emails: "emails",
     obsExpedicao: "obs_expedicao",
-    obsEntrega: "obs_entrega"
+    obsEntrega: "obs_entrega",
+    // faturamento (só entregas): ver agenda-pagamento.js e agenda-pedido.js
+    formaPagamento: "forma_pagamento",
+    prazosPagamento: "prazos_pagamento",
+    pedidoCompra: "pedido_compra",
+    pedidoNumero: "pedido_numero",
+    pedidoPdfCaminho: "pedido_pdf_caminho",
+    pedidoPdfNome: "pedido_pdf_nome"
 };
 
 
@@ -73,6 +80,19 @@ function doBanco(linha){
             : formatarMoedaBR(linha.frete);
 
     item.freteConta = linha.frete_conta || "nossa";
+
+    // patrimônio sempre no formato certo (O minúsculo depois dos números)
+    item.plataforma = patrimonioFormatado(item.plataforma);
+
+    item.plataformaRecolha = patrimonioFormatado(item.plataformaRecolha);
+
+    // faturamento: prazos sempre lista e pedido sempre sim/não
+    item.prazosPagamento =
+        Array.isArray(linha.prazos_pagamento)
+            ? linha.prazos_pagamento
+            : [];
+
+    item.pedidoCompra = linha.pedido_compra === true;
 
     return item;
 }
@@ -102,6 +122,14 @@ function paraBanco(dados){
                 (valor === "" || valor === null || valor === undefined || !Number.isFinite(numero))
                     ? null
                     : numero;
+
+        }else if(campo === "prazosPagamento"){
+
+            linha[coluna] = Array.isArray(valor) ? valor : [];
+
+        }else if(campo === "pedidoCompra"){
+
+            linha[coluna] = valor === true;
 
         }else{
 

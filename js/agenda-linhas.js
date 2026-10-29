@@ -128,6 +128,32 @@ function criarCelula(coluna, ...filhos){
 }
 
 
+// patrimônio em negrito. Só o modelo (ex: WAE15) = patrimônio ainda não
+// definido: fica em destaque (fundo amarelo e aviso) pra manutenção ver
+// quais máquinas faltam.
+function criarMaquina(patrimonio){
+
+    const maquina = criar("span", "ag-maquina");
+
+    const texto = criar("strong", "ag-patrimonio", patrimonio);
+
+    maquina.appendChild(texto);
+
+    if(patrimonioIncompleto(patrimonio)){
+
+        texto.classList.add("ag-patr-incompleto");
+
+        texto.title = "Patrimônio ainda não definido (só o modelo)";
+
+        maquina.appendChild(
+            criar("span", "ag-patr-aviso", "definir patrimônio")
+        );
+    }
+
+    return maquina;
+}
+
+
 function criarCelulasAgenda(item){
 
     const expedicao =
@@ -170,15 +196,16 @@ function criarCelulasAgenda(item){
     // ---------- plataforma / cliente ----------
     // troca técnica mostra as duas máquinas: a que vai e a que volta
 
-    const maquinas =
-        (item.tipo === "Troca técnica" && item.plataformaRecolha)
-            ? `${item.plataforma} ⇄ ${item.plataformaRecolha}`
-            : item.plataforma;
-
-    // patrimônio em negrito; o cliente em peso normal
     const titulo = criar("p", "ag-titulo");
 
-    titulo.appendChild(criar("strong", "ag-patrimonio", maquinas));
+    titulo.appendChild(criarMaquina(item.plataforma));
+
+    if(item.tipo === "Troca técnica" && item.plataformaRecolha){
+
+        titulo.appendChild(criar("span", "", " ⇄ "));
+
+        titulo.appendChild(criarMaquina(item.plataformaRecolha));
+    }
 
     if(item.cliente){
 

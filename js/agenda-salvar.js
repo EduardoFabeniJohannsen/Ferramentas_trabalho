@@ -18,10 +18,11 @@ async function salvarAgendamento(){
                 .replace(/\s+/g, " ");
     });
 
-    // plataforma e horário sempre em maiúsculas (como na planilha)
-    dados.plataforma = dados.plataforma.toUpperCase();
+    // plataforma e horário sempre em maiúsculas (como na planilha); no
+    // patrimônio a letra O depois dos números fica minúscula
+    dados.plataforma = patrimonioFormatado(dados.plataforma);
 
-    dados.plataformaRecolha = dados.plataformaRecolha.toUpperCase();
+    dados.plataformaRecolha = patrimonioFormatado(dados.plataformaRecolha);
 
     dados.horario = dados.horario.toUpperCase();
 
@@ -29,19 +30,19 @@ async function salvarAgendamento(){
     // agenda antes de ter data e transportador definidos
     if(!dados.plataforma){
 
-        return mostrarToast("Informe a plataforma", true);
+        return avisoFormulario("Informe a plataforma", "demanda");
     }
 
     if(!dados.cliente){
 
-        return mostrarToast("Informe o cliente", true);
+        return avisoFormulario("Informe o cliente", "demanda");
     }
 
     if(
         dados.frete &&
         !Number.isFinite(brToNumber(dados.frete))
     ){
-        return mostrarToast("Frete inválido", true);
+        return avisoFormulario("Frete inválido", "local");
     }
 
     // troca técnica precisa da máquina de recolha; nos outros tipos não vale
@@ -49,7 +50,7 @@ async function salvarAgendamento(){
 
         if(!dados.plataformaRecolha){
 
-            return mostrarToast("Informe a máquina de recolha da troca", true);
+            return avisoFormulario("Informe a máquina de recolha da troca", "demanda");
         }
 
     }else{
@@ -62,9 +63,9 @@ async function salvarAgendamento(){
         !horarioValido(dados.horario) &&
         dados.horario !== valoresOriginais.horario
     ){
-        return mostrarToast(
+        return avisoFormulario(
             "Horário inválido (use 08:00, CONFIRMAR ou IMEDIATO)",
-            true
+            "demanda"
         );
     }
 
@@ -75,7 +76,7 @@ async function salvarAgendamento(){
 
         if(dados.periodo !== valoresOriginais.periodo){
 
-            return mostrarToast(periodo.erro, true);
+            return avisoFormulario(periodo.erro, "demanda");
         }
 
     }else{
@@ -83,9 +84,23 @@ async function salvarAgendamento(){
         dados.periodo = periodo.valor;
     }
 
+    // faturamento: pagamento e pedido de compra (só entregas)
+    const faturamento = coletarFaturamento(dados.tipo);
+
+    if(faturamento.cancelado) return;
+
+    if(faturamento.erro){
+
+        return avisoFormulario(faturamento.erro, "faturamento");
+    }
+
+    Object.assign(dados, faturamento.dados);
+
     const id = idEmEdicao;
 
     salvandoAgendamento = true;
+
+    let salvo = null;
 
     try{
 
@@ -101,16 +116,20 @@ async function salvarAgendamento(){
 
                 Object.assign(item, atualizado);
 
+                salvo = item;
+
             }else{
 
                 agendamentos.push(atualizado);
+
+                salvo = atualizado;
             }
 
         }else{
 
-            agendamentos.push(
-                await inserirAgendamento(dados)
-            );
+            salvo = await inserirAgendamento(dados);
+
+            agendamentos.push(salvo);
         }
 
     }catch(erro){
@@ -121,6 +140,31 @@ async function salvarAgendamento(){
 
         // o formulário continua aberto pra não perder o que foi digitado
         return mostrarToast("Erro ao salvar o agendamento", true);
+    }
+
+    // PDF do pedido de compra: envia/apaga depois de gravar (o caminho usa o id)
+    const pdf = await sincronizarPdfPedido(salvo);
+
+    if(pdf.erro){
+
+        salvandoAgendamento = false;
+
+        // o agendamento já foi gravado: o formulário passa a editar ele,
+        // pra anexar o PDF de novo sem criar outro
+        if(!id){
+
+            removerRascunho("novo");
+
+            idEmEdicao = salvo.id;
+
+            $("tituloModalAgenda").innerText = "Editar agendamento";
+
+            atualizarBotoesModal(true, false);
+        }
+
+        renderizarAgenda();
+
+        return avisoFormulario(pdf.erro, "faturamento");
     }
 
     salvandoAgendamento = false;
@@ -170,8 +214,10 @@ async function excluirAgendamento(id){
     agendamentos =
         agendamentos.filter(ag => ag.id !== id);
 
-    // sem agendamento, não sobra rascunho dele
+    // sem agendamento, não sobra rascunho nem PDF dele
     removerRascunho(`edit:${id}`);
+
+    await removerPedidoPdfStorage(item.pedidoPdfCaminho);
 
     renderizarAgenda();
 

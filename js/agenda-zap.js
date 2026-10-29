@@ -81,7 +81,7 @@ function textoPeriodoReferencia(periodo){
     return texto
         .toUpperCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+        .replace(/[̀-ͯ]/g, "");
 }
 
 
@@ -192,6 +192,10 @@ function montarTextoZap(item){
         String(item.contato || "").trim() ||
         (porCliente ? "abaixo ⤵️" : "");
 
+    // observação para a entrega (a do transportador): só sai se foi preenchida
+    const observacao =
+        String(item.obsEntrega || "").trim();
+
     const linhas = [
 
         `🚚 AGENDAMENTO DE ${troca ? "TROCA" : String(item.tipo).toUpperCase()}`,
@@ -222,6 +226,11 @@ function montarTextoZap(item){
             troca
         )
     ];
+
+    if(observacao){
+
+        linhas.push(`*Observação:* ${observacao}`);
+    }
 
     // troca: a máquina que volta é recolhida no mesmo local da entrega
     if(troca){

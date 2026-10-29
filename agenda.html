@@ -530,6 +530,219 @@ tr.ag-item td.ag-lado{
     color:#cbd5e1;
 }
 
+/* ===== Faturamento (pagamento e pedido de compra) ===== */
+#blocoFaturamento label{
+    margin-top:6px;
+}
+.prazo-linha{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
+}
+.prazo-linha input{
+    width:90px;
+    margin:0;
+    text-align:center;
+}
+.prazo-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.prazo-rotulo{
+    min-width:56px;
+    font-size:13px;
+    color:#cbd5e1;
+}
+.prazo-unidade{
+    font-size:13px;
+    color:#94a3b8;
+}
+.btn-add-prazo{
+    margin:0 10px 8px 0;
+    padding:6px 12px;
+    font-size:13px;
+}
+.resumo-prazos{
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+#agPedidoCompra:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+.doc-linha{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:6px 0;
+    padding:6px 10px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:8px;
+    font-size:13px;
+}
+.doc-linha .doc-nome{
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.doc-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.aviso-pedido{
+    margin:4px 0 0;
+    font-size:12px;
+    color:#fbbf24;
+}
+
+/* ===== Etapas do formulário (demanda → local → faturamento) ===== */
+.etapa{
+    grid-column:1 / -1;
+    margin-top:14px;
+    border:1px solid #334155;
+    border-left-width:5px;
+    border-radius:10px;
+    overflow:hidden;
+}
+.etapa:first-child{
+    margin-top:0;
+}
+.etapa-demanda{
+    border-left-color:#3b82f6;
+}
+.etapa-local{
+    border-left-color:#f59e0b;
+}
+.etapa-faturamento{
+    border-left-color:#22c55e;
+}
+.etapa-titulo{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    padding:8px 14px;
+    font-size:14px;
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.etapa-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    font-size:12px;
+    color:#0f172a;
+    background:#94a3b8;
+}
+.etapa-demanda .etapa-num{
+    background:#3b82f6;
+}
+.etapa-local .etapa-num{
+    background:#f59e0b;
+}
+.etapa-faturamento .etapa-num{
+    background:#22c55e;
+}
+.etapa-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+    padding:6px 14px 14px;
+}
+
+/* etapa recolhível: clicar no título esconde o conteúdo */
+.etapa-titulo{
+    cursor:pointer;
+    user-select:none;
+}
+.etapa-titulo:hover{
+    filter:brightness(1.2);
+}
+.etapa-seta{
+    margin-left:auto;
+    font-size:14px;
+    transition:transform .15s;
+}
+.etapa.recolhida .etapa-seta{
+    transform:rotate(-90deg);
+}
+.etapa.recolhida .etapa-grade{
+    display:none;
+}
+
+/* ===== Largura das colunas (arrastar a borda do título) ===== */
+.ag-tabela thead th{
+    position:relative;
+}
+.ag-redimensiona{
+    position:absolute;
+    top:0;
+    right:-3px;
+    width:7px;
+    height:100%;
+    z-index:2;
+    cursor:col-resize;
+    user-select:none;
+    touch-action:none;
+}
+.ag-redimensiona:hover,
+.ag-redimensiona.ativo{
+    background:#3b82f6;
+}
+/* com largura escolhida, o texto quebra de linha dentro da coluna */
+.ag-tabela.largura-fixa{
+    table-layout:fixed;
+}
+.ag-tabela.largura-fixa .ag-conteudo{
+    max-width:none !important;
+    overflow-wrap:anywhere;
+}
+.ag-tabela.largura-fixa .ag-sem-quebra{
+    white-space:normal;
+}
+.ag-tabela.largura-fixa thead th{
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.ag-tabela.largura-fixa thead th .ag-redimensiona{
+    right:0;
+}
+
+/* ===== Patrimônio ainda não definido (só o modelo, ex: WAE15) ===== */
+.ag-patr-incompleto{
+    padding:0 6px;
+    border-radius:6px;
+    background:#facc15;
+    color:#422006;
+}
+.ag-patr-aviso{
+    margin-left:4px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#b45309;
+    color:#ffffff;
+    font-size:10px;
+    font-weight:bold;
+    white-space:nowrap;
+    text-transform:uppercase;
+}
+.aviso-patrimonio{
+    margin:3px 0 0;
+    font-size:12px;
+    color:#fbbf24;
+}
+#btnSemPatrimonio.filtrando{
+    background:#b45309;
+}
+
 /* ===== Cadastro de transportadoras e motoristas ===== */
 .modal-motoristas{
     max-width:440px;
@@ -578,7 +791,8 @@ tr.ag-item td.ag-lado{
 }
 
 @media(max-width:600px){
-    .form-grade{
+    .form-grade,
+    .etapa-grade{
         grid-template-columns:1fr;
     }
 }
@@ -704,6 +918,39 @@ body.tema-claro .data-todas{
 }
 body.tema-claro .ag-tabela thead th.ag-cab-coluna:hover{
     color:#0f172a;
+}
+body.tema-claro .prazo-rotulo,
+body.tema-claro .resumo-prazos{
+    color:#3b4a63;
+}
+body.tema-claro .prazo-unidade{
+    color:#52617a;
+}
+body.tema-claro .doc-linha{
+    background:var(--claro-campo);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .aviso-pedido{
+    color:#a14a09;
+}
+body.tema-claro .etapa{
+    border-color:var(--claro-linha);
+}
+body.tema-claro .etapa-demanda{
+    border-left-color:#3b82f6;
+}
+body.tema-claro .etapa-local{
+    border-left-color:#f59e0b;
+}
+body.tema-claro .etapa-faturamento{
+    border-left-color:#22c55e;
+}
+body.tema-claro .etapa-titulo{
+    background:var(--claro-botao);
+    color:#0f172a;
+}
+body.tema-claro .aviso-patrimonio{
+    color:#a14a09;
 }
 body.tema-claro .sep-modal{
     border-top-color:var(--claro-linha);
@@ -859,6 +1106,17 @@ CONTAINER
 
             <select id="ordemAgenda" title="Ordem dentro de cada data"></select>
 
+            <!-- só as máquinas cujo patrimônio a manutenção ainda não definiu -->
+            <button
+                type="button"
+                class="btn-secundario"
+                id="btnSemPatrimonio"
+                onclick="alternarSemPatrimonio()"
+                title="Mostrar só as máquinas sem patrimônio definido (só o modelo, ex: WAE15)"
+            >
+                ⚠️ Só sem patrimônio
+            </button>
+
             <button
                 type="button"
                 class="btn-secundario"
@@ -873,8 +1131,8 @@ CONTAINER
                 class="btn-secundario"
                 id="btnColunasPadrao"
                 style="display:none"
-                onclick="restaurarOrdemColunas()"
-                title="Voltar as colunas para a ordem padrão"
+                onclick="restaurarColunasPadrao()"
+                title="Voltar as colunas para a ordem e a largura padrão"
             >
                 ↺ Colunas padrão
             </button>
@@ -963,158 +1221,239 @@ MODAL (novo / editar)
 
         <div class="form-grade">
 
-            <div>
-                <label for="agData">Data</label>
-                <input type="date" id="agData">
-            </div>
+            <!-- ETAPA 1: a demanda (o que, quando e quem) -->
+            <section class="etapa etapa-demanda" data-etapa="demanda">
 
-            <div>
-                <label for="agHorario">Horário</label>
-                <input
-                    type="text"
-                    id="agHorario"
-                    list="listaHorarios"
-                    maxlength="9"
-                    autocomplete="off"
-                    placeholder="08:00, CONFIRMAR ou IMEDIATO"
-                >
-            </div>
+                <h4 class="etapa-titulo"><span class="etapa-num">1</span> Demanda</h4>
 
-            <div>
-                <label for="agTipo">Tipo</label>
-                <select id="agTipo"></select>
-            </div>
+                <div class="etapa-grade">
 
-            <div>
-                <label for="agStatus">Status</label>
-                <select id="agStatus"></select>
-            </div>
+                    <div>
+                        <label for="agData">Data</label>
+                        <input type="date" id="agData">
+                    </div>
 
-            <div>
-                <label for="agPlataforma" id="rotuloPlataforma">Plataforma</label>
-                <input type="text" id="agPlataforma" autocomplete="off" placeholder="Ex: WAE16010">
-            </div>
+                    <div>
+                        <label for="agHorario">Horário</label>
+                        <input
+                            type="text"
+                            id="agHorario"
+                            list="listaHorarios"
+                            maxlength="9"
+                            autocomplete="off"
+                            placeholder="08:00, CONFIRMAR ou IMEDIATO"
+                        >
+                    </div>
 
-            <div>
-                <label for="agTransportadora">Transportadora</label>
-                <select id="agTransportadora"></select>
-            </div>
+                    <div>
+                        <label for="agTipo">Tipo</label>
+                        <select id="agTipo"></select>
+                    </div>
 
-            <div class="largo" id="blocoRecolha" style="display:none">
-                <label for="agPlataformaRecolha">Máquina de recolha (volta com a troca)</label>
-                <input type="text" id="agPlataformaRecolha" autocomplete="off" placeholder="Ex: WTE10014">
-            </div>
+                    <div>
+                        <label for="agStatus">Status</label>
+                        <select id="agStatus"></select>
+                    </div>
 
-            <div>
-                <label for="agCliente">Cliente</label>
-                <input type="text" id="agCliente" placeholder="Nome do cliente">
-            </div>
+                    <div>
+                        <label for="agPlataforma" id="rotuloPlataforma">Plataforma</label>
+                        <input type="text" id="agPlataforma" autocomplete="off" placeholder="Ex: WAE16010">
+                        <p class="aviso-patrimonio" id="avisoPatrimonio" style="display:none"></p>
+                    </div>
 
-            <div>
-                <label for="agMotorista">Motorista</label>
-                <select id="agMotorista"></select>
-            </div>
+                    <div>
+                        <label for="agTransportadora">Transportadora</label>
+                        <select id="agTransportadora"></select>
+                    </div>
 
-            <div>
-                <label for="agProposta">Nº da proposta</label>
-                <input type="text" id="agProposta">
-            </div>
+                    <div class="largo" id="blocoRecolha" style="display:none">
+                        <label for="agPlataformaRecolha">Máquina de recolha (volta com a troca)</label>
+                        <input type="text" id="agPlataformaRecolha" autocomplete="off" placeholder="Ex: WTE10014">
+                        <p class="aviso-patrimonio" id="avisoPatrimonioRecolha" style="display:none"></p>
+                    </div>
 
-            <div>
-                <label for="agPeriodo">Período</label>
-                <input
-                    type="text"
-                    id="agPeriodo"
-                    list="listaPeriodos"
-                    autocomplete="off"
-                    placeholder="16 dias, 3 períodos ou Anual"
-                >
-            </div>
+                    <div>
+                        <label for="agCliente">Cliente</label>
+                        <input type="text" id="agCliente" placeholder="Nome do cliente">
+                    </div>
 
-            <p class="largo subtitulo-form">
-                📍 Retirada (vazio em entrega e troca = W Rental)
-            </p>
+                    <div>
+                        <label for="agMotorista">Motorista</label>
+                        <select id="agMotorista"></select>
+                    </div>
 
-            <div class="largo">
-                <label for="agOrigemNome">Nome do local</label>
-                <input type="text" id="agOrigemNome" placeholder="Ex: Obra A">
-            </div>
+                    <div>
+                        <label for="agProposta">Nº da proposta</label>
+                        <input type="text" id="agProposta">
+                    </div>
 
-            <div class="largo">
-                <label for="agOrigemEndereco">Endereço completo</label>
-                <input type="text" id="agOrigemEndereco" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
-            </div>
+                    <div>
+                        <label for="agPeriodo">Período</label>
+                        <input
+                            type="text"
+                            id="agPeriodo"
+                            list="listaPeriodos"
+                            autocomplete="off"
+                            placeholder="16 dias, 3 períodos ou Anual"
+                        >
+                    </div>
 
-            <div class="largo">
-                <label for="agLinkOrigem">Link (opcional)</label>
-                <input type="text" id="agLinkOrigem" placeholder="https://maps...">
-            </div>
+                    <div class="largo">
+                        <label for="agReferencia">Referência da mensagem do Zap (ficha / proposta — digitada à mão)</label>
+                        <input type="text" id="agReferencia" placeholder="Ficha / referência">
+                    </div>
 
-            <p class="largo subtitulo-form">
-                📍 Entrega (vazio em coleta = W Rental)
-            </p>
+                </div>
 
-            <div class="largo">
-                <label for="agDestinoNome">Nome do local</label>
-                <input type="text" id="agDestinoNome" placeholder="Ex: Cliente X">
-            </div>
+            </section>
 
-            <div class="largo">
-                <label for="agDestinoEndereco">Endereço completo</label>
-                <input type="text" id="agDestinoEndereco" placeholder="Ex: Rua B, 200, Centro, Brusque/SC">
-            </div>
+            <!-- ETAPA 2: o local certo (retirada, entrega, frete e observações) -->
+            <section class="etapa etapa-local" data-etapa="local">
 
-            <div class="largo">
-                <label for="agLinkDestino">Link (opcional)</label>
-                <input type="text" id="agLinkDestino" placeholder="https://maps...">
-            </div>
+                <h4 class="etapa-titulo"><span class="etapa-num">2</span> Local e entrega</h4>
 
-            <div>
-                <label for="agFrete">Frete (R$)</label>
-                <input type="text" id="agFrete" placeholder="Ex: 450,00">
-            </div>
+                <div class="etapa-grade">
 
-            <div>
-                <label for="agFreteConta">Frete por conta de</label>
-                <select id="agFreteConta">
-                    <option value="nossa">Nossa conta</option>
-                    <option value="cliente">Conta do cliente</option>
+                    <p class="largo subtitulo-form">
+                        📍 Retirada (vazio em entrega e troca = W Rental)
+                    </p>
+
+                    <div class="largo">
+                        <label for="agOrigemNome">Nome do local</label>
+                        <input type="text" id="agOrigemNome" placeholder="Ex: Obra A">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agOrigemEndereco">Endereço completo</label>
+                        <input type="text" id="agOrigemEndereco" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agLinkOrigem">Link (opcional)</label>
+                        <input type="text" id="agLinkOrigem" placeholder="https://maps...">
+                    </div>
+
+                    <p class="largo subtitulo-form">
+                        📍 Entrega (vazio em coleta = W Rental)
+                    </p>
+
+                    <div class="largo">
+                        <label for="agDestinoNome">Nome do local</label>
+                        <input type="text" id="agDestinoNome" placeholder="Ex: Cliente X">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agDestinoEndereco">Endereço completo</label>
+                        <input type="text" id="agDestinoEndereco" placeholder="Ex: Rua B, 200, Centro, Brusque/SC">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agLinkDestino">Link (opcional)</label>
+                        <input type="text" id="agLinkDestino" placeholder="https://maps...">
+                    </div>
+
+                    <div>
+                        <label for="agFrete">Frete (R$)</label>
+                        <input type="text" id="agFrete" placeholder="Ex: 450,00">
+                    </div>
+
+                    <div>
+                        <label for="agFreteConta">Frete por conta de</label>
+                        <select id="agFreteConta">
+                            <option value="nossa">Nossa conta</option>
+                            <option value="cliente">Conta do cliente</option>
+                        </select>
+                    </div>
+
+                    <div class="largo" id="blocoCard">
+                        <label for="agCard">Card</label>
+                        <input type="text" id="agCard">
+                    </div>
+
+                    <div class="largo" id="blocoEmails">
+                        <label for="agEmails">E-mails do cliente (financeiro)</label>
+                        <input type="text" id="agEmails" placeholder="a@cliente.com; b@cliente.com">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agContato">Contato de quem vai receber</label>
+                        <input type="text" id="agContato" placeholder="Nome e telefone">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agObsExpedicao">Obs. para a expedição</label>
+                        <input type="text" id="agObsExpedicao">
+                    </div>
+
+                    <div class="largo">
+                        <label for="agObsEntrega">Obs. para a entrega (transportador)</label>
+                        <input type="text" id="agObsEntrega">
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ETAPA 3: particularidades de faturamento -->
+            <!-- só aparece nas entregas (agenda-pagamento.js) -->
+            <section class="etapa etapa-faturamento" data-etapa="faturamento" style="display:none">
+
+                <h4 class="etapa-titulo"><span class="etapa-num">3</span> Faturamento</h4>
+
+                <div class="etapa-grade">
+
+                    <!-- faturamento: só aparece nas entregas -->
+            <div class="largo" id="blocoFaturamento">
+
+                <p class="subtitulo-form">
+                    💳 Faturamento (pagamento e pedido de compra)
+                </p>
+
+                <label for="agFormaPagamento">Forma de pagamento</label>
+                <select id="agFormaPagamento">
+                    <option value="">Não informada</option>
+                    <option value="Depósito">Depósito</option>
+                    <option value="Boleto">Boleto</option>
                 </select>
+
+                <label>Prazo de pagamento (uma linha por vencimento)</label>
+                <div id="listaPrazos"></div>
+                <button type="button" class="btn-secundario btn-add-prazo" id="btnAddPrazo">
+                    + Adicionar prazo
+                </button>
+                <span class="resumo-prazos" id="resumoPrazos"></span>
+
+                <label for="agPedidoCompra">Pedido de compra</label>
+                <select id="agPedidoCompra">
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                </select>
+
+                <div id="blocoPedido" style="display:none">
+
+                    <label for="agPedidoNumero">Número do pedido de compra</label>
+                    <input type="text" id="agPedidoNumero" maxlength="40" autocomplete="off">
+
+                    <div class="doc-linha" id="linhaPedidoPdf" style="display:none">
+                        <span class="doc-nome" id="nomePedidoPdf"></span>
+                        <button type="button" class="btn-secundario" id="btnAbrirPedidoPdf" title="Abrir o PDF">👁 Abrir</button>
+                        <button type="button" class="btn-secundario" id="btnApagarPedidoPdf" title="Apagar o PDF">🗑️ Apagar</button>
+                    </div>
+
+                    <div id="campoPedidoPdf">
+                        <label for="arquivoPedidoPdf">PDF do pedido (até 5 MB)</label>
+                        <input type="file" id="arquivoPedidoPdf" accept="application/pdf,.pdf">
+                    </div>
+
+                    <p class="aviso-pedido" id="avisoPedidoPdf"></p>
+
+                </div>
+
             </div>
 
-            <div class="largo">
-                <label for="agObsExpedicao">Obs. para a expedição</label>
-                <input type="text" id="agObsExpedicao">
-            </div>
+                </div>
 
-            <div class="largo">
-                <label for="agObsEntrega">Obs. para a entrega (transportador)</label>
-                <input type="text" id="agObsEntrega">
-            </div>
-
-            <p class="largo subtitulo-form">
-                💬 Mensagem do Zap
-            </p>
-
-            <div class="largo">
-                <label for="agReferencia">Referência (ficha / proposta — digitada à mão)</label>
-                <input type="text" id="agReferencia" placeholder="Ficha / referência">
-            </div>
-
-            <div class="largo">
-                <label for="agContato">Contato de quem vai receber</label>
-                <input type="text" id="agContato" placeholder="Nome e telefone">
-            </div>
-
-            <div class="largo" id="blocoCard">
-                <label for="agCard">Card</label>
-                <input type="text" id="agCard">
-            </div>
-
-            <div class="largo" id="blocoEmails">
-                <label for="agEmails">E-mails do cliente (financeiro)</label>
-                <input type="text" id="agEmails" placeholder="a@cliente.com; b@cliente.com">
-            </div>
+            </section>
 
         </div>
 
@@ -1214,7 +1553,32 @@ MODAL (cadastro de transportadoras e motoristas)
 
 <script src="js/helpers.js"></script>
 <script src="js/menu.js"></script>
-<script src="js/agenda.js"></script>
+<script src="js/agenda-config.js"></script>
+<script src="js/agenda-utils.js"></script>
+<script src="js/agenda-patrimonio.js"></script>
+<script src="js/agenda-banco.js"></script>
+<script src="js/agenda-filtros.js"></script>
+<script src="js/agenda-filtro-datas.js"></script>
+<script src="js/agenda-filtro-status.js"></script>
+<script src="js/agenda-ordem.js"></script>
+<script src="js/agenda-render.js"></script>
+<script src="js/agenda-linhas.js"></script>
+<script src="js/agenda-colunas.js"></script>
+<script src="js/agenda-larguras.js"></script>
+<script src="js/agenda-tema.js"></script>
+<script src="js/agenda-zap.js"></script>
+<script src="js/agenda-transportadoras.js"></script>
+<script src="js/agenda-motoristas.js"></script>
+<script src="js/agenda-form-campos.js"></script>
+<script src="js/agenda-rascunho.js"></script>
+<script src="js/agenda-etapas.js"></script>
+<script src="js/agenda-modal.js"></script>
+<script src="js/agenda-salvar.js"></script>
+<script src="js/agenda-coleta.js"></script>
+<script src="js/agenda-pagamento.js"></script>
+<script src="js/agenda-pedido.js"></script>
+<script src="js/agenda-pedido-pdf.js"></script>
+<script src="js/agenda-init.js"></script>
 
 </body>
 

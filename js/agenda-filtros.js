@@ -50,6 +50,27 @@ function visivelNoModo(item){
 
 
 // ======================================
+// SÓ SEM PATRIMÔNIO
+// ======================================
+// Botão da barra: mostra só as máquinas cujo patrimônio ainda não foi
+// definido (a manutenção só passou o modelo). O estado fica no próprio
+// botão (classe "filtrando"), como o filtro de tipo fica no select.
+
+function filtrandoSemPatrimonio(){
+
+    return $("btnSemPatrimonio").classList.contains("filtrando");
+}
+
+
+function alternarSemPatrimonio(){
+
+    $("btnSemPatrimonio").classList.toggle("filtrando");
+
+    renderizarAgenda();
+}
+
+
+// ======================================
 // FILTROS
 // ======================================
 // ignorarTransportadora = usado pra contar os botões das
@@ -61,6 +82,9 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
 
     const expedicao =
         modoVisualizacao === "expedicao";
+
+    const soSemPatrimonio =
+        filtrandoSemPatrimonio();
 
     return agendamentos.filter(item => {
 
@@ -86,6 +110,9 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
 
         // na expedição só tem entrega, então o filtro de tipo não vale
         if(!expedicao && tipo && item.tipo !== tipo) return false;
+
+        // só as máquinas sem patrimônio definido
+        if(soSemPatrimonio && !itemSemPatrimonio(item)) return false;
 
         // filtro de status: os desmarcados não aparecem
         if(!ignorarStatus && statusOcultos.has(item.status)) return false;

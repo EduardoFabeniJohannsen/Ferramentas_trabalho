@@ -78,7 +78,12 @@ function salvarRascunho(){
 
     const todos = lerRascunhos();
 
-    todos[chaveRascunho()] = { campos: campos, salvoEm: Date.now() };
+    // faturamento (pagamento e pedido de compra) vem de agenda-pagamento.js
+    todos[chaveRascunho()] = {
+        campos: campos,
+        faturamento: faturamentoParaRascunho(),
+        salvoEm: Date.now()
+    };
 
     gravarRascunhos(todos);
 }

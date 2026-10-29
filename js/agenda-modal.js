@@ -85,11 +85,20 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
         $("agFreteConta").value = "nossa";
     }
 
+    // faturamento (pagamento e pedido de compra): do agendamento ou do
+    // rascunho. Vem de agenda-pagamento.js (cópia de coleta não leva nada)
+    preencherFaturamento(item || valoresIniciais, rascunho);
+
     atualizarCamposConta();
 
     atualizarCamposTipo();
 
     atualizarSugestoesPeriodo();
+
+    atualizarAvisoPatrimonio();
+
+    // etapas recolhidas como o usuário deixou
+    aplicarEtapasSalvas();
 
     atualizarBotoesModal(!!item, !!rascunho);
 

@@ -123,14 +123,13 @@ function atualizarControlesModo(){
 
     atualizarSelectOrdem();
 
-    // só aparece quando as colunas estão fora da ordem padrão
-    $("btnColunasPadrao").style.display =
-        ordemColunasPersonalizada() ? "" : "none";
+    // só aparece quando a ordem ou a largura das colunas saiu do padrão
+    atualizarBotaoColunasPadrao();
 
     $("dicaModo").innerText =
         expedicao
-            ? "Só entregas e trocas que ainda não saíram, sem endereço e sem valor. Inclui as sem data (preparar). Arraste os títulos das colunas para mudar a ordem."
-            : "Informação completa. Só o que já tem data definida. Arraste os títulos das colunas para mudar a ordem.";
+            ? "Só entregas e trocas que ainda não saíram, sem endereço e sem valor. Inclui as sem data (preparar). Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura."
+            : "Informação completa. Só o que já tem data definida. Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura.";
 }
 
 
@@ -219,6 +218,9 @@ function renderizarAgenda(){
     });
 
     tabela.appendChild(corpo);
+
+    // largura das colunas escolhida pelo usuário (agenda-larguras.js)
+    aplicarLarguras(tabela);
 
     lista.appendChild(tabela);
 }

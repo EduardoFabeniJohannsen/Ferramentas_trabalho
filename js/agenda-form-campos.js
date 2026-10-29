@@ -67,29 +67,40 @@ function preencherSelect(id, valores, textoVazio){
 // CAMPOS DO FORMULÁRIO (máscaras e regras)
 // ======================================
 
-// maiúsculo enquanto digita, sem pular o cursor
+// maiúsculo enquanto digita, sem pular o cursor. Nos campos de patrimônio
+// a letra O depois dos números fica minúscula (ver agenda-patrimonio.js).
 function forcarMaiusculo(evento){
 
     const campo = evento.target;
 
-    const maiusculo = campo.value.toUpperCase();
+    const ehPatrimonio =
+        campo.id === "agPlataforma" ||
+        campo.id === "agPlataformaRecolha";
 
-    if(campo.value === maiusculo) return;
+    const maiusculo =
+        ehPatrimonio
+            ? patrimonioFormatado(campo.value)
+            : campo.value.toUpperCase();
 
-    const inicio = campo.selectionStart;
+    if(campo.value !== maiusculo){
 
-    const fim = campo.selectionEnd;
+        const inicio = campo.selectionStart;
 
-    campo.value = maiusculo;
+        const fim = campo.selectionEnd;
 
-    try{
+        campo.value = maiusculo;
 
-        campo.setSelectionRange(inicio, fim);
+        try{
 
-    }catch(erro){
+            campo.setSelectionRange(inicio, fim);
 
-        // alguns tipos de campo não aceitam seleção
+        }catch(erro){
+
+            // alguns tipos de campo não aceitam seleção
+        }
     }
+
+    if(ehPatrimonio) atualizarAvisoPatrimonio();
 }
 
 

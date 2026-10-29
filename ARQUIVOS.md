@@ -18,7 +18,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
-- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-init
+- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
@@ -69,12 +69,12 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - definirModo, visivelNoModo, filtrandoSemPatrimonio, alternarSemPatrimonio, filtrarAgendamentos
 - `agenda-form-campos.js` (287 linhas): CAMPOS_AGENDA, máscaras de horário/período e regras dos campos.
   - preencherSelect, forcarMaiusculo, mascararHorario, mascararCampoHorario, horarioValido, textoDias, textoPeriodos, normalizarPeriodo, atualizarSugestoesPeriodo, atualizarCamposTipo, garantirOpcaoTransportadora
-- `agenda-init.js` (148 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
+- `agenda-init.js` (149 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
 - `agenda-larguras.js` (358 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js. ⚠️ passa de ~300 linhas (sugerir divisão)
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
 - `agenda-linhas.js` (442 linhas): Montagem de cada linha/célula da tabela, cabeçalho e seletor de status. ⚠️ passa de ~300 linhas (sugerir divisão)
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarMaquina, criarCelulasAgenda, criarCabecalhoAgenda, criarItemAgenda
-- `agenda-modal.js` (221 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal.
+- `agenda-modal.js` (224 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal.
   - abrirModalAgenda, atualizarCamposConta, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista
@@ -82,8 +82,10 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - ordemEfetiva, compararHorario, ordenarAgendamentos
 - `agenda-pagamento.js` (275 linhas): Faturamento no formulário (só entregas): forma de pagamento (Depósito/Boleto) e prazos em linhas (28 e 56 = 28/56). Carrega depois de agenda-coleta.js e antes de agenda-init.js.
   - prazosDigitados, atualizarResumoPrazos, desenharPrazos, adicionarPrazo, validarPrazos, atualizarBlocoFaturamento, preencherFaturamento, faturamentoParaRascunho, faturamentoPreenchido, coletarFaturamento
-- `agenda-patrimonio.js` (87 linhas): Regras do patrimônio: formato (maiúsculo, com a letra O depois dos números minúscula) e patrimônio ainda não definido (só o modelo, menos de 3 números, ex: WAE15). Carregar depois de agenda-utils.js.
-  - patrimonioFormatado, patrimonioIncompleto, itemSemPatrimonio, atualizarAvisoPatrimonio
+- `agenda-patrimonio.js` (140 linhas): Regras do patrimônio: formato (maiúsculo, com a letra O depois dos números minúscula), patrimônio ainda não definido (só o modelo, menos de 3 números, ex: WAE15; com vários equipamentos basta um) e vários equipamentos juntos na coluna plataforma ("2x WAD16 + WTE12"). Carregar depois de agenda-utils.js.
+  - patrimonioFormatado, separarPlataformas, juntarPlataformas, plataformasFormatadas, patrimonioIncompleto, itemSemPatrimonio, atualizarAvisoPatrimonio
+- `agenda-plataformas.js` (142 linhas): Linhas de equipamento do formulário (patrimônio, quantidade, − e +, como em propostas). As linhas são só a tela: o valor salvo fica no campo escondido agPlataforma. Carregar antes de agenda-modal.js.
+  - criarLinhaPlataforma, sincronizarPlataformas, desenharPlataformas, adicionarLinhaPlataforma, removerLinhaPlataforma, digitarPlataforma
 - `agenda-pedido.js` (242 linhas): Pedido de compra (sim/não, número, PDF até 5 MB). Com PDF anexado o Sim/Não fica travado até apagar o PDF.
   - pedidoTemPdf, atualizarControlesPedido, preencherPedido, anexarPedidoPdf, apagarPedidoPdf, lerPedidoFormulario, limparPedidoParaSalvar
 - `agenda-pedido-pdf.js` (134 linhas): PDF do pedido no Storage (bucket privado `pedidos-compra`, link assinado de 120 s). Só envia/apaga ao clicar em Salvar.
@@ -100,8 +102,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - carregarTransportadoras, definirTransportadoras, atualizarSelectsTransportadora
 - `agenda-utils.js` (74 linhas): criar(), dataISO(), corDoDia(), tituloDoDia().
   - criar, dataISO, corDoDia, tituloDoDia
-- `agenda-zap.js` (285 linhas): Texto de agendamento copiado para o grupo da transportadora.
-  - textoDataZap, ehLocalWR, modeloDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
+- `agenda-zap.js` (298 linhas): Texto de agendamento copiado para o grupo da transportadora.
+  - textoDataZap, ehLocalWR, modeloDaPlataforma, modelosDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
 - `auth-guard.js` (376 linhas): Incluir em toda página que precisa de login (depois de supabase-config.js). Sem sessão ativa manda pra login.html antes da página aparecer; depois confere perfil (com cache), acesso à página e filial, e mostra os itens `.so-admin` para admin. ⚠️ passa de ~300 linhas (sugerir divisão)
   - existeLoginSalvo, ehAdmin, carregarPerfil, salvarPerfilCache, lerPerfilCache, buscarPerfil, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES (uma tabela por transportadora) e buscarLinhasFretes() (busca em páginas de 1000 linhas).
@@ -251,6 +253,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".
+- Vários equipamentos no mesmo agendamento vão juntos na coluna `plataforma` (texto), ex: `2x WAD16 + WTE12`. Card, Zap, ordem e filtro leem esse texto; sem mudança no Supabase. A máquina de recolha da troca continua uma só.
 - Faturamento (forma, prazos, pedido) só em entregas; a coleta gerada de uma entrega não copia esses campos e o Zap não leva essas informações (só o card).
 - `menu.js` é a lista única dos links da topbar: página nova entra lá (nada de links digitados à mão). Página nova com acesso controlado entra também em `ACESSOS_ADMIN` (`admin-config.js`).
 - Mudou VERSAO_SISTEMA? Fica em `helpers.js`.

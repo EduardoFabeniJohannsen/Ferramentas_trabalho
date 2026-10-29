@@ -20,7 +20,7 @@ async function salvarAgendamento(){
 
     // plataforma e horário sempre em maiúsculas (como na planilha); no
     // patrimônio a letra O depois dos números fica minúscula
-    dados.plataforma = patrimonioFormatado(dados.plataforma);
+    dados.plataforma = plataformasFormatadas(dados.plataforma);
 
     dados.plataformaRecolha = patrimonioFormatado(dados.plataformaRecolha);
 

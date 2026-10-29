@@ -79,6 +79,9 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
         $("agTransportadora").value = "";
     }
 
+    // uma linha por equipamento (vem do campo escondido agPlataforma)
+    desenharPlataformas();
+
     // agendamentos antigos (ou novos) sem valor ficam por nossa conta
     if(!$("agFreteConta").value){
 
@@ -116,7 +119,7 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 
     if(caixa) caixa.scrollTop = 0;
 
-    $("agPlataforma").focus();
+    $("listaPlataformas").querySelector(".ag-plataforma-item").focus();
 }
 
 

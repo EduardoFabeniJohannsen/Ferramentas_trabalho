@@ -69,6 +69,19 @@ function modeloDaPlataforma(plataforma){
 }
 
 
+// vários equipamentos: modelo de cada um, com a quantidade
+// (2x WAD16010 + WTE12046 -> 2x WAD16 + WTE12)
+function modelosDaPlataforma(plataforma){
+
+    return juntarPlataformas(
+        separarPlataformas(plataforma).map(item => ({
+            quantidade: item.quantidade,
+            patrimonio: modeloDaPlataforma(item.patrimonio)
+        }))
+    );
+}
+
+
 // período na linha de referência: maiúsculo e sem acento
 // (3 períodos -> 3 PERIODOS). Um dia só vira DIÁRIA.
 function textoPeriodoReferencia(periodo){
@@ -101,7 +114,7 @@ function referenciaZap(item){
     const nome =
         [
             String(item.cliente || "").trim().toUpperCase(),
-            modeloDaPlataforma(item.plataforma),
+            modelosDaPlataforma(item.plataforma),
             textoPeriodoReferencia(item.periodo)
         ]
             .filter(Boolean)

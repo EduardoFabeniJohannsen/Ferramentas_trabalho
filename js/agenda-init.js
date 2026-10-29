@@ -62,8 +62,9 @@
         atualizarCamposTipo
     );
 
-    // plataformas sempre em maiúsculo enquanto digita
-    $("agPlataforma").addEventListener("input", forcarMaiusculo);
+    // plataformas sempre em maiúsculo enquanto digita (as linhas de
+    // equipamento vão juntas para o campo escondido agPlataforma)
+    $("listaPlataformas").addEventListener("input", digitarPlataforma);
 
     $("agPlataformaRecolha").addEventListener("input", forcarMaiusculo);
 

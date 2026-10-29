@@ -82,7 +82,7 @@ function doBanco(linha){
     item.freteConta = linha.frete_conta || "nossa";
 
     // patrimônio sempre no formato certo (O minúsculo depois dos números)
-    item.plataforma = patrimonioFormatado(item.plataforma);
+    item.plataforma = plataformasFormatadas(item.plataforma);
 
     item.plataformaRecolha = patrimonioFormatado(item.plataformaRecolha);
 

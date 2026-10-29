@@ -74,7 +74,7 @@ function forcarMaiusculo(evento){
     const campo = evento.target;
 
     const ehPatrimonio =
-        campo.id === "agPlataforma" ||
+        campo.classList.contains("ag-plataforma-item") ||
         campo.id === "agPlataformaRecolha";
 
     const maiusculo =

@@ -550,6 +550,21 @@ tr.ag-item td.ag-lado{
     margin:0;
     padding:4px 10px;
 }
+/* plataformas: uma linha por equipamento */
+.ag-plataforma-linha{
+    margin-bottom:6px;
+}
+.ag-plataforma-linha input{
+    margin:0;
+}
+.ag-plataforma-linha button{
+    flex:none;
+    width:38px;
+    margin:0;
+    padding:8px 0;
+    font-size:18px;
+    line-height:1;
+}
 .prazo-rotulo{
     min-width:56px;
     font-size:13px;
@@ -1192,21 +1207,24 @@ MODAL (novo / editar)
                         <select id="agStatus"></select>
                     </div>
 
-                    <div>
-                        <label for="agPlataforma" id="rotuloPlataforma">Plataforma</label>
-                        <input type="text" id="agPlataforma" autocomplete="off" placeholder="Ex: WAE16010">
+                    <!-- uma linha por equipamento (quantidade, − e +); o que é
+                         salvo é o campo escondido, ex: "2x WAD16 + WTE12" -->
+                    <div class="largo">
+                        <label id="rotuloPlataforma">Plataforma</label>
+                        <div id="listaPlataformas"></div>
+                        <input type="hidden" id="agPlataforma">
                         <p class="aviso-patrimonio" id="avisoPatrimonio" style="display:none"></p>
-                    </div>
-
-                    <div>
-                        <label for="agTransportadora">Transportadora</label>
-                        <select id="agTransportadora"></select>
                     </div>
 
                     <div class="largo" id="blocoRecolha" style="display:none">
                         <label for="agPlataformaRecolha">Máquina de recolha (volta com a troca)</label>
                         <input type="text" id="agPlataformaRecolha" autocomplete="off" placeholder="Ex: WTE10014">
                         <p class="aviso-patrimonio" id="avisoPatrimonioRecolha" style="display:none"></p>
+                    </div>
+
+                    <div>
+                        <label for="agTransportadora">Transportadora</label>
+                        <select id="agTransportadora"></select>
                     </div>
 
                     <div>
@@ -1430,6 +1448,7 @@ MODAL (novo / editar)
 <script src="js/agenda-transportadoras.js"></script>
 <script src="js/agenda-motoristas.js"></script>
 <script src="js/agenda-form-campos.js"></script>
+<script src="js/agenda-plataformas.js"></script>
 <script src="js/agenda-rascunho.js"></script>
 <script src="js/agenda-etapas.js"></script>
 <script src="js/agenda-modal.js"></script>

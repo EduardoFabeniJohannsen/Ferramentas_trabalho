@@ -12,6 +12,8 @@
 
     montarListaEquipamentos();
 
+    montarSelectUnidade();
+
     restaurarCacheWEG();
 
     gerarDocumento();
@@ -46,6 +48,11 @@
 
     $("periodos").addEventListener(
         "input",
+        atualizar
+    );
+
+    $("unidadeWEG").addEventListener(
+        "change",
         atualizar
     );
 

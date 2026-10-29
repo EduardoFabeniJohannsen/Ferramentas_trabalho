@@ -27,6 +27,7 @@ function salvarCacheWEG() {
 
         quantidades: quantidades,
         valorFrete: $("valorFrete")?.value || "",
+        unidadeWEG: $("unidadeWEG")?.value || "",
         periodos: $("periodos")?.value || "1",
         dataInicio: $("dataInicio")?.value || ""
     };
@@ -80,6 +81,12 @@ function restaurarCacheWEG() {
     });
 
     $("valorFrete").value = dados.valorFrete || "";
+
+    // unidade que não existe mais na lista fica na primeira
+    if (contratoWEG.unidadesWEG.includes(dados.unidadeWEG)) {
+
+        $("unidadeWEG").value = dados.unidadeWEG;
+    }
 
     $("periodos").value = dados.periodos || "1";
 

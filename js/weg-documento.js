@@ -42,10 +42,23 @@ function gerarDocumento() {
 
     let linhasTabela = "";
 
+    // Só os equipamentos com quantidade (0 não aparece no print).
     // Agrupa por tipo de equipamento e numera na ordem exibida (1, 2, 3...)
     const itensOrdenados =
-        [...contratoWEG.itens]
+        contratoWEG.itens
+            .filter((item) => obterQuantidade(item.modelo) > 0)
             .sort((a, b) => ordemDoGrupo(a.modelo) - ordemDoGrupo(b.modelo));
+
+    if (!itensOrdenados.length) {
+
+        linhasTabela = `
+            <tr>
+                <td colspan="5" style="text-align:center; color:#64748b;">
+                    Nenhum equipamento selecionado
+                </td>
+            </tr>
+        `;
+    }
 
     let grupoAnterior = null;
 
@@ -100,16 +113,23 @@ function gerarDocumento() {
         ? `${formatarData(datas.inicio)} a ${formatarData(datas.final)} (${periodoTexto})`
         : "—";
 
+    // de qual filial é o frete: W Rental Itajaí x WEG <unidade>
+    const rotuloFrete = `
+            <span>
+                Locação complementar (frete)
+                <span class="rota-frete">${textoRotaFrete()}</span>
+            </span>`;
+
     const linhaFrete = freteBonificado
         ? `
         <div class="resumo-linha bonificado">
-            <span>Locação complementar (frete)</span>
+            ${rotuloFrete}
             <span>BONIFICADO</span>
         </div>
         `
         : `
         <div class="resumo-linha">
-            <span>Locação complementar (frete)</span>
+            ${rotuloFrete}
             <span>${freteInvalido ? "Frete inválido" : "R$ " + formatarMoedaBR(complementar)}</span>
         </div>
         `;

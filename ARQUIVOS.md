@@ -185,15 +185,15 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `transp-init.js` (81 linhas): Confere se é admin (quem não é fica só vendo: some Nova/Excluir transportadora e Novo item), liga os eventos e carrega os dados. Quem não tem acesso já saiu pelo auth-guard.js. Sempre o ÚLTIMO script da página.
 - `transp-render.js` (381 linhas): Seleção da transportadora, abas, cartões de veículos e motoristas (admin: editar/excluir; só leitura: 👁 ver) e recarga. ⚠️ passa de ~300 linhas (sugerir divisão)
   - criarElemento, criarBotao, numeroBR, dataBR, placasDoVeiculo, desenharSelectTransportadora, definirAbaTransp, abrirNovoItemTransp, desenharListaTransp, textoQuantidadeDocs, criarItemVeiculo, criarAcoesItemTransp, criarItemMotorista, recarregarTransp
-- `weg-cache.js` (89 linhas): Salva/restaura o preenchimento no navegador.
+- `weg-cache.js` (96 linhas): Salva/restaura o preenchimento no navegador (inclui a unidade WEG).
   - salvarCacheWEG, restaurarCacheWEG
-- `weg-dados.js` (140 linhas): contratoWEG, lista de equipamentos, períodos, datas e grupos.
-  - montarListaEquipamentos, obterQuantidade, obterPeriodos, obterDatas, grupoDoModelo, ordemDoGrupo
-- `weg-documento.js` (168 linhas): gerarDocumento(): área para print.
+- `weg-dados.js` (169 linhas): contratoWEG (inclui origem do frete e unidades WEG: Jaraguá do Sul, Itajaí, Blumenau, Guaramirim), lista de equipamentos, unidade da WEG, períodos, datas e grupos.
+  - montarListaEquipamentos, montarSelectUnidade, textoRotaFrete, obterQuantidade, obterPeriodos, obterDatas, grupoDoModelo, ordemDoGrupo
+- `weg-documento.js` (188 linhas): gerarDocumento(): área para print. Só lista os equipamentos com quantidade maior que 0; a locação complementar mostra a rota do frete (W Rental Itajaí x WEG unidade).
   - gerarDocumento
 - `weg-email.js` (82 linhas): Texto copiado para o e-mail.
   - htmlConfirmacaoEmail, textoConfirmacaoEmail, copiarParaEmail
-- `weg-init.js` (63 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `weg-init.js` (70 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
 
 ## CSS
 

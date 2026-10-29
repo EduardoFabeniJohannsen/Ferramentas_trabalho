@@ -1,7 +1,7 @@
 // ======================================
 // WEG - DADOS E FORMULÁRIO
 // ======================================
-// contratoWEG, lista de equipamentos, períodos, datas e grupos.
+// contratoWEG, lista de equipamentos, unidade da WEG (frete), períodos, datas e grupos.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -19,6 +19,12 @@ const contratoWEG = {
     // ordem dos grupos no documento (2ª e 3ª letra do modelo:
     // ME = mastro, TE = tesoura, AD = articulada diesel, AE = articulada elétrica)
     ordemGrupos: ["ME", "TE", "AD", "AE"],
+
+    // o frete (locação complementar) sai sempre da W Rental Itajaí;
+    // a unidade da WEG escolhida aparece no documento
+    origemFrete: "W Rental Itajaí",
+
+    unidadesWEG: ["Jaraguá do Sul", "Itajaí", "Blumenau", "Guaramirim"],
 
     itens: [
         { modelo: "WME10", descricao: "MASTRO ELÉTRICO 10M", preco: 5820 },
@@ -63,6 +69,29 @@ function montarListaEquipamentos() {
     });
 
     lista.innerHTML = html;
+}
+
+
+// ======================================
+// UNIDADE DA WEG (destino do frete)
+// ======================================
+
+function montarSelectUnidade() {
+
+    $("unidadeWEG").innerHTML =
+        contratoWEG.unidadesWEG
+            .map((unidade) => `<option value="${unidade}">WEG ${unidade}</option>`)
+            .join("");
+}
+
+
+// "W Rental Itajaí x WEG Blumenau"
+function textoRotaFrete() {
+
+    const unidade =
+        $("unidadeWEG")?.value || contratoWEG.unidadesWEG[0];
+
+    return `${contratoWEG.origemFrete} x WEG ${unidade}`;
 }
 
 

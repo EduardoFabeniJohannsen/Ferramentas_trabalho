@@ -74,7 +74,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
 - `agenda-linhas.js` (442 linhas): Montagem de cada linha/célula da tabela, cabeçalho e seletor de status. ⚠️ passa de ~300 linhas (sugerir divisão)
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarMaquina, criarCelulasAgenda, criarCabecalhoAgenda, criarItemAgenda
-- `agenda-modal.js` (224 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal.
+- `agenda-modal.js` (222 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
   - abrirModalAgenda, atualizarCamposConta, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista

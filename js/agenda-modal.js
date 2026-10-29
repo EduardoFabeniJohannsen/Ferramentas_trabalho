@@ -123,7 +123,8 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 }
 
 
-// por nossa conta aparece o Card; por conta do cliente, os e-mails
+// por nossa conta aparece o Card. Os e-mails aparecem sempre (servem
+// pro faturamento da locação), mas só vão no agendamento por conta do cliente.
 function atualizarCamposConta(){
 
     const porCliente =
@@ -131,9 +132,6 @@ function atualizarCamposConta(){
 
     $("blocoCard").style.display =
         porCliente ? "none" : "";
-
-    $("blocoEmails").style.display =
-        porCliente ? "" : "none";
 }
 
 

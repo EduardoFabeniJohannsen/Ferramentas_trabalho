@@ -43,6 +43,10 @@ const ROTULOS_DOC = {
 // o navegador lembra a última transportadora escolhida
 const CHAVE_TRANSP_ULTIMA = "transportadorasUltima";
 
+// opção "Todas as transportadoras" do select (lista tudo; cadastrar novo
+// e excluir transportadora pedem uma transportadora escolhida)
+const TRANSP_TODAS = "__todas__";
+
 
 // ======================================
 // ESTADO
@@ -81,3 +85,9 @@ let transpSoLeitura = true;
 
 // evita salvar duas vezes com clique duplo
 let salvandoTransp = false;
+
+
+function emTodasTransp(){
+
+    return transpAtual === TRANSP_TODAS;
+}

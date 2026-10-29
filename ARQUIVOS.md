@@ -167,24 +167,24 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - criarLinhaTabela, criarLinhaNova, salvarCampo, adicionarLinha, excluirLinha
 - `tabelas-init.js` (101 linhas): Alternar consulta/edição e início. Sempre o ÚLTIMO script da página.
   - atualizarModo, alternarModoEdicao
-- `transp-banco.js` (259 linhas): Leitura e gravação: transportadoras, veículos, dados dos motoristas e exclusões. Os PDFs (Storage e tabela de documentos) ficam em transp-docs.js; o cadastro de transportadora, em transp-cad-banco.js.
-  - exigirDados, detalhesErroTransp, carregarListaTransportadoras, carregarDadosTransportadora, salvarVeiculoBanco, excluirVeiculoBanco, adicionarMotoristaBanco, salvarDadosMotoristaBanco, excluirMotoristaBanco
+- `transp-banco.js` (295 linhas): Leitura e gravação: transportadoras, veículos (de uma ou de todas as transportadoras), motoristas (renomear leva junto os agendamentos), dados dos motoristas e exclusões. Os PDFs (Storage e tabela de documentos) ficam em transp-docs.js; o cadastro de transportadora, em transp-cad-banco.js.
+  - exigirDados, detalhesErroTransp, carregarListaTransportadoras, carregarDadosTransportadora, salvarVeiculoBanco, excluirVeiculoBanco, adicionarMotoristaBanco, renomearMotoristaBanco, salvarDadosMotoristaBanco, excluirMotoristaBanco
 - `transp-cad-banco.js` (61 linhas): Adicionar e excluir transportadoras no Supabase e contar o que usa cada uma (motoristas, veículos, agendamentos). A tela fica em transp-cad-tela.js.
   - adicionarTransportadoraBanco, contarUsosTransportadora, excluirTransportadoraBanco
 - `transp-cad-tela.js` (184 linhas): Botões "+ Nova transportadora" e "Excluir transportadora" da barra (só exclui se não tiver motorista, veículo nem agendamento). Carregar antes de transp-init.js.
   - abrirFormNovaTransp, fecharFormNovaTransp, escolherTransportadora, adicionarTransportadoraTransp, textoUsosTransportadora, excluirTransportadoraAtual
-- `transp-config.js` (83 linhas): Tabelas (TRANSP_TABELAS, inclui agendamentos para checar vínculos), bucket, limite do PDF (5 MB), tipos e medidas do veículo, rótulos de documento e variáveis de estado (inclui `transpSoLeitura`: quem não é admin só vê). As policies de RLS no Supabase é que protegem os dados.
+- `transp-config.js` (93 linhas): Tabelas (TRANSP_TABELAS, inclui agendamentos para checar vínculos), bucket, limite do PDF (5 MB), tipos e medidas do veículo, rótulos de documento, TRANSP_TODAS (opção "Todas as transportadoras", conferida por emTodasTransp()) e variáveis de estado (inclui `transpSoLeitura`: quem não é admin só vê). As policies de RLS no Supabase é que protegem os dados.
 - `transp-docs.js` (314 linhas): Envio, abertura e exclusão dos PDFs de veículos e motoristas, e o bloco de documentos do formulário (só leitura: abre, sem anexar nem excluir). Os arquivos ficam no bucket privado (BUCKET_DOCS) e só abrem por link temporário. ⚠️ passa de ~300 linhas (sugerir divisão)
   - docsDoDono, removerArquivosStorage, enviarDocumento, abrirDocumento, excluirDocumento, criarBlocoDocumentos, desenharBlocoDocumentos
 - `transp-form.js` (132 linhas): Campos, máscara de CPF, abrir/fechar o modal (só leitura: campos travados e sem Salvar) e salvar (veículo e motorista ficam em transp-form-veiculo.js e transp-form-motorista.js).
   - criarCampoForm, maiusculoCampoTransp, formatarCPF, cpfValido, abrirModalTransp, fecharModalTransp, salvarModalTransp
-- `transp-form-motorista.js` (248 linhas): Modal do motorista (nome, CPF, nascimento, CNH), salvar e excluir.
+- `transp-form-motorista.js` (263 linhas): Modal do motorista (nome, CPF, nascimento, CNH), salvar e excluir. O admin pode trocar o nome; os agendamentos com o nome antigo são atualizados junto.
   - abrirModalMotorista, salvarMotoristaTransp, excluirMotoristaTransp
-- `transp-form-veiculo.js` (257 linhas): Modal do veículo (prancha ou carreta), validação de placas e medidas, salvar e excluir.
+- `transp-form-veiculo.js` (261 linhas): Modal do veículo (prancha ou carreta), validação de placas e medidas, salvar e excluir (editando, o veículo continua na transportadora dele).
   - atualizarCamposPlaca, abrirModalVeiculo, salvarVeiculoTransp, excluirVeiculoTransp
 - `transp-init.js` (81 linhas): Confere se é admin (quem não é fica só vendo: some Nova/Excluir transportadora e Novo item), liga os eventos e carrega os dados. Quem não tem acesso já saiu pelo auth-guard.js. Sempre o ÚLTIMO script da página.
-- `transp-render.js` (381 linhas): Seleção da transportadora, abas, cartões de veículos e motoristas (admin: editar/excluir; só leitura: 👁 ver) e recarga. ⚠️ passa de ~300 linhas (sugerir divisão)
-  - criarElemento, criarBotao, numeroBR, dataBR, placasDoVeiculo, desenharSelectTransportadora, definirAbaTransp, abrirNovoItemTransp, desenharListaTransp, textoQuantidadeDocs, criarItemVeiculo, criarAcoesItemTransp, criarItemMotorista, recarregarTransp
+- `transp-render.js` (408 linhas): Seleção da transportadora (inclui "Todas as transportadoras": lista tudo com o nome da transportadora no cartão; cadastrar novo e excluir transportadora ficam desativados), abas, cartões de veículos e motoristas (admin: editar/excluir; só leitura: 👁 ver) e recarga. ⚠️ passa de ~300 linhas (sugerir divisão)
+  - criarElemento, criarBotao, numeroBR, dataBR, placasDoVeiculo, adicionarNomeTransp, desenharSelectTransportadora, definirAbaTransp, abrirNovoItemTransp, desenharListaTransp, textoQuantidadeDocs, criarItemVeiculo, criarAcoesItemTransp, criarItemMotorista, recarregarTransp
 - `weg-cache.js` (96 linhas): Salva/restaura o preenchimento no navegador (inclui a unidade WEG).
   - salvarCacheWEG, restaurarCacheWEG
 - `weg-dados.js` (169 linhas): contratoWEG (inclui origem do frete e unidades WEG: Jaraguá do Sul, Itajaí, Blumenau, Guaramirim), lista de equipamentos, unidade da WEG, períodos, datas e grupos.
@@ -248,7 +248,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (442), `proposta-zap.js` (439), `transp-render.js` (381), `auth-guard.js` (376), `agenda-larguras.js` (358), `agenda-banco.js` (327), `transp-docs.js` (314), `index-ferramentas.js` (313).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (442), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (358), `agenda-banco.js` (327), `transp-docs.js` (314), `index-ferramentas.js` (313).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

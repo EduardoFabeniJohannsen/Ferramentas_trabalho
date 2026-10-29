@@ -21,24 +21,24 @@ function abrirModalMotorista(id){
 
     const grade = criarElemento("div", "grade-transp");
 
-    // o nome não muda aqui: os agendamentos guardam o nome como texto
     grade.appendChild(
         criarCampoForm(
             "Nome",
             "mtNome",
             motorista ? motorista.nome : "",
-            { readOnly: !!motorista, placeholder: "Nome completo" },
+            { placeholder: "Nome completo" },
             true
         )
     );
 
-    if(motorista){
+    // os agendamentos guardam o nome como texto: trocar aqui atualiza eles também
+    if(motorista && !transpSoLeitura){
 
         grade.appendChild(
             criarElemento(
                 "p",
                 "nota-form",
-                "O nome não é alterado aqui (os agendamentos antigos usam o nome como está)."
+                "Ao trocar o nome, os agendamentos com o nome antigo são atualizados junto."
             )
         );
     }
@@ -101,7 +101,7 @@ function abrirModalMotorista(id){
 
     abrirModalTransp(motorista ? "Editar motorista" : "Novo motorista");
 
-    (motorista ? $("mtCpf") : $("mtNome")).focus();
+    $("mtNome").focus();
 }
 
 
@@ -118,13 +118,21 @@ async function salvarMotoristaTransp(){
 
     const nascimento = $("mtNascimento").value;
 
-    if(!modalTransp.id){
+    if(!nome) return mostrarToast("Informe o nome do motorista", true);
 
-        if(!nome) return mostrarToast("Informe o nome do motorista", true);
+    const atual =
+        motoristasTransp.find(item => item.id === modalTransp.id) || null;
+
+    const trocouNome = !!atual && atual.nome !== nome;
+
+    if(!atual || trocouNome){
 
         const jaExiste =
             motoristasTransp.some(
-                item => item.nome.toLowerCase() === nome.toLowerCase()
+                item =>
+                    item.id !== modalTransp.id &&
+                    item.transportadora === (atual ? atual.transportadora : transpAtual) &&
+                    item.nome.toLowerCase() === nome.toLowerCase()
             );
 
         if(jaExiste){
@@ -169,6 +177,13 @@ async function salvarMotoristaTransp(){
 
             // se a gravação dos dados falhar, tentar de novo não duplica o motorista
             modalTransp.id = motoristaId;
+
+        }else if(trocouNome){
+
+            await renomearMotoristaBanco(atual, nome);
+
+            // se os dados falharem depois, tentar de novo não renomeia outra vez
+            atual.nome = nome;
         }
 
         await salvarDadosMotoristaBanco(motoristaId, dados);
@@ -220,7 +235,7 @@ async function excluirMotoristaTransp(id){
 
     if(
         !confirm(
-            `Excluir ${motorista.nome} (${transpAtual})?\n\n` +
+            `Excluir ${motorista.nome} (${motorista.transportadora})?\n\n` +
             "Os dados e os PDFs dele também serão apagados. " +
             "Os agendamentos antigos continuam com o nome."
         )

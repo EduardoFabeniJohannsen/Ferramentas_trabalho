@@ -70,7 +70,7 @@
     }
 
     transpAtual =
-        transpLista.includes(salva)
+        (transpLista.includes(salva) || (salva === TRANSP_TODAS && transpLista.length))
             ? salva
             : (transpLista[0] || "");
 

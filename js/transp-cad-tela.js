@@ -120,7 +120,7 @@ function textoUsosTransportadora(usos){
 // só exclui se não tiver motorista, veículo nem agendamento usando
 async function excluirTransportadoraAtual(){
 
-    if(!transpAtual || salvandoTransp) return;
+    if(!transpAtual || emTodasTransp() || salvandoTransp) return;
 
     const nome = transpAtual;
 

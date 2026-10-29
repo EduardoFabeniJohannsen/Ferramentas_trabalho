@@ -121,6 +121,10 @@
 .tag-transp.carreta{
     background:#7e22ce;
 }
+/* em "Todas as transportadoras": nome da transportadora no cartão */
+.tag-transp.empresa{
+    background:#475569;
+}
 
 /* ----- modal ----- */
 .modal-overlay{

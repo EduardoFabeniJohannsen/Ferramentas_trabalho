@@ -40,26 +40,35 @@ async function carregarListaTransportadoras(){
 }
 
 
-// veículos, motoristas (já com CPF/nascimento/CNH) e documentos de uma transportadora
+// veículos, motoristas (já com CPF/nascimento/CNH) e documentos de uma
+// transportadora (TRANSP_TODAS = de todas, em ordem de transportadora)
 async function carregarDadosTransportadora(nome){
 
     const resultado = { veiculos: [], motoristas: [], docs: [] };
 
     if(!nome) return resultado;
 
+    const todas = nome === TRANSP_TODAS;
+
+    const consulta = (tabela, campos, ordem) => {
+
+        let busca =
+            supabaseClient
+                .from(tabela)
+                .select(campos);
+
+        busca = todas
+            ? busca.order("transportadora")
+            : busca.eq("transportadora", nome);
+
+        return busca.order(ordem);
+    };
+
     const [respostaVeiculos, respostaMotoristas] = await Promise.all([
 
-        supabaseClient
-            .from(TRANSP_TABELAS.veiculos)
-            .select("*")
-            .eq("transportadora", nome)
-            .order("placa"),
+        consulta(TRANSP_TABELAS.veiculos, "*", "placa"),
 
-        supabaseClient
-            .from(TRANSP_TABELAS.motoristas)
-            .select("id, transportadora, nome")
-            .eq("transportadora", nome)
-            .order("nome")
+        consulta(TRANSP_TABELAS.motoristas, "id, transportadora, nome", "nome")
     ]);
 
     const veiculos = exigirDados(respostaVeiculos);
@@ -198,6 +207,33 @@ async function adicionarMotoristaBanco(transportadora, nome){
             .insert({ transportadora: transportadora, nome: nome })
             .select("id, transportadora, nome")
             .single()
+    );
+}
+
+
+// troca o nome e leva junto os agendamentos (eles guardam o nome como texto)
+async function renomearMotoristaBanco(motorista, nomeNovo){
+
+    const alterados = exigirDados(
+        await supabaseClient
+            .from(TRANSP_TABELAS.motoristas)
+            .update({ nome: nomeNovo })
+            .eq("id", motorista.id)
+            .select("id")
+    );
+
+    if(!alterados.length){
+
+        throw new Error("Nome não alterado (sem permissão ou motorista excluído)");
+    }
+
+    exigirDados(
+        await supabaseClient
+            .from(TRANSP_TABELAS.agendamentos)
+            .update({ motorista: nomeNovo })
+            .eq("transportadora", motorista.transportadora)
+            .eq("motorista", motorista.nome)
+            .select("id")
     );
 }
 

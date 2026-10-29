@@ -64,6 +64,17 @@ function placasDoVeiculo(veiculo){
 }
 
 
+// em "Todas": de qual transportadora é o item
+function adicionarNomeTransp(titulo, item){
+
+    if(!emTodasTransp()) return;
+
+    titulo.appendChild(
+        criarElemento("span", "tag-transp empresa", item.transportadora)
+    );
+}
+
+
 function desenharSelectTransportadora(){
 
     const select = $("selectTransportadora");
@@ -81,6 +92,12 @@ function desenharSelectTransportadora(){
 
         return;
     }
+
+    const todas = criarElemento("option", "", "Todas as transportadoras");
+
+    todas.value = TRANSP_TODAS;
+
+    select.appendChild(todas);
 
     transpLista.forEach(nome => {
 
@@ -108,7 +125,7 @@ function definirAbaTransp(aba){
 
 function abrirNovoItemTransp(){
 
-    if(!transpAtual || transpSoLeitura) return;
+    if(!transpAtual || emTodasTransp() || transpSoLeitura) return;
 
     if(abaTransp === "veiculos"){
 
@@ -132,10 +149,15 @@ function desenharListaTransp(){
     $("btnNovoItem").innerText =
         emVeiculos ? "+ Novo veículo" : "+ Novo motorista";
 
-    $("btnNovoItem").disabled = !transpAtual;
+    // cadastrar e excluir pedem uma transportadora (não vale em "Todas")
+    const semUma = !transpAtual || emTodasTransp();
 
-    // sem transportadora escolhida não há o que excluir
-    $("btnExcluirTransportadora").disabled = !transpAtual;
+    $("btnNovoItem").disabled = semUma;
+
+    $("btnNovoItem").title =
+        emTodasTransp() ? "Escolha uma transportadora para cadastrar" : "";
+
+    $("btnExcluirTransportadora").disabled = semUma;
 
     const lista = $("listaTransp");
 
@@ -213,6 +235,8 @@ function criarItemVeiculo(veiculo){
         )
     );
 
+    adicionarNomeTransp(titulo, veiculo);
+
     info.appendChild(titulo);
 
     const medidas =
@@ -282,9 +306,12 @@ function criarItemMotorista(motorista){
 
     const info = criarElemento("div", "item-transp-info");
 
-    info.appendChild(
-        criarElemento("div", "item-transp-titulo", motorista.nome)
-    );
+    const titulo =
+        criarElemento("div", "item-transp-titulo", motorista.nome);
+
+    adicionarNomeTransp(titulo, motorista);
+
+    info.appendChild(titulo);
 
     const partes = [];
 

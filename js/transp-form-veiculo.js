@@ -155,8 +155,12 @@ async function salvarVeiculoTransp(){
         }
     }
 
+    // editando: continua na transportadora dele (em "Todas" não há uma escolhida)
+    const atual =
+        veiculosTransp.find(item => item.id === modalTransp.id);
+
     const dados = {
-        transportadora: transpAtual,
+        transportadora: atual ? atual.transportadora : transpAtual,
         tipo: tipo,
         placa: placa,
         placa2: tipo === "Carreta" ? placa2 : null

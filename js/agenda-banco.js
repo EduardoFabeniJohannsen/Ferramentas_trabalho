@@ -152,6 +152,55 @@ function detalhesErro(erro){
 }
 
 
+// Texto claro para o toast quando salvar falha: diz o motivo em vez de só
+// "erro". O detalhe técnico continua indo para o console.
+function mensagemErroSalvar(erro){
+
+    const codigo = erro?.code || "";
+
+    const texto = String(erro?.message || "");
+
+    // coluna que o código usa e o banco ainda não tem
+    if(
+        codigo === "PGRST204" ||
+        codigo === "42703" ||
+        (/column/i.test(texto) && /schema cache|does not exist/i.test(texto))
+    ){
+        const achou =
+            texto.match(/'([a-z_]+)' column/i) ||
+            texto.match(/column "?([a-z_.]+)"?/i);
+
+        return (
+            "Banco desatualizado: falta a coluna" +
+            (achou ? ` "${achou[1]}"` : "") +
+            " na tabela agendamentos. Aplique o SQL do faturamento no Supabase."
+        );
+    }
+
+    if(codigo === "42501" || /row-level security/i.test(texto)){
+
+        return "Sem permissão para salvar na agenda. Confira seu acesso à agenda ou entre de novo no sistema.";
+    }
+
+    if(codigo === "23514"){
+
+        return "O banco recusou os dados: confira forma de pagamento e pedido de compra.";
+    }
+
+    if(/failed to fetch|networkerror|network request/i.test(texto)){
+
+        return "Sem conexão com o servidor. Confira a internet e tente de novo.";
+    }
+
+    if(/não encontrado|foi excluído/i.test(texto)){
+
+        return "Este agendamento não existe mais (outra pessoa excluiu). Atualize a agenda.";
+    }
+
+    return `Erro ao salvar o agendamento: ${texto || "motivo desconhecido"}`;
+}
+
+
 // o Supabase devolve no máximo 1000 linhas por consulta,
 // então busca em páginas até acabar
 async function carregarAgenda(){

@@ -12,6 +12,25 @@
 
 <link rel="stylesheet" href="css/transportadoras.css">
 
+<style>
+/* cadastro de transportadora: formulário que abre embaixo da barra */
+.nova-transp{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:10px;
+}
+.nova-transp input{
+    flex:1;
+    min-width:200px;
+    margin:0;
+}
+.nova-transp button{
+    margin:0;
+}
+</style>
+
 </head>
 
 <body>
@@ -42,15 +61,54 @@ CONTAINER (só aparece depois de confirmar que é admin)
         <h2 style="text-align:center">Transportadoras</h2>
 
         <p class="dica-transp">
-            Área restrita ao admin. Veículos, motoristas e PDFs da documentação.
+            Área restrita ao admin. Cadastro de transportadoras, veículos, motoristas e PDFs da documentação.
         </p>
 
         <div class="barra-transp">
 
             <select id="selectTransportadora"></select>
 
+            <button
+                type="button"
+                class="btn-secundario"
+                id="btnNovaTransportadora"
+                onclick="abrirFormNovaTransp()"
+            >
+                + Nova transportadora
+            </button>
+
+            <button
+                type="button"
+                class="btn-secundario"
+                id="btnExcluirTransportadora"
+                onclick="excluirTransportadoraAtual()"
+                title="Excluir a transportadora selecionada (só se não tiver motorista, veículo nem agendamento)"
+            >
+                🗑️ Excluir transportadora
+            </button>
+
             <button type="button" id="btnNovoItem" onclick="abrirNovoItemTransp()">
                 + Novo veículo
+            </button>
+
+        </div>
+
+        <div class="nova-transp" id="formNovaTransp" style="display:none">
+
+            <input
+                type="text"
+                id="nomeNovaTransp"
+                placeholder="Nome da transportadora"
+                maxlength="60"
+                autocomplete="off"
+            >
+
+            <button type="button" onclick="adicionarTransportadoraTransp()">
+                Adicionar
+            </button>
+
+            <button type="button" class="btn-secundario" onclick="fecharFormNovaTransp()">
+                Cancelar
             </button>
 
         </div>
@@ -139,11 +197,13 @@ MODAL (veículo / motorista)
 <script src="js/menu.js"></script>
 <script src="js/transp-config.js"></script>
 <script src="js/transp-banco.js"></script>
+<script src="js/transp-cad-banco.js"></script>
 <script src="js/transp-docs.js"></script>
 <script src="js/transp-render.js"></script>
 <script src="js/transp-form.js"></script>
 <script src="js/transp-form-veiculo.js"></script>
 <script src="js/transp-form-motorista.js"></script>
+<script src="js/transp-cad-tela.js"></script>
 <script src="js/transp-init.js"></script>
 
 </body>

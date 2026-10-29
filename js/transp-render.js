@@ -134,6 +134,9 @@ function desenharListaTransp(){
 
     $("btnNovoItem").disabled = !transpAtual;
 
+    // sem transportadora escolhida não há o que excluir
+    $("btnExcluirTransportadora").disabled = !transpAtual;
+
     const lista = $("listaTransp");
 
     lista.innerHTML = "";
@@ -159,7 +162,7 @@ function desenharListaTransp(){
                         (
                             transpAtual
                                 ? `Nenhum ${emVeiculos ? "veículo" : "motorista"} cadastrado`
-                                : "Cadastre uma transportadora na agenda primeiro"
+                                : "Cadastre uma transportadora em \"+ Nova transportadora\""
                         )
                     )
             )

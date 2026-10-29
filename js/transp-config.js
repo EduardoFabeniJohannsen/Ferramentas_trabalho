@@ -13,7 +13,8 @@ const TRANSP_TABELAS = {
     veiculos: "veiculos",
     motoristas: "motoristas",
     motoristasDados: "motoristas_dados",
-    docs: "transportadora_docs"
+    docs: "transportadora_docs",
+    agendamentos: "agendamentos"
 };
 
 // bucket privado: os PDFs só abrem por link temporário

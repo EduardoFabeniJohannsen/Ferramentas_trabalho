@@ -18,9 +18,7 @@
 
     preencherSelect("agTransportadora", TRANSPORTADORAS, "Sem transportadora");
 
-    preencherSelect("motTransportadora", TRANSPORTADORAS);
-
-    ["filtroTipo"].forEach(id => {
+    [ "filtroTipo" ].forEach(id => {
 
         $(id).addEventListener(
             "change",
@@ -32,19 +30,6 @@
     $("agTransportadora").addEventListener(
         "change",
         () => atualizarOpcoesMotorista($("agTransportadora").value, "")
-    );
-
-    $("motTransportadora").addEventListener(
-        "change",
-        desenharMotoristas
-    );
-
-    $("motNome").addEventListener(
-        "keydown",
-        (evento) => {
-
-            if(evento.key === "Enter") adicionarMotorista();
-        }
     );
 
     $("agFreteConta").addEventListener(
@@ -106,14 +91,6 @@
     $("modalAgenda").addEventListener("input", agendarRascunho);
 
     $("modalAgenda").addEventListener("change", agendarRascunho);
-
-    $("transNome").addEventListener(
-        "keydown",
-        (evento) => {
-
-            if(evento.key === "Enter") adicionarTransportadora();
-        }
-    );
 
     $("ordemAgenda").addEventListener(
         "change",

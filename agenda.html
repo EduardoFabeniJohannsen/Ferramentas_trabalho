@@ -310,6 +310,7 @@ tr.ag-item[data-status="Concluído"] td{
 }
 .ag-patrimonio{
     font-weight:bold;
+    font-size:15px;
 }
 
 /* status: a própria etiqueta troca o status ao clicar */
@@ -743,53 +744,6 @@ tr.ag-item td.ag-lado{
     background:#b45309;
 }
 
-/* ===== Cadastro de transportadoras e motoristas ===== */
-.modal-motoristas{
-    max-width:440px;
-}
-.modal-agenda label.rotulo-modal{
-    display:block;
-    font-size:12px;
-    color:#94a3b8;
-    margin-bottom:2px;
-}
-.sep-modal{
-    margin:14px 0;
-    border:none;
-    border-top:1px solid #334155;
-}
-.mot-linha{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:6px 10px;
-    margin-bottom:5px;
-    background:#0f172a;
-    border:1px solid #334155;
-    border-radius:8px;
-}
-.mot-linha button{
-    margin:0;
-    padding:4px 10px;
-}
-.mot-vazio{
-    color:#94a3b8;
-    font-size:13px;
-    padding:8px 0;
-}
-.mot-novo{
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-}
-.mot-novo input{
-    margin:0;
-    flex:1;
-}
-.mot-novo button{
-    margin:0;
-}
-
 @media(max-width:600px){
     .form-grade,
     .etapa-grade{
@@ -821,8 +775,7 @@ body.tema-claro select{
 }
 body.tema-claro .contagem-agenda,
 body.tema-claro .dica-modo,
-body.tema-claro .agenda-vazia,
-body.tema-claro .mot-vazio{
+body.tema-claro .agenda-vazia{
     color:#52617a;
 }
 body.tema-claro .chip,
@@ -884,8 +837,7 @@ body.tema-claro .modal-agenda-topo{
     background:var(--claro-card);
     border-bottom-color:var(--claro-linha);
 }
-body.tema-claro .form-grade label,
-body.tema-claro .modal-agenda label.rotulo-modal{
+body.tema-claro .form-grade label{
     color:#3b4a63;
 }
 body.tema-claro .subtitulo-form{
@@ -893,10 +845,6 @@ body.tema-claro .subtitulo-form{
 }
 body.tema-claro .aviso-rascunho{
     color:#a14a09;
-}
-body.tema-claro .mot-linha{
-    background:var(--claro-campo);
-    border-color:var(--claro-linha);
 }
 body.tema-claro .tag.sem-transp,
 body.tema-claro .ag-hora-vazio{
@@ -951,9 +899,6 @@ body.tema-claro .etapa-titulo{
 }
 body.tema-claro .aviso-patrimonio{
     color:#a14a09;
-}
-body.tema-claro .sep-modal{
-    border-top-color:var(--claro-linha);
 }
 </style>
 
@@ -1013,14 +958,6 @@ CONTAINER
 
             <button type="button" onclick="abrirModalAgenda()">
                 + Novo agendamento
-            </button>
-
-            <button
-                type="button"
-                class="btn-secundario"
-                onclick="abrirModalMotoristas()"
-            >
-                🚚 Transportadoras e motoristas
             </button>
 
             <!-- filtro de datas estilo Excel: lista com caixinhas -->
@@ -1467,83 +1404,6 @@ MODAL (novo / editar)
 </datalist>
 
 <datalist id="listaPeriodos"></datalist>
-
-<!-- =========================
-MODAL (cadastro de transportadoras e motoristas)
-========================= -->
-
-<div
-    id="modalMotoristas"
-    class="modal-overlay"
-    onclick="if(event.target === this) fecharModalMotoristas()"
->
-
-    <div class="modal-agenda modal-motoristas">
-
-        <div class="modal-agenda-topo">
-
-            <h3>🚚 Transportadoras e motoristas</h3>
-
-            <button
-                type="button"
-                class="btn-fechar"
-                onclick="fecharModalMotoristas()"
-                title="Fechar"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div class="modal-corpo">
-
-            <p class="subtitulo-form" style="margin-top:0">Transportadoras</p>
-
-            <div id="listaTransportadorasCadastro"></div>
-
-            <div class="mot-novo">
-
-                <input
-                    type="text"
-                    id="transNome"
-                    placeholder="Nome da transportadora"
-                >
-
-                <button type="button" onclick="adicionarTransportadora()">
-                    Adicionar
-                </button>
-
-            </div>
-
-            <hr class="sep-modal">
-
-            <p class="subtitulo-form" style="margin-top:0">Motoristas</p>
-
-            <label class="rotulo-modal" for="motTransportadora">Transportadora</label>
-
-            <select id="motTransportadora"></select>
-
-            <div id="listaMotoristasCadastro"></div>
-
-            <div class="mot-novo">
-
-                <input
-                    type="text"
-                    id="motNome"
-                    placeholder="Nome do motorista"
-                >
-
-                <button type="button" onclick="adicionarMotorista()">
-                    Adicionar
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 
 <div id="toast"></div>
 

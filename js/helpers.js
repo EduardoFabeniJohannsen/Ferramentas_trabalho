@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.5.2";
+const VERSAO_SISTEMA = "16.5.4";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -174,5 +174,5 @@ const mostrarToast = (msg, erro = false) => {
 
         toast.classList.remove("show");
 
-    }, erro ? 4000 : 2000);
+    }, erro ? Math.max(4000, msg.length * 70) : 2000);
 };

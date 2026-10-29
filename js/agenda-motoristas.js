@@ -1,8 +1,8 @@
 // ======================================
-// AGENDA - CADASTRO DE MOTORISTAS
+// AGENDA - MOTORISTAS (LEITURA)
 // ======================================
-// Carregar e adicionar motoristas; modal de cadastro. Excluir motorista: só admin, em transportadoras.html.
-// (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
+// Carrega os motoristas e monta as opções do formulário. Cadastrar e
+// excluir motorista: só o admin, na página transportadoras.html.
 
 // ======================================
 // MOTORISTAS (cadastro por transportadora)
@@ -87,119 +87,4 @@ function atualizarOpcoesMotorista(transportadora, motoristaAtual){
         !transportadora && !motoristaAtual;
 
     select.value = motoristaAtual || "";
-}
-
-
-// ---------- modal de cadastro ----------
-
-function abrirModalMotoristas(){
-
-    $("modalMotoristas").classList.add("aberto");
-
-    desenharTransportadoras();
-
-    desenharMotoristas();
-
-    $("transNome").focus();
-}
-
-
-function fecharModalMotoristas(){
-
-    $("modalMotoristas").classList.remove("aberto");
-}
-
-
-function desenharMotoristas(){
-
-    const lista = $("listaMotoristasCadastro");
-
-    lista.innerHTML = "";
-
-    const transportadora =
-        $("motTransportadora").value;
-
-    const motoristas =
-        motoristasCadastrados
-            .filter(item => item.transportadora === transportadora)
-            .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-
-    if(!motoristas.length){
-
-        lista.appendChild(
-            criar("div", "mot-vazio", "Nenhum motorista cadastrado")
-        );
-
-        return;
-    }
-
-    motoristas.forEach(motorista => {
-
-        const linha = criar("div", "mot-linha");
-
-        linha.appendChild(criar("span", "", motorista.nome));
-
-        lista.appendChild(linha);
-    });
-}
-
-
-async function adicionarMotorista(){
-
-    const transportadora =
-        $("motTransportadora").value;
-
-    const nome =
-        $("motNome").value
-            .trim()
-            .replace(/\s+/g, " ");
-
-    if(!transportadora){
-
-        return mostrarToast("Cadastre uma transportadora primeiro", true);
-    }
-
-    if(!nome){
-
-        return mostrarToast("Informe o nome do motorista", true);
-    }
-
-    const jaExiste =
-        motoristasDe(transportadora).some(
-            existente =>
-                existente.toLowerCase() === nome.toLowerCase()
-        );
-
-    if(jaExiste){
-
-        return mostrarToast("Esse motorista já está cadastrado", true);
-    }
-
-    const { data, error } =
-        await supabaseClient
-            .from(TABELA_MOTORISTAS)
-            .insert({ transportadora: transportadora, nome: nome })
-            .select("id, transportadora, nome")
-            .single();
-
-    if(error){
-
-        console.error("[motoristas] Falha ao adicionar:", detalhesErro(error));
-
-        // 23505 = já existe (alguém cadastrou ao mesmo tempo)
-        return mostrarToast(
-            error.code === "23505"
-                ? "Esse motorista já está cadastrado"
-                : "Erro ao adicionar o motorista",
-            true
-        );
-    }
-
-    motoristasCadastrados.push(data);
-
-    $("motNome").value = "";
-
-    desenharMotoristas();
-
-    mostrarToast("Motorista adicionado");
 }

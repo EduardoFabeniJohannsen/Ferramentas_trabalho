@@ -139,7 +139,7 @@ async function salvarAgendamento(){
         salvandoAgendamento = false;
 
         // o formulário continua aberto pra não perder o que foi digitado
-        return mostrarToast("Erro ao salvar o agendamento", true);
+        return mostrarToast(mensagemErroSalvar(erro), true);
     }
 
     // PDF do pedido de compra: envia/apaga depois de gravar (o caminho usa o id)

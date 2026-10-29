@@ -99,6 +99,9 @@ function calcularBoletos(){
     const valorTexto =
         $("valor")?.value;
 
+    const parcelasTexto =
+        $("parcelas")?.value;
+
 
     if(dataTexto){
 
@@ -143,28 +146,55 @@ function calcularBoletos(){
     }
 
 
-    if(valorTexto){
+    const valor =
+        brToNumber(valorTexto);
 
-        const valor =
-            brToNumber(valorTexto);
+    const parcelas =
+        parseInt(parcelasTexto, 10);
 
-        if(
-            Number.isFinite(valor) &&
-            valor > 0
-        ){
 
-            $("metade").innerText =
-                "R$ " + formatarMoedaBR(valor / 2);
-
-        }else{
-
-            $("metade").innerText = "";
-        }
-
-    }else{
+    if(
+        !valorTexto ||
+        !Number.isFinite(valor) ||
+        valor <= 0 ||
+        !Number.isFinite(parcelas) ||
+        parcelas < 1
+    ){
 
         $("metade").innerText = "";
+
+        return calcularDiasPersonalizados();
     }
+
+
+    // Conta em centavos para não perder valor no arredondamento.
+    // A sobra da divisão vai inteira para a 1ª parcela.
+    const totalCentavos =
+        Math.round(valor * 100);
+
+    const baseCentavos =
+        Math.floor(totalCentavos / parcelas);
+
+    const restoCentavos =
+        totalCentavos - (baseCentavos * parcelas);
+
+
+    const linhas = [];
+
+    for(let i = 0; i < parcelas; i++){
+
+        const centavos =
+            i === 0
+                ? baseCentavos + restoCentavos
+                : baseCentavos;
+
+        linhas.push(
+            `${i + 1}ª: R$ ` + formatarMoedaBR(centavos / 100)
+        );
+    }
+
+    $("metade").innerText =
+        linhas.join("\n");
 
 
     calcularDiasPersonalizados();
@@ -256,6 +286,15 @@ function calcularDiasPersonalizados(){
     if($("valor")){
 
         $("valor")
+            .addEventListener(
+                "input",
+                calcularBoletos
+            );
+    }
+
+    if($("parcelas")){
+
+        $("parcelas")
             .addEventListener(
                 "input",
                 calcularBoletos

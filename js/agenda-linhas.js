@@ -384,6 +384,30 @@ function criarItemAgenda(item){
 
     botoes.appendChild(botaoZap);
 
+    // faturamento (forma, prazo e e-mails): só entrega tem. Nos outros
+    // tipos fica invisível, pra manter os botões alinhados.
+    const botaoFaturamento = criar("button", "btn-faturamento", "🧾");
+
+    botaoFaturamento.type = "button";
+
+    if(item.tipo === "Entrega"){
+
+        botaoFaturamento.title = "Copiar faturamento (pagamento, prazo e e-mails)";
+
+        botaoFaturamento.addEventListener(
+            "click",
+            () => copiarFaturamento(item)
+        );
+
+    }else{
+
+        botaoFaturamento.style.visibility = "hidden";
+
+        botaoFaturamento.tabIndex = -1;
+    }
+
+    botoes.appendChild(botaoFaturamento);
+
     // entrega: cria uma coleta a partir dela. Nos outros tipos fica um
     // botão invisível, só pra os botões da direita ficarem alinhados.
     const botaoColeta = criar("button", "btn-coleta", "↩️");

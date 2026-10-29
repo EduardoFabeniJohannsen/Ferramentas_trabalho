@@ -62,6 +62,22 @@
         atualizarCamposTipo
     );
 
+    // retirada recolhida (entrega): clique ou Enter abre e fecha
+    $("tituloRetirada").addEventListener("click", alternarRetirada);
+
+    $("tituloRetirada").addEventListener(
+        "keydown",
+        evento => {
+
+            if(evento.key === "Enter" || evento.key === " "){
+
+                evento.preventDefault();
+
+                alternarRetirada();
+            }
+        }
+    );
+
     // plataformas sempre em maiúsculo enquanto digita (as linhas de
     // equipamento vão juntas para o campo escondido agPlataforma)
     $("listaPlataformas").addEventListener("input", digitarPlataforma);

@@ -262,6 +262,57 @@ function coletarFaturamento(tipo){
 
 
 // ======================================
+// COPIAR FATURAMENTO (botão 🧾 da linha)
+// ======================================
+// "Boleto – 28/56 DD - Enviar para:" e um e-mail por linha. Pega só os
+// e-mails do campo: separadores (, ; /), nomes e telefones ficam de fora.
+
+function textoFaturamento(item){
+
+    const encontrados =
+        String(item.emails || "")
+            .match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || [];
+
+    // sem repetir (o mesmo e-mail digitado duas vezes sai uma vez só)
+    const emails =
+        encontrados
+            .map(email => email.replace(/\.+$/, "").toLowerCase())
+            .filter((email, posicao, lista) => lista.indexOf(email) === posicao);
+
+    if(!emails.length){
+
+        return { erro: "Informe os e-mails do cliente (faturamento) no agendamento" };
+    }
+
+    const prazos =
+        (Array.isArray(item.prazosPagamento) ? item.prazosPagamento : [])
+            .map(String)
+            .filter(Boolean);
+
+    const partes = [item.formaPagamento || "Forma de pagamento não informada"];
+
+    if(prazos.length) partes.push(`${prazos.join("/")} DD`);
+
+    return {
+        texto: `${partes.join(" – ")} - Enviar para:  \n${emails.join("\n")}`
+    };
+}
+
+
+function copiarFaturamento(item){
+
+    const resultado = textoFaturamento(item);
+
+    if(resultado.erro){
+
+        return mostrarToast(resultado.erro, true);
+    }
+
+    copiar(resultado.texto, "Faturamento copiado");
+}
+
+
+// ======================================
 // LIGAÇÕES
 // ======================================
 

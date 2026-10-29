@@ -266,6 +266,56 @@ function atualizarCamposTipo(){
 
     $("rotuloPlataforma").innerText =
         troca ? "Máquina de entrega" : "Plataforma";
+
+    atualizarRetirada();
+}
+
+
+// ======================================
+// RETIRADA (recolhida em entrega)
+// ======================================
+// Na entrega a retirada é quase sempre a W Rental: vem recolhida. Se tiver
+// algo preenchido, ou em outro tipo, aparece aberta (não esconde dado).
+
+function retiradaPreenchida(){
+
+    return ["agOrigemNome", "agOrigemEndereco", "agLinkOrigem"]
+        .some(id => $(id).value.trim() !== "");
+}
+
+
+function mostrarRetirada(aberta){
+
+    $("tituloRetirada").classList.toggle("recolhida", !aberta);
+
+    $("tituloRetirada").setAttribute("aria-expanded", aberta ? "true" : "false");
+
+    document.querySelectorAll(".campo-retirada").forEach(campo => {
+
+        campo.style.display = aberta ? "" : "none";
+    });
+
+    $("resumoRetirada").innerText =
+        aberta ? "" : `— ${LOCAL_PADRAO}`;
+}
+
+
+function atualizarRetirada(){
+
+    mostrarRetirada(
+        $("agTipo").value !== "Entrega" || retiradaPreenchida()
+    );
+}
+
+
+function alternarRetirada(){
+
+    const aberta =
+        $("tituloRetirada").classList.contains("recolhida");
+
+    mostrarRetirada(aberta);
+
+    if(aberta) $("agOrigemNome").focus();
 }
 
 

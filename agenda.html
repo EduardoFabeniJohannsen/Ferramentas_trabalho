@@ -430,6 +430,12 @@ tr.ag-item td.ag-lado{
 .ag-botoes .btn-zap:hover{
     background:#15803d;
 }
+.ag-botoes .btn-faturamento{
+    background:#0e7490;
+}
+.ag-botoes .btn-faturamento:hover{
+    background:#155e75;
+}
 .ag-botoes .btn-coleta{
     background:#b45309;
 }
@@ -692,6 +698,29 @@ tr.ag-item td.ag-lado{
 }
 .etapa.recolhida .etapa-grade{
     display:none;
+}
+
+/* retirada recolhida (entrega): só o título com "W Rental" */
+.titulo-retirada{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    user-select:none;
+}
+.titulo-retirada:hover{
+    filter:brightness(1.2);
+}
+.retirada-resumo{
+    font-weight:normal;
+    color:#94a3b8;
+}
+.retirada-seta{
+    margin-left:auto;
+    transition:transform .15s;
+}
+.titulo-retirada.recolhida .retirada-seta{
+    transform:rotate(-90deg);
 }
 
 /* ===== Largura das colunas (arrastar a borda do título) ===== */
@@ -1269,21 +1298,30 @@ MODAL (novo / editar)
 
                 <div class="etapa-grade">
 
-                    <p class="largo subtitulo-form">
+                    <!-- em entrega vem recolhida (quase sempre é a W Rental); clique abre -->
+                    <p
+                        class="largo subtitulo-form titulo-retirada"
+                        id="tituloRetirada"
+                        tabindex="0"
+                        role="button"
+                        title="Clique para mostrar ou esconder o local de retirada"
+                    >
                         📍 Retirada (vazio em entrega e troca = W Rental)
+                        <span class="retirada-resumo" id="resumoRetirada"></span>
+                        <span class="retirada-seta">▾</span>
                     </p>
 
-                    <div class="largo">
+                    <div class="largo campo-retirada">
                         <label for="agOrigemNome">Nome do local</label>
                         <input type="text" id="agOrigemNome" placeholder="Ex: Obra A">
                     </div>
 
-                    <div class="largo">
+                    <div class="largo campo-retirada">
                         <label for="agOrigemEndereco">Endereço completo</label>
                         <input type="text" id="agOrigemEndereco" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
                     </div>
 
-                    <div class="largo">
+                    <div class="largo campo-retirada">
                         <label for="agLinkOrigem">Link (opcional)</label>
                         <input type="text" id="agLinkOrigem" placeholder="https://maps...">
                     </div>

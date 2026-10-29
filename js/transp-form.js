@@ -89,7 +89,20 @@ function cpfValido(texto){
 }
 
 
+// quem só vê: campos travados, sem Salvar e título sem "Editar"
 function abrirModalTransp(titulo){
+
+    if(transpSoLeitura){
+
+        titulo = titulo.replace(/^Editar /, "Dados do ");
+
+        $("corpoModalTransp")
+            .querySelectorAll(".grade-transp input, .grade-transp select")
+            .forEach(campo => { campo.disabled = true; });
+    }
+
+    $("btnSalvarTransp").style.display =
+        transpSoLeitura ? "none" : "";
 
     $("tituloModalTransp").innerText = titulo;
 
@@ -110,6 +123,8 @@ function fecharModalTransp(){
 
 
 function salvarModalTransp(){
+
+    if(transpSoLeitura) return;
 
     if(modalTransp.tipo === "veiculo") return salvarVeiculoTransp();
 

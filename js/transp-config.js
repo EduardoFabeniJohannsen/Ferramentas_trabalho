@@ -75,5 +75,9 @@ let cargaTransp = 0;
 // formulário aberto: { tipo: "veiculo" | "motorista", id: null (novo) | número }
 let modalTransp = { tipo: "", id: null };
 
+// quem não é admin só vê (lista, dados e PDFs): some tudo que edita.
+// Começa travado; o transp-init.js libera para o admin.
+let transpSoLeitura = true;
+
 // evita salvar duas vezes com clique duplo
 let salvandoTransp = false;

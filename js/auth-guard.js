@@ -120,8 +120,8 @@ async function ehAdmin(){
 // ======================================
 // Cada usuário tem uma linha na tabela "perfis":
 // - acessos: páginas liberadas (nome do arquivo sem .html, em
-//   minúsculas: index, propostas, agenda, estoque, tabelas, weg)
-//   mais "fretes" (dados das tabelas de frete);
+//   minúsculas: index, propostas, agenda, estoque, tabelas, weg,
+//   transportadoras = só ver) mais "fretes" (dados das tabelas de frete);
 // - filiais: filiais do estoque que ele enxerga (ITAJAI, JOINVILLE);
 // - ativo: false bloqueia o usuário.
 // Admin (app_metadata.role) tem acesso a tudo. Sem linha no

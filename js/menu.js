@@ -23,8 +23,11 @@
 
         { arquivo: "WEG.html", rotulo: "🏢 WEG" },
 
+        // comAcesso: o link só aparece para quem tem o acesso da página
+        // (admin ou liberado na página Admin)
+        { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras", comAcesso: true },
+
         // soAdmin: o link só aparece para admin
-        { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras", soAdmin: true },
 
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
     ];
@@ -93,6 +96,20 @@
                 ehAdmin().then(admin => {
 
                     if(admin) link.style.display = "";
+                });
+            }
+
+            // página com acesso controlado: escondido até ler o perfil
+            if(pagina.comAcesso){
+
+                link.style.display = "none";
+
+                carregarPerfil().then(() => {
+
+                    if(temAcesso(recursoDaPagina(pagina.arquivo))){
+
+                        link.style.display = "";
+                    }
                 });
             }
 

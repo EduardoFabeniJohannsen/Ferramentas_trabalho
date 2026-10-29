@@ -108,7 +108,7 @@ function definirAbaTransp(aba){
 
 function abrirNovoItemTransp(){
 
-    if(!transpAtual) return;
+    if(!transpAtual || transpSoLeitura) return;
 
     if(abaTransp === "veiculos"){
 
@@ -162,7 +162,11 @@ function desenharListaTransp(){
                         (
                             transpAtual
                                 ? `Nenhum ${emVeiculos ? "veículo" : "motorista"} cadastrado`
-                                : "Cadastre uma transportadora em \"+ Nova transportadora\""
+                                : (
+                                    transpSoLeitura
+                                        ? "Nenhuma transportadora cadastrada"
+                                        : "Cadastre uma transportadora em \"+ Nova transportadora\""
+                                )
                         )
                     )
             )
@@ -241,24 +245,34 @@ function criarItemVeiculo(veiculo){
 
     item.appendChild(info);
 
-    const acoes = criarElemento("div", "item-transp-acoes");
-
-    acoes.appendChild(
-        criarBotao("✏️", "Editar", "", () => abrirModalVeiculo(veiculo.id))
-    );
-
-    acoes.appendChild(
-        criarBotao(
-            "🗑️",
-            "Excluir",
-            "btn-secundario",
+    item.appendChild(
+        criarAcoesItemTransp(
+            () => abrirModalVeiculo(veiculo.id),
             () => excluirVeiculoTransp(veiculo.id)
         )
     );
 
-    item.appendChild(acoes);
-
     return item;
+}
+
+
+// admin: editar e excluir; quem só vê: abrir (dados e PDFs)
+function criarAcoesItemTransp(abrir, excluir){
+
+    const acoes = criarElemento("div", "item-transp-acoes");
+
+    if(transpSoLeitura){
+
+        acoes.appendChild(criarBotao("👁", "Ver dados e documentos", "", abrir));
+
+        return acoes;
+    }
+
+    acoes.appendChild(criarBotao("✏️", "Editar", "", abrir));
+
+    acoes.appendChild(criarBotao("🗑️", "Excluir", "btn-secundario", excluir));
+
+    return acoes;
 }
 
 
@@ -303,22 +317,12 @@ function criarItemMotorista(motorista){
 
     item.appendChild(info);
 
-    const acoes = criarElemento("div", "item-transp-acoes");
-
-    acoes.appendChild(
-        criarBotao("✏️", "Editar", "", () => abrirModalMotorista(motorista.id))
-    );
-
-    acoes.appendChild(
-        criarBotao(
-            "🗑️",
-            "Excluir",
-            "btn-secundario",
+    item.appendChild(
+        criarAcoesItemTransp(
+            () => abrirModalMotorista(motorista.id),
             () => excluirMotoristaTransp(motorista.id)
         )
     );
-
-    item.appendChild(acoes);
 
     return item;
 }

@@ -5,13 +5,18 @@
 
 (async function init(){
 
-    // só admin: quem não for volta pra página inicial
-    // (quem protege os dados de verdade é o RLS no Supabase)
-    if(!(await ehAdmin())){
+    // Entrar na página: admin ou acesso "transportadoras" (o auth-guard.js
+    // já mandou embora quem não tem). Editar: só admin; os outros só veem.
+    // Quem protege os dados de verdade é o RLS no Supabase.
+    transpSoLeitura = !(await ehAdmin());
 
-        window.location.href = "index.html";
+    if(transpSoLeitura){
 
-        return;
+        ["btnNovaTransportadora", "btnExcluirTransportadora", "btnNovoItem"]
+            .forEach(id => { $(id).style.display = "none"; });
+
+        $("dicaTransp").innerText =
+            "Consulta de transportadoras, veículos, motoristas e PDFs da documentação. Só o admin cadastra e edita.";
     }
 
     $("conteudoTransp").style.display = "";

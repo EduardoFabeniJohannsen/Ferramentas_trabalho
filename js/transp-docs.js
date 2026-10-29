@@ -196,17 +196,23 @@ function desenharBlocoDocumentos(container, dono){
             criarBotao("👁", "Abrir PDF", "btn-secundario", () => abrirDocumento(doc))
         );
 
-        linha.appendChild(
-            criarBotao(
-                "🗑️",
-                "Excluir documento",
-                "btn-secundario",
-                () => excluirDocumento(doc, container, dono)
-            )
-        );
+        if(!transpSoLeitura){
+
+            linha.appendChild(
+                criarBotao(
+                    "🗑️",
+                    "Excluir documento",
+                    "btn-secundario",
+                    () => excluirDocumento(doc, container, dono)
+                )
+            );
+        }
 
         container.appendChild(linha);
     });
+
+    // quem só vê: abre os PDFs, mas não anexa
+    if(transpSoLeitura) return;
 
     // ---------- anexar novo ----------
 

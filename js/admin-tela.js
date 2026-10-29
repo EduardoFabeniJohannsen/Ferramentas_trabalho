@@ -134,17 +134,42 @@ function desenharPerfis(){
                 criarCaixaAdmin(
                     perfil.acessos.includes(acesso.chave),
                     acesso.rotulo,
-                    (marcada) =>
-                        salvarPerfilAdmin(
-                            perfil,
-                            {
-                                acessos: alternarItemLista(
-                                    perfil.acessos,
-                                    acesso.chave,
-                                    marcada
-                                )
-                            }
-                        )
+                    async (marcada) => {
+
+                        const salvou =
+                            await salvarPerfilAdmin(
+                                perfil,
+                                {
+                                    acessos: alternarItemLista(
+                                        perfil.acessos,
+                                        acesso.chave,
+                                        marcada
+                                    )
+                                }
+                            );
+
+                        if(!salvou) return false;
+
+                        // confere o que o banco gravou de verdade (uma regra
+                        // no Supabase pode descartar um acesso que não conhece)
+                        if(perfil.acessos.includes(acesso.chave) !== marcada){
+
+                            console.error(
+                                "[admin] O banco não gravou o acesso:",
+                                acesso.chave,
+                                perfil.acessos
+                            );
+
+                            mostrarToast(
+                                `O banco não aceitou "${acesso.rotulo}" (ver regras da tabela perfis no Supabase)`,
+                                true
+                            );
+
+                            return false;
+                        }
+
+                        return true;
+                    }
                 )
             );
         });

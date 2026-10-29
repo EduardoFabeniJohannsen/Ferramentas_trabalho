@@ -88,10 +88,21 @@ function gerarStatus(tipo){
 - Frete entrega: R$ ${frete} - ${saida} x ${cidade}
 - Frete retirada: R$ ${frete} - ${cidade} x ${saida}
 
+- Valores sujeitos à alteração no retorno conforme reajustes de mercado, combustível, pedágios e inflação do período (IPCA).
+- Alteração de endereço de entrega/coleta poderá alterar o valor do frete.
+
 Transportadores Indicados:
-KUNG 47 9616-5616
-MAGNUS 47 9754-0321
-RR 47 9180-5385`,
+Dionizio Transportes:
+47 9784-0248
+
+Magnus Guinchos:
+47 9754-0321
+
+RR Guinchos:
+47 9180-5385
+
+JGR Guinchos:
+47 9720-5094`,
 
 
         FreteZOHOLocComp:

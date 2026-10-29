@@ -148,6 +148,12 @@
                 "input",
                 gerarTextos
             );
+
+        $("valorFrete")
+            .addEventListener(
+                "input",
+                atualizarResumoComplementar
+            );
     }
 
 })();

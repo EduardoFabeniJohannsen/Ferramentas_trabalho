@@ -132,10 +132,10 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
   - mostrarAvisoDadosSalvos, avisarFalhaCarregamento, preencherListaEquipamentos, preencherListaCidades
-- `propostas-cache.js` (293 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.
+- `propostas-cache.js` (295 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.
   - salvarCache, restaurarCache, limparTudo
-- `propostas-config.js` (280 linhas): Locação complementar, bitributação, diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
-  - alternarLocacaoComplementar, atualizarBotaoLocacaoComplementar, alternarBitributacao, atualizarBotaoBitributacao, alternarValorDiaria, atualizarBotaoValorDiaria, alternarEmojis, atualizarBotaoEmojis, alternarCidadeSaida, atualizarBotaoCidadeSaida, alternarSepararPagamento, atualizarBotaoSepararPagamento, abrirConfiguracoes, fecharConfiguracoes
+- `propostas-config.js` (331 linhas): Locação complementar (com o valor pronto embaixo do frete: frete x 2, +20% com bitributação), bitributação, diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
+  - alternarLocacaoComplementar, atualizarBotaoLocacaoComplementar, alternarBitributacao, atualizarBotaoBitributacao, valorLocacaoComplementar, atualizarResumoComplementar, alternarValorDiaria, atualizarBotaoValorDiaria, alternarEmojis, atualizarBotaoEmojis, alternarCidadeSaida, atualizarBotaoCidadeSaida, alternarSepararPagamento, atualizarBotaoSepararPagamento, abrirConfiguracoes, fecharConfiguracoes
 - `propostas-desconto.js` (170 linhas): Desenha e atualiza o bloco de desconto de cada equipamento.
   - htmlPlaceholderDesconto, renderizarDescontosPorEquipamento
 - `propostas-desconto-calculo.js` (191 linhas): Cálculo por % ou valor desejado, valor final e eventos de input.
@@ -146,7 +146,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - normalizarModelo, normalizarCidade
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
-- `propostas-init.js` (153 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página.
+- `propostas-init.js` (159 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página.
 - `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes.
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (191 linhas): Cópia offline (localStorage, de preços e de fretes) e carregamento de tabela_precos.
@@ -248,7 +248,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (466), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (358), `agenda-form-campos.js` (337), `agenda-banco.js` (327), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (466), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (358), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (327), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

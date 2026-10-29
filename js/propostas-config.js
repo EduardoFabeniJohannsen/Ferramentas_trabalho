@@ -89,6 +89,57 @@ function atualizarBotaoBitributacao(){
         `Bitributação (+20%): ${
             bitributacaoAtiva ? "Ativada" : "Desativada"
         }`;
+
+    // o valor da locação complementar depende dos dois toggles
+    atualizarResumoComplementar();
+}
+
+
+// ======================================
+// RESUMO DA LOCAÇÃO COMPLEMENTAR (embaixo do frete)
+// ======================================
+// Com a locação complementar ativada, mostra o valor pronto pra lançar
+// no sistema: frete (cada perna) x 2, com +20% se a bitributação estiver
+// ativada.
+
+function valorLocacaoComplementar(){
+
+    const frete = brToNumber($("valorFrete")?.value);
+
+    if(!locacaoComplementarAtiva || !Number.isFinite(frete) || frete <= 0){
+
+        return null;
+    }
+
+    const idaVolta = frete * 2;
+
+    return {
+        frete: frete,
+        idaVolta: idaVolta,
+        total: idaVolta * (bitributacaoAtiva ? 1.2 : 1)
+    };
+}
+
+
+function atualizarResumoComplementar(){
+
+    const bloco = $("resumoComplementar");
+
+    if(!bloco) return;
+
+    const valor = valorLocacaoComplementar();
+
+    bloco.style.display = valor ? "" : "none";
+
+    if(!valor) return;
+
+    const conta =
+        `R$ ${formatarMoedaBR(valor.frete)} x 2 (ida e volta) = R$ ${formatarMoedaBR(valor.idaVolta)}` +
+        (bitributacaoAtiva ? " + 20% bitributação" : "");
+
+    $("contaComplementar").innerText = conta;
+
+    $("valorComplementar").innerText = `R$ ${formatarMoedaBR(valor.total)}`;
 }
 
 

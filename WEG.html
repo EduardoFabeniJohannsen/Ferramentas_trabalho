@@ -97,10 +97,21 @@ CONTAINER
     DOCUMENTO (área pra print)
     ========================= -->
 
-    <div
-        id="documentoProposta"
-        class="documento-proposta"
-    ></div>
+    <div class="coluna-documento">
+
+        <!-- fora da área de print: texto pra mandar junto no e-mail -->
+        <button
+            class="btn-copiar-email"
+            onclick="copiarParaEmail()"
+            title="Copia a saudação e os dados para confirmação"
+        >📋 Copiar texto do e-mail</button>
+
+        <div
+            id="documentoProposta"
+            class="documento-proposta"
+        ></div>
+
+    </div>
 
 </div>
 

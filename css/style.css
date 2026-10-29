@@ -639,6 +639,35 @@ DOCUMENTO PROPOSTA (impressão/print)
     opacity:.8;
 }
 
+/* WEG: coluna do documento com o botão de copiar o e-mail em cima */
+.coluna-documento{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:6px;
+
+    max-width:100%;
+}
+
+.btn-copiar-email{
+
+    margin:0;
+
+    padding:5px 10px;
+
+    font-size:12px;
+
+    background:#475569;
+}
+
+.btn-copiar-email:hover{
+    background:#334155;
+}
+
 .documento-proposta .resumo-linha.bonificado{
 
     background:#16a34a;

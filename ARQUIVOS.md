@@ -191,8 +191,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - montarListaEquipamentos, montarSelectUnidade, textoRotaFrete, obterQuantidade, obterPeriodos, obterDatas, grupoDoModelo, ordemDoGrupo
 - `weg-documento.js` (188 linhas): gerarDocumento(): área para print. Só lista os equipamentos com quantidade maior que 0; a locação complementar mostra a rota do frete (W Rental Itajaí x WEG unidade).
   - gerarDocumento
-- `weg-email.js` (82 linhas): Texto copiado para o e-mail.
-  - htmlConfirmacaoEmail, textoConfirmacaoEmail, copiarParaEmail
+- `weg-email.js` (95 linhas): Texto para mandar junto com o print por e-mail (botão "Copiar texto do e-mail" ao lado do documento): saudação pelo horário, nome das máquinas escolhidas e dados para confirmação.
+  - saudacaoEmail, nomeEquipamentoEmail, equipamentosEmail, textoConfirmacaoEmail, copiarParaEmail
 - `weg-init.js` (70 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
 
 ## CSS

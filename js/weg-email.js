@@ -1,82 +1,95 @@
 // ======================================
-// WEG - TEXTO DE CONFIRMAÇÃO
+// WEG - TEXTO PARA O E-MAIL
 // ======================================
-// Texto copiado para o e-mail.
+// Texto copiado para enviar junto com o print por e-mail.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
-// TEXTO DE CONFIRMAÇÃO (copiar pro e-mail)
+// TEXTO DO E-MAIL (botão ao lado do documento)
 // ======================================
-// Fica fora da área de print (botão ao lado do documento). Copia em HTML (cola
-// formatado no Outlook/Gmail) e em texto simples como reserva.
+// Fica fora da área de print. O nome da máquina sai dos equipamentos
+// escolhidos (quantidade maior que 0).
 
 const confirmacaoLocacao = {
 
-    titulo: "Para confirmação da locação, favor enviar:",
+    titulo: "Para confirmação por favor informar os dados abaixo:",
 
     campos: [
-        "CNPJ de faturamento:",
-        "Data da necessidade:",
-        "Prédio e setor onde a máquina ficará:",
-        "Responsável pelo recebimento:"
+        "Data da entrega:",
+        "CNPJ de Faturamento:",
+        "Endereço completo de entrega, (Portaria e Prédio que a máquina irá ficar (setor)):",
+        "E-mails para envio da Fatura de Locação"
     ]
 };
 
 
-function htmlConfirmacaoEmail() {
+// antes do meio-dia: "Bom dia"; depois: "Boa tarde"
+function saudacaoEmail() {
 
-    const itens =
-        confirmacaoLocacao.campos
-            .map((campo) => `<li><b>${campo}</b>&nbsp;</li>`)
-            .join("");
+    return new Date().getHours() < 12
+        ? "Bom dia, tudo bem?"
+        : "Boa tarde, tudo bem?";
+}
 
-    return `<div style="font-family:Calibri,Arial,sans-serif;font-size:14px;">` +
-        `<p><b>${confirmacaoLocacao.titulo}</b></p>` +
-        `<ul>${itens}</ul>` +
-        `</div>`;
+
+// "ARTICULADA ELÉTRICA 15M" -> "Articulada Elétrica de 15 metros de Altura de trabalho"
+function nomeEquipamentoEmail(descricao) {
+
+    const altura = descricao.match(/(\d+)\s*M$/i);
+
+    const nome =
+        descricao
+            .replace(/\s*\d+\s*M$/i, "")
+            .toLowerCase()
+            .replace(/(^|\s)\S/g, (letra) => letra.toUpperCase());
+
+    return altura
+        ? `${nome} de ${altura[1]} metros de Altura de trabalho`
+        : nome;
+}
+
+
+// "da Tesoura Elétrica de 10 metros... e da Articulada Elétrica de 15 metros..."
+function equipamentosEmail() {
+
+    const nomes =
+        contratoWEG.itens
+            .filter((item) => obterQuantidade(item.modelo) > 0)
+            .sort((a, b) => ordemDoGrupo(a.modelo) - ordemDoGrupo(b.modelo))
+            .map((item) => {
+
+                const quantidade = obterQuantidade(item.modelo);
+
+                const unidades = quantidade > 1 ? ` (${quantidade} unidades)` : "";
+
+                return `da ${nomeEquipamentoEmail(item.descricao)}${unidades}`;
+            });
+
+    if (!nomes.length) return "do equipamento";
+
+    if (nomes.length === 1) return nomes[0];
+
+    return nomes.slice(0, -1).join(", ") + " e " + nomes[nomes.length - 1];
 }
 
 
 function textoConfirmacaoEmail() {
 
-    const itens =
-        confirmacaoLocacao.campos
-            .map((campo) => `• ${campo} `)
-            .join("\n");
+    const periodos = obterPeriodos();
 
-    return `${confirmacaoLocacao.titulo}\n\n${itens}`;
+    const ciclo =
+        periodos > 1
+            ? `${periodos} ciclos de ${contratoWEG.periodoDias} dias`
+            : `ciclo de ${contratoWEG.periodoDias} dias`;
+
+    return `${saudacaoEmail()}\n\n` +
+        `Conforme solicitado segue abaixo valores do BID WEG para locação do ${ciclo} ${equipamentosEmail()}.\n\n` +
+        `${confirmacaoLocacao.titulo}\n` +
+        confirmacaoLocacao.campos.join("\n");
 }
 
 
-async function copiarParaEmail() {
+function copiarParaEmail() {
 
-    try {
-
-        if (navigator.clipboard && window.ClipboardItem) {
-
-            await navigator.clipboard.write([
-                new ClipboardItem({
-                    "text/html": new Blob(
-                        [htmlConfirmacaoEmail()],
-                        { type: "text/html" }
-                    ),
-                    "text/plain": new Blob(
-                        [textoConfirmacaoEmail()],
-                        { type: "text/plain" }
-                    )
-                })
-            ]);
-
-            mostrarToast("Texto copiado");
-
-            return;
-        }
-
-    } catch (erro) {
-
-        console.error("Erro ao copiar em HTML:", erro);
-    }
-
-    // navegador bloqueou o HTML: copia só o texto
-    copiar(textoConfirmacaoEmail(), "Texto copiado (sem formatação)");
+    copiar(textoConfirmacaoEmail(), "Texto do e-mail copiado");
 }

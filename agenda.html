@@ -35,6 +35,17 @@
 .barra-agenda button{
     margin:0;
 }
+/* pesquisa: campo + botão × pra limpar */
+.busca-agenda{
+    display:flex;
+    gap:4px;
+    flex:2;
+    min-width:240px;
+}
+.busca-agenda input{
+    margin:0;
+    flex:1;
+}
 .btn-secundario{
     background:#475569;
 }
@@ -1004,6 +1015,30 @@ CONTAINER
                 + Novo agendamento
             </button>
 
+            <!-- pesquisa (agenda-busca.js): também acha os agendamentos antigos -->
+            <div class="busca-agenda">
+
+                <input
+                    type="search"
+                    id="buscaAgenda"
+                    placeholder="🔍 Pesquisar: endereço, cliente ou patrimônio"
+                    autocomplete="off"
+                    title="Procura também nos agendamentos antigos. Pesquisando, os filtros de data e status ficam de lado."
+                >
+
+                <button
+                    type="button"
+                    class="btn-secundario"
+                    id="btnLimparBusca"
+                    style="display:none"
+                    onclick="limparBuscaAgenda()"
+                    title="Limpar a pesquisa"
+                >
+                    ×
+                </button>
+
+            </div>
+
             <!-- filtro de datas estilo Excel: lista com caixinhas -->
             <div class="filtro-datas">
 
@@ -1474,6 +1509,7 @@ MODAL (novo / editar)
 <script src="js/agenda-patrimonio.js"></script>
 <script src="js/agenda-banco.js"></script>
 <script src="js/agenda-filtros.js"></script>
+<script src="js/agenda-busca.js"></script>
 <script src="js/agenda-filtro-datas.js"></script>
 <script src="js/agenda-filtro-status.js"></script>
 <script src="js/agenda-ordem.js"></script>

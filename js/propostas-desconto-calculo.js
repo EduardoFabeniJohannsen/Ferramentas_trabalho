@@ -4,6 +4,33 @@
 // Cálculo por % ou valor desejado, valor final e eventos de input.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
+// Valor de tabela e valor desejado são do total (todas as máquinas), mas o
+// desconto é lançado por máquina: 2x de R$ 1.000 querendo R$ 1.500 dá
+// R$ 250 de desconto em cada uma (R$ 500 no total).
+function textoDescontoBloco(bloco, valorDesconto, detalhe){
+
+    const quantidade =
+        Math.max(1, Number(bloco.dataset.quantidade) || 1);
+
+    if(quantidade === 1){
+
+        return `
+            Desconto: <strong>R$ ${formatarNumeroPonto(valorDesconto)}</strong>
+            <br>
+            <span style="color:#94a3b8">${detalhe}</span>
+        `;
+    }
+
+    return `
+        Desconto por máquina: <strong>R$ ${formatarNumeroPonto(valorDesconto / quantidade)}</strong>
+        <br>
+        <span style="color:#94a3b8">
+            ${detalhe} · total R$ ${formatarMoedaBR(valorDesconto)} (${quantidade} máquinas)
+        </span>
+    `;
+}
+
+
 function calcularDescontoBloco(bloco){
 
     const valorTabela =
@@ -59,13 +86,12 @@ function calcularDescontoBloco(bloco){
             campoDesejado.value =
                 formatarMoedaBR(valorFinal);
 
-            resultado.innerHTML = `
-                Desconto: <strong>R$ ${formatarNumeroPonto(valorDesconto)}</strong>
-                <br>
-                <span style="color:#94a3b8">
-                    ${percentual.toFixed(2)}% → R$ ${formatarMoedaBR(valorFinal)}
-                </span>
-            `;
+            resultado.innerHTML =
+                textoDescontoBloco(
+                    bloco,
+                    valorDesconto,
+                    `${percentual.toFixed(2)}% → R$ ${formatarMoedaBR(valorFinal)}`
+                );
 
             bloco.dataset.valorFinal = valorFinal;
             atualizarValorFinalProposta();
@@ -94,13 +120,12 @@ function calcularDescontoBloco(bloco){
             const percentual =
                 (valorDesconto / valorTabela) * 100;
 
-            resultado.innerHTML = `
-                Desconto: <strong>R$ ${formatarNumeroPonto(valorDesconto)}</strong>
-                <br>
-                <span style="color:#94a3b8">
-                    Desconto de ${percentual.toFixed(2)}%
-                </span>
-            `;
+            resultado.innerHTML =
+                textoDescontoBloco(
+                    bloco,
+                    valorDesconto,
+                    `Desconto de ${percentual.toFixed(2)}%`
+                );
 
             bloco.dataset.valorFinal = valorDesejado;
             atualizarValorFinalProposta();

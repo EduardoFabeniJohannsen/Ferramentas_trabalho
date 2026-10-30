@@ -320,6 +320,9 @@ async function recarregarAgenda(manual){
 
     renderizarAgenda();
 
+    // a recarga troca a lista toda: pesquisando, busca os antigos de novo
+    if(buscandoAgenda()) buscarAntigosAgenda();
+
     if(manual && !erroAgenda){
 
         mostrarToast("Agenda atualizada");

@@ -99,6 +99,9 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
         bloco.querySelector(".desconto-item-titulo").innerText =
             titulo;
 
+        // o desconto é lançado por máquina: o cálculo divide pela quantidade
+        bloco.dataset.quantidade = equipamento.quantidade || 1;
+
         const campoValorTabela =
             bloco.querySelector(".descValorTabela");
 

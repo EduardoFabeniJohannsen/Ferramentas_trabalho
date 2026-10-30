@@ -86,9 +86,23 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
     const soSemPatrimonio =
         filtrandoSemPatrimonio();
 
+    // pesquisa (agenda-busca.js): acha qualquer agendamento, então o modo,
+    // as datas e os status não escondem nada
+    const buscando = buscandoAgenda();
+
     return agendamentos.filter(item => {
 
-        if(!visivelNoModo(item)) return false;
+        if(buscando){
+
+            if(!itemCombinaBusca(item)) return false;
+
+        }else{
+
+            // antigo só aparece enquanto pesquisa
+            if(item.antigo) return false;
+
+            if(!visivelNoModo(item)) return false;
+        }
 
         if(!ignorarTransportadora){
 
@@ -113,6 +127,8 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
 
         // só as máquinas sem patrimônio definido
         if(soSemPatrimonio && !itemSemPatrimonio(item)) return false;
+
+        if(buscando) return true;
 
         // filtro de status: os desmarcados não aparecem
         if(!ignorarStatus && statusOcultos.has(item.status)) return false;

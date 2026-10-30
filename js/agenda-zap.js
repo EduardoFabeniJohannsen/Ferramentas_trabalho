@@ -102,14 +102,23 @@ function textoPeriodoReferencia(periodo){
 // à mão, vale ela. Senão monta o nome da proposta:
 // CLIENTE_MODELO_PERÍODO - Proposta: 712804
 // (troca técnica não monta sozinha: tem a ficha própria, digitada à mão)
+// Referência digitada sem o número da proposta ganha o " - Proposta: N".
 function referenciaZap(item){
 
     const manual =
         String(item.referencia || "").trim();
 
-    if(manual) return manual;
+    const proposta =
+        String(item.proposta || "").trim();
 
-    if(item.tipo === "Troca técnica") return "";
+    if(item.tipo === "Troca técnica") return manual;
+
+    if(manual){
+
+        if(!proposta || manual.includes(proposta)) return manual;
+
+        return `${manual} - Proposta: ${proposta}`;
+    }
 
     const nome =
         [
@@ -120,7 +129,7 @@ function referenciaZap(item){
             .filter(Boolean)
             .join("_");
 
-    return `${nome} - Proposta: ${String(item.proposta || "").trim()}`.trimEnd();
+    return `${nome} - Proposta: ${proposta}`.trimEnd();
 }
 
 

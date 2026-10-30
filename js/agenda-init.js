@@ -62,6 +62,22 @@
         atualizarCamposTipo
     );
 
+    // pesquisa por endereço, cliente ou patrimônio (Esc limpa)
+    $("buscaAgenda").addEventListener("input", digitarBuscaAgenda);
+
+    $("buscaAgenda").addEventListener(
+        "keydown",
+        evento => {
+
+            if(evento.key === "Escape" && $("buscaAgenda").value){
+
+                evento.stopPropagation();
+
+                limparBuscaAgenda();
+            }
+        }
+    );
+
     // retirada recolhida (entrega): clique ou Enter abre e fecha
     $("tituloRetirada").addEventListener("click", alternarRetirada);
 

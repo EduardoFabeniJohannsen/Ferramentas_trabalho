@@ -92,6 +92,7 @@ async function buscarAntigosAgenda(){
                 .from(TABELA_AGENDAMENTOS)
                 .select("*")
                 .lt("data", dataISO(-DIAS_PASSADOS_AGENDA))
+                .is("excluido_em", null)
                 .or(
                     [
                         "cliente",

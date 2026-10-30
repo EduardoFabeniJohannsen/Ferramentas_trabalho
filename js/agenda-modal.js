@@ -218,5 +218,7 @@ document.addEventListener("keydown", (evento) => {
         fecharPainelDatas();
 
         fecharPainelStatus();
+
+        fecharLixeira();
     }
 });

@@ -523,6 +523,39 @@ tr.ag-item td.ag-lado{
     padding:2px 10px;
     font-size:20px;
 }
+/* lixeira (só admin) */
+.modal-lixeira{
+    max-width:720px;
+}
+.item-lixeira{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #334155;
+}
+.item-lixeira-info{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+}
+.item-lixeira-info small{
+    opacity:.7;
+}
+.item-lixeira-botoes{
+    display:flex;
+    gap:8px;
+}
+.item-lixeira-botoes button{
+    margin:0;
+    padding:6px 12px;
+}
+body.tema-claro .item-lixeira{
+    border-bottom-color:var(--claro-linha);
+}
 .modal-corpo{
     padding:14px 20px 20px;
 }
@@ -1163,6 +1196,17 @@ CONTAINER
                 ☀️ Fundo claro
             </button>
 
+            <!-- só admin: agendamentos excluídos (restaurar ou apagar de vez) -->
+            <button
+                type="button"
+                class="btn-secundario so-admin"
+                style="display:none"
+                onclick="abrirLixeira()"
+                title="Agendamentos excluídos: restaurar ou apagar de vez"
+            >
+                🗑️ Lixeira
+            </button>
+
         </div>
 
         <div class="chips" id="chipsTransportadora"></div>
@@ -1489,6 +1533,35 @@ MODAL (novo / editar)
 
 </div>
 
+<!-- =========================
+LIXEIRA (só admin)
+========================= -->
+
+<div id="modalLixeira" class="modal-overlay">
+
+    <div class="modal-agenda modal-lixeira">
+
+        <div class="modal-agenda-topo">
+
+            <h3>🗑️ Lixeira</h3>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                onclick="fecharLixeira()"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-corpo" id="listaLixeira"></div>
+
+    </div>
+
+</div>
+
 <datalist id="listaHorarios">
     <option value="CONFIRMAR">
     <option value="IMEDIATO">
@@ -1531,6 +1604,7 @@ MODAL (novo / editar)
 <script src="js/agenda-pagamento.js"></script>
 <script src="js/agenda-pedido.js"></script>
 <script src="js/agenda-pedido-pdf.js"></script>
+<script src="js/agenda-lixeira.js"></script>
 <script src="js/agenda-init.js"></script>
 
 </body>

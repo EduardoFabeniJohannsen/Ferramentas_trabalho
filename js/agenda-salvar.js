@@ -194,13 +194,14 @@ async function excluirAgendamento(id){
 
     if(!item) return false;
 
-    if(!confirm(`Excluir ${item.plataforma} — ${item.cliente}?`)) return false;
+    if(!confirm(`Excluir ${item.plataforma} — ${item.cliente}?\n\nEle vai para a lixeira (só o admin pode restaurar ou apagar de vez).`)) return false;
 
     let excluiu = false;
 
     try{
 
-        excluiu = await excluirAgendamentoBanco(id);
+        // vai para a lixeira (agenda-lixeira.js); apagar de vez é só do admin
+        excluiu = await moverParaLixeiraBanco(id);
 
     }catch(erro){
 
@@ -214,16 +215,14 @@ async function excluirAgendamento(id){
     agendamentos =
         agendamentos.filter(ag => ag.id !== id);
 
-    // sem agendamento, não sobra rascunho nem PDF dele
+    // o rascunho sai; o PDF do pedido fica até o admin apagar de vez
     removerRascunho(`edit:${id}`);
-
-    await removerPedidoPdfStorage(item.pedidoPdfCaminho);
 
     renderizarAgenda();
 
     mostrarToast(
         excluiu
-            ? "Agendamento excluído"
+            ? "Agendamento movido para a lixeira"
             : "Esse agendamento já tinha sido excluído"
     );
 

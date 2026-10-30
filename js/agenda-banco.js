@@ -224,6 +224,7 @@ async function carregarAgenda(){
                     .from(TABELA_AGENDAMENTOS)
                     .select("*")
                     .or(`data.gte.${limite},data.is.null`)
+                    .is("excluido_em", null)
                     .order("id")
                     .range(inicio, inicio + tamanhoPagina - 1);
 
@@ -287,6 +288,7 @@ async function atualizarAgendamento(id, dados){
 }
 
 
+// apaga de vez do banco: só o admin (RLS), pela lixeira (agenda-lixeira.js)
 async function excluirAgendamentoBanco(id){
 
     const { data, error } =

@@ -10,35 +10,35 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **index.html** — Página inicial: conversor de texto e calculadora de boletos
 - CSS: style
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → status → index-ferramentas → menu
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → status → index-ferramentas → menu
 
 **propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes)
 - CSS: style → propostas
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-textos → proposta-zap → propostas-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-textos → proposta-zap → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
-- JS: [SheetJS 0.18.5/CDN] → supabase-config → auth-guard → helpers → atualizacao-sistema → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
+- JS: [SheetJS 0.18.5/CDN] → supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
 
 **tabelas.html** — Consulta e edição das tabelas de preços e fretes
 - CSS: style → tabelas
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
 **transportadoras.html** — Transportadoras: cadastro, veículos, motoristas e PDFs (ver: acesso "transportadoras"; editar: só admin)
 - CSS: style → transportadoras → bloco <style> no HTML (formulário de nova transportadora)
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
 
 **WEG.html** — Contrato WEG (preços fixos)
 - CSS: style
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
 **admin.html** — Usuários e acessos (só admin)
 - CSS: style → admin
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → menu → admin-config → admin-dados → admin-tela → admin-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-init
 
 **login.html** — Login
 - CSS: style
@@ -47,9 +47,11 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 ## Arquivos (responsabilidade e funções)
 
 - `admin-config.js` (45 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
-- `admin-dados.js` (102 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
+- `admin-dados.js` (105 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
   - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
-- `admin-init.js` (30 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `admin-init.js` (33 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `admin-online.js` (118 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano. Sem histórico.
+  - nomePaginaOnline, tempoOnline, textoAbaOnline, pessoasOnline, desenharUsuariosOnline
 - `admin-tela.js` (229 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (338 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras). ⚠️ passa de ~300 linhas (sugerir divisão)
@@ -147,6 +149,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `menu.js` (119 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
 - `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
   - copiarPropostaZap
+- `presenca.js` (121 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai só o id, a página e o estado; não grava nada no banco. Carregar depois de helpers.js e auth-guard.js.
+  - calcularEstadoPresenca, enviarPresenca, iniciarPresenca
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
   - mostrarAvisoDadosSalvos, avisarFalhaCarregamento, preencherListaEquipamentos, preencherListaCidades
 - `propostas-cache.js` (303 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.

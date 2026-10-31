@@ -25,6 +25,9 @@
 
     desenharPerfis();
 
+    // o tempo de "parado há 12 min" continua contando sem ninguém avisar
+    setInterval(desenharUsuariosOnline, 30000);
+
     await carregarPerfisAdmin();
 
 })();

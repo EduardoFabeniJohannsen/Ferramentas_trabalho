@@ -30,6 +30,9 @@ async function carregarPerfisAdmin(){
     }
 
     desenharPerfis();
+
+    // o painel de online usa os e-mails que acabaram de chegar
+    desenharUsuariosOnline();
 }
 
 

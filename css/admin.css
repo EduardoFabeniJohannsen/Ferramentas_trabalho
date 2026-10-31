@@ -4,6 +4,48 @@
     max-width:1100px;
     text-align:left;
 }
+/* online agora: a bolinha mostra o estado de cada pessoa */
+.painel-online{
+    margin-bottom:18px;
+    padding:12px 14px;
+    border:1px solid #334155;
+    border-radius:8px;
+}
+.painel-online h3{
+    margin:0;
+    font-size:15px;
+}
+.painel-online ul{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+.online-linha{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:2px 10px;
+    padding:6px 0 0;
+    font-size:14px;
+}
+.online-linha::before{
+    content:"";
+    width:10px;
+    height:10px;
+    flex:none;
+    border-radius:50%;
+    background:#94a3b8;
+}
+.online-linha.online-usando::before{
+    background:#4ade80;
+}
+.online-linha.online-parado::before{
+    background:#fbbf24;
+}
+.online-linha span{
+    color:#94a3b8;
+    font-size:13px;
+}
 .dica-admin{
     color:#94a3b8;
     font-size:13px;

@@ -36,54 +36,13 @@ function formatarCNPJ(){
 
     if(!campo) return;
 
-    const linhasFormatadas =
+    // 07.626.346/0001-49 -> 07626346000149. Tira só a pontuação (e espaços),
+    // pra não estragar o CNPJ novo, que também tem letras.
+    campo.value =
         campo.value
             .split("\n")
-            .map(linha => {
-
-                // Mantém só os dígitos, limitado a 14 (tamanho do CNPJ)
-                const numeros =
-                    linha
-                        .replace(/\D/g, "")
-                        .slice(0, 14);
-
-                if(!numeros) return linha;
-
-                let formatado = numeros;
-
-                if(numeros.length > 12){
-
-                    formatado = numeros.replace(
-                        /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/,
-                        "$1.$2.$3/$4-$5"
-                    );
-
-                }else if(numeros.length > 8){
-
-                    formatado = numeros.replace(
-                        /^(\d{2})(\d{3})(\d{3})(\d{1,4})$/,
-                        "$1.$2.$3/$4"
-                    );
-
-                }else if(numeros.length > 5){
-
-                    formatado = numeros.replace(
-                        /^(\d{2})(\d{3})(\d{1,3})$/,
-                        "$1.$2.$3"
-                    );
-
-                }else if(numeros.length > 2){
-
-                    formatado = numeros.replace(
-                        /^(\d{2})(\d{1,3})$/,
-                        "$1.$2"
-                    );
-                }
-
-                return formatado;
-            });
-
-    campo.value = linhasFormatadas.join("\n");
+            .map(linha => linha.replace(/[.\/\\\-–—\s]/g, ""))
+            .join("\n");
 }
 
 

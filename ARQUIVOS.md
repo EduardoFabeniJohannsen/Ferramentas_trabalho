@@ -134,7 +134,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - lerArquivo, cancelarPrevia, publicarResumo
 - `helpers.js` (178 linhas): Versão do sistema (VERSAO_SISTEMA), $, formatadores, copiar() e mostrarToast().
   - formatarData, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast
-- `index-ferramentas.js` (313 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados). ⚠️ passa de ~300 linhas (sugerir divisão)
+- `index-ferramentas.js` (272 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados). ⚠️ passa de ~300 linhas (sugerir divisão)
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
 - `menu.js` (119 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
 - `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
@@ -261,7 +261,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

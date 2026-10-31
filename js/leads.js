@@ -669,6 +669,18 @@ function criarAcoesLead(lead, comigo){
         )
     );
 
+    // clicou em "Vou chamar" sem querer: desfaz e o lead volta para os novos
+    if(comigo && lead.status === "chamado"){
+
+        acoes.appendChild(
+            criarBotaoLead(
+                "↩️ Voltar para novos",
+                "btn-estornar",
+                () => registrarResultado(lead, "novo")
+            )
+        );
+    }
+
     // resultado: só quem marcou. O admin também, pra soltar lead esquecido.
     if(lead.chamado_por && (comigo || adminLeads)){
 
@@ -867,7 +879,7 @@ async function registrarResultado(lead, status){
 
     mostrarToast(
         status === "novo"
-            ? "Lead liberado"
+            ? "Lead voltou para os novos"
             : `Marcado como ${rotuloStatusLead(status)}`
     );
 }

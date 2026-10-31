@@ -19,7 +19,8 @@ const STATUS_LEADS = [
     { valor: "novo", rotulo: "Novo" },
     { valor: "chamado", rotulo: "Chamado" },
     { valor: "interessado", rotulo: "Interessado" },
-    { valor: "sem_interesse", rotulo: "Sem interesse" }
+    { valor: "sem_interesse", rotulo: "Sem interesse" },
+    { valor: "ja_cliente", rotulo: "Já é cliente" }
 ];
 
 const PORTES_LEADS = [
@@ -689,7 +690,12 @@ function criarAcoesLead(lead, comigo){
 
     const acoes = criarElLead("div", "lead-acoes");
 
-    if(!lead.chamado_por){
+    const jaCliente = lead.status === "ja_cliente";
+
+    // lead de outra pessoa continua com ela (o admin pode mexer em qualquer um)
+    const podeMudar = !lead.chamado_por || comigo || adminLeads;
+
+    if(!lead.chamado_por && !jaCliente){
 
         acoes.appendChild(
             criarBotaoLead("🙋 Vou chamar", "btn-pegar", () => pegarLead(lead))
@@ -739,8 +745,21 @@ function criarAcoesLead(lead, comigo){
         )
     );
 
-    // clicou em "Vou chamar" sem querer: desfaz e o lead volta para os novos
-    if(comigo && lead.status === "chamado"){
+    // não precisa chamar antes: a pessoa já sabe que a empresa é cliente
+    if(podeMudar && !jaCliente){
+
+        acoes.appendChild(
+            criarBotaoLead(
+                "🤝 Já é cliente",
+                "btn-ja-cliente",
+                () => registrarResultado(lead, "ja_cliente")
+            )
+        );
+    }
+
+    // clicou sem querer em "Vou chamar" ou "Já é cliente": desfaz e o lead
+    // volta para os novos
+    if((comigo && lead.status === "chamado") || (jaCliente && podeMudar)){
 
         acoes.appendChild(
             criarBotaoLead(
@@ -752,7 +771,7 @@ function criarAcoesLead(lead, comigo){
     }
 
     // resultado: só quem marcou. O admin também, pra soltar lead esquecido.
-    if(lead.chamado_por && (comigo || adminLeads)){
+    if(lead.chamado_por && (comigo || adminLeads) && !jaCliente){
 
         acoes.appendChild(
             criarBotaoLead(
@@ -908,7 +927,7 @@ async function pegarLead(lead){
 }
 
 
-// status = "interessado", "sem_interesse" ou "novo" (não atendeu: libera o lead)
+// status = "interessado", "sem_interesse", "ja_cliente" ou "novo" (não atendeu: libera o lead)
 async function registrarResultado(lead, status){
 
     const dados =
@@ -923,7 +942,13 @@ async function registrarResultado(lead, status){
             .eq("id", lead.id);
 
     // sem isso, a tela velha mexeria num lead que já passou para outra pessoa
-    if(!adminLeads) consulta = consulta.eq("chamado_por", usuarioLeads.id);
+    if(!adminLeads){
+
+        consulta =
+            lead.chamado_por
+                ? consulta.eq("chamado_por", usuarioLeads.id)
+                : consulta.is("chamado_por", null);
+    }
 
     const { data, error } = await consulta.select();
 

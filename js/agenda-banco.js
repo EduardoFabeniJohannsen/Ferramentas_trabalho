@@ -262,6 +262,8 @@ async function inserirAgendamento(dados){
 
     if(error) throw error;
 
+    avisarMudancaNaAgenda();
+
     return doBanco(data);
 }
 
@@ -284,6 +286,8 @@ async function atualizarAgendamento(id, dados){
         throw new Error("Agendamento não encontrado (foi excluído?)");
     }
 
+    avisarMudancaNaAgenda();
+
     return doBanco(data[0]);
 }
 
@@ -299,6 +303,8 @@ async function excluirAgendamentoBanco(id){
             .select();
 
     if(error) throw error;
+
+    avisarMudancaNaAgenda();
 
     return data.length > 0;
 }

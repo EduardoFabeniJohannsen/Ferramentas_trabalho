@@ -186,6 +186,9 @@
         carregarBotoesLinha();
 
         recarregarAgenda(false);
+
+        // mudou algo em outro navegador: atualiza aqui (agenda-tempo-real.js)
+        iniciarTempoReal();
     });
 
     // várias pessoas usam: ao voltar pra aba, atualiza se passou um tempo

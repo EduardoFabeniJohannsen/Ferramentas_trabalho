@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.21.0";
+const VERSAO_SISTEMA = "16.22.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -21,6 +21,42 @@ document.querySelectorAll(".versao").forEach(elemento => {
 // ======================================
 
 const $ = (id) => document.getElementById(id);
+
+
+// Canal de avisos da agenda (agenda-tempo-real.js escuta). Fica aqui porque
+// outras páginas também mudam agendamentos (ex: renomear motorista). O aviso
+// não leva dado nenhum, e sem conexão aberta o Supabase envia por uma requisição.
+const EVENTO_AGENDA_MUDOU = "mudou";
+
+let canalAgendaAberto = null;
+
+const canalAgenda = () => {
+
+    if(!canalAgendaAberto){
+
+        canalAgendaAberto = supabaseClient.channel("agenda-mudancas");
+    }
+
+    return canalAgendaAberto;
+};
+
+
+// falhar aqui não pode atrapalhar quem salvou: a gravação já deu certo
+const avisarAgendaMudou = async () => {
+
+    try{
+
+        await canalAgenda().send({
+            type: "broadcast",
+            event: EVENTO_AGENDA_MUDOU,
+            payload: {}
+        });
+
+    }catch(erro){
+
+        console.error("Erro ao avisar a mudança na agenda:", erro);
+    }
+};
 
 
 const formatarData = (data) => {

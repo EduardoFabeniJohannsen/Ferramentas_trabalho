@@ -235,6 +235,9 @@ async function renomearMotoristaBanco(motorista, nomeNovo){
             .eq("motorista", motorista.nome)
             .select("id")
     );
+
+    // quem está com a agenda aberta vê o nome novo
+    avisarAgendaMudou();
 }
 
 

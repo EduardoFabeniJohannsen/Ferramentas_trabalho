@@ -19,6 +19,8 @@ async function moverParaLixeiraBanco(id){
 
     if(error) throw error;
 
+    avisarMudancaNaAgenda();
+
     return data === true;
 }
 
@@ -180,6 +182,8 @@ async function restaurarDaLixeira(item){
 
         return;
     }
+
+    avisarMudancaNaAgenda();
 
     itensLixeira = itensLixeira.filter(ag => ag.id !== item.id);
 

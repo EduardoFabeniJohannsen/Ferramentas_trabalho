@@ -48,6 +48,12 @@ let carregandoLeads = true;
 
 let ultimaCargaLeads = 0;
 
+// última busca do agente: { created_at, inseridos, repetidos, ... } ou null
+let ultimaBuscaAgente = null;
+
+// a busca roda todo dia: passou disso sem rodar, algo deu errado
+const LIMITE_BUSCA_ATRASADA_MS = 26 * 60 * 60 * 1000;
+
 let usuarioLeads = { id: "", email: "" };
 
 let adminLeads = false;
@@ -330,9 +336,55 @@ async function carregarLeads(){
 }
 
 
+// sem resultado (agente ainda não ativado) a linha só não aparece
+async function carregarUltimaBusca(){
+
+    const { data, error } =
+        await supabaseClient
+            .from("leads_buscas")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+    if(error){
+
+        console.error("[leads] Falha ao ler a última busca:", error);
+
+        return;
+    }
+
+    ultimaBuscaAgente = data;
+}
+
+
+function desenharUltimaBusca(){
+
+    const aviso = $("ultimaBusca");
+
+    const busca = ultimaBuscaAgente;
+
+    aviso.style.display = busca ? "" : "none";
+
+    if(!busca) return;
+
+    const atrasada =
+        Date.now() - new Date(busca.created_at).getTime() > LIMITE_BUSCA_ATRASADA_MS;
+
+    aviso.classList.toggle("atrasada", atrasada);
+
+    aviso.textContent =
+        `${atrasada ? "⚠️ O agente não rodou nas últimas 24 horas. " : "🤖 "}` +
+        `Última busca: ${dataHoraLead(busca.created_at)}, ` +
+        `${busca.inseridos} novo(s), ${busca.repetidos} já na lista`;
+}
+
+
 async function recarregarLeads(manual){
 
-    await carregarLeads();
+    await Promise.all([carregarLeads(), carregarUltimaBusca()]);
+
+    desenharUltimaBusca();
 
     desenharLeads();
 
@@ -574,6 +626,24 @@ function criarContatoLead(lead){
         const link = criarElLead("a", "", lead.site);
 
         link.href = site;
+
+        link.target = "_blank";
+
+        link.rel = "noopener";
+
+        contato.appendChild(link);
+    }
+
+    // de onde saiu o motivo do lead (o agente é obrigado a informar)
+    const fonte = linkSite(lead.fonte_url);
+
+    if(fonte){
+
+        if(contato.textContent) contato.append(" · ");
+
+        const link = criarElLead("a", "", "🔗 Fonte");
+
+        link.href = fonte;
 
         link.target = "_blank";
 

@@ -136,7 +136,14 @@ function criarTabelaEstoque(maquinas, reservas){
 
     const cabecalho = criar("tr");
 
-    ["Patrimônio", "Marca", "Modelo", "Situação", ""].forEach(titulo => {
+    // botão "Usar" (agenda-usar-patrimonio.js): coleta, cancelado e concluído
+    // não escolhem máquina
+    const podeUsar = agendamentoReservaMaquina(estoqueItemAberto);
+
+    [
+        "Patrimônio", "Marca", "Modelo", "Situação", "",
+        ...(podeUsar ? [""] : [])
+    ].forEach(titulo => {
 
         cabecalho.appendChild(criar("th", "", titulo));
     });
@@ -183,6 +190,27 @@ function criarTabelaEstoque(maquinas, reservas){
         linha.appendChild(
             criar("td", "estoque-reserva", reserva ? textoReserva(reserva) : "")
         );
+
+        if(podeUsar){
+
+            const celulaUsar = criar("td", "estoque-usar");
+
+            // a que já está neste agendamento não tem o que usar
+            if(!reserva || reserva.id !== estoqueItemAberto.id){
+
+                const usar = criar("button", "", "Usar");
+
+                usar.type = "button";
+
+                usar.title = `Usar ${maquina.p} neste agendamento`;
+
+                usar.addEventListener("click", () => usarPatrimonio(maquina));
+
+                celulaUsar.appendChild(usar);
+            }
+
+            linha.appendChild(celulaUsar);
+        }
 
         corpo.appendChild(linha);
     });

@@ -18,7 +18,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
-- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque → agenda-conflitos → agenda-init
+- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
@@ -67,7 +67,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-config.js` (227 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
-- `agenda-estoque.js` (382 linhas): Botão 🔍 da linha: patrimônios disponíveis e em manutenção no último estoque publicado (patrimônio, marca, modelo, situação), por filial, começando pelo modelo do agendamento; destaca a máquina que já está em alguma demanda. Lê pela função `estoque_disponiveis` do banco (só esses dois status, sem cliente, com `tem_acesso('agenda')`). Só consulta. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `agenda-estoque.js` (410 linhas): Botão 🔍 da linha: patrimônios disponíveis e em manutenção no último estoque publicado (patrimônio, marca, modelo, situação), por filial, começando pelo modelo do agendamento; destaca a máquina que já está em alguma demanda. Lê pela função `estoque_disponiveis` do banco (só esses dois status, sem cliente, com `tem_acesso('agenda')`). Só consulta. ⚠️ passa de ~300 linhas (sugerir divisão)
   - carregarEstoqueDisponivel, modelosDoAgendamento, agendamentoReservaMaquina, reservasDaAgenda, textoReserva, descricaoDemanda, maquinasDaFilial, criarTabelaEstoque, desenharEstoqueAgenda, abrirEstoqueAgenda, fecharEstoqueAgenda
 - `agenda-etapas.js` (158 linhas): Etapas do formulário (Demanda, Local e entrega, Faturamento) que recolhem ao clicar no título; salva por usuário; avisoFormulario() abre a etapa com erro. Carregar antes de agenda-modal.js.
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
@@ -111,6 +111,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - aplicarTema, alternarTema
 - `agenda-transportadoras.js` (57 linhas): Só leitura: carrega a lista de transportadoras para os campos e filtros da agenda. Cadastrar/excluir transportadora: só admin, em transportadoras.html.
   - carregarTransportadoras, definirTransportadoras, atualizarSelectsTransportadora
+- `agenda-usar-patrimonio.js` (144 linhas): Botão "Usar" em cada máquina da lupa: grava o patrimônio no agendamento com um clique. Só o modelo preenche direto; patrimônio definido pergunta antes de trocar; máquina em outra demanda passa pelo alerta. Coleta, cancelado e concluído não têm o botão. Carregar depois de agenda-conflitos.js.
+  - plataformaComPatrimonio, atualizarPlataformaDoRascunho, usarPatrimonio
 - `agenda-utils.js` (100 linhas): criar(), dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco() (cidade/UF tirada do texto do endereço).
   - criar, dataISO, corDoDia, tituloDoDia
 - `agenda-zap.js` (307 linhas): Texto de agendamento copiado para o grupo da transportadora. A referência digitada à mão sem o número da proposta ganha " - Proposta: N" no fim. ⚠️ passa de ~300 linhas (sugerir divisão)

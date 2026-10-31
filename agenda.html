@@ -692,14 +692,26 @@ body.tema-claro .item-lixeira{
 }
 .estoque-tabela{
     width:100%;
+    min-width:560px;
     margin-top:6px;
     border-collapse:collapse;
     table-layout:fixed;
     font-size:13px;
 }
 /* mesmas colunas nas duas filiais; o aviso de reserva fica com o espaço maior */
-.estoque-tabela th:last-child{
-    width:34%;
+.estoque-tabela th:nth-child(5){
+    width:30%;
+}
+.estoque-tabela th:nth-child(6){
+    width:64px;
+}
+.estoque-usar{
+    text-align:right;
+}
+.estoque-usar button{
+    margin:0;
+    padding:3px 10px;
+    font-size:12px;
 }
 .estoque-em-manutencao{
     font-weight:bold;
@@ -1925,6 +1937,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 <script src="js/agenda-lixeira.js"></script>
 <script src="js/agenda-estoque.js"></script>
 <script src="js/agenda-conflitos.js"></script>
+<script src="js/agenda-usar-patrimonio.js"></script>
 <script src="js/agenda-init.js"></script>
 
 </body>

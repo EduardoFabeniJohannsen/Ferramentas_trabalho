@@ -98,6 +98,9 @@ async function salvarAgendamento(){
 
     const id = idEmEdicao;
 
+    // patrimônio já em outra demanda (agenda-conflitos.js)
+    if(!confirmarConflitos(dados, id)) return;
+
     salvandoAgendamento = true;
 
     let salvo = null;

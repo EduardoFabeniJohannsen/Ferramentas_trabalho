@@ -47,9 +47,21 @@ function modelosDoAgendamento(item){
 }
 
 
+// esse agendamento tira uma máquina do pátio?
+function agendamentoReservaMaquina(item){
+
+    return (
+        TIPOS_RESERVAM_MAQUINA.includes(item.tipo) &&
+        item.status !== "Concluído" &&
+        item.status !== "Cancelado"
+    );
+}
+
+
 // { "WAE18R001": agendamento } com o próximo agendamento de cada máquina.
 // Maiúsculo porque na agenda o O depois dos números fica minúsculo.
-function reservasDaAgenda(){
+// idIgnorado = não conta esse agendamento (o que está sendo salvo).
+function reservasDaAgenda(idIgnorado){
 
     const hoje = dataISO(0);
 
@@ -57,11 +69,9 @@ function reservasDaAgenda(){
 
     agendamentos.forEach(item => {
 
-        if(item.antigo) return;
+        if(item.antigo || item.id === idIgnorado) return;
 
-        if(!TIPOS_RESERVAM_MAQUINA.includes(item.tipo)) return;
-
-        if(item.status === "Concluído" || item.status === "Cancelado") return;
+        if(!agendamentoReservaMaquina(item)) return;
 
         if(item.data && item.data < hoje) return;
 
@@ -87,11 +97,16 @@ function textoReserva(reserva){
 
     if(reserva.id === estoqueItemAberto.id) return "neste agendamento";
 
+    return `já em demanda: ${descricaoDemanda(reserva)}`;
+}
+
+
+// "31/10/2026 — Cliente Três" (também usado no alerta ao salvar)
+function descricaoDemanda(reserva){
+
     const quem = reserva.cliente ? ` — ${reserva.cliente}` : "";
 
-    return reserva.data
-        ? `já em demanda: ${dataLixeira(reserva.data)}${quem}`
-        : `já em demanda: sem data${quem}`;
+    return `${reserva.data ? dataLixeira(reserva.data) : "sem data"}${quem}`;
 }
 
 

@@ -1,11 +1,11 @@
 // ======================================
 // AGENDA - CONSULTA AO ESTOQUE (botão 🔍 da linha)
 // ======================================
-// Mostra os patrimônios disponíveis no último estoque publicado (patrimônio,
-// marca e modelo), começando pelos do mesmo modelo do agendamento. Só consulta,
-// não muda nada. Lê pela função estoque_disponiveis do banco, que libera só os
-// disponíveis, sem cliente, para quem tem acesso à agenda. Avisa a máquina que
-// já tem agendamento marcado (o estoque não sabe disso).
+// Mostra os patrimônios disponíveis e em manutenção no último estoque publicado
+// (patrimônio, marca, modelo e situação), começando pelos do mesmo modelo do
+// agendamento. Só consulta, não muda nada. Lê pela função estoque_disponiveis do
+// banco, que libera só esses dois status, sem cliente, para quem tem acesso à
+// agenda. Destaca a máquina que já está em alguma demanda (o estoque não sabe disso).
 // Carregar depois de agenda-zap.js e agenda-lixeira.js.
 
 // cada filial é uma linha da tabela resumo_estoque (ver FILIAIS em estoque-config.js)
@@ -90,8 +90,28 @@ function textoReserva(reserva){
     const quem = reserva.cliente ? ` — ${reserva.cliente}` : "";
 
     return reserva.data
-        ? `já agendada: ${dataLixeira(reserva.data)}${quem}`
-        : `já agendada: sem data${quem}`;
+        ? `já em demanda: ${dataLixeira(reserva.data)}${quem}`
+        : `já em demanda: sem data${quem}`;
+}
+
+
+// máquinas da filial nos dois status da consulta; modelos = null mostra todas
+function maquinasDaFilial(filial, modelos){
+
+    return [
+        ["disponiveis", "Disponível"],
+        ["manutencao", "Manutenção"]
+    ]
+        .flatMap(([campo, situacao]) =>
+            Object.entries(filial[campo] || {})
+                .filter(([modelo]) => !modelos || modelos.includes(modelo))
+                .flatMap(([modelo, lista]) =>
+                    lista.map(maquina => ({ ...maquina, modelo, situacao }))
+                )
+        )
+        .sort((a, b) =>
+            a.p.localeCompare(b.p, "pt-BR", { numeric: true })
+        );
 }
 
 
@@ -101,7 +121,7 @@ function criarTabelaEstoque(maquinas, reservas){
 
     const cabecalho = criar("tr");
 
-    ["Patrimônio", "Marca", "Modelo", ""].forEach(titulo => {
+    ["Patrimônio", "Marca", "Modelo", "Situação", ""].forEach(titulo => {
 
         cabecalho.appendChild(criar("th", "", titulo));
     });
@@ -125,7 +145,25 @@ function criarTabelaEstoque(maquinas, reservas){
 
         linha.appendChild(criar("td", "", maquina.f || maquina.modelo));
 
+        linha.appendChild(
+            criar(
+                "td",
+                maquina.situacao === "Manutenção" ? "estoque-em-manutencao" : "",
+                maquina.situacao
+            )
+        );
+
         const reserva = reservas[maquina.p.toUpperCase()];
+
+        // já está em demanda: a linha inteira fica em destaque
+        if(reserva){
+
+            linha.classList.add(
+                reserva.id === estoqueItemAberto.id
+                    ? "estoque-neste-agendamento"
+                    : "estoque-em-demanda"
+            );
+        }
 
         linha.appendChild(
             criar("td", "estoque-reserva", reserva ? textoReserva(reserva) : "")
@@ -207,14 +245,10 @@ function desenharEstoqueAgenda(){
     estoqueFiliais.forEach(filial => {
 
         const maquinas =
-            Object.entries(filial.disponiveis || {})
-                .filter(([modelo]) => mostrarTodos || modelos.includes(modelo))
-                .flatMap(([modelo, lista]) =>
-                    lista.map(maquina => ({ ...maquina, modelo }))
-                )
-                .sort((a, b) =>
-                    a.p.localeCompare(b.p, "pt-BR", { numeric: true })
-                );
+            maquinasDaFilial(filial, mostrarTodos ? null : modelos);
+
+        const emManutencao =
+            maquinas.filter(maquina => maquina.situacao === "Manutenção").length;
 
         if(maquinas.some(maquina => maquina.m || maquina.e)) semMarca = false;
 
@@ -224,7 +258,11 @@ function desenharEstoqueAgenda(){
             NOMES_FILIAIS_ESTOQUE[filial.filial_id] || `Filial ${filial.filial_id}`;
 
         secao.appendChild(
-            criar("h4", "", `${nome}: ${maquinas.length} disponível(is)`)
+            criar(
+                "h4",
+                "",
+                `${nome}: ${maquinas.length - emManutencao} disponível(is), ${emManutencao} em manutenção`
+            )
         );
 
         secao.appendChild(
@@ -238,13 +276,25 @@ function desenharEstoqueAgenda(){
                     "p",
                     "estoque-nada",
                     mostrarTodos
-                        ? "Nenhuma máquina disponível."
-                        : "Nenhuma máquina disponível deste modelo."
+                        ? "Nenhuma máquina disponível ou em manutenção."
+                        : "Nenhuma máquina disponível ou em manutenção deste modelo."
                 )
         );
 
         corpo.appendChild(secao);
     });
+
+    // função antiga no banco: só devolve as disponíveis
+    if(estoqueFiliais.some(filial => !("manutencao" in filial))){
+
+        corpo.appendChild(
+            criar(
+                "p",
+                "estoque-nada",
+                "As máquinas em manutenção não aparecem: falta atualizar a função estoque_disponiveis no Supabase."
+            )
+        );
+    }
 
     if(semMarca){
 

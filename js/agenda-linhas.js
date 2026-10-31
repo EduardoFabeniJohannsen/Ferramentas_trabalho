@@ -479,7 +479,7 @@ function criarItemAgenda(item){
 
     botaoEstoque.type = "button";
 
-    botaoEstoque.title = "Ver os patrimônios disponíveis no estoque";
+    botaoEstoque.title = "Ver os patrimônios disponíveis e em manutenção no estoque";
 
     botaoEstoque.addEventListener(
         "click",

@@ -699,7 +699,31 @@ body.tema-claro .item-lixeira{
 }
 /* mesmas colunas nas duas filiais; o aviso de reserva fica com o espaço maior */
 .estoque-tabela th:last-child{
-    width:40%;
+    width:34%;
+}
+.estoque-em-manutencao{
+    font-weight:bold;
+    color:#f87171;
+}
+/* máquina que já está em alguma demanda: a linha inteira em destaque */
+.estoque-tabela tr.estoque-em-demanda td{
+    background:rgba(251,191,36,.18);
+}
+.estoque-tabela tr.estoque-em-demanda td:first-child{
+    box-shadow:inset 4px 0 0 #fbbf24;
+}
+.estoque-tabela tr.estoque-neste-agendamento td{
+    background:rgba(96,165,250,.16);
+}
+.estoque-tabela tr.estoque-neste-agendamento td:first-child{
+    box-shadow:inset 4px 0 0 #60a5fa;
+}
+.estoque-tabela tr.estoque-em-demanda .estoque-reserva,
+.estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    font-weight:bold;
+}
+.estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    color:#93c5fd;
 }
 .estoque-tabela th,
 .estoque-tabela td{
@@ -726,6 +750,12 @@ body.tema-claro .estoque-tabela td{
 }
 body.tema-claro .estoque-reserva{
     color:#a14a09;
+}
+body.tema-claro .estoque-em-manutencao{
+    color:#b91c1c;
+}
+body.tema-claro .estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    color:#1d4ed8;
 }
 .modal-corpo{
     padding:14px 20px 20px;
@@ -1829,7 +1859,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 
         <div class="modal-agenda-topo">
 
-            <h3>🔍 Patrimônios disponíveis</h3>
+            <h3>🔍 Patrimônios disponíveis e em manutenção</h3>
 
             <button
                 type="button"

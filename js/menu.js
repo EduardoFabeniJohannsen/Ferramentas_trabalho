@@ -27,6 +27,8 @@
         // (admin ou liberado na página Admin)
         { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras", comAcesso: true },
 
+        { arquivo: "leads.html", rotulo: "🎯 Leads", comAcesso: true },
+
         // soAdmin: o link só aparece para admin
 
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }

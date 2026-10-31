@@ -28,6 +28,8 @@ const ACESSOS_ADMIN = [
     // só ver: cadastrar, editar e excluir continua só com o admin
     { chave: "transportadoras", rotulo: "Transportadoras (ver)" },
 
+    { chave: "leads", rotulo: "Leads" },
+
     { chave: "fretes", rotulo: "Dados de frete" }
 ];
 

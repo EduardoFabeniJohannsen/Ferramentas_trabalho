@@ -317,7 +317,8 @@ const PAGINAS_DESTINO = [
     "agenda.html",
     "estoque.html",
     "tabelas.html",
-    "WEG.html"
+    "WEG.html",
+    "leads.html"
 ];
 
 

@@ -40,13 +40,17 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - CSS: style → admin
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-init
 
+**leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
+- CSS: style → bloco <style> no próprio leads.html
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads
+
 **login.html** — Login
 - CSS: style
 - JS: supabase-config
 
 ## Arquivos (responsabilidade e funções)
 
-- `admin-config.js` (45 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
+- `admin-config.js` (47 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
 - `admin-dados.js` (105 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
   - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
 - `admin-init.js` (33 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
@@ -123,7 +127,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - textoDataZap, ehLocalWR, modeloDaPlataforma, modelosDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
 - `atualizacao-sistema.js` (293 linhas): Em toda página menos o login: a cada 2 min e ao voltar para a aba compara VERSAO_SISTEMA com a do helpers.js publicado; se mudou, renova os arquivos no navegador e recarrega. Espera se houver janela aberta, trabalho não salvo ou uso no último minuto (mostra aviso com "Atualizar agora"). Carregar depois de helpers.js.
   - lerTentativaAtualizacao, gravarTentativaAtualizacao, lerVersaoPublicada, temTrabalhoAberto, paginaOcupada, esconderAvisoNovaVersao, mostrarAvisoNovaVersao, aplicarAtualizacao, tentarAtualizar, verificarVersaoSistema
-- `auth-guard.js` (376 linhas): Incluir em toda página que precisa de login (depois de supabase-config.js). Sem sessão ativa manda pra login.html antes da página aparecer; depois confere perfil (com cache), acesso à página e filial, e mostra os itens `.so-admin` para admin. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `auth-guard.js` (377 linhas): Incluir em toda página que precisa de login (depois de supabase-config.js). Sem sessão ativa manda pra login.html antes da página aparecer; depois confere perfil (com cache), acesso à página e filial, e mostra os itens `.so-admin` para admin. ⚠️ passa de ~300 linhas (sugerir divisão)
   - existeLoginSalvo, ehAdmin, carregarPerfil, salvarPerfilCache, lerPerfilCache, buscarPerfil, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES (uma tabela por transportadora) e buscarLinhasFretes() (busca em páginas de 1000 linhas).
   - buscarLinhasFretes
@@ -146,7 +150,9 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - formatarData, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast
 - `index-ferramentas.js` (272 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados). ⚠️ passa de ~300 linhas (sugerir divisão)
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
-- `menu.js` (119 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
+- `leads.js` (1224 linhas): Página de leads: lista, filtros, contadores, "Vou chamar" com condição no banco (só um pega), WhatsApp, ligar, copiar mensagem, resultado (só quem marcou ou admin), observação, link para Propostas, mensagens por segmento e configuração de busca (leads_config). Dados vêm de fora: nada entra como HTML. ⚠️ passa de ~300 linhas (sugerir divisão)
+  - semAcentoLeads, saudacaoAgora, montarMensagemLead, numeroComDDI, linkWhatsApp, linkLigar, linkSite, criarElLead, dataHoraLead, rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads, carregarLeads, recarregarLeads, opcoesDoCampo, preencherSelectLeads, passaNosFiltros, atualizarContadoresLeads, desenharLeads, criarCardLead, criarContatoLead, criarBotaoLead, criarLinkLead, criarAcoesLead, criarObservacaoLead, pegarLead, registrarResultado, separarListaConfig, carregarConfigsBusca, resumoConfig, desenharConfigsBusca, desenharPortesConfig, limparFormConfig, editarConfigBusca, salvarConfigBusca, alternarConfigBusca, abrirConfigBusca, fecharConfigBusca
+- `menu.js` (121 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
 - `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
   - copiarPropostaZap
 - `presenca.js` (121 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai só o id, a página e o estado; não grava nada no banco. Carregar depois de helpers.js e auth-guard.js.
@@ -167,7 +173,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - normalizarModelo, normalizarCidade
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
-- `propostas-init.js` (159 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página.
+- `propostas-init.js` (190 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página. Lê ?cliente= e ?cidade= (vindos de leads.html) depois do cache e limpa o endereço.
 - `propostas-pagamento.js` (56 linhas): Boleto ou depósito e o prazo em dias (⚙️ Configurações) na mensagem da Proposta Zap; sem escolher, sai o texto padrão.
   - atualizarCampoPrazo, trocarFormaPagamento, prazoPagamentoTexto, textoFormaPagamento
 - `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes.
@@ -235,6 +241,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 | `frete_dionizio` | `busca-fretes.js`, `tabelas-config.js` |
 | `frete_magnus` | `busca-fretes.js`, `tabelas-config.js` |
 | `função:criar-usuario` | `admin-dados.js` |
+| `leads` | `leads.js` (grava só status, chamado e observação; quem cria é o agente externo, com service_role no servidor dele) |
+| `leads_config` | `leads.js` (o agente externo lê as ativas) |
 | `motoristas` | `agenda-banco.js` (leitura em `agenda-motoristas.js`), `transp-config.js` |
 | `motoristas_dados` | `transp-config.js` |
 | `perfis` | `admin-config.js`, `auth-guard.js` |
@@ -262,6 +270,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `agendaLarguras` | `agenda-config.js` |
 | `agendaEtapas` | `agenda-config.js` |
 | `agendaRascunhos` | `agenda-config.js` |
+| `leadsVendedor:<usuário>` | `leads.js` |
 | `authPerfil` | `auth-guard.js` |
 | `estoqueFilial` | `estoque-config.js` (e no legado `estoque.js`) |
 | `propostaCache` | `propostas-cache.js` |
@@ -273,7 +282,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `leads.js` (1224), `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (408), `auth-guard.js` (377), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
@@ -282,4 +291,5 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 - Vários equipamentos no mesmo agendamento vão juntos na coluna `plataforma` (texto), ex: `2x WAD16 + WTE12`. Card, Zap, ordem e filtro leem esse texto; sem mudança no Supabase. A máquina de recolha da troca continua uma só.
 - Faturamento (forma, prazos, pedido) só em entregas; a coleta gerada de uma entrega não copia esses campos e o Zap não leva essas informações (só o card).
 - `menu.js` é a lista única dos links da topbar: página nova entra lá (nada de links digitados à mão). Página nova com acesso controlado entra também em `ACESSOS_ADMIN` (`admin-config.js`).
+- Leads: as tabelas e permissões estão em `leads.sql` (raiz), rodado à mão no SQL Editor. Policies com `tem_acesso('leads')`. A regra "só quem marcou registra o resultado" é da tela, não do banco.
 - Mudou VERSAO_SISTEMA? Fica em `helpers.js`.

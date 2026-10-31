@@ -36,6 +36,37 @@
 
 
     // ==================================
+    // VEIO DA PÁGINA DE LEADS
+    // ==================================
+    // propostas.html?cliente=X&cidade=Y. Vem depois do cache pra valer sobre
+    // ele, e limpa o endereço pra um F5 não apagar o que for digitado depois.
+
+    const parametros =
+        new URLSearchParams(window.location.search);
+
+    if(parametros.has("cliente") || parametros.has("cidade")){
+
+        if(parametros.has("cliente")){
+
+            $("nomeCliente").value = parametros.get("cliente");
+        }
+
+        if(parametros.has("cidade")){
+
+            $("cidade").value = parametros.get("cidade");
+        }
+
+        gerarTextos();
+
+        mostrarFretes();
+
+        salvarCache();
+
+        history.replaceState(null, "", window.location.pathname);
+    }
+
+
+    // ==================================
     // NOME CLIENTE
     // ==================================
 

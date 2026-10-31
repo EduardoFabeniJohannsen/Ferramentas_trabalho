@@ -724,3 +724,37 @@ TOGGLE LOCAÇÃO COMPLEMENTAR
 .btn-toggle.ativo:hover{
     background:#15803d;
 }
+
+/* ===== Versão nova do sistema (js/atualizacao-sistema.js) ===== */
+.aviso-nova-versao{
+    position:fixed;
+    left:50%;
+    bottom:16px;
+    transform:translateX(-50%);
+    z-index:2000;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:8px 12px;
+    box-sizing:border-box;
+    width:max-content;
+    max-width:calc(100vw - 32px);
+    padding:10px 14px;
+    border-radius:10px;
+    background:#1d4ed8;
+    color:#ffffff;
+    font-size:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.45);
+}
+.aviso-nova-versao button{
+    width:auto;
+    margin:0;
+    padding:5px 12px;
+    background:#ffffff;
+    color:#1d4ed8;
+    font-size:13px;
+}
+.aviso-nova-versao button:hover{
+    background:#dbeafe;
+}

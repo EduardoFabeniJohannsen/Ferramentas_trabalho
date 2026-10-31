@@ -81,6 +81,11 @@ const MENSAGENS_SEGMENTO = [
         busca: ["logistic", "galp", "armaz", "transport"],
         texto: "{saudacao}! Aqui é {vendedor}, da W Rental. Para galpões e centros de distribuição em {cidade}, alugamos plataformas elevatórias tesoura e articulada, com entrega rápida e suporte técnico. A {empresa} precisa de algum serviço em altura, como iluminação, cobertura ou estrutura?"
     },
+    // antes da manutenção predial: "manutenção naval" também contém "manutenc"
+    {
+        busca: ["naval", "estaleiro", "embarca", "marina"],
+        texto: "{saudacao}! Aqui é {vendedor}, da W Rental. Alugamos plataformas elevatórias (tesoura e articulada) para reparo e manutenção naval em {cidade}, como alternativa a andaimes e escadas, com entrega rápida e suporte técnico. A {empresa} tem algum serviço em altura previsto?"
+    },
     {
         busca: ["manutenc", "predial", "facilit", "condomin"],
         texto: "{saudacao}! Aqui é {vendedor}, da W Rental. Alugamos plataformas elevatórias (tesoura e articulada) para manutenção predial e fachadas em {cidade}, com entrega rápida e suporte técnico. A {empresa} tem algum serviço em altura para os próximos dias?"

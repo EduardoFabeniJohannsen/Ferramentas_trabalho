@@ -406,10 +406,9 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
             : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada.)`;
 
 
+    // boleto ou depósito e o prazo (propostas-pagamento.js)
     const textoPagamento =
-        emojisAtivo
-            ? "Mediante aprovação cadastral."
-            : "28 dias, mediante aprovação cadastral.";
+        textoFormaPagamento();
 
     // Linha em branco entre Cortesia e Pagamento: sem emojis sempre
     // tem; com emojis só se o toggle (⚙️ Configurações) estiver ativo

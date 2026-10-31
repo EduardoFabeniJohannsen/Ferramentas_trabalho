@@ -370,6 +370,34 @@ MODAL DE CONFIGURAÇÕES
 
         <p class="dica">Ativada, deixa uma linha em branco entre "Cortesia" e "Forma de pagamento" na Proposta Zap.</p>
 
+
+        <!-- forma de pagamento da Proposta Zap (propostas-pagamento.js) -->
+        <div class="pagamento-linha">
+
+            <select
+                id="formaPagamento"
+                title="Forma de pagamento na Proposta Zap"
+                onchange="trocarFormaPagamento()"
+            >
+                <option value="">Pagamento: texto padrão</option>
+                <option value="Boleto">Pagamento: Boleto</option>
+                <option value="Depósito">Pagamento: Depósito</option>
+            </select>
+
+            <input
+                type="text"
+                id="prazoPagamento"
+                placeholder="Prazo (dias)"
+                inputmode="numeric"
+                title="Prazo em dias. Mais de um vencimento: 28/56"
+                style="display:none"
+                oninput="salvarCache()"
+            >
+
+        </div>
+
+        <p class="dica">Forma de pagamento e prazo em dias na Proposta Zap. Mais de um vencimento: 28/56.</p>
+
     </div>
 
 </div>
@@ -397,6 +425,7 @@ MODAL DE CONFIGURAÇÕES
 <script src="js/propostas-desconto-calculo.js"></script>
 <script src="js/propostas-cache.js"></script>
 <script src="js/propostas-config.js"></script>
+<script src="js/propostas-pagamento.js"></script>
 <script src="js/proposta-zap.js"></script>
 <script src="js/propostas-textos.js"></script>
 <script src="js/proposta-zap.js"></script>

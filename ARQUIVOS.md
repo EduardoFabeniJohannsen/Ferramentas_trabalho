@@ -14,7 +14,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes)
 - CSS: style → propostas
-- JS: supabase-config → auth-guard → helpers → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → proposta-zap → propostas-textos → proposta-zap → propostas-init
+- JS: supabase-config → auth-guard → helpers → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-textos → proposta-zap → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
@@ -137,11 +137,11 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `index-ferramentas.js` (313 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados). ⚠️ passa de ~300 linhas (sugerir divisão)
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
 - `menu.js` (119 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
-- `proposta-zap.js` (439 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
   - mostrarAvisoDadosSalvos, avisarFalhaCarregamento, preencherListaEquipamentos, preencherListaCidades
-- `propostas-cache.js` (295 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.
+- `propostas-cache.js` (303 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.
   - salvarCache, restaurarCache, limparTudo
 - `propostas-config.js` (331 linhas): Locação complementar (com o valor pronto embaixo do frete: frete x 2, +20% com bitributação), bitributação, diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
   - alternarLocacaoComplementar, atualizarBotaoLocacaoComplementar, alternarBitributacao, atualizarBotaoBitributacao, valorLocacaoComplementar, atualizarResumoComplementar, alternarValorDiaria, atualizarBotaoValorDiaria, alternarEmojis, atualizarBotaoEmojis, alternarCidadeSaida, atualizarBotaoCidadeSaida, alternarSepararPagamento, atualizarBotaoSepararPagamento, abrirConfiguracoes, fecharConfiguracoes
@@ -156,6 +156,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
 - `propostas-init.js` (159 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página.
+- `propostas-pagamento.js` (56 linhas): Boleto ou depósito e o prazo em dias (⚙️ Configurações) na mensagem da Proposta Zap; sem escolher, sai o texto padrão.
+  - atualizarCampoPrazo, trocarFormaPagamento, prazoPagamentoTexto, textoFormaPagamento
 - `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes.
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (191 linhas): Cópia offline (localStorage, de preços e de fretes) e carregamento de tabela_precos.
@@ -259,7 +261,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (522), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

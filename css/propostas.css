@@ -70,6 +70,27 @@
     color:#94a3b8;
 }
 
+/* ===== Forma de pagamento + prazo (lado a lado) ===== */
+.pagamento-linha{
+    display:flex;
+    gap:6px;
+    width:100%;
+    margin-top:10px;
+}
+.pagamento-linha select,
+.pagamento-linha input{
+    margin:0 0 2px;
+}
+.pagamento-linha select{
+    flex:1;
+    min-width:0;
+}
+.pagamento-linha input{
+    width:110px;
+    flex:none;
+    text-align:center;
+}
+
 /* ===== Período + Períodos (lado a lado) ===== */
 .periodo-linha{
     display:flex;

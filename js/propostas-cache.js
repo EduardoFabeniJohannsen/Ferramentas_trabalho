@@ -53,6 +53,8 @@ function salvarCache(){
         periodos: $("periodos")?.value || "",
         cidade: $("cidade")?.value || "",
         valorFrete: $("valorFrete")?.value || "",
+        formaPagamento: $("formaPagamento")?.value || "",
+        prazoPagamento: $("prazoPagamento")?.value || "",
         locacaoComplementarAtiva: locacaoComplementarAtiva,
         bitributacaoAtiva: bitributacaoAtiva,
         valorDiariaAtivo: valorDiariaAtivo,
@@ -100,6 +102,12 @@ function restaurarCache(){
     if($("periodos")) $("periodos").value = dados.periodos || "";
     if($("cidade")) $("cidade").value = dados.cidade || "";
     if($("valorFrete")) $("valorFrete").value = dados.valorFrete || "";
+
+    $("formaPagamento").value = dados.formaPagamento || "";
+
+    $("prazoPagamento").value = dados.prazoPagamento || "";
+
+    atualizarCampoPrazo();
 
     locacaoComplementarAtiva = dados.locacaoComplementarAtiva === true;
 

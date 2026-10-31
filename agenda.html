@@ -35,6 +35,71 @@
 .barra-agenda button{
     margin:0;
 }
+/* botão ⚙️ Filtros: painel com os filtros e as opções da tela */
+.filtro-geral{
+    position:relative;
+}
+.filtro-geral > button.filtrando{
+    background:#2563eb;
+}
+.painel-filtros{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:60;
+    box-sizing:border-box;
+    width:400px;
+    max-width:92vw;
+    max-height:78vh;
+    overflow-y:auto;
+    padding:12px;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.painel-filtros.aberto{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+.painel-filtros-titulo{
+    margin:0;
+    font-size:11px;
+    font-weight:bold;
+    text-transform:uppercase;
+    color:#94a3b8;
+}
+.painel-filtros-titulo:not(:first-child){
+    margin-top:8px;
+    padding-top:12px;
+    border-top:1px solid #334155;
+}
+.painel-filtros .chips{
+    margin:0;
+}
+.painel-filtros .chip{
+    padding:5px 10px;
+    font-size:13px;
+}
+.painel-filtros select{
+    flex:none;
+    width:100%;
+}
+.painel-filtros > button,
+.painel-filtros .filtro-datas > button,
+.painel-filtros .filtro-status > button,
+.painel-filtros .filtro-colunas > button,
+.painel-filtros .filtro-botoes > button{
+    width:100%;
+    text-align:left;
+}
+.contagem-agenda button{
+    margin:0 0 0 6px;
+    padding:2px 8px;
+    font-size:12px;
+}
 /* pesquisa: campo + botão × pra limpar */
 .busca-agenda{
     display:flex;
@@ -60,7 +125,9 @@
 }
 /* ===== Filtro de datas (estilo Excel) ===== */
 .filtro-datas,
-.filtro-status{
+.filtro-status,
+.filtro-colunas,
+.filtro-botoes{
     position:relative;
 }
 .filtro-datas > button.filtrando,
@@ -68,7 +135,9 @@
     background:#2563eb;
 }
 .painel-datas,
-.painel-status{
+.painel-status,
+.painel-colunas,
+.painel-botoes{
     display:none;
     position:absolute;
     top:calc(100% + 6px);
@@ -83,11 +152,29 @@
     box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
 .painel-datas.aberto,
-.painel-status.aberto{
+.painel-status.aberto,
+.painel-colunas.aberto,
+.painel-botoes.aberto{
     display:block;
 }
-.painel-status{
+.painel-status,
+.painel-colunas,
+.painel-botoes{
     width:250px;
+}
+.painel-colunas .lista-datas{
+    max-height:min(70vh, 520px);
+}
+/* dentro do ⚙️ Filtros, as listas abrem no meio do painel, sem flutuar */
+.painel-filtros .painel-datas,
+.painel-filtros .painel-status,
+.painel-filtros .painel-colunas,
+.painel-filtros .painel-botoes{
+    position:static;
+    width:auto;
+    max-width:none;
+    margin-top:6px;
+    box-shadow:none;
 }
 .contagem-status{
     margin-left:auto;
@@ -236,11 +323,16 @@
     box-shadow:inset -3px 0 0 #3b82f6;
 }
 .ag-tabela thead th.ag-cab-proposta{
-    border-left:2px dashed #334155;
     text-align:center;
 }
 .ag-tabela thead th.ag-cab-lado{
     border:none;
+}
+/* traço de corte do print: a proposta fica fora enquanto for a última coluna;
+   se o usuário mudar ela de lugar, só os botões ficam fora */
+.ag-tabela thead th.ag-cab-proposta:nth-last-child(2),
+.ag-tabela thead th:not(.ag-cab-proposta) + th.ag-cab-lado{
+    border-left:2px dashed #334155;
 }
 
 /* cabeçalho de cada dia (a cor do dia vem da variável --cor-dia) */
@@ -411,8 +503,8 @@ tr.ag-item select.tag-select option{
     color:#cbd5e1;
 }
 
-/* proposta e botões da linha: ficam à direita do traço de corte,
-   fora da área do print */
+/* proposta e botões da linha: o traço de corte separa o que fica fora
+   da área do print (ver o cabeçalho) */
 tr.ag-item td.ag-proposta{
     padding-left:14px;
     padding-right:14px;
@@ -420,11 +512,17 @@ tr.ag-item td.ag-proposta{
     color:#cbd5e1;
     text-align:center;
     white-space:nowrap;
-    border-left:2px dashed #334155;
 }
 tr.ag-item td.ag-lado{
     padding-left:14px;
     border-left:1px dashed #475569;
+}
+tr.ag-item td.ag-proposta:nth-last-child(2),
+tr.ag-item td:not(.ag-proposta) + td.ag-lado{
+    border-left:2px dashed #334155;
+}
+tr.ag-item td.ag-proposta:first-child{
+    border-left:6px solid var(--cor-dia);
 }
 .ag-botoes{
     display:flex;
@@ -455,6 +553,9 @@ tr.ag-item td.ag-lado{
 }
 .ag-botoes .btn-excluir-ag{
     margin-left:12px;
+}
+.ag-botoes .btn-excluir-ag:first-child{
+    margin-left:0;
 }
 
 /* ===== Modal ===== */
@@ -887,7 +988,8 @@ body.tema-claro .ag-tabela thead th{
 body.tema-claro .ag-tabela thead th + th,
 body.tema-claro tr.ag-item td + td,
 body.tema-claro .ag-tabela thead th.ag-cab-proposta,
-body.tema-claro tr.ag-item td.ag-proposta,
+body.tema-claro .ag-tabela thead th:not(.ag-cab-proposta) + th.ag-cab-lado,
+body.tema-claro tr.ag-item td.ag-proposta:not(:first-child),
 body.tema-claro tr.ag-item td.ag-lado{
     border-left-color:var(--claro-linha);
 }
@@ -941,8 +1043,17 @@ body.tema-claro .ag-hora-vazio{
 body.tema-claro .contagem-status{
     color:#52617a;
 }
+body.tema-claro .painel-filtros-titulo{
+    color:#3b4a63;
+}
+body.tema-claro .painel-filtros-titulo:not(:first-child){
+    border-top-color:var(--claro-linha);
+}
+body.tema-claro .painel-filtros,
 body.tema-claro .painel-datas,
-body.tema-claro .painel-status{
+body.tema-claro .painel-status,
+body.tema-claro .painel-colunas,
+body.tema-claro .painel-botoes{
     background:var(--claro-card);
     border-color:var(--claro-linha);
 }
@@ -1072,99 +1183,177 @@ CONTAINER
 
             </div>
 
-            <!-- filtro de datas estilo Excel: lista com caixinhas -->
-            <div class="filtro-datas">
+            <!-- filtros e opções da tela: tudo num botão só (agenda-filtros.js) -->
+            <div class="filtro-geral">
 
                 <button
                     type="button"
-                    id="btnDatas"
+                    id="btnFiltros"
                     class="btn-secundario"
-                    onclick="alternarPainelDatas()"
+                    onclick="alternarPainelFiltros()"
+                    title="Filtrar os agendamentos e escolher o que aparece na tela"
                 >
-                    📅 Todas as datas ▾
+                    ⚙️ Filtros ▾
                 </button>
 
-                <div class="painel-datas" id="painelDatas">
+                <div class="painel-filtros" id="painelFiltros">
 
-                    <div class="atalhos-datas">
+                    <p class="painel-filtros-titulo">Filtrar agendamentos</p>
 
-                        <button
-                            type="button"
-                            class="btn-secundario"
-                            onclick="selecionarProximosDias(0)"
-                        >
-                            Só hoje
-                        </button>
+                    <div class="chips" id="chipsTransportadora"></div>
+
+                    <!-- filtro de datas estilo Excel: lista com caixinhas -->
+                    <div class="filtro-datas">
 
                         <button
                             type="button"
+                            id="btnDatas"
                             class="btn-secundario"
-                            onclick="selecionarProximosDias(7)"
+                            onclick="alternarPainelDatas()"
                         >
-                            Próximos 7 dias
+                            📅 Todas as datas ▾
                         </button>
+
+                        <div class="painel-datas" id="painelDatas">
+
+                            <div class="atalhos-datas">
+
+                                <button
+                                    type="button"
+                                    class="btn-secundario"
+                                    onclick="selecionarProximosDias(0)"
+                                >
+                                    Só hoje
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-secundario"
+                                    onclick="selecionarProximosDias(7)"
+                                >
+                                    Próximos 7 dias
+                                </button>
+
+                            </div>
+
+                            <input
+                                type="text"
+                                id="buscaDatas"
+                                placeholder="Buscar data..."
+                                autocomplete="off"
+                            >
+
+                            <label class="data-opcao data-todas">
+                                <input type="checkbox" id="marcarTodasDatas">
+                                <span>(Selecionar tudo)</span>
+                            </label>
+
+                            <div class="lista-datas" id="listaDatasFiltro"></div>
+
+                        </div>
 
                     </div>
 
-                    <input
-                        type="text"
-                        id="buscaDatas"
-                        placeholder="Buscar data..."
-                        autocomplete="off"
+                    <select id="filtroTipo">
+                        <option value="">Todos os tipos</option>
+                    </select>
+
+                    <!-- filtro de status igual ao de datas: lista com caixinhas -->
+                    <div class="filtro-status">
+
+                        <button
+                            type="button"
+                            id="btnStatus"
+                            class="btn-secundario"
+                            onclick="alternarPainelStatus()"
+                        >
+                            🏷️ Todos os status ▾
+                        </button>
+
+                        <div class="painel-status" id="painelStatus">
+
+                            <label class="data-opcao data-todas">
+                                <input type="checkbox" id="marcarTodosStatus">
+                                <span>(Selecionar tudo)</span>
+                            </label>
+
+                            <div class="lista-datas" id="listaStatusFiltro"></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- só as máquinas cujo patrimônio a manutenção ainda não definiu -->
+                    <button
+                        type="button"
+                        class="btn-secundario"
+                        id="btnSemPatrimonio"
+                        onclick="alternarSemPatrimonio()"
+                        title="Mostrar só as máquinas sem patrimônio definido (só o modelo, ex: WAE15)"
                     >
+                        ⚠️ Só sem patrimônio
+                    </button>
 
-                    <label class="data-opcao data-todas">
-                        <input type="checkbox" id="marcarTodasDatas">
-                        <span>(Selecionar tudo)</span>
-                    </label>
+                    <p class="painel-filtros-titulo">O que aparece na tela</p>
 
-                    <div class="lista-datas" id="listaDatasFiltro"></div>
+                    <select id="ordemAgenda" title="Ordem dentro de cada data"></select>
+
+                    <!-- só na expedição: escolher quais informações aparecem -->
+                    <div class="filtro-colunas" id="filtroColunas" style="display:none">
+
+                        <button
+                            type="button"
+                            id="btnColunas"
+                            class="btn-secundario"
+                            onclick="alternarPainelColunas()"
+                            title="Escolher quais informações aparecem na tabela"
+                        >
+                            👁️ Colunas ▾
+                        </button>
+
+                        <div class="painel-colunas" id="painelColunas">
+
+                            <div class="lista-datas" id="listaColunasVisiveis"></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- cada usuário escolhe os botões que aparecem em cada agendamento -->
+                    <div class="filtro-botoes">
+
+                        <button
+                            type="button"
+                            id="btnBotoes"
+                            class="btn-secundario"
+                            onclick="alternarPainelBotoes()"
+                            title="Escolher quais botões aparecem em cada agendamento"
+                        >
+                            🔘 Botões ▾
+                        </button>
+
+                        <div class="painel-botoes" id="painelBotoes">
+
+                            <div class="lista-datas" id="listaBotoesLinha"></div>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-secundario"
+                        id="btnColunasPadrao"
+                        style="display:none"
+                        onclick="restaurarColunasPadrao()"
+                        title="Voltar as colunas para a ordem, a largura e as informações padrão"
+                    >
+                        ↺ Colunas padrão
+                    </button>
 
                 </div>
 
             </div>
-
-            <select id="filtroTipo">
-                <option value="">Todos os tipos</option>
-            </select>
-
-            <!-- filtro de status igual ao de datas: lista com caixinhas -->
-            <div class="filtro-status">
-
-                <button
-                    type="button"
-                    id="btnStatus"
-                    class="btn-secundario"
-                    onclick="alternarPainelStatus()"
-                >
-                    🏷️ Todos os status ▾
-                </button>
-
-                <div class="painel-status" id="painelStatus">
-
-                    <label class="data-opcao data-todas">
-                        <input type="checkbox" id="marcarTodosStatus">
-                        <span>(Selecionar tudo)</span>
-                    </label>
-
-                    <div class="lista-datas" id="listaStatusFiltro"></div>
-
-                </div>
-
-            </div>
-
-            <select id="ordemAgenda" title="Ordem dentro de cada data"></select>
-
-            <!-- só as máquinas cujo patrimônio a manutenção ainda não definiu -->
-            <button
-                type="button"
-                class="btn-secundario"
-                id="btnSemPatrimonio"
-                onclick="alternarSemPatrimonio()"
-                title="Mostrar só as máquinas sem patrimônio definido (só o modelo, ex: WAE15)"
-            >
-                ⚠️ Só sem patrimônio
-            </button>
 
             <button
                 type="button"
@@ -1173,17 +1362,6 @@ CONTAINER
                 title="Buscar de novo os agendamentos e motoristas"
             >
                 ↻ Atualizar
-            </button>
-
-            <button
-                type="button"
-                class="btn-secundario"
-                id="btnColunasPadrao"
-                style="display:none"
-                onclick="restaurarColunasPadrao()"
-                title="Voltar as colunas para a ordem e a largura padrão"
-            >
-                ↺ Colunas padrão
             </button>
 
             <button
@@ -1209,9 +1387,19 @@ CONTAINER
 
         </div>
 
-        <div class="chips" id="chipsTransportadora"></div>
-
-        <p class="contagem-agenda" id="contagemAgenda"></p>
+        <p class="contagem-agenda">
+            <span id="contagemAgenda"></span>
+            <span id="resumoFiltros"></span>
+            <button
+                type="button"
+                class="btn-secundario"
+                id="btnLimparFiltros"
+                style="display:none"
+                onclick="limparFiltros()"
+            >
+                × Limpar filtros
+            </button>
+        </p>
 
         <div id="listaAgenda"></div>
 
@@ -1589,6 +1777,8 @@ LIXEIRA (só admin)
 <script src="js/agenda-render.js"></script>
 <script src="js/agenda-linhas.js"></script>
 <script src="js/agenda-colunas.js"></script>
+<script src="js/agenda-colunas-visiveis.js"></script>
+<script src="js/agenda-botoes-linha.js"></script>
 <script src="js/agenda-larguras.js"></script>
 <script src="js/agenda-tema.js"></script>
 <script src="js/agenda-zap.js"></script>

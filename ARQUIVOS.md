@@ -18,7 +18,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
-- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-init
+- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
@@ -58,26 +58,30 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - palavrasBuscaAgenda, buscandoAgenda, itemCombinaBusca, removerAntigosBusca, buscarAntigosAgenda, digitarBuscaAgenda, limparBuscaAgenda
 - `agenda-coleta.js` (67 linhas): Cria uma coleta já preenchida a partir de uma entrega.
   - valoresColetaDaEntrega, copiarEntregaParaColeta
-- `agenda-colunas.js` (283 linhas): Colunas por modo e ordem das colunas (arrastar o título).
+- `agenda-colunas.js` (284 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
-- `agenda-config.js` (188 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
+- `agenda-colunas-visiveis.js` (190 linhas): Botão 👁️ Colunas (só na expedição): mostrar e ocultar qualquer informação da tabela; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
+  - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
+- `agenda-botoes-linha.js` (165 linhas): Botão 🔘 Botões: cada usuário escolhe quais botões aparecem em cada agendamento (nos dois modos). Também mede a largura da coluna dos botões quando as larguras são fixas. Carregar antes de agenda-init.js.
+  - botaoLigado, chaveBotoesLinha, carregarBotoesLinha, salvarBotoesLinha, ligarBotaoLinha, larguraColunaBotoes, atualizarBotaoBotoesLinha, desenharPainelBotoes, alternarPainelBotoes, fecharPainelBotoes
+- `agenda-config.js` (226 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
 - `agenda-etapas.js` (158 linhas): Etapas do formulário (Demanda, Local e entrega, Faturamento) que recolhem ao clicar no título; salva por usuário; avisoFormulario() abre a etapa com erro. Carregar antes de agenda-modal.js.
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
 - `agenda-filtro-datas.js` (214 linhas): Painel de datas estilo Excel e atalhos (hoje / próximos dias).
   - semAcentoMinusculo, datasDoFiltro, rotuloDataFiltro, atualizarBotaoDatas, desenharPainelDatas, alternarPainelDatas, fecharPainelDatas, alternarTodasDatas, selecionarProximosDias
 - `agenda-filtro-status.js` (177 linhas): Painel de status estilo Excel.
   - statusDoFiltro, contagemPorStatus, atualizarBotaoStatus, desenharPainelStatus, alternarPainelStatus, fecharPainelStatus, alternarTodosStatus
-- `agenda-filtros.js` (141 linhas): Modo expedição/transportador, botão "Só sem patrimônio" e filtrarAgendamentos() (pesquisando, o modo, as datas e os status não escondem nada; os antigos só aparecem na pesquisa).
-  - definirModo, visivelNoModo, filtrandoSemPatrimonio, alternarSemPatrimonio, filtrarAgendamentos
+- `agenda-filtros.js` (247 linhas): Modo expedição/transportador, botão "Só sem patrimônio", botão ⚙️ Filtros (painel único com filtros e opções; o botão e a linha da contagem avisam o que está filtrando) e filtrarAgendamentos() (pesquisando, o modo, as datas e os status não escondem nada; os antigos só aparecem na pesquisa).
+  - definirModo, visivelNoModo, filtrandoSemPatrimonio, alternarSemPatrimonio, filtrosAtivos, atualizarBotaoFiltros, limparFiltros, alternarPainelFiltros, fecharPainelFiltros, filtrarAgendamentos
 - `agenda-form-campos.js` (337 linhas): CAMPOS_AGENDA, máscaras de horário/período e regras dos campos. Em entrega, a retirada vem recolhida ("— W Rental"); abre sozinha se tiver algo preenchido ou em outro tipo. ⚠️ passa de ~300 linhas (sugerir divisão)
   - preencherSelect, forcarMaiusculo, mascararHorario, mascararCampoHorario, horarioValido, textoDias, textoPeriodos, normalizarPeriodo, atualizarSugestoesPeriodo, atualizarCamposTipo, retiradaPreenchida, mostrarRetirada, atualizarRetirada, alternarRetirada, garantirOpcaoTransportadora
-- `agenda-init.js` (181 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
-- `agenda-larguras.js` (358 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `agenda-init.js` (204 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
+- `agenda-larguras.js` (367 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js. ⚠️ passa de ~300 linhas (sugerir divisão)
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
 - `agenda-lixeira.js` (222 linhas): Lixeira (só admin): excluir manda o agendamento para a lixeira (`excluido_em`, pela função `mover_agendamento_lixeira` do banco; quem não é admin não vê mais). Botão 🗑️ Lixeira (`.so-admin`) lista os excluídos para restaurar ou apagar de vez (só admin pelo RLS; apaga junto o PDF do pedido). Carregar antes de agenda-init.js.
-- `agenda-linhas.js` (466 linhas): Montagem de cada linha/célula da tabela, cabeçalho, seletor de status e botões da linha (📋 Zap, 🧾 faturamento, ↩️ coleta, editar, excluir). ⚠️ passa de ~300 linhas (sugerir divisão)
+- `agenda-linhas.js` (509 linhas): Montagem de cada linha/célula da tabela, cabeçalho, seletor de status e botões da linha (📋 Zap, 🧾 faturamento, ↩️ coleta, editar, excluir). ⚠️ passa de ~300 linhas (sugerir divisão)
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarMaquina, criarCelulasAgenda, criarCabecalhoAgenda, criarItemAgenda
-- `agenda-modal.js` (224 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
+- `agenda-modal.js` (230 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
   - abrirModalAgenda, atualizarCamposConta, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista
@@ -95,7 +99,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - abrirPedidoPdf, enviarPedidoPdf, removerPedidoPdfStorage, sincronizarPdfPedido
 - `agenda-rascunho.js` (122 linhas): Guarda no navegador o que foi digitado e não salvo.
   - chaveRascunho, lerRascunhos, gravarRascunhos, removerRascunho, salvarRascunho, agendarRascunho, atualizarBotoesModal
-- `agenda-render.js` (226 linhas): Chips de transportadora, select de ordem, controles do modo e renderizarAgenda().
+- `agenda-render.js` (233 linhas): Chips de transportadora, select de ordem, controles do modo e renderizarAgenda().
   - desenharChips, atualizarSelectOrdem, definirOrdem, atualizarControlesModo, renderizarAgenda
 - `agenda-salvar.js` (230 linhas): salvarAgendamento() e excluirAgendamento() (manda para a lixeira; o PDF do pedido fica até apagar de vez).
   - salvarAgendamento, excluirAgendamento
@@ -103,7 +107,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - aplicarTema, alternarTema
 - `agenda-transportadoras.js` (57 linhas): Só leitura: carrega a lista de transportadoras para os campos e filtros da agenda. Cadastrar/excluir transportadora: só admin, em transportadoras.html.
   - carregarTransportadoras, definirTransportadoras, atualizarSelectsTransportadora
-- `agenda-utils.js` (74 linhas): criar(), dataISO(), corDoDia(), tituloDoDia().
+- `agenda-utils.js` (100 linhas): criar(), dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco() (cidade/UF tirada do texto do endereço).
   - criar, dataISO, corDoDia, tituloDoDia
 - `agenda-zap.js` (307 linhas): Texto de agendamento copiado para o grupo da transportadora. A referência digitada à mão sem o número da proposta ganha " - Proposta: N" no fim. ⚠️ passa de ~300 linhas (sugerir divisão)
   - textoDataZap, ehLocalWR, modeloDaPlataforma, modelosDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
@@ -237,6 +241,8 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `agendaOrdem` | `agenda-config.js` |
 | `agendaTema` | `agenda-config.js` |
 | `agendaColunas` | `agenda-config.js` |
+| `agendaColunasVisiveis` | `agenda-config.js` |
+| `agendaBotoes` | `agenda-config.js` |
 | `agendaLarguras` | `agenda-config.js` |
 | `agendaEtapas` | `agenda-config.js` |
 | `agendaRascunhos` | `agenda-config.js` |
@@ -251,7 +257,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (466), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (358), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (509), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

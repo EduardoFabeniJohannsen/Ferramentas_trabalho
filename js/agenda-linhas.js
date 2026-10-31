@@ -257,67 +257,116 @@ function criarCelulasAgenda(item){
                 : null
         );
 
-    // ---------- transportador: local e frete ----------
-    // (a expedição não mostra local nem valor)
+    // ---------- local e frete ----------
+    // (na expedição só aparecem se o usuário ligar a coluna)
 
-    if(!expedicao){
+    // entrega e troca saem da W Rental e coleta volta pra ela,
+    // quando o local fica vazio
+    let origemNome = item.origemNome;
 
-        // entrega e troca saem da W Rental e coleta volta pra ela,
-        // quando o local fica vazio
-        let origemNome = item.origemNome;
-
-        if(
-            !origemNome &&
-            !item.origemEndereco &&
-            (item.tipo === "Entrega" || item.tipo === "Troca técnica")
-        ){
-            origemNome = LOCAL_PADRAO;
-        }
-
-        let destinoNome = item.destinoNome;
-
-        if(
-            !destinoNome &&
-            !item.destinoEndereco &&
-            item.tipo === "Coleta"
-        ){
-            destinoNome = LOCAL_PADRAO;
-        }
-
-        celulas.retirada =
-            celula(
-                "retirada",
-                (origemNome || item.origemEndereco || item.linkOrigem)
-                    ? criarBlocoLocal(
-                        origemNome,
-                        item.origemEndereco,
-                        item.linkOrigem
-                    )
-                    : null
-            );
-
-        celulas.entrega =
-            celula(
-                "entrega",
-                (destinoNome || item.destinoEndereco || item.linkDestino)
-                    ? criarBlocoLocal(
-                        destinoNome,
-                        item.destinoEndereco,
-                        item.linkDestino
-                    )
-                    : null
-            );
-
-        const frete = brToNumber(item.frete);
-
-        celulas.frete =
-            celula(
-                "frete",
-                (Number.isFinite(frete) && frete > 0)
-                    ? criar("p", "ag-extra", `R$ ${formatarMoedaBR(frete)}`)
-                    : null
-            );
+    if(
+        !origemNome &&
+        !item.origemEndereco &&
+        (item.tipo === "Entrega" || item.tipo === "Troca técnica")
+    ){
+        origemNome = LOCAL_PADRAO;
     }
+
+    let destinoNome = item.destinoNome;
+
+    if(
+        !destinoNome &&
+        !item.destinoEndereco &&
+        item.tipo === "Coleta"
+    ){
+        destinoNome = LOCAL_PADRAO;
+    }
+
+    celulas.retirada =
+        celula(
+            "retirada",
+            (origemNome || item.origemEndereco || item.linkOrigem)
+                ? criarBlocoLocal(
+                    origemNome,
+                    item.origemEndereco,
+                    item.linkOrigem
+                )
+                : null
+        );
+
+    celulas.entrega =
+        celula(
+            "entrega",
+            (destinoNome || item.destinoEndereco || item.linkDestino)
+                ? criarBlocoLocal(
+                    destinoNome,
+                    item.destinoEndereco,
+                    item.linkDestino
+                )
+                : null
+        );
+
+    const frete = brToNumber(item.frete);
+
+    celulas.frete =
+        celula(
+            "frete",
+            (Number.isFinite(frete) && frete > 0)
+                ? criar("p", "ag-extra", `R$ ${formatarMoedaBR(frete)}`)
+                : null
+        );
+
+    // ---------- informações que só aparecem se o usuário ligar a coluna ----------
+
+    const celulaTexto = (id, texto) =>
+        celula(id, texto ? criar("span", "", texto) : null);
+
+    celulas.cidade =
+        celulaTexto("cidade", cidadeDoEndereco(item.destinoEndereco));
+
+    celulas.contato = celulaTexto("contato", item.contato);
+
+    celulas.obsEntrega = celulaTexto("obsEntrega", item.obsEntrega);
+
+    celulas.referencia = celulaTexto("referencia", item.referencia);
+
+    celulas.freteConta =
+        celulaTexto(
+            "freteConta",
+            item.freteConta === "cliente" ? "Conta do cliente" : "Nossa conta"
+        );
+
+    celulas.card = celulaTexto("card", item.card);
+
+    celulas.emails = celulaTexto("emails", item.emails);
+
+    // só entrega tem faturamento
+    celulas.pagamento =
+        celulaTexto(
+            "pagamento",
+            item.formaPagamento
+                ? [
+                    item.formaPagamento,
+                    item.prazosPagamento.length
+                        ? `${item.prazosPagamento.join("/")} DD`
+                        : ""
+                ].filter(Boolean).join(" – ")
+                : ""
+        );
+
+    celulas.pedido =
+        celulaTexto(
+            "pedido",
+            item.pedidoCompra
+                ? (item.pedidoNumero || "Sim")
+                : ""
+        );
+
+    // ---------- proposta ----------
+
+    celulas.proposta = celulaTexto("proposta", item.proposta);
+
+    celulas.proposta.classList.add("ag-proposta");
 
     return colunas.map(coluna => celulas[coluna.id]);
 }
@@ -334,9 +383,6 @@ function criarCabecalhoAgenda(){
 
         linha.appendChild(criarTituloColuna(coluna));
     });
-
-    // à direita do traço de corte do print: proposta e botões
-    linha.appendChild(criar("th", "ag-cab-proposta", "Proposta"));
 
     linha.appendChild(criar("th", "ag-cab-lado"));
 
@@ -361,11 +407,8 @@ function criarItemAgenda(item){
         linha.appendChild(celula);
     });
 
-    // ---------- proposta e controles (fora da área do print) ----------
-
-    linha.appendChild(
-        criar("td", "ag-proposta", item.proposta || "")
-    );
+    // ---------- controles (fora da área do print) ----------
+    // cada usuário escolhe quais aparecem (agenda-botoes-linha.js)
 
     const lado = criar("td", "ag-lado");
 
@@ -382,7 +425,7 @@ function criarItemAgenda(item){
         () => copiarAgendamentoZap(item)
     );
 
-    botoes.appendChild(botaoZap);
+    if(botaoLigado("zap")) botoes.appendChild(botaoZap);
 
     // faturamento (forma, prazo e e-mails): só entrega tem. Nos outros
     // tipos fica invisível, pra manter os botões alinhados.
@@ -406,7 +449,7 @@ function criarItemAgenda(item){
         botaoFaturamento.tabIndex = -1;
     }
 
-    botoes.appendChild(botaoFaturamento);
+    if(botaoLigado("faturamento")) botoes.appendChild(botaoFaturamento);
 
     // entrega: cria uma coleta a partir dela. Nos outros tipos fica um
     // botão invisível, só pra os botões da direita ficarem alinhados.
@@ -430,7 +473,7 @@ function criarItemAgenda(item){
         botaoColeta.tabIndex = -1;
     }
 
-    botoes.appendChild(botaoColeta);
+    if(botaoLigado("coleta")) botoes.appendChild(botaoColeta);
 
     const botaoEditar = criar("button", "", "✏️");
 
@@ -443,7 +486,7 @@ function criarItemAgenda(item){
         () => abrirModalAgenda(item.id)
     );
 
-    botoes.appendChild(botaoEditar);
+    if(botaoLigado("editar")) botoes.appendChild(botaoEditar);
 
     const botaoExcluir = criar("button", "btn-secundario btn-excluir-ag", "🗑️");
 
@@ -456,7 +499,7 @@ function criarItemAgenda(item){
         () => excluirAgendamento(item.id)
     );
 
-    botoes.appendChild(botaoExcluir);
+    if(botaoLigado("excluir")) botoes.appendChild(botaoExcluir);
 
     lado.appendChild(botoes);
 

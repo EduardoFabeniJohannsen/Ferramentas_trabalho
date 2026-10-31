@@ -46,6 +46,15 @@
 
     document.addEventListener("click", (evento) => {
 
+        // o clique redesenhou o que foi clicado (ex: chip da transportadora):
+        // ele já saiu da página e não dá pra saber onde estava
+        if(!evento.target.isConnected) return;
+
+        if(!evento.target.closest(".filtro-geral")){
+
+            fecharPainelFiltros();
+        }
+
         if(!evento.target.closest(".filtro-datas")){
 
             fecharPainelDatas();
@@ -54,6 +63,16 @@
         if(!evento.target.closest(".filtro-status")){
 
             fecharPainelStatus();
+        }
+
+        if(!evento.target.closest(".filtro-colunas")){
+
+            fecharPainelColunas();
+        }
+
+        if(!evento.target.closest(".filtro-botoes")){
+
+            fecharPainelBotoes();
         }
     });
 
@@ -161,6 +180,10 @@
         usuarioAgenda = usuario;
 
         carregarOrdemColunas();
+
+        carregarColunasVisiveis();
+
+        carregarBotoesLinha();
 
         recarregarAgenda(false);
     });

@@ -219,6 +219,12 @@ document.addEventListener("keydown", (evento) => {
 
         fecharPainelStatus();
 
+        fecharPainelColunas();
+
+        fecharPainelBotoes();
+
+        fecharPainelFiltros();
+
         fecharLixeira();
     }
 });

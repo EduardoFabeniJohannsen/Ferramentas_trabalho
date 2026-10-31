@@ -88,7 +88,7 @@ function temLarguraPersonalizada(){
 }
 
 
-// botão ↺ Colunas padrão: ordem e largura voltam ao padrão
+// botão ↺ Colunas padrão: ordem, largura e colunas ligadas voltam ao padrão
 function restaurarColunasPadrao(){
 
     lerLarguras();
@@ -96,6 +96,8 @@ function restaurarColunasPadrao(){
     larguraColunas[modoVisualizacao] = {};
 
     salvarLarguras();
+
+    restaurarColunasVisiveis();
 
     restaurarOrdemColunas();
 }
@@ -105,10 +107,10 @@ function restaurarColunasPadrao(){
 // APLICAR NA TABELA
 // ======================================
 
-// ids na ordem do que aparece: colunas, proposta e botões
+// ids na ordem do que aparece: colunas e botões
 function idsDaTabela(){
 
-    return [...colunasAtuais().map(coluna => coluna.id), "proposta", "lado"];
+    return [...colunasAtuais().map(coluna => coluna.id), "lado"];
 }
 
 
@@ -138,7 +140,10 @@ function aplicarLarguras(tabela){
 
         idsDaTabela().forEach(id => {
 
-            const largura = larguras[id] || LARGURA_PADRAO_COLUNA;
+            const largura =
+                id === "lado"
+                    ? larguraColunaBotoes(tabela)
+                    : (larguras[id] || LARGURA_PADRAO_COLUNA);
 
             const coluna = criar("col");
 
@@ -236,11 +241,15 @@ function ajustarLarguraAoConteudo(tabela, id, indice){
 }
 
 
-// só aparece quando a ordem ou a largura saiu do padrão
+// só aparece quando a ordem, a largura ou as colunas ligadas saíram do padrão
 function atualizarBotaoColunasPadrao(){
 
     $("btnColunasPadrao").style.display =
-        (ordemColunasPersonalizada() || temLarguraPersonalizada())
+        (
+            ordemColunasPersonalizada() ||
+            temLarguraPersonalizada() ||
+            temColunasVisiveisPersonalizadas()
+        )
             ? ""
             : "none";
 }

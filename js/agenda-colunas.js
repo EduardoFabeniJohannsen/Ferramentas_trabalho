@@ -38,12 +38,13 @@ function ordenarColunas(lista){
 }
 
 
-// colunas visíveis agora, na ordem do usuário. No transportador a coluna
-// da transportadora some quando já tem uma transportadora filtrada
-// (ou "sem transportadora").
+// colunas visíveis agora, na ordem do usuário, sem as que ele desligou
+// (agenda-colunas-visiveis.js). No transportador a coluna da transportadora
+// some quando já tem uma transportadora filtrada (ou "sem transportadora").
 function colunasAtuais(){
 
-    const lista = ordenarColunas(colunasDoModo());
+    const lista =
+        ordenarColunas(colunasDoModo()).filter(colunaLigada);
 
     if(modoVisualizacao === "expedicao") return lista;
 
@@ -60,7 +61,7 @@ function colunasAtuais(){
 // ORDEM DAS COLUNAS (arrastar o título)
 // ======================================
 // Cada usuário arruma as colunas como quiser; fica salvo neste navegador
-// (separado por usuário e por modo). Proposta e botões ficam sempre à direita.
+// (separado por usuário e por modo). Só os botões ficam sempre à direita.
 
 async function obterUsuarioAgenda(){
 
@@ -173,7 +174,7 @@ function restaurarOrdemColunas(){
 
     renderizarAgenda();
 
-    mostrarToast("Colunas na ordem padrão");
+    mostrarToast("Colunas no padrão");
 }
 
 

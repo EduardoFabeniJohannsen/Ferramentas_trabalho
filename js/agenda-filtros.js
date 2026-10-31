@@ -52,7 +52,7 @@ function visivelNoModo(item){
 // ======================================
 // SÓ SEM PATRIMÔNIO
 // ======================================
-// Botão da barra: mostra só as máquinas cujo patrimônio ainda não foi
+// Botão do painel de filtros: mostra só as máquinas cujo patrimônio ainda não foi
 // definido (a manutenção só passou o modelo). O estado fica no próprio
 // botão (classe "filtrando"), como o filtro de tipo fica no select.
 
@@ -67,6 +67,112 @@ function alternarSemPatrimonio(){
     $("btnSemPatrimonio").classList.toggle("filtrando");
 
     renderizarAgenda();
+}
+
+
+// ======================================
+// PAINEL DE FILTROS (botão ⚙️ Filtros)
+// ======================================
+// Filtros e opções da tela ficam todos num painel só. Como ficam escondidos,
+// o botão e a linha da contagem avisam o que está filtrando agora, pra
+// ninguém achar que um agendamento sumiu.
+
+// nomes dos filtros que estão escondendo algo. Chamar depois de atualizar os
+// botões de datas e status (a classe "filtrando" deles é que diz).
+function filtrosAtivos(){
+
+    const ativos = [];
+
+    if(filtroTransportadora === SEM_TRANSPORTADORA){
+
+        ativos.push("sem transportadora");
+
+    }else if(filtroTransportadora){
+
+        ativos.push(`transportadora ${filtroTransportadora}`);
+    }
+
+    // pesquisando, as datas e os status não escondem nada
+    if(!buscandoAgenda()){
+
+        if($("btnDatas").classList.contains("filtrando")) ativos.push("datas");
+
+        if($("btnStatus").classList.contains("filtrando")) ativos.push("status");
+    }
+
+    if(modoVisualizacao !== "expedicao" && $("filtroTipo").value){
+
+        ativos.push(`tipo ${$("filtroTipo").value}`);
+    }
+
+    if(filtrandoSemPatrimonio()) ativos.push("só sem patrimônio");
+
+    return ativos;
+}
+
+
+function atualizarBotaoFiltros(){
+
+    const ativos = filtrosAtivos();
+
+    const botao = $("btnFiltros");
+
+    botao.innerText =
+        ativos.length
+            ? `⚙️ Filtros: ${ativos.length} ${ativos.length === 1 ? "ativo" : "ativos"} ▾`
+            : "⚙️ Filtros ▾";
+
+    botao.classList.toggle("filtrando", ativos.length > 0);
+
+    $("resumoFiltros").innerText =
+        ativos.length ? `· Filtrando por: ${ativos.join(", ")}` : "";
+
+    $("btnLimparFiltros").style.display = ativos.length ? "" : "none";
+}
+
+
+function limparFiltros(){
+
+    filtroTransportadora = "";
+
+    datasOcultas.clear();
+
+    statusOcultos.clear();
+
+    $("filtroTipo").value = "";
+
+    $("btnSemPatrimonio").classList.remove("filtrando");
+
+    renderizarAgenda();
+}
+
+
+function alternarPainelFiltros(){
+
+    const painel = $("painelFiltros");
+
+    if(painel.classList.contains("aberto")){
+
+        fecharPainelFiltros();
+
+        return;
+    }
+
+    encaixarPainelNaTela(painel);
+
+    // não passa do fim da tela: o que não couber rola dentro do painel
+    painel.style.maxHeight =
+        Math.max(
+            260,
+            document.documentElement.clientHeight -
+            painel.getBoundingClientRect().top - 12
+        ) + "px";
+}
+
+
+function fecharPainelFiltros(){
+
+    $("painelFiltros").classList.remove("aberto");
 }
 
 

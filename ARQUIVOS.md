@@ -18,7 +18,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
-- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-init
+- JS: supabase-config → auth-guard → helpers → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
@@ -64,7 +64,9 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
 - `agenda-botoes-linha.js` (165 linhas): Botão 🔘 Botões: cada usuário escolhe quais botões aparecem em cada agendamento (nos dois modos). Também mede a largura da coluna dos botões quando as larguras são fixas. Carregar antes de agenda-init.js.
   - botaoLigado, chaveBotoesLinha, carregarBotoesLinha, salvarBotoesLinha, ligarBotaoLinha, larguraColunaBotoes, atualizarBotaoBotoesLinha, desenharPainelBotoes, alternarPainelBotoes, fecharPainelBotoes
-- `agenda-config.js` (226 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
+- `agenda-config.js` (227 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
+- `agenda-estoque.js` (317 linhas): Botão 🔍 da linha: patrimônios disponíveis no último estoque publicado (patrimônio, marca, modelo), por filial, começando pelo modelo do agendamento; avisa máquina já agendada. Lê pela função `estoque_disponiveis` do banco (só disponíveis, sem cliente, com `tem_acesso('agenda')`). Só consulta. ⚠️ passa de ~300 linhas (sugerir divisão)
+  - carregarEstoqueDisponivel, modelosDoAgendamento, reservasDaAgenda, textoReserva, criarTabelaEstoque, desenharEstoqueAgenda, abrirEstoqueAgenda, fecharEstoqueAgenda
 - `agenda-etapas.js` (158 linhas): Etapas do formulário (Demanda, Local e entrega, Faturamento) que recolhem ao clicar no título; salva por usuário; avisoFormulario() abre a etapa com erro. Carregar antes de agenda-modal.js.
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
 - `agenda-filtro-datas.js` (214 linhas): Painel de datas estilo Excel e atalhos (hoje / próximos dias).
@@ -79,9 +81,9 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `agenda-larguras.js` (367 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js. ⚠️ passa de ~300 linhas (sugerir divisão)
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
 - `agenda-lixeira.js` (222 linhas): Lixeira (só admin): excluir manda o agendamento para a lixeira (`excluido_em`, pela função `mover_agendamento_lixeira` do banco; quem não é admin não vê mais). Botão 🗑️ Lixeira (`.so-admin`) lista os excluídos para restaurar ou apagar de vez (só admin pelo RLS; apaga junto o PDF do pedido). Carregar antes de agenda-init.js.
-- `agenda-linhas.js` (509 linhas): Montagem de cada linha/célula da tabela, cabeçalho, seletor de status e botões da linha (📋 Zap, 🧾 faturamento, ↩️ coleta, editar, excluir). ⚠️ passa de ~300 linhas (sugerir divisão)
+- `agenda-linhas.js` (522 linhas): Montagem de cada linha/célula da tabela, cabeçalho, seletor de status e botões da linha (📋 Zap, 🧾 faturamento, ↩️ coleta, 🔍 estoque, editar, excluir). ⚠️ passa de ~300 linhas (sugerir divisão)
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarMaquina, criarCelulasAgenda, criarCabecalhoAgenda, criarItemAgenda
-- `agenda-modal.js` (230 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
+- `agenda-modal.js` (232 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
   - abrirModalAgenda, atualizarCamposConta, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista
@@ -124,7 +126,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 - `estoque-grupos.js` (94 linhas): Agrupa modelos por tipo (letras do patrimônio) para cada status.
   - tipoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
 - `estoque-init.js` (86 linhas): Ligações iniciais (restaura a filial salva). Sempre o ÚLTIMO script da página.
-- `estoque-parser.js` (296 linhas): Relatório bruto -> resumo (resumirEstoque).
+- `estoque-parser.js` (322 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda. ⚠️ passa de ~300 linhas (sugerir divisão)
   - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, resumirEstoque
 - `estoque-render.js` (223 linhas): HTML dos cards de status e avisos.
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
@@ -222,7 +224,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 | `motoristas` | `agenda-banco.js` (leitura em `agenda-motoristas.js`), `transp-config.js` |
 | `motoristas_dados` | `transp-config.js` |
 | `perfis` | `admin-config.js`, `auth-guard.js` |
-| `resumo_estoque` | `estoque-dados.js`, `estoque-upload.js`, `estoque.js` (legado) |
+| `resumo_estoque` | `estoque-dados.js`, `estoque-upload.js`, `agenda-estoque.js` (função `estoque_disponiveis`), `estoque.js` (legado) |
 | `tabela_fretes` | `propostas-tabelas-fretes.js`, `tabelas-config.js` |
 | `tabela_precos` | `propostas-tabelas-precos.js`, `tabelas-config.js` |
 | `transportadora_docs` | `transp-config.js` |
@@ -257,7 +259,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 ## Atenções
 
 - `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (509), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-linhas.js` (522), `proposta-zap.js` (439), `transp-render.js` (408), `auth-guard.js` (376), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (332), `agenda-pagamento.js` (326), `transp-docs.js` (314), `index-ferramentas.js` (313), `agenda-zap.js` (307).
 - `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
 - `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

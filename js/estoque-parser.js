@@ -134,6 +134,13 @@ function resumirEstoque(linhas, nomeArquivo){
     const colPrevisao =
         cabecalho.indexOf("previsao retorno");
 
+    // marca e modelo de fábrica: só guardados para a lupa da agenda
+    const colMarca =
+        cabecalho.findIndex(c => c.startsWith("marca") || c.startsWith("fabricante"));
+
+    const colModeloFabrica =
+        cabecalho.findIndex(c => c.startsWith("modelo"));
+
     const statusPorTexto = {};
 
     STATUS_ESTOQUE.forEach(item => {
@@ -260,6 +267,18 @@ function resumirEstoque(linhas, nomeArquivo){
 
         if(previsao) item.r = previsao;
 
+        const marca =
+            colMarca >= 0 ? String(linha[colMarca] ?? "").trim() : "";
+
+        const modeloFabrica =
+            colModeloFabrica >= 0 ? String(linha[colModeloFabrica] ?? "").trim() : "";
+
+        if(marca) item.m = marca;
+
+        if(modeloFabrica) item.f = modeloFabrica;
+
+        if(equipamento.trim()) item.e = equipamento.trim();
+
         resultado.status[chave][modelo].push(item);
 
         resultado.totais[chave]++;
@@ -276,6 +295,13 @@ function resumirEstoque(linhas, nomeArquivo){
 
         resultado.avisos.push(
             `${duplicados} patrimônio(s) repetido(s) no arquivo (contados uma vez)`
+        );
+    }
+
+    if(colMarca < 0){
+
+        resultado.avisos.push(
+            "Não achei a coluna Marca no relatório: a lupa da agenda mostra o nome do equipamento no lugar."
         );
     }
 

@@ -475,6 +475,19 @@ function criarItemAgenda(item){
 
     if(botaoLigado("coleta")) botoes.appendChild(botaoColeta);
 
+    const botaoEstoque = criar("button", "btn-estoque", "🔍");
+
+    botaoEstoque.type = "button";
+
+    botaoEstoque.title = "Ver os patrimônios disponíveis no estoque";
+
+    botaoEstoque.addEventListener(
+        "click",
+        () => abrirEstoqueAgenda(item)
+    );
+
+    if(botaoLigado("estoque")) botoes.appendChild(botaoEstoque);
+
     const botaoEditar = criar("button", "", "✏️");
 
     botaoEditar.type = "button";

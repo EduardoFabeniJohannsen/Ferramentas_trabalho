@@ -226,5 +226,7 @@ document.addEventListener("keydown", (evento) => {
         fecharPainelFiltros();
 
         fecharLixeira();
+
+        fecharEstoqueAgenda();
     }
 });

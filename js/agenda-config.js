@@ -106,6 +106,7 @@ const BOTOES_LINHA = [
     { id: "zap", rotulo: "📋 Copiar agendamento" },
     { id: "faturamento", rotulo: "🧾 Copiar faturamento" },
     { id: "coleta", rotulo: "↩️ Criar coleta da entrega" },
+    { id: "estoque", rotulo: "🔍 Consultar estoque" },
     { id: "editar", rotulo: "✏️ Editar" },
     { id: "excluir", rotulo: "🗑️ Excluir" }
 ];

@@ -34,12 +34,13 @@ function patrimonioFormatado(texto){
 // ======================================
 // Ficam juntos na coluna plataforma, separados por "+", com a quantidade
 // na frente quando passa de 1: "2x WAD16 + WTE12". Um só fica como era.
+// Digitado à mão também pode vir com / , ; ou "e" ("WAE18R001 / WAE18R002").
 
 // "2x WAD16 + WTE12" -> [{ quantidade: 2, patrimonio: "WAD16" }, { quantidade: 1, patrimonio: "WTE12" }]
 function separarPlataformas(texto){
 
     return String(texto || "")
-        .split("+")
+        .split(/\s*[+,;\/]\s*|\s+e\s+/i)
         .map(parte => parte.trim())
         .filter(Boolean)
         .map(parte => {

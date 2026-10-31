@@ -2,62 +2,50 @@
 // AGENDA - USAR PATRIMÔNIO DA LUPA
 // ======================================
 // Botão "Usar" em cada máquina da lupa (agenda-estoque.js): grava o patrimônio
-// no agendamento com um clique. Só o modelo (WAE18) é preenchido direto; patrimônio
-// já definido pergunta antes de trocar; máquina em outra demanda passa pelo alerta
-// de agenda-conflitos.js. Carregar depois de agenda-conflitos.js.
+// no agendamento com um clique. Só o modelo (WAE18) é preenchido direto; um
+// patrimônio já definido pergunta antes de trocar; com vários equipamentos a
+// pessoa escolhe qual trocar; máquina em outra demanda passa pelo alerta de
+// agenda-conflitos.js. Carregar depois de agenda-conflitos.js.
 
 // evita gravar duas vezes com clique duplo
 let usandoPatrimonio = false;
 
 
-// Qual equipamento do agendamento recebe a máquina: primeiro um do mesmo modelo
-// ainda sem patrimônio; depois um do mesmo modelo já definido (troca). Modelo
-// diferente só com um equipamento, senão não dá pra saber qual seria trocado.
-// Devolve { plataforma, trocado } ou { erro }.
-function plataformaComPatrimonio(item, maquina){
+// Qual equipamento recebe a máquina. Um do mesmo modelo ainda sem patrimônio
+// recebe direto. Fora isso, com vários equipamentos só a pessoa sabe qual trocar.
+// Devolve { indice, direto } ou { escolher: true }.
+function destinoDoPatrimonio(partes, maquina){
 
-    const partes = separarPlataformas(item.plataforma);
-
-    const mesmoModelo = (parte) =>
-        modeloDaPlataforma(parte.patrimonio) === maquina.modelo;
-
-    let indice =
+    const indice =
         partes.findIndex(parte =>
-            mesmoModelo(parte) && patrimonioIncompleto(parte.patrimonio)
+            modeloDaPlataforma(parte.patrimonio) === maquina.modelo &&
+            patrimonioIncompleto(parte.patrimonio)
         );
 
-    const preenche = indice >= 0;
+    if(indice >= 0) return { indice, direto: true };
 
-    if(!preenche) indice = partes.findIndex(mesmoModelo);
+    if(partes.length > 1) return { escolher: true };
 
-    if(indice < 0 && partes.length === 1) indice = 0;
+    return { indice: 0, direto: patrimonioIncompleto(partes[0].patrimonio) };
+}
 
-    if(indice < 0){
 
-        return {
-            erro: "Modelo diferente dos equipamentos deste agendamento: use ✏️ Editar para escolher qual trocar"
-        };
-    }
+// troca o equipamento do índice pela máquina. "2x WAD16": uma máquina vira o
+// patrimônio e a outra segue como estava.
+function plataformaTrocando(partes, indice, maquina){
 
     const alvo = partes[indice];
 
-    // "2x WAD16": uma máquina vira o patrimônio e a outra segue como modelo
-    const novas = [
-        ...partes.slice(0, indice),
-        { quantidade: 1, patrimonio: maquina.p },
-        ...(alvo.quantidade > 1
-            ? [{ quantidade: alvo.quantidade - 1, patrimonio: alvo.patrimonio }]
-            : []),
-        ...partes.slice(indice + 1)
-    ];
-
-    return {
-        plataforma: plataformasFormatadas(juntarPlataformas(novas)),
-        trocado:
-            preenche || patrimonioIncompleto(alvo.patrimonio)
-                ? ""
-                : alvo.patrimonio
-    };
+    return plataformasFormatadas(
+        juntarPlataformas([
+            ...partes.slice(0, indice),
+            { quantidade: 1, patrimonio: maquina.p },
+            ...(alvo.quantidade > 1
+                ? [{ quantidade: alvo.quantidade - 1, patrimonio: alvo.patrimonio }]
+                : []),
+            ...partes.slice(indice + 1)
+        ])
+    );
 }
 
 
@@ -77,9 +65,78 @@ function atualizarPlataformaDoRascunho(id, plataforma){
 }
 
 
+function fecharEscolhaTroca(){
+
+    const painel = $("escolhaTroca");
+
+    if(painel) painel.remove();
+}
+
+
+// "Qual equipamento trocar?": um botão por equipamento, no topo da janela
+function mostrarEscolhaTroca(item, partes, maquina){
+
+    fecharEscolhaTroca();
+
+    const painel = criar("div", "estoque-escolha");
+
+    painel.id = "escolhaTroca";
+
+    painel.appendChild(
+        criar("p", "", `Qual equipamento trocar por ${maquina.p}?`)
+    );
+
+    const botoes = criar("div", "estoque-escolha-botoes");
+
+    partes.forEach((parte, indice) => {
+
+        const botao =
+            criar(
+                "button",
+                "",
+                parte.quantidade > 1
+                    ? `${parte.patrimonio} (1 de ${parte.quantidade})`
+                    : parte.patrimonio
+            );
+
+        botao.type = "button";
+
+        botao.addEventListener(
+            "click",
+            () => {
+
+                fecharEscolhaTroca();
+
+                gravarPatrimonio(item, partes, indice, maquina);
+            }
+        );
+
+        botoes.appendChild(botao);
+    });
+
+    const cancelar = criar("button", "btn-secundario", "Cancelar");
+
+    cancelar.type = "button";
+
+    cancelar.addEventListener("click", fecharEscolhaTroca);
+
+    botoes.appendChild(cancelar);
+
+    painel.appendChild(botoes);
+
+    const corpo = $("listaEstoqueAgenda");
+
+    corpo.insertBefore(painel, corpo.firstChild);
+
+    painel.scrollIntoView({ block: "nearest" });
+}
+
+
 async function usarPatrimonio(maquina){
 
     if(usandoPatrimonio) return;
+
+    fecharEscolhaTroca();
 
     // a agenda pode ter recarregado com a janela aberta
     const item =
@@ -90,16 +147,28 @@ async function usarPatrimonio(maquina){
         return mostrarToast(`${maquina.p} já está neste agendamento`, true);
     }
 
-    const destino = plataformaComPatrimonio(item, maquina);
+    const partes = separarPlataformas(item.plataforma);
 
-    if(destino.erro) return mostrarToast(destino.erro, true);
+    const destino = destinoDoPatrimonio(partes, maquina);
+
+    if(destino.escolher) return mostrarEscolhaTroca(item, partes, maquina);
 
     if(
-        destino.trocado &&
-        !confirm(`Trocar ${destino.trocado} por ${maquina.p} em ${item.cliente || "este agendamento"}?`)
+        !destino.direto &&
+        !confirm(`Trocar ${partes[destino.indice].patrimonio} por ${maquina.p} em ${item.cliente || "este agendamento"}?`)
     ) return;
 
-    if(!confirmarConflitos({ ...item, plataforma: destino.plataforma }, item.id)) return;
+    await gravarPatrimonio(item, partes, destino.indice, maquina);
+}
+
+
+async function gravarPatrimonio(item, partes, indice, maquina){
+
+    if(usandoPatrimonio) return;
+
+    const plataforma = plataformaTrocando(partes, indice, maquina);
+
+    if(!confirmarConflitos({ ...item, plataforma }, item.id)) return;
 
     usandoPatrimonio = true;
 
@@ -107,7 +176,7 @@ async function usarPatrimonio(maquina){
 
         Object.assign(
             item,
-            await atualizarAgendamento(item.id, { plataforma: destino.plataforma })
+            await atualizarAgendamento(item.id, { plataforma })
         );
 
     }catch(erro){

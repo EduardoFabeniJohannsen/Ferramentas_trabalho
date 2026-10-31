@@ -93,7 +93,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - ordemEfetiva, compararHorario, ordenarAgendamentos
 - `agenda-pagamento.js` (326 linhas): Faturamento no formulário (só entregas): forma de pagamento (Depósito/Boleto) e prazos em linhas (28 e 56 = 28/56). Botão 🧾 da linha copia "Boleto – 28/56 DD - Enviar para:" com um e-mail por linha (pega só os e-mails do campo; nomes, telefones e separadores ficam de fora). Carrega depois de agenda-coleta.js e antes de agenda-init.js. ⚠️ passa de ~300 linhas (sugerir divisão)
   - prazosDigitados, atualizarResumoPrazos, desenharPrazos, adicionarPrazo, validarPrazos, atualizarBlocoFaturamento, preencherFaturamento, faturamentoParaRascunho, faturamentoPreenchido, coletarFaturamento, textoFaturamento, copiarFaturamento
-- `agenda-patrimonio.js` (140 linhas): Regras do patrimônio: formato (maiúsculo, com a letra O depois dos números minúscula), patrimônio ainda não definido (só o modelo, menos de 3 números, ex: WAE15; com vários equipamentos basta um) e vários equipamentos juntos na coluna plataforma ("2x WAD16 + WTE12"). Carregar depois de agenda-utils.js.
+- `agenda-patrimonio.js` (141 linhas): Regras do patrimônio: formato (maiúsculo, com a letra O depois dos números minúscula), patrimônio ainda não definido (só o modelo, menos de 3 números, ex: WAE15; com vários equipamentos basta um) e vários equipamentos juntos na coluna plataforma ("2x WAD16 + WTE12"; também entende / , ; e "e" digitados à mão). Carregar depois de agenda-utils.js.
   - patrimonioFormatado, separarPlataformas, juntarPlataformas, plataformasFormatadas, patrimonioIncompleto, itemSemPatrimonio, atualizarAvisoPatrimonio
 - `agenda-plataformas.js` (142 linhas): Linhas de equipamento do formulário (patrimônio, quantidade, − e +, como em propostas). As linhas são só a tela: o valor salvo fica no campo escondido agPlataforma. Carregar antes de agenda-modal.js.
   - criarLinhaPlataforma, sincronizarPlataformas, desenharPlataformas, adicionarLinhaPlataforma, removerLinhaPlataforma, digitarPlataforma
@@ -113,8 +113,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
   - aplicarTema, alternarTema
 - `agenda-transportadoras.js` (57 linhas): Só leitura: carrega a lista de transportadoras para os campos e filtros da agenda. Cadastrar/excluir transportadora: só admin, em transportadoras.html.
   - carregarTransportadoras, definirTransportadoras, atualizarSelectsTransportadora
-- `agenda-usar-patrimonio.js` (144 linhas): Botão "Usar" em cada máquina da lupa: grava o patrimônio no agendamento com um clique. Só o modelo preenche direto; patrimônio definido pergunta antes de trocar; máquina em outra demanda passa pelo alerta. Coleta, cancelado e concluído não têm o botão. Carregar depois de agenda-conflitos.js.
-  - plataformaComPatrimonio, atualizarPlataformaDoRascunho, usarPatrimonio
+- `agenda-usar-patrimonio.js` (213 linhas): Botão "Usar" em cada máquina da lupa: grava o patrimônio no agendamento com um clique. Só o modelo preenche direto; patrimônio definido pergunta antes de trocar; com vários equipamentos a pessoa escolhe qual trocar; máquina em outra demanda passa pelo alerta. Coleta, cancelado e concluído não têm o botão. Carregar depois de agenda-conflitos.js.
+  - destinoDoPatrimonio, plataformaTrocando, atualizarPlataformaDoRascunho, fecharEscolhaTroca, mostrarEscolhaTroca, usarPatrimonio, gravarPatrimonio
 - `agenda-utils.js` (100 linhas): criar(), dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco() (cidade/UF tirada do texto do endereço).
   - criar, dataISO, corDoDia, tituloDoDia
 - `agenda-zap.js` (307 linhas): Texto de agendamento copiado para o grupo da transportadora. A referência digitada à mão sem o número da proposta ganha " - Proposta: N" no fim. ⚠️ passa de ~300 linhas (sugerir divisão)

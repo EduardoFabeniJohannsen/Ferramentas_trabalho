@@ -14,6 +14,9 @@ const NOMES_FILIAIS_ESTOQUE = { 1: "Itajaí", 2: "Joinville" };
 // tipos em que a máquina sai do pátio (coleta é a máquina voltando)
 const TIPOS_RESERVAM_MAQUINA = ["Entrega", "Troca técnica", "Transferência"];
 
+// passou disso sem publicar: a data do estoque fica em destaque
+const LIMITE_ESTOQUE_ANTIGO_MS = 12 * 60 * 60 * 1000;
+
 // o que está aberto na janela
 let estoqueItemAberto = null;
 
@@ -107,6 +110,51 @@ function descricaoDemanda(reserva){
     const quem = reserva.cliente ? ` — ${reserva.cliente}` : "";
 
     return `${reserva.data ? dataLixeira(reserva.data) : "sem data"}${quem}`;
+}
+
+
+// "há 40 minutos", "há 15 horas", "há 1 dia e 3 horas"
+function tempoDesde(milissegundos){
+
+    const plural = (quantidade, nome) =>
+        `${quantidade} ${nome}${quantidade === 1 ? "" : "s"}`;
+
+    const minutos = Math.floor(milissegundos / 60000);
+
+    if(minutos < 1) return "agora há pouco";
+
+    if(minutos < 60) return `há ${plural(minutos, "minuto")}`;
+
+    const horas = Math.floor(minutos / 60);
+
+    if(horas < 24) return `há ${plural(horas, "hora")}`;
+
+    const dias = Math.floor(horas / 24);
+
+    return horas % 24
+        ? `há ${plural(dias, "dia")} e ${plural(horas % 24, "hora")}`
+        : `há ${plural(dias, "dia")}`;
+}
+
+
+// data da publicação e o tempo que passou; estoque antigo fica em destaque
+function criarDataEstoque(atualizadoEm){
+
+    const decorrido = Date.now() - new Date(atualizadoEm).getTime();
+
+    // data vazia viraria 1969
+    if(!atualizadoEm || !Number.isFinite(decorrido)){
+
+        return criar("small", "", "Estoque sem data de publicação");
+    }
+
+    const antigo = decorrido > LIMITE_ESTOQUE_ANTIGO_MS;
+
+    return criar(
+        "small",
+        antigo ? "estoque-desatualizado" : "",
+        `${antigo ? "⚠️ " : ""}Estoque publicado em ${quandoExcluido(atualizadoEm)} — ${tempoDesde(decorrido)}`
+    );
 }
 
 
@@ -308,9 +356,7 @@ function desenharEstoqueAgenda(){
             )
         );
 
-        secao.appendChild(
-            criar("small", "", `Estoque publicado em ${quandoExcluido(filial.atualizado_em)}`)
-        );
+        secao.appendChild(criarDataEstoque(filial.atualizado_em));
 
         secao.appendChild(
             maquinas.length

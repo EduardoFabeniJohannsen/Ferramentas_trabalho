@@ -2,8 +2,12 @@
   "name": "ferramentas-trabalho",
   "private": true,
   "description": "O site não usa build: isto serve só para rodar os testes da pasta testes/.",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "test": "node testes/rodar.js"
+    "test": "node testes/rodar.js",
+    "mapa": "node testes/gerar-mapa.js"
   },
   "devDependencies": {
     "@supabase/supabase-js": "2.45.0",

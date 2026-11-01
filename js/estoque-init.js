@@ -28,17 +28,9 @@
         return;
     }
 
-    try{
+    const salva = lerLocal(CHAVE_FILIAL_ESTOQUE);
 
-        const salva =
-            localStorage.getItem(CHAVE_FILIAL_ESTOQUE);
-
-        if(FILIAIS[salva]) filialAtual = salva;
-
-    }catch(erro){
-
-        filialAtual = "ITAJAI";
-    }
+    if(FILIAIS[salva]) filialAtual = salva;
 
     // filial salva (ou padrão) sem acesso: usa a primeira liberada
     if(!liberadas.includes(filialAtual)) filialAtual = liberadas[0];

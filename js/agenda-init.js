@@ -149,26 +149,18 @@
         () => definirOrdem($("ordemAgenda").value)
     );
 
-    try{
+    if(lerLocal(CHAVE_AGENDA_MODO) === "expedicao"){
 
-        if(localStorage.getItem(CHAVE_AGENDA_MODO) === "expedicao"){
+        modoVisualizacao = "expedicao";
+    }
 
-            modoVisualizacao = "expedicao";
-        }
+    aplicarTema(lerLocal(CHAVE_AGENDA_TEMA));
 
-        aplicarTema(localStorage.getItem(CHAVE_AGENDA_TEMA));
+    const ordemSalva = lerLocal(CHAVE_AGENDA_ORDEM);
 
-        const ordemSalva =
-            localStorage.getItem(CHAVE_AGENDA_ORDEM);
+    if(ORDENS.some(ordem => ordem.valor === ordemSalva)){
 
-        if(ORDENS.some(ordem => ordem.valor === ordemSalva)){
-
-            ordemAgenda = ordemSalva;
-        }
-
-    }catch(erro){
-
-        console.error("Erro ao ler modo/ordem:", erro);
+        ordemAgenda = ordemSalva;
     }
 
     // mostra "Carregando...", descobre quem está logado (a ordem das colunas

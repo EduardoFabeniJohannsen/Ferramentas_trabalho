@@ -1,7 +1,7 @@
 // ======================================
 // HELPERS GERAIS
 // ======================================
-// Versão do sistema, $, criar(), semAcento(), datas, formatadores, copiar() e mostrarToast().
+// Versão do sistema, $, criar(), semAcento(), datas, formatadores, copiar(), mostrarToast() e preferências salvas no navegador.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.29.5";
+const VERSAO_SISTEMA = "16.29.6";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -281,3 +281,76 @@ const mostrarToast = (msg, erro = false) => {
 
     }, erro ? Math.max(4000, msg.length * 70) : 2000);
 };
+
+
+// ======================================
+// PREFERÊNCIAS SALVAS NO NAVEGADOR
+// ======================================
+// O navegador pode bloquear o armazenamento ou guardar algo corrompido: aqui
+// isso vira "não tem nada salvo" e a página segue. (O auth-guard.js carrega
+// antes deste arquivo e tem o próprio tratamento.)
+
+function lerLocal(chave){
+
+    try{
+
+        return localStorage.getItem(chave);
+
+    }catch(erro){
+
+        console.error(`[${chave}] Erro ao ler:`, erro);
+
+        return null;
+    }
+}
+
+
+function lerLocalJSON(chave, padrao = null){
+
+    const salvo = lerLocal(chave);
+
+    if(!salvo) return padrao;
+
+    try{
+
+        return JSON.parse(salvo);
+
+    }catch(erro){
+
+        console.error(`[${chave}] Valor salvo inválido, ignorando:`, erro);
+
+        return padrao;
+    }
+}
+
+
+function gravarLocal(chave, valor){
+
+    try{
+
+        localStorage.setItem(chave, valor);
+
+    }catch(erro){
+
+        console.error(`[${chave}] Erro ao salvar:`, erro);
+    }
+}
+
+
+function gravarLocalJSON(chave, dados){
+
+    gravarLocal(chave, JSON.stringify(dados));
+}
+
+
+function removerLocal(chave){
+
+    try{
+
+        localStorage.removeItem(chave);
+
+    }catch(erro){
+
+        console.error(`[${chave}] Erro ao apagar:`, erro);
+    }
+}

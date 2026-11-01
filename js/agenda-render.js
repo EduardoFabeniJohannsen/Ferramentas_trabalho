@@ -92,17 +92,7 @@ function definirOrdem(valor){
 
     ordemAgenda = valor;
 
-    try{
-
-        localStorage.setItem(
-            CHAVE_AGENDA_ORDEM,
-            ordemAgenda
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar ordem:", erro);
-    }
+    gravarLocal(CHAVE_AGENDA_ORDEM, ordemAgenda);
 
     renderizarAgenda();
 }

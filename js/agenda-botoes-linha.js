@@ -21,42 +21,21 @@ function carregarBotoesLinha(){
 
     botoesOcultos = [];
 
-    try{
+    const dados = lerLocalJSON(chaveBotoesLinha(), []);
 
-        const salvo =
-            localStorage.getItem(chaveBotoesLinha());
+    if(Array.isArray(dados)){
 
-        const dados =
-            salvo ? JSON.parse(salvo) : [];
-
-        if(Array.isArray(dados)){
-
-            botoesOcultos =
-                BOTOES_LINHA
-                    .map(botao => botao.id)
-                    .filter(id => dados.includes(id));
-        }
-
-    }catch(erro){
-
-        console.error("Botões da linha inválidos, ignorando:", erro);
+        botoesOcultos =
+            BOTOES_LINHA
+                .map(botao => botao.id)
+                .filter(id => dados.includes(id));
     }
 }
 
 
 function salvarBotoesLinha(){
 
-    try{
-
-        localStorage.setItem(
-            chaveBotoesLinha(),
-            JSON.stringify(botoesOcultos)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar os botões da linha:", erro);
-    }
+    gravarLocalJSON(chaveBotoesLinha(), botoesOcultos);
 }
 
 

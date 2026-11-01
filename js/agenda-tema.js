@@ -21,17 +21,7 @@ function alternarTema(){
     const claro =
         !document.body.classList.contains("tema-claro");
 
-    try{
-
-        localStorage.setItem(
-            CHAVE_AGENDA_TEMA,
-            claro ? "claro" : "escuro"
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar tema:", erro);
-    }
+    gravarLocal(CHAVE_AGENDA_TEMA, claro ? "claro" : "escuro");
 
     aplicarTema(claro ? "claro" : "escuro");
 }

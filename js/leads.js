@@ -1258,33 +1258,16 @@ function fecharConfigBusca(){
     // o nome sai do e-mail até a pessoa corrigir
     const campoVendedor = $("nomeVendedor");
 
-    try{
-
-        campoVendedor.value =
-            localStorage.getItem(`${CHAVE_VENDEDOR_LEADS}:${usuarioLeads.id}`) ||
-            nomeDoEmail(usuarioLeads.email);
-
-    }catch(erro){
-
-        campoVendedor.value = nomeDoEmail(usuarioLeads.email);
-    }
+    campoVendedor.value =
+        lerLocal(`${CHAVE_VENDEDOR_LEADS}:${usuarioLeads.id}`) ||
+        nomeDoEmail(usuarioLeads.email);
 
     campoVendedor.addEventListener(
         "input",
-        () => {
-
-            try{
-
-                localStorage.setItem(
-                    `${CHAVE_VENDEDOR_LEADS}:${usuarioLeads.id}`,
-                    campoVendedor.value
-                );
-
-            }catch(erro){
-
-                console.error("[leads] Erro ao salvar o nome:", erro);
-            }
-        }
+        () => gravarLocal(
+            `${CHAVE_VENDEDOR_LEADS}:${usuarioLeads.id}`,
+            campoVendedor.value
+        )
     );
 
     await recarregarLeads(false);

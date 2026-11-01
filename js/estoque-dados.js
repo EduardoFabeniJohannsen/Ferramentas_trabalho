@@ -78,14 +78,7 @@ function trocarFilial(chave){
 
     filialAtual = chave;
 
-    try{
-
-        localStorage.setItem(CHAVE_FILIAL_ESTOQUE, chave);
-
-    }catch(erro){
-
-        console.error("[estoque] Erro ao salvar filial:", erro);
-    }
+    gravarLocal(CHAVE_FILIAL_ESTOQUE, chave);
 
     resumoPublicado = null;
 

@@ -32,38 +32,13 @@ function salvarCacheWEG() {
         dataInicio: $("dataInicio")?.value || ""
     };
 
-    try {
-
-        localStorage.setItem(
-            CHAVE_CACHE_WEG,
-            JSON.stringify(dados)
-        );
-
-    } catch (erro) {
-
-        console.error("Erro ao salvar cache WEG:", erro);
-    }
+    gravarLocalJSON(CHAVE_CACHE_WEG, dados);
 }
 
 
 function restaurarCacheWEG() {
 
-    let dados;
-
-    try {
-
-        const salvo = localStorage.getItem(CHAVE_CACHE_WEG);
-
-        if (!salvo) return;
-
-        dados = JSON.parse(salvo);
-
-    } catch (erro) {
-
-        console.error("Cache WEG inválido, ignorando:", erro);
-
-        return;
-    }
+    const dados = lerLocalJSON(CHAVE_CACHE_WEG);
 
     if (!dados || typeof dados !== "object") return;
 

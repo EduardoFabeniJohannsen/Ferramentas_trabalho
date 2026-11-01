@@ -19,17 +19,7 @@ function definirModo(modo){
             ? "expedicao"
             : "transportador";
 
-    try{
-
-        localStorage.setItem(
-            CHAVE_AGENDA_MODO,
-            modoVisualizacao
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar modo:", erro);
-    }
+    gravarLocal(CHAVE_AGENDA_MODO, modoVisualizacao);
 
     renderizarAgenda();
 }

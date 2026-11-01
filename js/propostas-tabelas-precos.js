@@ -24,57 +24,27 @@ let tabelaFretesSalvaEm = "";
 
 function salvarCopiaTabela(chave, linhas){
 
-    try{
-
-        localStorage.setItem(
-            chave,
-            JSON.stringify({
-                salvoEm: new Date().toISOString(),
-                linhas: linhas
-            })
-        );
-
-    }catch(erro){
-
-        console.error(
-            `[${chave}] Erro ao salvar cópia offline:`,
-            erro
-        );
-    }
+    gravarLocalJSON(chave, {
+        salvoEm: new Date().toISOString(),
+        linhas: linhas
+    });
 }
 
 
 function lerCopiaTabela(chave){
 
-    try{
+    const copia = lerLocalJSON(chave);
 
-        const salvo =
-            localStorage.getItem(chave);
-
-        if(!salvo) return null;
-
-        const copia =
-            JSON.parse(salvo);
-
-        if(
-            !copia ||
-            !Array.isArray(copia.linhas) ||
-            !copia.linhas.length
-        ){
-            return null;
-        }
-
-        return copia;
-
-    }catch(erro){
-
-        console.error(
-            `[${chave}] Cópia offline inválida, ignorando:`,
-            erro
-        );
+    if(
+        !copia ||
+        !Array.isArray(copia.linhas) ||
+        !copia.linhas.length
+    ){
 
         return null;
     }
+
+    return copia;
 }
 
 

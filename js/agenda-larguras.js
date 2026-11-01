@@ -34,49 +34,31 @@ function lerLarguras(){
 
     larguraColunas = { expedicao: {}, transportador: {} };
 
-    try{
+    const dados = lerLocalJSON(chave, {});
 
-        const salvo = localStorage.getItem(chave);
+    ["expedicao", "transportador"].forEach(modo => {
 
-        const dados = salvo ? JSON.parse(salvo) : {};
+        const lista = dados ? dados[modo] : null;
 
-        ["expedicao", "transportador"].forEach(modo => {
+        if(!lista || typeof lista !== "object") return;
 
-            const lista = dados ? dados[modo] : null;
+        Object.entries(lista).forEach(([id, valor]) => {
 
-            if(!lista || typeof lista !== "object") return;
+            if(
+                Number.isFinite(valor) &&
+                valor >= LARGURA_MINIMA_COLUNA
+            ){
 
-            Object.entries(lista).forEach(([id, valor]) => {
-
-                if(
-                    Number.isFinite(valor) &&
-                    valor >= LARGURA_MINIMA_COLUNA
-                ){
-                    larguraColunas[modo][id] = Math.round(valor);
-                }
-            });
+                larguraColunas[modo][id] = Math.round(valor);
+            }
         });
-
-    }catch(erro){
-
-        console.error("Larguras das colunas inválidas, ignorando:", erro);
-    }
+    });
 }
 
 
 function salvarLarguras(){
 
-    try{
-
-        localStorage.setItem(
-            chaveLarguras(),
-            JSON.stringify(larguraColunas)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar a largura das colunas:", erro);
-    }
+    gravarLocalJSON(chaveLarguras(), larguraColunas);
 }
 
 

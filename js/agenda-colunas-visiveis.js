@@ -23,46 +23,25 @@ function carregarColunasVisiveis(){
 
     colunasVisiveis = { expedicao: {}, transportador: {} };
 
-    try{
+    const dados = lerLocalJSON(chaveColunasVisiveis(), {});
 
-        const salvo =
-            localStorage.getItem(chaveColunasVisiveis());
+    ["expedicao", "transportador"].forEach(modo => {
 
-        const dados =
-            salvo ? JSON.parse(salvo) : {};
+        const lista = dados ? dados[modo] : null;
 
-        ["expedicao", "transportador"].forEach(modo => {
+        if(!lista || typeof lista !== "object") return;
 
-            const lista = dados ? dados[modo] : null;
+        Object.entries(lista).forEach(([id, valor]) => {
 
-            if(!lista || typeof lista !== "object") return;
-
-            Object.entries(lista).forEach(([id, valor]) => {
-
-                if(typeof valor === "boolean") colunasVisiveis[modo][id] = valor;
-            });
+            if(typeof valor === "boolean") colunasVisiveis[modo][id] = valor;
         });
-
-    }catch(erro){
-
-        console.error("Colunas visíveis inválidas, ignorando:", erro);
-    }
+    });
 }
 
 
 function salvarColunasVisiveis(){
 
-    try{
-
-        localStorage.setItem(
-            chaveColunasVisiveis(),
-            JSON.stringify(colunasVisiveis)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar as colunas visíveis:", erro);
-    }
+    gravarLocalJSON(chaveColunasVisiveis(), colunasVisiveis);
 }
 
 

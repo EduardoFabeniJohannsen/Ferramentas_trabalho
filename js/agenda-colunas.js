@@ -92,41 +92,18 @@ function carregarOrdemColunas(){
             ? lista.filter(id => typeof id === "string")
             : [];
 
-    try{
+    const dados = lerLocalJSON(chaveOrdemColunas(), {});
 
-        const salvo =
-            localStorage.getItem(chaveOrdemColunas());
-
-        const dados =
-            salvo ? JSON.parse(salvo) : {};
-
-        ordemColunas = {
-            expedicao: limpa(dados?.expedicao),
-            transportador: limpa(dados?.transportador)
-        };
-
-    }catch(erro){
-
-        console.error("Ordem das colunas inválida, ignorando:", erro);
-
-        ordemColunas = { expedicao: [], transportador: [] };
-    }
+    ordemColunas = {
+        expedicao: limpa(dados?.expedicao),
+        transportador: limpa(dados?.transportador)
+    };
 }
 
 
 function salvarOrdemColunas(){
 
-    try{
-
-        localStorage.setItem(
-            chaveOrdemColunas(),
-            JSON.stringify(ordemColunas)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar a ordem das colunas:", erro);
-    }
+    gravarLocalJSON(chaveOrdemColunas(), ordemColunas);
 }
 
 

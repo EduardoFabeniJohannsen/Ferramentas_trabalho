@@ -26,14 +26,7 @@ function escolherTransportadora(nome){
 
     transpAtual = nome;
 
-    try{
-
-        localStorage.setItem(CHAVE_TRANSP_ULTIMA, transpAtual);
-
-    }catch(erro){
-
-        console.error("Erro ao salvar transportadora:", erro);
-    }
+    gravarLocal(CHAVE_TRANSP_ULTIMA, transpAtual);
 
     desenharSelectTransportadora();
 

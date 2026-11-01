@@ -27,14 +27,7 @@
 
             transpAtual = $("selectTransportadora").value;
 
-            try{
-
-                localStorage.setItem(CHAVE_TRANSP_ULTIMA, transpAtual);
-
-            }catch(erro){
-
-                console.error("Erro ao salvar transportadora:", erro);
-            }
+            gravarLocal(CHAVE_TRANSP_ULTIMA, transpAtual);
 
             recarregarTransp();
         }
@@ -58,16 +51,7 @@
         mostrarToast("Falha ao carregar as transportadoras", true);
     }
 
-    let salva = "";
-
-    try{
-
-        salva = localStorage.getItem(CHAVE_TRANSP_ULTIMA) || "";
-
-    }catch(erro){
-
-        salva = "";
-    }
+    const salva = lerLocal(CHAVE_TRANSP_ULTIMA) || "";
 
     transpAtual =
         (transpLista.includes(salva) || (salva === TRANSP_TODAS && transpLista.length))

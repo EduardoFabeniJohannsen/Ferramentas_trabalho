@@ -20,38 +20,15 @@ function chaveRascunho(){
 
 function lerRascunhos(){
 
-    try{
+    const dados = lerLocalJSON(CHAVE_AGENDA_RASCUNHOS, {});
 
-        const salvo =
-            localStorage.getItem(CHAVE_AGENDA_RASCUNHOS);
-
-        const dados =
-            salvo ? JSON.parse(salvo) : {};
-
-        return (dados && typeof dados === "object") ? dados : {};
-
-    }catch(erro){
-
-        console.error("Rascunhos inválidos, ignorando:", erro);
-
-        return {};
-    }
+    return (dados && typeof dados === "object") ? dados : {};
 }
 
 
 function gravarRascunhos(dados){
 
-    try{
-
-        localStorage.setItem(
-            CHAVE_AGENDA_RASCUNHOS,
-            JSON.stringify(dados)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar rascunho:", erro);
-    }
+    gravarLocalJSON(CHAVE_AGENDA_RASCUNHOS, dados);
 }
 
 

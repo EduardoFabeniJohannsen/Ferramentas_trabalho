@@ -24,40 +24,21 @@ function lerEtapas(){
 
     etapasRecolhidas = {};
 
-    try{
+    const dados = lerLocalJSON(chave, {});
 
-        const salvo = localStorage.getItem(chave);
+    if(dados && typeof dados === "object"){
 
-        const dados = salvo ? JSON.parse(salvo) : {};
+        Object.entries(dados).forEach(([etapa, recolhida]) => {
 
-        if(dados && typeof dados === "object"){
-
-            Object.entries(dados).forEach(([etapa, recolhida]) => {
-
-                if(recolhida === true) etapasRecolhidas[etapa] = true;
-            });
-        }
-
-    }catch(erro){
-
-        console.error("Etapas recolhidas inválidas, ignorando:", erro);
+            if(recolhida === true) etapasRecolhidas[etapa] = true;
+        });
     }
 }
 
 
 function salvarEtapas(){
 
-    try{
-
-        localStorage.setItem(
-            chaveEtapas(),
-            JSON.stringify(etapasRecolhidas)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar as etapas recolhidas:", erro);
-    }
+    gravarLocalJSON(chaveEtapas(), etapasRecolhidas);
 }
 
 

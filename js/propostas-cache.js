@@ -64,38 +64,15 @@ function salvarCache(){
         equipamentos: equipamentos
     };
 
-    try{
-
-        localStorage.setItem(
-            CHAVE_CACHE_PROPOSTA,
-            JSON.stringify(dados)
-        );
-
-    }catch(erro){
-
-        console.error("Erro ao salvar cache:", erro);
-    }
+    gravarLocalJSON(CHAVE_CACHE_PROPOSTA, dados);
 }
 
 
 function restaurarCache(){
 
-    const salvo =
-        localStorage.getItem(CHAVE_CACHE_PROPOSTA);
+    const dados = lerLocalJSON(CHAVE_CACHE_PROPOSTA);
 
-    if(!salvo) return;
-
-    let dados;
-
-    try{
-
-        dados = JSON.parse(salvo);
-
-    }catch(erro){
-
-        console.error("Cache inválido, ignorando:", erro);
-        return;
-    }
+    if(!dados) return;
 
     if($("nomeCliente")) $("nomeCliente").value = dados.nomeCliente || "";
     if($("periodo")) $("periodo").value = dados.periodo || "";
@@ -297,7 +274,7 @@ function limparTudo(){
     // reseta o card de desconto pro estado inicial
     renderizarDescontosPorEquipamento([]);
 
-    localStorage.removeItem(CHAVE_CACHE_PROPOSTA);
+    removerLocal(CHAVE_CACHE_PROPOSTA);
 
     mostrarToast("Tudo limpo");
 }

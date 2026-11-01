@@ -26,7 +26,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
-- CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
+- CSS: style → agenda
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
@@ -38,7 +38,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
 **transportadoras.html** — Transportadoras: cadastro, veículos, motoristas e PDFs (ver: acesso "transportadoras"; editar: só admin)
-- CSS: style → transportadoras → bloco <style> no HTML (formulário de nova transportadora)
+- CSS: style → transportadoras
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
 
 **WEG.html** — Contrato WEG (preços fixos)
@@ -50,7 +50,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
-- CSS: style → bloco <style> no próprio leads.html
+- CSS: style → leads
 - JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads
 
 **login.html** — Login
@@ -235,8 +235,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 ## CSS
 
 - `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta)
-- `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`: estilos de cada página
-- `transportadoras.css`: lista, modal e documentos da página de transportadoras (o formulário de nova transportadora está no <style> do transportadoras.html)
+- `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `agenda.css`, `leads.css`: estilos de cada página
+- `transportadoras.css`: lista, modal, documentos e formulário de nova transportadora
 
 ## Supabase (tabelas, bucket e função)
 

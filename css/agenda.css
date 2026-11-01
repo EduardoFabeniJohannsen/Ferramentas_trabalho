@@ -1,0 +1,1233 @@
+/* ===== Agenda ===== */
+/* o card se ajusta ao conteúdo (não estica em tela grande) */
+.card-agenda{
+    width:fit-content;
+    min-width:min(100%, 900px);
+    max-width:100%;
+    text-align:left;
+}
+.barra-agenda{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom:10px;
+}
+.barra-agenda select{
+    width:auto;
+    margin:0;
+    flex:1;
+    min-width:140px;
+}
+.barra-agenda button{
+    margin:0;
+}
+/* botão ⚙️ Filtros: painel com os filtros e as opções da tela */
+.filtro-geral{
+    position:relative;
+}
+.filtro-geral > button.filtrando{
+    background:#2563eb;
+}
+.painel-filtros{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:60;
+    box-sizing:border-box;
+    width:400px;
+    max-width:92vw;
+    max-height:78vh;
+    overflow-y:auto;
+    padding:12px;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.painel-filtros.aberto{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+.painel-filtros-titulo{
+    margin:0;
+    font-size:11px;
+    font-weight:bold;
+    text-transform:uppercase;
+    color:#94a3b8;
+}
+.painel-filtros-titulo:not(:first-child){
+    margin-top:8px;
+    padding-top:12px;
+    border-top:1px solid #334155;
+}
+.painel-filtros .chips{
+    margin:0;
+}
+.painel-filtros .chip{
+    padding:5px 10px;
+    font-size:13px;
+}
+.painel-filtros select{
+    flex:none;
+    width:100%;
+}
+.painel-filtros > button,
+.painel-filtros .filtro-datas > button,
+.painel-filtros .filtro-status > button,
+.painel-filtros .filtro-colunas > button,
+.painel-filtros .filtro-botoes > button{
+    width:100%;
+    text-align:left;
+}
+.contagem-agenda button{
+    margin:0 0 0 6px;
+    padding:2px 8px;
+    font-size:12px;
+}
+/* pesquisa: campo + botão × pra limpar */
+.busca-agenda{
+    display:flex;
+    gap:4px;
+    flex:2;
+    min-width:240px;
+}
+.busca-agenda input{
+    margin:0;
+    flex:1;
+}
+.btn-secundario{
+    background:#475569;
+}
+.btn-secundario:hover{
+    background:#334155;
+}
+.btn-perigo{
+    background:#dc2626;
+}
+.btn-perigo:hover{
+    background:#b91c1c;
+}
+/* ===== Filtro de datas (estilo Excel) ===== */
+.filtro-datas,
+.filtro-status,
+.filtro-colunas,
+.filtro-botoes{
+    position:relative;
+}
+.filtro-datas > button.filtrando,
+.filtro-status > button.filtrando{
+    background:#2563eb;
+}
+.painel-datas,
+.painel-status,
+.painel-colunas,
+.painel-botoes{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:60;
+    width:300px;
+    max-width:90vw;
+    padding:10px;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.painel-datas.aberto,
+.painel-status.aberto,
+.painel-colunas.aberto,
+.painel-botoes.aberto{
+    display:block;
+}
+.painel-status,
+.painel-colunas,
+.painel-botoes{
+    width:250px;
+}
+.painel-colunas .lista-datas{
+    max-height:min(70vh, 520px);
+}
+/* dentro do ⚙️ Filtros, as listas abrem no meio do painel, sem flutuar */
+.painel-filtros .painel-datas,
+.painel-filtros .painel-status,
+.painel-filtros .painel-colunas,
+.painel-filtros .painel-botoes{
+    position:static;
+    width:auto;
+    max-width:none;
+    margin-top:6px;
+    box-shadow:none;
+}
+.contagem-status{
+    margin-left:auto;
+    font-size:12px;
+    color:#94a3b8;
+}
+.atalhos-datas{
+    display:flex;
+    gap:6px;
+    margin-bottom:8px;
+}
+.atalhos-datas button{
+    margin:0;
+    padding:6px 10px;
+    font-size:12px;
+}
+.painel-datas input[type="text"]{
+    margin:0 0 8px;
+    padding:6px 8px;
+    font-size:13px;
+}
+.data-opcao{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:4px 6px;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+}
+.data-opcao:hover{
+    background:#334155;
+}
+.data-opcao input{
+    width:auto;
+    margin:0;
+    padding:0;
+}
+.data-todas{
+    font-weight:bold;
+    border-bottom:1px solid #334155;
+    border-radius:6px 6px 0 0;
+}
+.lista-datas{
+    max-height:260px;
+    overflow-y:auto;
+    padding-top:4px;
+}
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+}
+.chip{
+    margin:0;
+    padding:8px 14px;
+    background:#334155;
+}
+.chip:hover{
+    background:#475569;
+}
+.chip.ativo{
+    background:#2563eb;
+}
+.contagem-agenda{
+    color:#94a3b8;
+    font-size:13px;
+    margin:0 0 8px;
+}
+.agenda-vazia{
+    color:#94a3b8;
+    text-align:center;
+    padding:24px 0;
+}
+
+.modos{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:10px;
+}
+.modo-btn{
+    margin:0;
+    padding:10px 22px;
+    background:#334155;
+}
+.modo-btn:hover{
+    background:#475569;
+}
+.modo-btn.ativo{
+    background:#2563eb;
+}
+.dica-modo{
+    margin:0 0 10px;
+    font-size:12px;
+    color:#94a3b8;
+    text-align:center;
+}
+
+/* ===== Lista (tabela: as colunas se ajustam ao texto e ficam alinhadas) ===== */
+#listaAgenda{
+    overflow-x:auto;
+}
+.ag-tabela{
+    border-collapse:separate;
+    border-spacing:0 3px;
+    width:auto;
+    max-width:100%;
+}
+.ag-tabela p{
+    margin:0;
+}
+.ag-tabela thead th{
+    padding:4px 10px;
+    font-size:11px;
+    font-weight:bold;
+    text-align:left;
+    text-transform:uppercase;
+    color:#94a3b8;
+    border-bottom:1px solid #334155;
+    white-space:nowrap;
+}
+.ag-tabela thead th + th{
+    border-left:1px dashed #475569;
+}
+.ag-tabela thead th.ag-cab-horario{
+    text-align:center;
+}
+/* título arrastável (muda a ordem das colunas) */
+.ag-tabela thead th.ag-cab-coluna{
+    cursor:grab;
+    user-select:none;
+}
+.ag-tabela thead th.ag-cab-coluna:hover{
+    color:#e5e7eb;
+}
+.ag-tabela thead th.arrastando{
+    opacity:.4;
+}
+.ag-tabela thead th.solta-antes{
+    box-shadow:inset 3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.solta-depois{
+    box-shadow:inset -3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.ag-cab-proposta{
+    text-align:center;
+}
+.ag-tabela thead th.ag-cab-lado{
+    border:none;
+}
+/* traço de corte do print: a proposta fica fora enquanto for a última coluna;
+   se o usuário mudar ela de lugar, só os botões ficam fora */
+.ag-tabela thead th.ag-cab-proposta:nth-last-child(2),
+.ag-tabela thead th:not(.ag-cab-proposta) + th.ag-cab-lado{
+    border-left:2px dashed #334155;
+}
+
+/* cabeçalho de cada dia (a cor do dia vem da variável --cor-dia) */
+tr.ag-dia{
+    --cor-dia:#94a3b8;
+}
+tr.ag-dia th{
+    padding:3px 12px;
+    font-size:14px;
+    text-align:left;
+    text-transform:capitalize;
+    background:var(--cor-dia);
+    color:#0f172a;
+    border-radius:6px;
+    background-clip:padding-box;
+}
+tr.ag-dia:not(:first-child) th{
+    border-top:8px solid transparent;
+}
+
+/* linha de cada agendamento */
+tr.ag-item{
+    --cor-dia:#94a3b8;
+}
+tr.ag-item td{
+    padding:2px 10px;
+    font-size:13px;
+    line-height:1.25;
+    vertical-align:middle;
+    background:#0f172a;
+    background:color-mix(in srgb, var(--cor-dia) 16%, #0f172a);
+    border-top:1px solid var(--cor-dia);
+    border-bottom:1px solid var(--cor-dia);
+}
+tr.ag-item td + td{
+    border-left:1px dashed #475569;
+}
+tr.ag-item td:first-child{
+    border-left:6px solid var(--cor-dia);
+    border-radius:8px 0 0 8px;
+}
+tr.ag-item td:last-child{
+    border-right:1px solid var(--cor-dia);
+    border-radius:0 8px 8px 0;
+}
+tr.ag-item[data-status="Cancelado"] td,
+tr.ag-item[data-status="Concluído"] td{
+    opacity:.55;
+}
+.ag-conteudo{
+    overflow-wrap:anywhere;
+}
+/* colunas curtas (período, status, motorista...): nunca quebram de linha */
+.ag-sem-quebra{
+    white-space:nowrap;
+}
+.ag-hora{
+    font-weight:bold;
+    font-size:14px;
+    text-align:center;
+    white-space:nowrap;
+}
+.ag-hora.ag-hora-texto{
+    font-size:11px;
+}
+/* horário em destaque: branco no fundo vermelho */
+.ag-hora-pilula{
+    display:inline-block;
+    padding:1px 10px;
+    border-radius:999px;
+    background:#991b1b;
+    color:#ffffff;
+}
+/* sem horário: discreto */
+.ag-hora-vazio{
+    color:#94a3b8;
+    font-weight:normal;
+}
+.ag-patrimonio{
+    font-weight:bold;
+    font-size:15px;
+}
+
+/* status: a própria etiqueta troca o status ao clicar */
+tr.ag-item select.tag-select{
+    -webkit-appearance:none;
+    appearance:none;
+    width:auto;
+    margin:0;
+    padding:1px 9px;
+    border:none;
+    border-radius:999px;
+    font-family:inherit;
+    font-size:11px;
+    font-weight:bold;
+    color:#e5e7eb;
+    text-align:center;
+    cursor:pointer;
+}
+tr.ag-item select.tag-select option{
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.tag{
+    display:inline-block;
+    padding:1px 8px;
+    border-radius:999px;
+    background:#334155;
+    color:#e5e7eb;
+    font-size:11px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+.tag[data-tipo="Entrega"]{
+    background:#1d4ed8;
+}
+.tag[data-tipo="Coleta"]{
+    background:#b45309;
+}
+.tag[data-tipo="Transferência"]{
+    background:#7e22ce;
+}
+.tag[data-tipo="Troca técnica"]{
+    background:#0f766e;
+}
+/* transportadora "A definir": discreto, só o texto (sem etiqueta colorida) */
+.tag.sem-transp{
+    padding:0;
+    background:transparent;
+    color:#94a3b8;
+    font-weight:normal;
+}
+.tag[data-status="A confirmar"]{
+    background:#a16207;
+}
+.tag[data-status="Confirmado"]{
+    background:#1d4ed8;
+}
+.tag[data-status="Em rota"]{
+    background:#c2410c;
+}
+.tag[data-status="Concluído"]{
+    background:#15803d;
+}
+.tag[data-status="Cancelado"]{
+    background:#475569;
+}
+
+.ag-local{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+}
+.ag-local-texto{
+    font-weight:bold;
+    color:#e5e7eb;
+}
+.ag-local-endereco{
+    color:#cbd5e1;
+}
+.ag-link{
+    display:block;
+    font-size:11px;
+    color:#60a5fa;
+    word-break:break-all;
+}
+.ag-extra{
+    color:#cbd5e1;
+}
+
+/* proposta e botões da linha: o traço de corte separa o que fica fora
+   da área do print (ver o cabeçalho) */
+tr.ag-item td.ag-proposta{
+    padding-left:14px;
+    padding-right:14px;
+    font-size:12px;
+    color:#cbd5e1;
+    text-align:center;
+    white-space:nowrap;
+}
+tr.ag-item td.ag-lado{
+    padding-left:14px;
+    border-left:1px dashed #475569;
+}
+tr.ag-item td.ag-proposta:nth-last-child(2),
+tr.ag-item td:not(.ag-proposta) + td.ag-lado{
+    border-left:2px dashed #334155;
+}
+tr.ag-item td.ag-proposta:first-child{
+    border-left:6px solid var(--cor-dia);
+}
+.ag-botoes{
+    display:flex;
+    gap:16px;
+    align-items:center;
+}
+.ag-botoes button{
+    margin:0;
+    padding:5px 10px;
+}
+.ag-botoes .btn-zap{
+    background:#16a34a;
+}
+.ag-botoes .btn-zap:hover{
+    background:#15803d;
+}
+.ag-botoes .btn-faturamento{
+    background:#0e7490;
+}
+.ag-botoes .btn-faturamento:hover{
+    background:#155e75;
+}
+.ag-botoes .btn-coleta{
+    background:#b45309;
+}
+.ag-botoes .btn-coleta:hover{
+    background:#92400e;
+}
+.ag-botoes .btn-estoque{
+    background:#6d28d9;
+}
+.ag-botoes .btn-estoque:hover{
+    background:#5b21b6;
+}
+.ag-botoes .btn-excluir-ag{
+    margin-left:12px;
+}
+.ag-botoes .btn-excluir-ag:first-child{
+    margin-left:0;
+}
+
+/* ===== Modal ===== */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1100;
+    background:rgba(0,0,0,.6);
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.modal-overlay.aberto{
+    display:flex;
+}
+.modal-agenda{
+    width:100%;
+    max-width:600px;
+    max-height:90vh;
+    overflow:auto;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+/* cabeçalho fixo: o Salvar acompanha quando o formulário rola */
+.modal-agenda-topo{
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 20px;
+    background:#1e293b;
+    border-bottom:1px solid #334155;
+}
+.modal-agenda-topo h3{
+    margin:0;
+}
+.modal-titulo{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 12px;
+    align-items:baseline;
+}
+.aviso-rascunho{
+    font-size:12px;
+    color:#fbbf24;
+}
+.modal-acoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+}
+.modal-acoes button{
+    margin:0;
+    padding:8px 14px;
+}
+.modal-agenda .btn-fechar{
+    margin:0;
+    padding:2px 10px;
+    font-size:20px;
+}
+/* lixeira (só admin) */
+.modal-lixeira{
+    max-width:720px;
+}
+.item-lixeira{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #334155;
+}
+.item-lixeira-info{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+}
+.item-lixeira-info small{
+    opacity:.7;
+}
+.item-lixeira-botoes{
+    display:flex;
+    gap:8px;
+}
+.item-lixeira-botoes button{
+    margin:0;
+    padding:6px 12px;
+}
+body.tema-claro .item-lixeira{
+    border-bottom-color:var(--claro-linha);
+}
+/* consulta ao estoque (botão 🔍 da linha) */
+.estoque-topo{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center;
+    justify-content:space-between;
+}
+.estoque-topo button{
+    margin:0;
+    padding:6px 12px;
+}
+.estoque-filial{
+    margin-top:16px;
+    overflow-x:auto;
+}
+.estoque-filial h4{
+    margin:0;
+}
+.estoque-filial small{
+    opacity:.7;
+}
+/* mais de 12 horas sem publicar o estoque */
+.estoque-filial small.estoque-desatualizado{
+    display:inline-block;
+    margin-top:2px;
+    padding:3px 8px;
+    border-radius:6px;
+    background:#b91c1c;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:bold;
+    opacity:1;
+}
+.estoque-nada{
+    margin:8px 0 0;
+    font-size:13px;
+    opacity:.8;
+}
+.estoque-tabela{
+    width:100%;
+    min-width:560px;
+    margin-top:6px;
+    border-collapse:collapse;
+    table-layout:fixed;
+    font-size:13px;
+}
+/* mesmas colunas nas duas filiais; o aviso de reserva fica com o espaço maior */
+.estoque-tabela th:nth-child(5){
+    width:30%;
+}
+.estoque-tabela th:nth-child(6){
+    width:64px;
+}
+/* "Qual equipamento trocar?" (vários equipamentos no agendamento) */
+.estoque-escolha{
+    margin-bottom:12px;
+    padding:10px 12px;
+    border:1px solid #3b82f6;
+    border-radius:8px;
+    background:rgba(59,130,246,.14);
+}
+.estoque-escolha p{
+    margin:0 0 8px;
+    font-weight:bold;
+}
+.estoque-escolha-botoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+.estoque-escolha-botoes button{
+    margin:0;
+    padding:6px 12px;
+}
+.estoque-usar{
+    text-align:right;
+}
+.estoque-usar button{
+    margin:0;
+    padding:3px 10px;
+    font-size:12px;
+}
+.estoque-em-manutencao{
+    font-weight:bold;
+    color:#f87171;
+}
+/* máquina que já está em alguma demanda: a linha inteira em destaque */
+.estoque-tabela tr.estoque-em-demanda td{
+    background:rgba(251,191,36,.18);
+}
+.estoque-tabela tr.estoque-em-demanda td:first-child{
+    box-shadow:inset 4px 0 0 #fbbf24;
+}
+.estoque-tabela tr.estoque-neste-agendamento td{
+    background:rgba(96,165,250,.16);
+}
+.estoque-tabela tr.estoque-neste-agendamento td:first-child{
+    box-shadow:inset 4px 0 0 #60a5fa;
+}
+.estoque-tabela tr.estoque-em-demanda .estoque-reserva,
+.estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    font-weight:bold;
+}
+.estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    color:#93c5fd;
+}
+.estoque-tabela th,
+.estoque-tabela td{
+    padding:5px 8px;
+    text-align:left;
+    border-bottom:1px solid #334155;
+}
+.estoque-tabela th{
+    font-size:11px;
+    text-transform:uppercase;
+    opacity:.75;
+}
+.estoque-patrimonio{
+    font-weight:bold;
+    white-space:nowrap;
+}
+.estoque-reserva{
+    font-size:12px;
+    color:#fbbf24;
+}
+body.tema-claro .estoque-tabela th,
+body.tema-claro .estoque-tabela td{
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .estoque-reserva{
+    color:#a14a09;
+}
+body.tema-claro .estoque-em-manutencao{
+    color:#b91c1c;
+}
+body.tema-claro .estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    color:#1d4ed8;
+}
+.modal-corpo{
+    padding:14px 20px 20px;
+}
+.form-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+    padding:14px 20px 20px;
+}
+.form-grade label{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:2px;
+}
+.form-grade .largo{
+    grid-column:1 / -1;
+}
+.subtitulo-form{
+    margin:10px 0 4px;
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+
+/* ===== Faturamento (pagamento e pedido de compra) ===== */
+#blocoFaturamento label{
+    margin-top:6px;
+}
+.prazo-linha{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
+}
+.prazo-linha input{
+    width:90px;
+    margin:0;
+    text-align:center;
+}
+.prazo-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+/* plataformas: uma linha por equipamento */
+.ag-plataforma-linha{
+    margin-bottom:6px;
+}
+.ag-plataforma-linha input{
+    margin:0;
+}
+.ag-plataforma-linha button{
+    flex:none;
+    width:38px;
+    margin:0;
+    padding:8px 0;
+    font-size:18px;
+    line-height:1;
+}
+.prazo-rotulo{
+    min-width:56px;
+    font-size:13px;
+    color:#cbd5e1;
+}
+.prazo-unidade{
+    font-size:13px;
+    color:#94a3b8;
+}
+.btn-add-prazo{
+    margin:0 10px 8px 0;
+    padding:6px 12px;
+    font-size:13px;
+}
+.resumo-prazos{
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+#agPedidoCompra:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+.doc-linha{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:6px 0;
+    padding:6px 10px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:8px;
+    font-size:13px;
+}
+.doc-linha .doc-nome{
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.doc-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.aviso-pedido{
+    margin:4px 0 0;
+    font-size:12px;
+    color:#fbbf24;
+}
+
+/* ===== Etapas do formulário (demanda → local → faturamento) ===== */
+.etapa{
+    grid-column:1 / -1;
+    margin-top:14px;
+    border:1px solid #334155;
+    border-left-width:5px;
+    border-radius:10px;
+    overflow:hidden;
+}
+.etapa:first-child{
+    margin-top:0;
+}
+.etapa-demanda{
+    border-left-color:#3b82f6;
+}
+.etapa-local{
+    border-left-color:#f59e0b;
+}
+.etapa-faturamento{
+    border-left-color:#22c55e;
+}
+.etapa-titulo{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    padding:8px 14px;
+    font-size:14px;
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.etapa-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    font-size:12px;
+    color:#0f172a;
+    background:#94a3b8;
+}
+.etapa-demanda .etapa-num{
+    background:#3b82f6;
+}
+.etapa-local .etapa-num{
+    background:#f59e0b;
+}
+.etapa-faturamento .etapa-num{
+    background:#22c55e;
+}
+.etapa-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+    padding:6px 14px 14px;
+}
+
+/* etapa recolhível: clicar no título esconde o conteúdo */
+.etapa-titulo{
+    cursor:pointer;
+    user-select:none;
+}
+.etapa-titulo:hover{
+    filter:brightness(1.2);
+}
+.etapa-seta{
+    margin-left:auto;
+    font-size:14px;
+    transition:transform .15s;
+}
+.etapa.recolhida .etapa-seta{
+    transform:rotate(-90deg);
+}
+.etapa.recolhida .etapa-grade{
+    display:none;
+}
+
+/* retirada recolhida (entrega): só o título com "W Rental" */
+.titulo-retirada{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    user-select:none;
+}
+.titulo-retirada:hover{
+    filter:brightness(1.2);
+}
+.retirada-resumo{
+    font-weight:normal;
+    color:#94a3b8;
+}
+.retirada-seta{
+    margin-left:auto;
+    transition:transform .15s;
+}
+.titulo-retirada.recolhida .retirada-seta{
+    transform:rotate(-90deg);
+}
+
+/* ===== Largura das colunas (arrastar a borda do título) ===== */
+.ag-tabela thead th{
+    position:relative;
+}
+.ag-redimensiona{
+    position:absolute;
+    top:0;
+    right:-3px;
+    width:7px;
+    height:100%;
+    z-index:2;
+    cursor:col-resize;
+    user-select:none;
+    touch-action:none;
+}
+.ag-redimensiona:hover,
+.ag-redimensiona.ativo{
+    background:#3b82f6;
+}
+/* com largura escolhida, o texto quebra de linha dentro da coluna */
+.ag-tabela.largura-fixa{
+    table-layout:fixed;
+}
+.ag-tabela.largura-fixa .ag-conteudo{
+    max-width:none !important;
+    overflow-wrap:anywhere;
+}
+.ag-tabela.largura-fixa .ag-sem-quebra{
+    white-space:normal;
+}
+.ag-tabela.largura-fixa thead th{
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.ag-tabela.largura-fixa thead th .ag-redimensiona{
+    right:0;
+}
+
+/* ===== Patrimônio ainda não definido (só o modelo, ex: WAE15) ===== */
+.ag-patr-incompleto{
+    padding:0 6px;
+    border-radius:6px;
+    background:#facc15;
+    color:#422006;
+}
+.ag-patr-aviso{
+    margin-left:4px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#b45309;
+    color:#ffffff;
+    font-size:10px;
+    font-weight:bold;
+    white-space:nowrap;
+    text-transform:uppercase;
+}
+.aviso-patrimonio{
+    margin:3px 0 0;
+    font-size:12px;
+    color:#fbbf24;
+}
+#btnSemPatrimonio.filtrando{
+    background:#b45309;
+}
+
+@media(max-width:600px){
+    .form-grade,
+    .etapa-grade{
+        grid-template-columns:1fr;
+    }
+}
+
+/* ===== Fundo claro (opção, escolhida no botão da barra) ===== */
+/* tons pastéis: se quiser mais claro ou mais escuro, é só mexer nestas cores */
+body.tema-claro{
+    --claro-fundo:#d3deed;      /* fundo da página */
+    --claro-card:#e3ebf6;       /* card, formulários e modais */
+    --claro-campo:#f1f5fb;      /* campos de digitação */
+    --claro-linha:#9db0ca;      /* bordas e traços */
+    --claro-botao:#bccbe1;      /* botões neutros (filtros, modos) */
+    --claro-mistura:42%;        /* quanto da cor do dia entra no fundo da linha */
+    background:var(--claro-fundo);
+    color:#0f172a;
+}
+body.tema-claro .card{
+    background:var(--claro-card);
+    box-shadow:0 8px 22px rgba(30,41,59,.14);
+}
+body.tema-claro input,
+body.tema-claro select{
+    background:var(--claro-campo);
+    color:#0f172a;
+    border-color:var(--claro-linha);
+}
+body.tema-claro .contagem-agenda,
+body.tema-claro .dica-modo,
+body.tema-claro .agenda-vazia{
+    color:#52617a;
+}
+body.tema-claro .chip,
+body.tema-claro .modo-btn{
+    background:var(--claro-botao);
+    color:#0f172a;
+}
+body.tema-claro .chip:hover,
+body.tema-claro .modo-btn:hover{
+    background:var(--claro-linha);
+}
+body.tema-claro .chip.ativo,
+body.tema-claro .modo-btn.ativo{
+    background:#2563eb;
+    color:#ffffff;
+}
+body.tema-claro .ag-tabela thead th{
+    color:#3b4a63;
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .ag-tabela thead th + th,
+body.tema-claro tr.ag-item td + td,
+body.tema-claro .ag-tabela thead th.ag-cab-proposta,
+body.tema-claro .ag-tabela thead th:not(.ag-cab-proposta) + th.ag-cab-lado,
+body.tema-claro tr.ag-item td.ag-proposta:not(:first-child),
+body.tema-claro tr.ag-item td.ag-lado{
+    border-left-color:var(--claro-linha);
+}
+body.tema-claro tr.ag-dia th{
+    background:var(--cor-dia);
+    background:color-mix(in srgb, var(--cor-dia) 78%, var(--claro-card));
+}
+body.tema-claro tr.ag-item td{
+    background:var(--claro-card);
+    background:color-mix(in srgb, var(--cor-dia) var(--claro-mistura), var(--claro-card));
+    color:#0f172a;
+}
+body.tema-claro tr.ag-item td.ag-proposta{
+    color:#3b4a63;
+}
+body.tema-claro tr.ag-item select.tag-select option{
+    background:var(--claro-campo);
+    color:#0f172a;
+}
+body.tema-claro .ag-local-texto{
+    color:#0f172a;
+}
+body.tema-claro .ag-local-endereco,
+body.tema-claro .ag-extra{
+    color:#2c3a52;
+}
+body.tema-claro .ag-link{
+    color:#1d4ed8;
+}
+body.tema-claro .modal-agenda{
+    background:var(--claro-card);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .modal-agenda-topo{
+    background:var(--claro-card);
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .form-grade label{
+    color:#3b4a63;
+}
+body.tema-claro .subtitulo-form{
+    color:#2c3a52;
+}
+body.tema-claro .aviso-rascunho{
+    color:#a14a09;
+}
+body.tema-claro .tag.sem-transp,
+body.tema-claro .ag-hora-vazio{
+    color:#64748b;
+}
+body.tema-claro .contagem-status{
+    color:#52617a;
+}
+body.tema-claro .painel-filtros-titulo{
+    color:#3b4a63;
+}
+body.tema-claro .painel-filtros-titulo:not(:first-child){
+    border-top-color:var(--claro-linha);
+}
+body.tema-claro .painel-filtros,
+body.tema-claro .painel-datas,
+body.tema-claro .painel-status,
+body.tema-claro .painel-colunas,
+body.tema-claro .painel-botoes{
+    background:var(--claro-card);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .data-opcao:hover{
+    background:var(--claro-botao);
+}
+body.tema-claro .data-todas{
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .ag-tabela thead th.ag-cab-coluna:hover{
+    color:#0f172a;
+}
+body.tema-claro .prazo-rotulo,
+body.tema-claro .resumo-prazos{
+    color:#3b4a63;
+}
+body.tema-claro .prazo-unidade{
+    color:#52617a;
+}
+body.tema-claro .doc-linha{
+    background:var(--claro-campo);
+    border-color:var(--claro-linha);
+}
+body.tema-claro .aviso-pedido{
+    color:#a14a09;
+}
+body.tema-claro .etapa{
+    border-color:var(--claro-linha);
+}
+body.tema-claro .etapa-demanda{
+    border-left-color:#3b82f6;
+}
+body.tema-claro .etapa-local{
+    border-left-color:#f59e0b;
+}
+body.tema-claro .etapa-faturamento{
+    border-left-color:#22c55e;
+}
+body.tema-claro .etapa-titulo{
+    background:var(--claro-botao);
+    color:#0f172a;
+}
+body.tema-claro .aviso-patrimonio{
+    color:#a14a09;
+}

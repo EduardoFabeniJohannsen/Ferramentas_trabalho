@@ -132,3 +132,70 @@
 .novo-usuario button{
     margin:0;
 }
+
+/* ===== Erros do sistema ===== */
+.secao-erros{
+    margin-top:28px;
+    padding-top:4px;
+    border-top:1px solid #334155;
+}
+.barra-admin select{
+    width:auto;
+    min-width:160px;
+    margin:0;
+    font-size:14px;
+}
+.barra-admin button:disabled{
+    opacity:.5;
+    cursor:default;
+}
+.tabela-erros td{
+    vertical-align:top;
+}
+.tabela-erros .col-quando{
+    white-space:nowrap;
+}
+.tabela-erros .col-erro-usuario{
+    min-width:150px;
+    overflow-wrap:anywhere;
+}
+.tabela-erros .col-erro{
+    min-width:300px;
+    text-align:left;
+}
+.tabela-erros .erros-vazio{
+    padding:18px 10px;
+    color:#94a3b8;
+}
+.tag-erro{
+    display:inline-block;
+    padding:1px 8px;
+    border-radius:999px;
+    background:#475569;
+    color:#ffffff;
+    font-size:11px;
+    font-weight:bold;
+}
+.tag-erro-codigo{
+    background:#b91c1c;
+}
+.tag-erro-arquivo{
+    background:#b45309;
+}
+.erro-mensagem{
+    margin-top:4px;
+    overflow-wrap:anywhere;
+}
+.col-erro details{
+    margin-top:4px;
+    color:#94a3b8;
+    font-size:12px;
+}
+.col-erro summary{
+    cursor:pointer;
+}
+.col-erro pre{
+    margin:4px 0 0;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}

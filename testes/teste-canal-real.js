@@ -144,8 +144,11 @@ function nomeArquivoAtual(){ return "agenda.html"; }`;
 
     // servidor caiu e voltou: a biblioteca reconecta sozinha
     antes = cargas.total;
+    const entradasNoCanal = () => entradas.filter(m => m.topic === "realtime:agenda-mudancas").length;
+    const entradasAntes = entradasNoCanal();
     ws.clients.forEach(c => c.terminate());
-    const voltou = await esperar(() => (inscritos.get("realtime:agenda-mudancas") || new Set()).size === 2, 15000);
+    // conta as entradas novas: logo depois de cair, o servidor ainda não notou a queda
+    const voltou = await esperar(() => entradasNoCanal() >= entradasAntes + 2, 15000);
     confere("conexão caiu: as abas entram de novo", voltou);
     confere("depois de reconectar, recarrega", await esperar(() => cargas.total >= antes + 2, 4000), cargas.total - antes);
 

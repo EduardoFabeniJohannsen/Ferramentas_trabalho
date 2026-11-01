@@ -112,6 +112,66 @@ CONTAINER
 
         </div>
 
+        <!-- o que deu errado no navegador de cada pessoa (admin-erros.js) -->
+        <div class="secao-erros">
+
+            <h2>Erros do sistema</h2>
+
+            <p class="dica-admin">
+                Erros que aconteceram no navegador de cada pessoa nos últimos 30 dias.
+                O mesmo erro repetido soma em "Vezes". Só o admin vê esta lista.
+            </p>
+
+            <div class="barra-admin">
+
+                <select id="filtroErrosPagina" title="Página"></select>
+
+                <button type="button" onclick="carregarErrosSite()">
+                    ↻ Atualizar
+                </button>
+
+                <button
+                    type="button"
+                    id="btnTestarErros"
+                    title="Grava um erro de teste, para conferir se o registro está funcionando"
+                    onclick="testarRegistroErros()"
+                >
+                    🧪 Testar registro
+                </button>
+
+                <button type="button" id="btnLimparErros" onclick="limparErrosSite()">
+                    🗑️ Limpar lista
+                </button>
+
+                <span class="contagem" id="contagemErros"></span>
+
+            </div>
+
+            <div class="area-admin">
+
+                <table class="tabela-admin tabela-erros">
+
+                    <thead>
+
+                        <tr>
+                            <th>Quando</th>
+                            <th>Página</th>
+                            <th>Versão</th>
+                            <th>Usuário</th>
+                            <th class="col-erro">Erro</th>
+                            <th>Vezes</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="corpoErros"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -122,6 +182,7 @@ CONTAINER
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
 <script src="js/supabase-config.js"></script>
+<script src="js/registro-erros.js"></script>
 <script src="js/auth-guard.js"></script>
 
 <script src="js/helpers.js"></script>
@@ -132,6 +193,7 @@ CONTAINER
 <script src="js/admin/admin-dados.js"></script>
 <script src="js/admin/admin-tela.js"></script>
 <script src="js/admin/admin-online.js"></script>
+<script src="js/admin/admin-erros.js"></script>
 <script src="js/admin/admin-init.js"></script>
 
 </body>

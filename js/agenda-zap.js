@@ -91,10 +91,7 @@ function textoPeriodoReferencia(periodo){
 
     if(/^1 dias?$/i.test(texto)) return "DIÁRIA";
 
-    return texto
-        .toUpperCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "");
+    return semAcento(texto.toUpperCase());
 }
 
 

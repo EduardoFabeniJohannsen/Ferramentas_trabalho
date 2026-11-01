@@ -46,9 +46,7 @@ async function enviarPedidoPdf(idAgendamento, arquivo){
 
     // nome sem acento e sem símbolos (o Storage não aceita todos)
     const nomeSeguro =
-        arquivo.name
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
+        semAcento(arquivo.name)
             .replace(/[^a-zA-Z0-9._-]/g, "_");
 
     const caminho =

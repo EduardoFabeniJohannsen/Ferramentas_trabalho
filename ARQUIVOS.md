@@ -86,7 +86,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - carregarEstoqueDisponivel, modelosDoAgendamento, agendamentoReservaMaquina, reservasDaAgenda, textoReserva, descricaoDemanda, tempoDesde, criarDataEstoque, maquinasDaFilial, criarTabelaEstoque, desenharEstoqueAgenda, abrirEstoqueAgenda, fecharEstoqueAgenda
 - `agenda-etapas.js` (158 linhas): Etapas do formulário (Demanda, Local e entrega, Faturamento) que recolhem ao clicar no título; salva por usuário; avisoFormulario() abre a etapa com erro. Carregar antes de agenda-modal.js.
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
-- `agenda-filtro-datas.js` (214 linhas): Painel de datas estilo Excel e atalhos (hoje / próximos dias).
+- `agenda-filtro-datas.js` (211 linhas): Painel de datas estilo Excel e atalhos (hoje / próximos dias).
   - semAcentoMinusculo, datasDoFiltro, rotuloDataFiltro, atualizarBotaoDatas, desenharPainelDatas, alternarPainelDatas, fecharPainelDatas, alternarTodasDatas, selecionarProximosDias
 - `agenda-filtro-status.js` (177 linhas): Painel de status estilo Excel.
   - statusDoFiltro, contagemPorStatus, atualizarBotaoStatus, desenharPainelStatus, alternarPainelStatus, fecharPainelStatus, alternarTodosStatus
@@ -114,7 +114,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - criarLinhaPlataforma, sincronizarPlataformas, desenharPlataformas, adicionarLinhaPlataforma, removerLinhaPlataforma, digitarPlataforma
 - `agenda-pedido.js` (242 linhas): Pedido de compra (sim/não, número, PDF até 5 MB). Com PDF anexado o Sim/Não fica travado até apagar o PDF.
   - pedidoTemPdf, atualizarControlesPedido, preencherPedido, anexarPedidoPdf, apagarPedidoPdf, lerPedidoFormulario, limparPedidoParaSalvar
-- `agenda-pedido-pdf.js` (134 linhas): PDF do pedido no Storage (bucket privado `pedidos-compra`, link assinado de 120 s). Só envia/apaga ao clicar em Salvar.
+- `agenda-pedido-pdf.js` (132 linhas): PDF do pedido no Storage (bucket privado `pedidos-compra`, link assinado de 120 s). Só envia/apaga ao clicar em Salvar.
   - abrirPedidoPdf, enviarPedidoPdf, removerPedidoPdfStorage, sincronizarPdfPedido
 - `agenda-rascunho.js` (122 linhas): Guarda no navegador o que foi digitado e não salvo.
   - chaveRascunho, lerRascunhos, gravarRascunhos, removerRascunho, salvarRascunho, agendarRascunho, atualizarBotoesModal
@@ -132,7 +132,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - destinoDoPatrimonio, plataformaTrocando, atualizarPlataformaDoRascunho, fecharEscolhaTroca, mostrarEscolhaTroca, usarPatrimonio, gravarPatrimonio
 - `agenda-utils.js` (84 linhas): dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco() (cidade/UF tirada do texto do endereço).
   - dataISO, corDoDia, tituloDoDia
-- `agenda-zap.js` (307 linhas): Texto de agendamento copiado para o grupo da transportadora. A referência digitada à mão sem o número da proposta ganha " - Proposta: N" no fim. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `agenda-zap.js` (304 linhas): Texto de agendamento copiado para o grupo da transportadora. A referência digitada à mão sem o número da proposta ganha " - Proposta: N" no fim. ⚠️ passa de ~300 linhas (sugerir divisão)
   - textoDataZap, ehLocalWR, modeloDaPlataforma, modelosDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
 - `atualizacao-sistema.js` (293 linhas): Em toda página menos o login: a cada 2 min e ao voltar para a aba compara VERSAO_SISTEMA com a do helpers.js publicado; se mudou, renova os arquivos no navegador e recarrega. Espera se houver janela aberta, trabalho não salvo ou uso no último minuto (mostra aviso com "Atualizar agora"). Carregar depois de helpers.js.
   - lerTentativaAtualizacao, gravarTentativaAtualizacao, lerVersaoPublicada, temTrabalhoAberto, paginaOcupada, esconderAvisoNovaVersao, mostrarAvisoNovaVersao, aplicarAtualizacao, tentarAtualizar, verificarVersaoSistema
@@ -148,17 +148,17 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `estoque-grupos.js` (94 linhas): Agrupa modelos por tipo (letras do patrimônio) para cada status.
   - tipoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
 - `estoque-init.js` (86 linhas): Ligações iniciais (restaura a filial salva). Sempre o ÚLTIMO script da página.
-- `estoque-parser.js` (322 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `estoque-parser.js` (320 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda. ⚠️ passa de ~300 linhas (sugerir divisão)
   - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, resumirEstoque
 - `estoque-render.js` (223 linhas): HTML dos cards de status e avisos.
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (123 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
-- `helpers.js` (231 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
+- `helpers.js` (240 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
   - formatarData, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast
 - `index-ferramentas.js` (272 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados). ⚠️ passa de ~300 linhas (sugerir divisão)
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
-- `leads.js` (1324 linhas): Página de leads: lista, filtros, contadores, "Vou chamar" com condição no banco (só um pega), WhatsApp, ligar, copiar mensagem, resultado (só quem marcou ou admin), observação, link para Propostas, mensagens por segmento e configuração de busca (leads_config). Dados vêm de fora: nada entra como HTML. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `leads.js` (1322 linhas): Página de leads: lista, filtros, contadores, "Vou chamar" com condição no banco (só um pega), WhatsApp, ligar, copiar mensagem, resultado (só quem marcou ou admin), observação, link para Propostas, mensagens por segmento e configuração de busca (leads_config). Dados vêm de fora: nada entra como HTML. ⚠️ passa de ~300 linhas (sugerir divisão)
   - semAcentoLeads, saudacaoAgora, montarMensagemLead, numeroComDDI, linkWhatsApp, linkLigar, linkSite, dataHoraLead, rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads, carregarLeads, carregarUltimaBusca, desenharUltimaBusca, recarregarLeads, opcoesDoCampo, preencherSelectLeads, passaNosFiltros, atualizarContadoresLeads, desenharLeads, criarCardLead, criarContatoLead, criarBotaoLead, criarLinkLead, criarAcoesLead, criarObservacaoLead, pegarLead, registrarResultado, separarListaConfig, carregarConfigsBusca, resumoConfig, desenharConfigsBusca, desenharPortesConfig, limparFormConfig, editarConfigBusca, salvarConfigBusca, alternarConfigBusca, abrirConfigBusca, fecharConfigBusca
 - `menu.js` (121 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
 - `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
@@ -177,7 +177,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - textoDescontoBloco, calcularDescontoBloco, atualizarValorFinalProposta
 - `propostas-equipamentos.js` (286 linhas): obterEquipamentos(), adicionar/remover linha e eventos.
   - obterEquipamentos, adicionarEquipamento, removerEquipamento, configurarEventosEquipamentos
-- `propostas-estado.js` (64 linhas): Variáveis das tabelas carregadas, normalizarModelo() e normalizarCidade().
+- `propostas-estado.js` (61 linhas): Variáveis das tabelas carregadas, normalizarModelo() e normalizarCidade().
   - normalizarModelo, normalizarCidade
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
@@ -211,7 +211,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `transp-cad-tela.js` (184 linhas): Botões "+ Nova transportadora" e "Excluir transportadora" da barra (só exclui se não tiver motorista, veículo nem agendamento). Carregar antes de transp-init.js.
   - abrirFormNovaTransp, fecharFormNovaTransp, escolherTransportadora, adicionarTransportadoraTransp, textoUsosTransportadora, excluirTransportadoraAtual
 - `transp-config.js` (93 linhas): Tabelas (TRANSP_TABELAS, inclui agendamentos para checar vínculos), bucket, limite do PDF (5 MB), tipos e medidas do veículo, rótulos de documento, TRANSP_TODAS (opção "Todas as transportadoras", conferida por emTodasTransp()) e variáveis de estado (inclui `transpSoLeitura`: quem não é admin só vê). As policies de RLS no Supabase é que protegem os dados.
-- `transp-docs.js` (314 linhas): Envio, abertura e exclusão dos PDFs de veículos e motoristas, e o bloco de documentos do formulário (só leitura: abre, sem anexar nem excluir). Os arquivos ficam no bucket privado (BUCKET_DOCS) e só abrem por link temporário. ⚠️ passa de ~300 linhas (sugerir divisão)
+- `transp-docs.js` (312 linhas): Envio, abertura e exclusão dos PDFs de veículos e motoristas, e o bloco de documentos do formulário (só leitura: abre, sem anexar nem excluir). Os arquivos ficam no bucket privado (BUCKET_DOCS) e só abrem por link temporário. ⚠️ passa de ~300 linhas (sugerir divisão)
   - docsDoDono, removerArquivosStorage, enviarDocumento, abrirDocumento, excluirDocumento, criarBlocoDocumentos, desenharBlocoDocumentos
 - `transp-form.js` (132 linhas): Campos, máscara de CPF, abrir/fechar o modal (só leitura: campos travados e sem Salvar) e salvar (veículo e motorista ficam em transp-form-veiculo.js e transp-form-motorista.js).
   - criarCampoForm, maiusculoCampoTransp, formatarCPF, cpfValido, abrirModalTransp, fecharModalTransp, salvarModalTransp
@@ -289,7 +289,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `leads.js` (1324), `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (392), `auth-guard.js` (377), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `leads.js` (1322), `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (392), `auth-guard.js` (377), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

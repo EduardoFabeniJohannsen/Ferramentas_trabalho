@@ -106,9 +106,7 @@ const MENSAGENS_SEGMENTO = [
 
 function semAcentoLeads(texto){
 
-    return String(texto || "")
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
+    return semAcento(texto || "")
         .replace(/\s+/g, " ")
         .trim()
         .toLowerCase();

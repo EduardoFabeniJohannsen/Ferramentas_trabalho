@@ -54,10 +54,7 @@ function normalizarModelo(valor){
 
 function normalizarCidade(valor){
 
-    return String(valor || "")
-        .replace(/\uFEFF/g, "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+    return semAcento(String(valor || "").replace(/\uFEFF/g, ""))
         .replace(/\s+/g, " ")
         .trim()
         .toUpperCase();

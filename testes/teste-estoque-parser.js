@@ -11,9 +11,9 @@ const confere = (nome, ok, extra) => {
 
 (async () => {
 
-    const ctx = {};
+    const ctx = { document: { querySelectorAll: () => [] } };
     vm.createContext(ctx);
-    for(const f of ["estoque-config.js", "estoque-parser.js"]){
+    for(const f of ["helpers.js", "estoque-config.js", "estoque-parser.js"]){
         vm.runInContext(fs.readFileSync(path.join(raiz, "js", f), "utf8"), ctx);
     }
     const resumir = (linhas) => { ctx.__l = linhas; return vm.runInContext("resumirEstoque(__l, 'x.xlsx')", ctx); };

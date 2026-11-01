@@ -1,7 +1,7 @@
 // ======================================
 // HELPERS GERAIS
 // ======================================
-// Versão do sistema, $, criar(), formatadores, copiar() e mostrarToast().
+// Versão do sistema, $, criar(), semAcento(), formatadores, copiar() e mostrarToast().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.29.3";
+const VERSAO_SISTEMA = "16.29.4";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -37,6 +37,15 @@ function criar(tag, classe, texto){
     }
 
     return elemento;
+}
+
+
+// tira só o acento: maiúsculas, minúsculas e espaços ficam a cargo de quem chama
+function semAcento(texto){
+
+    return String(texto ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 }
 
 

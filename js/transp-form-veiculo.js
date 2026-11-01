@@ -32,21 +32,21 @@ function abrirModalVeiculo(id){
 
     corpo.innerHTML = "";
 
-    const grade = criarElemento("div", "grade-transp");
+    const grade = criar("div", "grade-transp");
 
-    const blocoTipo = criarElemento("div", "campo-form largo");
+    const blocoTipo = criar("div", "campo-form largo");
 
-    const rotuloTipo = criarElemento("label", "", "Tipo");
+    const rotuloTipo = criar("label", "", "Tipo");
 
     rotuloTipo.htmlFor = "vcTipo";
 
-    const selectTipo = criarElemento("select");
+    const selectTipo = criar("select");
 
     selectTipo.id = "vcTipo";
 
     TIPOS_VEICULO.forEach(tipo => {
 
-        const opcao = criarElemento("option", "", tipo);
+        const opcao = criar("option", "", tipo);
 
         opcao.value = tipo;
 
@@ -104,7 +104,7 @@ function abrirModalVeiculo(id){
     }else{
 
         corpo.appendChild(
-            criarElemento(
+            criar(
                 "div",
                 "vazio-transp",
                 "Salve o veículo primeiro para poder anexar os PDFs."

@@ -3,25 +3,9 @@
 // ======================================
 // Seleção da transportadora, abas, cartões de veículos e motoristas e recarga.
 
-function criarElemento(tag, classe, texto){
-
-    const elemento =
-        document.createElement(tag);
-
-    if(classe) elemento.className = classe;
-
-    if(texto !== undefined && texto !== null){
-
-        elemento.textContent = texto;
-    }
-
-    return elemento;
-}
-
-
 function criarBotao(texto, titulo, classe, aoClicar){
 
-    const botao = criarElemento("button", classe, texto);
+    const botao = criar("button", classe, texto);
 
     botao.type = "button";
 
@@ -70,7 +54,7 @@ function adicionarNomeTransp(titulo, item){
     if(!emTodasTransp()) return;
 
     titulo.appendChild(
-        criarElemento("span", "tag-transp empresa", item.transportadora)
+        criar("span", "tag-transp empresa", item.transportadora)
     );
 }
 
@@ -84,7 +68,7 @@ function desenharSelectTransportadora(){
     if(!transpLista.length){
 
         const vazio =
-            criarElemento("option", "", "Nenhuma transportadora cadastrada");
+            criar("option", "", "Nenhuma transportadora cadastrada");
 
         vazio.value = "";
 
@@ -93,7 +77,7 @@ function desenharSelectTransportadora(){
         return;
     }
 
-    const todas = criarElemento("option", "", "Todas as transportadoras");
+    const todas = criar("option", "", "Todas as transportadoras");
 
     todas.value = TRANSP_TODAS;
 
@@ -101,7 +85,7 @@ function desenharSelectTransportadora(){
 
     transpLista.forEach(nome => {
 
-        const opcao = criarElemento("option", "", nome);
+        const opcao = criar("option", "", nome);
 
         opcao.value = nome;
 
@@ -174,7 +158,7 @@ function desenharListaTransp(){
     if(!itens.length){
 
         lista.appendChild(
-            criarElemento(
+            criar(
                 "div",
                 "vazio-transp",
                 carregandoTransp
@@ -220,15 +204,15 @@ function textoQuantidadeDocs(dono){
 
 function criarItemVeiculo(veiculo){
 
-    const item = criarElemento("div", "item-transp");
+    const item = criar("div", "item-transp");
 
-    const info = criarElemento("div", "item-transp-info");
+    const info = criar("div", "item-transp-info");
 
     const titulo =
-        criarElemento("div", "item-transp-titulo", placasDoVeiculo(veiculo));
+        criar("div", "item-transp-titulo", placasDoVeiculo(veiculo));
 
     titulo.appendChild(
-        criarElemento(
+        criar(
             "span",
             "tag-transp" + (veiculo.tipo === "Carreta" ? " carreta" : ""),
             veiculo.tipo
@@ -250,7 +234,7 @@ function criarItemVeiculo(veiculo){
             );
 
     info.appendChild(
-        criarElemento(
+        criar(
             "div",
             "item-transp-detalhe",
             medidas.length
@@ -260,7 +244,7 @@ function criarItemVeiculo(veiculo){
     );
 
     info.appendChild(
-        criarElemento(
+        criar(
             "div",
             "item-transp-docs",
             textoQuantidadeDocs({ tipo: "veiculo", id: veiculo.id })
@@ -283,7 +267,7 @@ function criarItemVeiculo(veiculo){
 // admin: editar e excluir; quem só vê: abrir (dados e PDFs)
 function criarAcoesItemTransp(abrir, excluir){
 
-    const acoes = criarElemento("div", "item-transp-acoes");
+    const acoes = criar("div", "item-transp-acoes");
 
     if(transpSoLeitura){
 
@@ -302,12 +286,12 @@ function criarAcoesItemTransp(abrir, excluir){
 
 function criarItemMotorista(motorista){
 
-    const item = criarElemento("div", "item-transp");
+    const item = criar("div", "item-transp");
 
-    const info = criarElemento("div", "item-transp-info");
+    const info = criar("div", "item-transp-info");
 
     const titulo =
-        criarElemento("div", "item-transp-titulo", motorista.nome);
+        criar("div", "item-transp-titulo", motorista.nome);
 
     adicionarNomeTransp(titulo, motorista);
 
@@ -325,7 +309,7 @@ function criarItemMotorista(motorista){
     if(motorista.cnh) partes.push(`CNH: ${motorista.cnh}`);
 
     info.appendChild(
-        criarElemento(
+        criar(
             "div",
             "item-transp-detalhe",
             partes.length
@@ -335,7 +319,7 @@ function criarItemMotorista(motorista){
     );
 
     info.appendChild(
-        criarElemento(
+        criar(
             "div",
             "item-transp-docs",
             textoQuantidadeDocs({ tipo: "motorista", id: motorista.id })

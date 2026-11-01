@@ -213,18 +213,6 @@ function linkSite(site){
 // UTILITÁRIOS
 // ======================================
 
-function criarElLead(tag, classe, texto){
-
-    const elemento = document.createElement(tag);
-
-    if(classe) elemento.className = classe;
-
-    if(texto !== undefined && texto !== null) elemento.textContent = texto;
-
-    return elemento;
-}
-
-
 // 31/10/2026 14:30
 function dataHoraLead(iso){
 
@@ -423,7 +411,7 @@ function preencherSelectLeads(id, todos, opcoes){
 
     select.innerHTML = "";
 
-    const primeira = criarElLead("option", "", todos);
+    const primeira = criar("option", "", todos);
 
     primeira.value = "";
 
@@ -431,7 +419,7 @@ function preencherSelectLeads(id, todos, opcoes){
 
     opcoes.forEach(([valor, rotulo]) => {
 
-        const opcao = criarElLead("option", "", rotulo);
+        const opcao = criar("option", "", rotulo);
 
         opcao.value = valor;
 
@@ -557,18 +545,18 @@ function criarCardLead(lead){
     const comigo = !!lead.chamado_por && lead.chamado_por === usuarioLeads.id;
 
     const card =
-        criarElLead(
+        criar(
             "div",
             "lead" + (comigo ? " comigo" : (lead.chamado_por ? " com-outro" : ""))
         );
 
     card.dataset.id = lead.id;
 
-    const topo = criarElLead("div", "lead-topo");
+    const topo = criar("div", "lead-topo");
 
-    topo.appendChild(criarElLead("span", "lead-empresa", lead.empresa));
+    topo.appendChild(criar("span", "lead-empresa", lead.empresa));
 
-    const tag = criarElLead("span", "tag-lead", rotuloStatusLead(lead.status));
+    const tag = criar("span", "tag-lead", rotuloStatusLead(lead.status));
 
     tag.dataset.status = lead.status;
 
@@ -582,9 +570,9 @@ function criarCardLead(lead){
     const dados =
         [lead.segmento, rotuloPorteLead(lead.porte), local].filter(Boolean).join(" · ");
 
-    if(dados) card.appendChild(criarElLead("div", "lead-dados", dados));
+    if(dados) card.appendChild(criar("div", "lead-dados", dados));
 
-    if(lead.motivo) card.appendChild(criarElLead("div", "lead-motivo", lead.motivo));
+    if(lead.motivo) card.appendChild(criar("div", "lead-motivo", lead.motivo));
 
     card.appendChild(criarContatoLead(lead));
 
@@ -594,7 +582,7 @@ function criarCardLead(lead){
             comigo ? "você" : (lead.chamado_por_email || "outro usuário");
 
         card.appendChild(
-            criarElLead(
+            criar(
                 "div",
                 "lead-chamado",
                 `Chamado por ${quem} em ${dataHoraLead(lead.chamado_em)}`
@@ -612,7 +600,7 @@ function criarCardLead(lead){
 
 function criarContatoLead(lead){
 
-    const contato = criarElLead("div", "lead-contato");
+    const contato = criar("div", "lead-contato");
 
     const partes = [lead.telefone, lead.whatsapp, lead.email].filter(Boolean);
 
@@ -624,7 +612,7 @@ function criarContatoLead(lead){
 
         if(contato.textContent) contato.append(" · ");
 
-        const link = criarElLead("a", "", lead.site);
+        const link = criar("a", "", lead.site);
 
         link.href = site;
 
@@ -642,7 +630,7 @@ function criarContatoLead(lead){
 
         if(contato.textContent) contato.append(" · ");
 
-        const link = criarElLead("a", "", "🔗 Fonte");
+        const link = criar("a", "", "🔗 Fonte");
 
         link.href = fonte;
 
@@ -659,7 +647,7 @@ function criarContatoLead(lead){
 
 function criarBotaoLead(texto, classe, aoClicar){
 
-    const botao = criarElLead("button", classe, texto);
+    const botao = criar("button", classe, texto);
 
     botao.type = "button";
 
@@ -671,7 +659,7 @@ function criarBotaoLead(texto, classe, aoClicar){
 
 function criarLinkLead(texto, classe, href, novaAba){
 
-    const link = criarElLead("a", classe, texto);
+    const link = criar("a", classe, texto);
 
     link.href = href;
 
@@ -688,7 +676,7 @@ function criarLinkLead(texto, classe, href, novaAba){
 
 function criarAcoesLead(lead, comigo){
 
-    const acoes = criarElLead("div", "lead-acoes");
+    const acoes = criar("div", "lead-acoes");
 
     const jaCliente = lead.status === "ja_cliente";
 
@@ -804,9 +792,9 @@ function criarAcoesLead(lead, comigo){
 
 function criarObservacaoLead(lead){
 
-    const area = criarElLead("div", "lead-obs");
+    const area = criar("div", "lead-obs");
 
-    const campo = criarElLead("input");
+    const campo = criar("input");
 
     campo.type = "text";
 
@@ -816,7 +804,7 @@ function criarObservacaoLead(lead){
 
     campo.value = lead.observacao || "";
 
-    const salvo = criarElLead("small");
+    const salvo = criar("small");
 
     let timer = null;
 
@@ -1042,7 +1030,7 @@ function desenharConfigsBusca(){
     if(!configsBusca.length){
 
         lista.appendChild(
-            criarElLead("p", "dica-leads", "Nenhuma configuração criada.")
+            criar("p", "dica-leads", "Nenhuma configuração criada.")
         );
 
         return;
@@ -1051,21 +1039,21 @@ function desenharConfigsBusca(){
     configsBusca.forEach(config => {
 
         const linha =
-            criarElLead("div", "config-busca" + (config.ativo ? "" : " inativa"));
+            criar("div", "config-busca" + (config.ativo ? "" : " inativa"));
 
-        const info = criarElLead("div", "config-busca-info");
+        const info = criar("div", "config-busca-info");
 
         info.appendChild(
-            criarElLead(
+            criar(
                 "strong",
                 "",
                 config.nome + (config.ativo ? "" : " (desativada)")
             )
         );
 
-        info.appendChild(criarElLead("small", "", resumoConfig(config)));
+        info.appendChild(criar("small", "", resumoConfig(config)));
 
-        const botoes = criarElLead("div", "config-busca-botoes");
+        const botoes = criar("div", "config-busca-botoes");
 
         botoes.appendChild(
             criarBotaoLead("✏️ Editar", "btn-secundario", () => editarConfigBusca(config))
@@ -1094,9 +1082,9 @@ function desenharPortesConfig(){
 
     PORTES_LEADS.forEach(porte => {
 
-        const rotulo = criarElLead("label");
+        const rotulo = criar("label");
 
-        const caixa = criarElLead("input");
+        const caixa = criar("input");
 
         caixa.type = "checkbox";
 

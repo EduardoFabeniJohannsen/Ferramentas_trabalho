@@ -6,15 +6,15 @@
 function criarCampoForm(rotulo, id, valor, extras, largo){
 
     const bloco =
-        criarElemento("div", "campo-form" + (largo ? " largo" : ""));
+        criar("div", "campo-form" + (largo ? " largo" : ""));
 
     bloco.id = "bloco-" + id;
 
-    const label = criarElemento("label", "", rotulo);
+    const label = criar("label", "", rotulo);
 
     label.htmlFor = id;
 
-    const input = criarElemento("input");
+    const input = criar("input");
 
     input.id = id;
 

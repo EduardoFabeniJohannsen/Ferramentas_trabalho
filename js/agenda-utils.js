@@ -1,28 +1,12 @@
 // ======================================
 // AGENDA - UTILITÁRIOS
 // ======================================
-// criar(), dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco().
+// dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
 // UTILITÁRIOS
 // ======================================
-
-function criar(tag, classe, texto){
-
-    const elemento =
-        document.createElement(tag);
-
-    if(classe) elemento.className = classe;
-
-    if(texto !== undefined && texto !== null){
-
-        elemento.textContent = texto;
-    }
-
-    return elemento;
-}
-
 
 // data de hoje + deslocamento, no formato do input date (AAAA-MM-DD)
 function dataISO(deslocamentoDias){

@@ -1,7 +1,7 @@
 // ======================================
 // HELPERS GERAIS
 // ======================================
-// Versão do sistema, $, formatadores, copiar() e mostrarToast().
+// Versão do sistema, $, criar(), formatadores, copiar() e mostrarToast().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.29.2";
+const VERSAO_SISTEMA = "16.29.3";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -21,6 +21,23 @@ document.querySelectorAll(".versao").forEach(elemento => {
 // ======================================
 
 const $ = (id) => document.getElementById(id);
+
+
+// cria um elemento com classe e texto (texto nunca vira HTML)
+function criar(tag, classe, texto){
+
+    const elemento =
+        document.createElement(tag);
+
+    if(classe) elemento.className = classe;
+
+    if(texto !== undefined && texto !== null){
+
+        elemento.textContent = texto;
+    }
+
+    return elemento;
+}
 
 
 // Canal de avisos da agenda (agenda-tempo-real.js escuta). Fica aqui porque

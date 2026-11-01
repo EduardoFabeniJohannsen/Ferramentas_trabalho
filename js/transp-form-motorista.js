@@ -19,7 +19,7 @@ function abrirModalMotorista(id){
 
     corpo.innerHTML = "";
 
-    const grade = criarElemento("div", "grade-transp");
+    const grade = criar("div", "grade-transp");
 
     grade.appendChild(
         criarCampoForm(
@@ -35,7 +35,7 @@ function abrirModalMotorista(id){
     if(motorista && !transpSoLeitura){
 
         grade.appendChild(
-            criarElemento(
+            criar(
                 "p",
                 "nota-form",
                 "Ao trocar o nome, os agendamentos com o nome antigo são atualizados junto."
@@ -91,7 +91,7 @@ function abrirModalMotorista(id){
     }else{
 
         corpo.appendChild(
-            criarElemento(
+            criar(
                 "div",
                 "vazio-transp",
                 "Salve o motorista primeiro para poder anexar os PDFs."

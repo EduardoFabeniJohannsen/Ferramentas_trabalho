@@ -151,7 +151,7 @@ async function excluirDocumento(doc, container, dono){
 
 function criarBlocoDocumentos(dono){
 
-    const container = criarElemento("div");
+    const container = criar("div");
 
     desenharBlocoDocumentos(container, dono);
 
@@ -166,7 +166,7 @@ function desenharBlocoDocumentos(container, dono){
     container.className = "docs-transp";
 
     container.appendChild(
-        criarElemento(
+        criar(
             "p",
             "subtitulo-transp",
             "📎 Documentos (PDF, até 5 MB cada)"
@@ -178,18 +178,18 @@ function desenharBlocoDocumentos(container, dono){
     if(!documentos.length){
 
         container.appendChild(
-            criarElemento("div", "vazio-transp", "Nenhum documento anexado")
+            criar("div", "vazio-transp", "Nenhum documento anexado")
         );
     }
 
     documentos.forEach(doc => {
 
-        const linha = criarElemento("div", "doc-linha");
+        const linha = criar("div", "doc-linha");
 
-        linha.appendChild(criarElemento("strong", "", doc.rotulo));
+        linha.appendChild(criar("strong", "", doc.rotulo));
 
         linha.appendChild(
-            criarElemento("span", "doc-nome", doc.nome_original || "")
+            criar("span", "doc-nome", doc.nome_original || "")
         );
 
         linha.appendChild(
@@ -218,13 +218,13 @@ function desenharBlocoDocumentos(container, dono){
 
     const idLista = "listaRotulosDoc";
 
-    const sugestoes = criarElemento("datalist");
+    const sugestoes = criar("datalist");
 
     sugestoes.id = idLista;
 
     ROTULOS_DOC[dono.tipo].forEach(rotulo => {
 
-        const opcao = criarElemento("option");
+        const opcao = criar("option");
 
         opcao.value = rotulo;
 
@@ -233,9 +233,9 @@ function desenharBlocoDocumentos(container, dono){
 
     container.appendChild(sugestoes);
 
-    const novo = criarElemento("div", "doc-novo");
+    const novo = criar("div", "doc-novo");
 
-    const campoRotulo = criarElemento("input");
+    const campoRotulo = criar("input");
 
     campoRotulo.type = "text";
 
@@ -245,7 +245,7 @@ function desenharBlocoDocumentos(container, dono){
 
     campoRotulo.autocomplete = "off";
 
-    const campoArquivo = criarElemento("input");
+    const campoArquivo = criar("input");
 
     campoArquivo.type = "file";
 

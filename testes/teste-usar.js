@@ -78,7 +78,7 @@ window.supabase = { createClient(){
                 WTE8: [{ p: "WTE8O079" }]
             },
             manutencao: { WAE18: [{ p: "WAE18R004" }] } }], error: null }),
-        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, send: async () => "ok" }),
+        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, track: async () => "ok", send: async () => "ok" }),
         auth: {
             getSession: async () => ({ data: { session: { user: { id: "u1", email: "t@t" } } } }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })

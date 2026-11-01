@@ -14,6 +14,16 @@ const testes =
         .filter(nome => /^teste-.*\.js$/.test(nome) && nome.includes(filtro))
         .sort();
 
+// no GitHub, a falha aparece na página da rodada, sem precisar abrir o registro
+const anotarNoGitHub = (nome, linhas) => {
+
+    if(!process.env.GITHUB_ACTIONS) return;
+
+    const texto = linhas.map(linha => linha.replace(/%/g, "%25")).join("%0A");
+
+    console.log(`::error title=${nome}::${texto}`);
+};
+
 const rodar = (nome) => new Promise(resolver => {
 
     const inicio = Date.now();
@@ -60,12 +70,16 @@ const rodar = (nome) => new Promise(resolver => {
 
         if(!r.passou){
 
-            r.linhas.filter(linha => linha.startsWith("FALHA")).forEach(linha => console.log("      " + linha));
+            const falhas = r.linhas.filter(linha => linha.startsWith("FALHA"));
+
+            falhas.forEach(linha => console.log("      " + linha));
 
             // sem o resumo final o teste quebrou no meio: mostra o fim da saída
             if(!r.linhas.some(linha => /^(todos ok|\d+ falha\(s\))$/.test(linha.trim()))){
                 r.linhas.slice(-15).forEach(linha => console.log("      " + linha));
             }
+
+            anotarNoGitHub(nome, falhas.length ? falhas : ["O teste parou antes do fim. Veja o registro da rodada."]);
         }
     }
 

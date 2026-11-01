@@ -58,7 +58,7 @@ window.supabase = { createClient(){
                 }, manutencao: { WAE18: [{ p: "WAE18R004", m: "JLG", f: "E450" }, { p: "WAE18R005", m: "GENIE", f: "Z45" }] } }
             ], error: null };
         },
-        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, send: async () => "ok" }),
+        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, track: async () => "ok", send: async () => "ok" }),
         auth: {
             getSession: async () => ({ data: { session: { user: { id: "u1", email: "t@t" } } } }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })

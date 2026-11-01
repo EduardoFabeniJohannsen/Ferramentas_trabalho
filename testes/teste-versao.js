@@ -31,7 +31,7 @@ window.supabase = { createClient(){
     return {
         from: consulta,
         rpc: async () => ({ data: [], error: null }),
-        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, send: async () => "ok" }),
+        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, track: async () => "ok", send: async () => "ok" }),
         auth: {
             getSession: async () => ({ data: { session: { user: { id: "u1", email: "t@t" } } } }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })

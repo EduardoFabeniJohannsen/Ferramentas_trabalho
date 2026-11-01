@@ -138,6 +138,13 @@ const confere = (nome, ok, extra) => {
 
     const enviar = (pagina) => pagina.evaluate(() => enviarErrosPendentes());
 
+    // o navegador avisa do erro quando puder: espera ele chegar, sem tempo fixo
+    const esperarAnotado = (pagina, texto) =>
+        pagina.waitForFunction(
+            (procurado) => [...errosPendentes.values()].some(erro => erro.mensagem.includes(procurado)),
+            texto
+        );
+
     const comTexto = (servidor, texto) => servidor.rpc.filter(chamada => chamada.p_mensagem.includes(texto));
 
     // ---------- página funcionando não registra nada ----------
@@ -161,7 +168,7 @@ const confere = (nome, ok, extra) => {
         confere("sem erro nenhum, não envia nada", servidor.rpc.length === 0, servidor.rpc);
 
         await pagina.evaluate(() => { setTimeout(() => { throw new Error("erro de codigo"); }); });
-        await pagina.waitForTimeout(50);
+        await esperarAnotado(pagina, "erro de codigo");
         await enviar(pagina);
         const codigo = comTexto(servidor, "erro de codigo")[0];
         confere("erro de código é registrado", codigo?.p_tipo === "codigo", codigo);
@@ -171,12 +178,12 @@ const confere = (nome, ok, extra) => {
         confere("envia com o login da pessoa", servidor.cabecalhosRpc[0]?.authorization === `Bearer ${TOKEN}`);
 
         await pagina.evaluate(() => { Promise.reject(new Error("promessa recusada")); });
-        await pagina.waitForTimeout(50);
+        await esperarAnotado(pagina, "promessa recusada");
         await enviar(pagina);
         confere("promessa recusada é registrada", comTexto(servidor, "promessa recusada")[0]?.p_tipo === "codigo");
 
         await pagina.evaluate(() => { Promise.reject({ message: "Erro do banco", code: "500" }); });
-        await pagina.waitForTimeout(50);
+        await esperarAnotado(pagina, "Erro do banco");
         await enviar(pagina);
         confere("promessa recusada com erro do banco", comTexto(servidor, "Erro do banco").length === 1);
 
@@ -201,7 +208,7 @@ const confere = (nome, ok, extra) => {
             s.src = "js/erro-no-arquivo.js";
             document.body.appendChild(s);
         });
-        await pagina.waitForTimeout(100);
+        await esperarAnotado(pagina, "erro dentro do arquivo");
         await enviar(pagina);
         const noArquivo = comTexto(servidor, "erro dentro do arquivo")[0];
         confere("a pilha mostra o arquivo sem o endereço do site", noArquivo?.p_detalhe.includes("/js/erro-no-arquivo.js") && !noArquivo?.p_detalhe.includes("site.test"), noArquivo?.p_detalhe);
@@ -211,7 +218,7 @@ const confere = (nome, ok, extra) => {
             s.src = "js/nao-existe.js?v=123";
             document.body.appendChild(s);
         });
-        await pagina.waitForTimeout(100);
+        await esperarAnotado(pagina, "nao-existe");
         await enviar(pagina);
         const arquivoFaltando = comTexto(servidor, "nao-existe")[0];
         confere("arquivo que não carrega é registrado", arquivoFaltando?.p_tipo === "arquivo", arquivoFaltando);
@@ -304,11 +311,16 @@ const confere = (nome, ok, extra) => {
         confere("sem nada novo, não envia de novo", comTexto(servidor, "sempre igual").length === 2);
 
         servidor.rpc.length = 0;
-        await pagina.evaluate(() => { console.error("sozinho um"); console.error("sozinho dois"); });
-        await pagina.waitForTimeout(800);
-        confere("espera antes de enviar", servidor.rpc.length === 0, servidor.rpc.length);
-        await pagina.waitForTimeout(1700);
-        confere("envia sozinho depois de 2 segundos", comTexto(servidor, "sozinho").length === 2, servidor.rpc.map(c => c.p_mensagem));
+        const inicioEspera = Date.now();
+        const agendou = await pagina.evaluate(() => {
+            console.error("sozinho um");
+            console.error("sozinho dois");
+            return timerEnvioErros !== null && errosPendentes.size === 2;
+        });
+        confere("espera antes de enviar", agendou && servidor.rpc.length === 0, servidor.rpc.length);
+        await pagina.waitForFunction(() => timerEnvioErros === null && errosPendentes.size === 0);
+        await enviar(pagina);
+        confere("envia sozinho depois de 2 segundos", comTexto(servidor, "sozinho").length === 2 && Date.now() - inicioEspera >= 1900, servidor.rpc.map(c => c.p_mensagem));
 
         await contexto.close();
     }

@@ -1,0 +1,39 @@
+# Roda os testes a cada envio para a main. Não bloqueia a publicação do site, que o
+# GitHub Pages faz à parte: se algo falhar, o commit ganha um X vermelho e o GitHub
+# avisa por e-mail. Também dá para rodar à mão na aba Actions (Run workflow).
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# dois envios seguidos: só o mais recente interessa
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: America/Sao_Paulo
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # os testes usam o Chrome que já vem instalado no computador do GitHub
+      - run: google-chrome --version
+
+      - run: npm ci
+
+      - run: npm test

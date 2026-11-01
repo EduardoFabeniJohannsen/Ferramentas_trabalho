@@ -20,6 +20,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `testes/teste-mapa.js`: acusa este mapa desatualizado ou citando arquivo que não existe (`npm run mapa` resolve a primeira parte).
 - Os outros `testes/teste-*.js` cobrem uma área cada. `testes/capturas/` guarda as imagens geradas e não vai para o Git.
 - Os testes de SQL e do agente de leads não ficam aqui, porque este repositório é público.
+- No GitHub: `.github/workflows/testes.yml` roda `npm test` a cada envio para a `main` (aba Actions), em Ubuntu e no fuso de São Paulo. Não bloqueia a publicação do site: se algo falhar, o commit ganha um X vermelho e o GitHub avisa por e-mail. O motivo aparece na página da rodada.
 
 ## Ordem de carregamento por página
 

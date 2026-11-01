@@ -29,7 +29,7 @@ window.supabase = { createClient(){
             filial_id: i + 1, atualizado_em: quando(h),
             disponiveis: { WAE18: [{ p: "WAE18R00" + i, m: "GENIE", f: "Z45" }] }, manutencao: null
         })), error: null }),
-        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, send: async () => "ok" }),
+        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, track: async () => "ok", send: async () => "ok" }),
         auth: {
             getSession: async () => ({ data: { session: { user: { id: "u1", email: "t@t" } } } }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })

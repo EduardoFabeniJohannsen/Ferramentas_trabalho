@@ -34,7 +34,7 @@ const carregarFuncao = (arquivo, nome) => {
 carregarFuncao("agenda/agenda-filtro-datas.js", "semAcentoMinusculo");
 carregarFuncao("agenda/agenda-zap.js", "textoPeriodoReferencia");
 carregarFuncao("estoque/estoque-parser.js", "normalizarTexto");
-carregarFuncao("leads/leads.js", "semAcentoLeads");
+carregarFuncao("leads/leads-contato.js", "semAcentoLeads");
 carregarFuncao("propostas/propostas-estado.js", "normalizarCidade");
 
 const CASOS = [

@@ -55,7 +55,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads-config → leads-contato → leads-utils → leads-dados → leads-filtros → leads-lista → leads-cards → leads-acoes → leads-busca-config → leads-init
 
 **login.html** — Login
 - CSS: style
@@ -162,8 +162,24 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - formatarData, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast
 - `index-ferramentas.js` (259 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados). ⚠️ passa de ~300 linhas (sugerir divisão)
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
-- `leads.js` (1290 linhas): Página de leads: lista, filtros, contadores, "Vou chamar" com condição no banco (só um pega), WhatsApp, ligar, copiar mensagem, resultado (só quem marcou ou admin), observação, link para Propostas, mensagens por segmento e configuração de busca (leads_config). Dados vêm de fora: nada entra como HTML. ⚠️ passa de ~300 linhas (sugerir divisão)
-  - semAcentoLeads, saudacaoAgora, montarMensagemLead, numeroComDDI, linkWhatsApp, linkLigar, linkSite, rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads, carregarLeads, carregarUltimaBusca, desenharUltimaBusca, recarregarLeads, opcoesDoCampo, preencherSelectLeads, passaNosFiltros, atualizarContadoresLeads, desenharLeads, criarCardLead, criarContatoLead, criarBotaoLead, criarLinkLead, criarAcoesLead, criarObservacaoLead, pegarLead, registrarResultado, separarListaConfig, carregarConfigsBusca, resumoConfig, desenharConfigsBusca, desenharPortesConfig, limparFormConfig, editarConfigBusca, salvarConfigBusca, alternarConfigBusca, abrirConfigBusca, fecharConfigBusca
+- `leads-acoes.js` (109 linhas): "Vou chamar" com condição no banco (só um pega) e resultado do contato (só quem marcou ou admin).
+  - pegarLead, registrarResultado
+- `leads-busca-config.js` (260 linhas): Janela de configuração de busca (leads_config), que o agente externo lê.
+  - separarListaConfig, carregarConfigsBusca, resumoConfig, desenharConfigsBusca, desenharPortesConfig, limparFormConfig, editarConfigBusca, salvarConfigBusca, alternarConfigBusca, abrirConfigBusca, fecharConfigBusca
+- `leads-cards.js` (325 linhas): Card de cada lead: contato, botões (WhatsApp, ligar, copiar mensagem, link para Propostas) e observação. Dados vêm de fora: nada entra como HTML. ⚠️ passa de ~300 linhas
+  - criarCardLead, criarContatoLead, criarBotaoLead, criarLinkLead, criarAcoesLead, criarObservacaoLead
+- `leads-config.js` (65 linhas): Tabelas, status, portes, limites e variáveis de estado da página.
+- `leads-contato.js` (145 linhas): Mensagem por segmento e links de WhatsApp, telefone e site.
+  - semAcentoLeads, saudacaoAgora, montarMensagemLead, numeroComDDI, linkWhatsApp, linkLigar, linkSite
+- `leads-dados.js` (110 linhas): Busca os leads e a última busca do agente, e recarrega a tela.
+  - carregarLeads, carregarUltimaBusca, desenharUltimaBusca, recarregarLeads
+- `leads-filtros.js` (78 linhas): Filtros de cidade, segmento, porte e status.
+  - opcoesDoCampo, preencherSelectLeads, passaNosFiltros
+- `leads-init.js` (85 linhas): Descobre quem está logado, liga os eventos e carrega. Sempre o último script da página.
+- `leads-lista.js` (87 linhas): Contadores e desenho da lista (em andamento e novos).
+  - atualizarContadoresLeads, desenharLeads
+- `leads-utils.js` (53 linhas): Rótulos de status e porte, nome a partir do e-mail e mensagem de erro.
+  - rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads
 - `menu.js` (121 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
 - `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. ⚠️ passa de ~300 linhas (sugerir divisão)
   - copiarPropostaZap
@@ -252,9 +268,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 | `frete_dionizio` | `busca-fretes.js`, `tabelas-config.js` |
 | `frete_magnus` | `busca-fretes.js`, `tabelas-config.js` |
 | `função:criar-usuario` | `admin-dados.js` |
-| `leads` | `leads.js` (grava só status, chamado e observação; quem cria é o agente externo, com service_role no servidor dele) |
-| `leads_buscas` | `leads.js` (só lê: resultado de cada busca do agente) |
-| `leads_config` | `leads.js` (o agente externo lê as ativas) |
+| `leads` | `leads-dados.js`, `leads-acoes.js`, `leads-cards.js` (grava só status, chamado e observação; quem cria é o agente externo, com service_role no servidor dele) |
+| `leads_buscas` | `leads-dados.js` (só lê: resultado de cada busca do agente) |
+| `leads_config` | `leads-busca-config.js` (o agente externo lê as ativas) |
 | `motoristas` | `agenda-banco.js` (leitura em `agenda-motoristas.js`), `transp-config.js` |
 | `motoristas_dados` | `transp-config.js` |
 | `perfis` | `admin-config.js`, `auth-guard.js` |
@@ -282,7 +298,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `agendaLarguras` | `agenda-config.js` |
 | `agendaEtapas` | `agenda-config.js` |
 | `agendaRascunhos` | `agenda-config.js` |
-| `leadsVendedor:<usuário>` | `leads.js` |
+| `leadsVendedor:<usuário>` | `leads-config.js` |
 | `authPerfil` | `auth-guard.js` |
 | `estoqueFilial` | `estoque-config.js` |
 | `propostaCache` | `propostas-cache.js` |
@@ -293,7 +309,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `leads.js` (1290), `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (381), `auth-guard.js` (377), `agenda-larguras.js` (349), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `leads-cards.js` (325), `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (381), `auth-guard.js` (377), `agenda-larguras.js` (349), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

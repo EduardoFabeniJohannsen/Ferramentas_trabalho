@@ -4,6 +4,10 @@ Sem build e sem módulos: cada página carrega os scripts na ordem abaixo (vari�
 Toda página carrega antes o supabase-js 2.45.0 (CDN jsDelivr); ele não aparece nas listas abaixo.
 Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é sempre o último da página.
 
+**Pastas:** `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `supabase-config`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo.
+
+**Não mude `js/helpers.js` de lugar:** as abas abertas leem a versão publicada nesse endereço (`atualizacao-sistema.js`). Se ele mudar, elas param de se atualizar sozinhas.
+
 > Este mapa foi regerado a partir dos arquivos do projeto (cabeçalhos e funções de cada um). Mudou ordem de scripts, funções ou criou arquivo? Atualize aqui.
 
 ## Testes

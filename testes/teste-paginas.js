@@ -83,6 +83,32 @@ const confere = (nome, ok, extra) => {
 
 (async () => {
 
+    // ---------- organização dos arquivos ----------
+    const paginasDoScript = {};
+
+    for(const arquivo of [...Object.keys(PAGINAS), "login.html"]){
+        const html = fs.readFileSync(path.join(raiz, arquivo), "utf8");
+        for(const achou of html.matchAll(/src="(js\/[^"]+)"/g)){
+            (paginasDoScript[achou[1]] = paginasDoScript[achou[1]] || []).push(arquivo);
+        }
+    }
+
+    const scriptsNoDisco = fs.readdirSync(path.join(raiz, "js"), { recursive: true })
+        .filter(nome => nome.endsWith(".js"))
+        .map(nome => "js/" + nome.split(path.sep).join("/"));
+
+    const semUso = scriptsNoDisco.filter(script => !paginasDoScript[script]);
+    confere("todo script é carregado por alguma página", semUso.length === 0, semUso.length ? semUso : undefined);
+
+    // js/agenda/ só na agenda; quem é usado por mais de uma página fica direto em js/
+    const foraDoLugar = Object.entries(paginasDoScript).filter(([script, paginas]) => {
+        const pasta = script.split("/").length > 2 ? script.split("/")[1] : null;
+        return pasta
+            ? !(paginas.length === 1 && paginas[0].toLowerCase() === `${pasta}.html`)
+            : paginas.length === 1;
+    }).map(([script]) => script);
+    confere("cada script está na pasta certa", foraDoLugar.length === 0, foraDoLugar.length ? foraDoLugar : undefined);
+
     const navegador = await chromium.launch({ channel: "chrome", headless: true });
 
     const novoContexto = async (usuario) => {

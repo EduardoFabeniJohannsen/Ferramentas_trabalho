@@ -4,7 +4,7 @@ const vm = require("vm");
 const raiz = path.resolve(__dirname, "..");
 const ctx = {};
 vm.createContext(ctx);
-vm.runInContext(fs.readFileSync(raiz + "/js/agenda-utils.js", "utf8"), ctx);
+vm.runInContext(fs.readFileSync(raiz + "/js/agenda/agenda-utils.js", "utf8"), ctx);
 
 const casos = [
     ["Rua B, 200, Centro, Brusque/SC", "Brusque/SC"],

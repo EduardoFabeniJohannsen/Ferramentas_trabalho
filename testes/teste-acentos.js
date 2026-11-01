@@ -31,11 +31,11 @@ const carregarFuncao = (arquivo, nome) => {
     vm.runInContext(texto.slice(inicio, fim), ctx);
 };
 
-carregarFuncao("agenda-filtro-datas.js", "semAcentoMinusculo");
-carregarFuncao("agenda-zap.js", "textoPeriodoReferencia");
-carregarFuncao("estoque-parser.js", "normalizarTexto");
-carregarFuncao("leads.js", "semAcentoLeads");
-carregarFuncao("propostas-estado.js", "normalizarCidade");
+carregarFuncao("agenda/agenda-filtro-datas.js", "semAcentoMinusculo");
+carregarFuncao("agenda/agenda-zap.js", "textoPeriodoReferencia");
+carregarFuncao("estoque/estoque-parser.js", "normalizarTexto");
+carregarFuncao("leads/leads.js", "semAcentoLeads");
+carregarFuncao("propostas/propostas-estado.js", "normalizarCidade");
 
 const CASOS = [
     ["semAcento", "Itajaí São João", "Itajai Sao Joao"],

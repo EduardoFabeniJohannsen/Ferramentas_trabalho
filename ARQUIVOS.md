@@ -23,7 +23,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes)
 - CSS: style → propostas
-- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-textos → proposta-zap → propostas-init
+- JS: supabase-config → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → bloco <style> no próprio agenda.html (o grosso dos estilos da agenda)
@@ -140,7 +140,6 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - existeLoginSalvo, ehAdmin, carregarPerfil, salvarPerfilCache, lerPerfilCache, buscarPerfil, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES (uma tabela por transportadora) e buscarLinhasFretes() (busca em páginas de 1000 linhas).
   - buscarLinhasFretes
-- `estoque.js` (930 linhas): **LEGADO: monolítico, nenhuma página carrega; ignorar e nunca editar.** (Versão antiga de toda a página de estoque, já dividida nos `estoque-*.js`.)
 - `estoque-busca.js` (114 linhas): Barra de pesquisa: mostra só o modelo digitado, num card. (Usa compararMaquinas, escaparHtml e STATUS_COM_PREVISAO do estoque-render.js.)
   - textoBusca, modelosDaBusca, htmlCardBusca, htmlBusca
 - `estoque-config.js` (95 linhas): Status, tipos, listas fixas, filiais e estado.
@@ -238,7 +237,6 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta)
 - `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`: estilos de cada página
 - `transportadoras.css`: lista, modal e documentos da página de transportadoras (o formulário de nova transportadora está no <style> do transportadoras.html)
-- `agenda.css`, `agenda-modal.css`, `agenda-tema-claro.css`: **nenhuma página carrega**. A agenda usa o bloco <style> do próprio agenda.html (lista, modais e tema claro `body.tema-claro`). Mexer no estilo da agenda = editar o agenda.html.
 
 ## Supabase (tabelas, bucket e função)
 
@@ -256,7 +254,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 | `motoristas` | `agenda-banco.js` (leitura em `agenda-motoristas.js`), `transp-config.js` |
 | `motoristas_dados` | `transp-config.js` |
 | `perfis` | `admin-config.js`, `auth-guard.js` |
-| `resumo_estoque` | `estoque-dados.js`, `estoque-upload.js`, `agenda-estoque.js` (função `estoque_disponiveis`), `estoque.js` (legado) |
+| `resumo_estoque` | `estoque-dados.js`, `estoque-upload.js`, `agenda-estoque.js` (função `estoque_disponiveis`) |
 | `tabela_fretes` | `propostas-tabelas-fretes.js`, `tabelas-config.js` |
 | `tabela_precos` | `propostas-tabelas-precos.js`, `tabelas-config.js` |
 | `transportadora_docs` | `transp-config.js` |
@@ -282,7 +280,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `agendaRascunhos` | `agenda-config.js` |
 | `leadsVendedor:<usuário>` | `leads.js` |
 | `authPerfil` | `auth-guard.js` |
-| `estoqueFilial` | `estoque-config.js` (e no legado `estoque.js`) |
+| `estoqueFilial` | `estoque-config.js` |
 | `propostaCache` | `propostas-cache.js` |
 | `cacheTabelaPrecos` | `propostas-tabelas-precos.js` |
 | `cacheTabelaFretes` | `propostas-tabelas-precos.js` |
@@ -291,10 +289,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- `propostas.html` carrega `proposta-zap.js` duas vezes (antes e depois de `propostas-textos`). Não quebra, mas é carga repetida.
 - Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `leads.js` (1336), `agenda-linhas.js` (522), `proposta-zap.js` (438), `transp-render.js` (408), `auth-guard.js` (377), `agenda-larguras.js` (367), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-banco.js` (338), `agenda-pagamento.js` (326), `transp-docs.js` (314), `agenda-zap.js` (307).
-- `estoque.js` (930) é o legado monolítico: nenhuma página carrega. Não editar.
-- `css/agenda*.css` não são carregados por nenhuma página (ver seção CSS).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

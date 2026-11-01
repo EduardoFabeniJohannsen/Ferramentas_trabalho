@@ -20,9 +20,6 @@ const PAGINAS = {
     "leads.html": "leads"
 };
 
-// já sabido e sem efeito na tela: sai quando o script repetido for removido
-const REPETIDOS_CONHECIDOS = { "propostas.html": ["js/proposta-zap.js"] };
-
 const tipos = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png" };
 
 // usuario: null = sem login; acessos e ativo vêm da tabela "perfis" simulada
@@ -168,9 +165,7 @@ const confere = (nome, ok, extra) => {
         const linksQuebrados = resumo.links.filter(link => !fs.existsSync(path.join(raiz, link.split(/[?#]/)[0])));
         confere(`${arquivo}: menu montado e sem link quebrado`, resumo.links.length > 0 && linksQuebrados.length === 0, linksQuebrados.length ? linksQuebrados : undefined);
 
-        const repetidos = resumo.scripts.filter((src, i) =>
-            resumo.scripts.indexOf(src) !== i && !(REPETIDOS_CONHECIDOS[arquivo] || []).includes(src)
-        );
+        const repetidos = resumo.scripts.filter((src, i) => resumo.scripts.indexOf(src) !== i);
         confere(`${arquivo}: nenhum script carregado duas vezes`, repetidos.length === 0, repetidos.length ? repetidos : undefined);
 
         // a atualização automática das abas abertas depende deste endereço

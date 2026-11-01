@@ -77,10 +77,7 @@ function formatarPrevisao(valor){
 
     }else if(/^\d{4}-\d{2}-\d{2}/.test(String(valor))){
 
-        const [ano, mes, dia] =
-            String(valor).slice(0, 10).split("-");
-
-        return `${dia}/${mes}/${ano}`;
+        return dataBR(valor);
     }
 
     if(data){

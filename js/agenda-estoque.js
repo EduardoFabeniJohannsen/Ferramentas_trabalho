@@ -153,7 +153,7 @@ function criarDataEstoque(atualizadoEm){
     return criar(
         "small",
         antigo ? "estoque-desatualizado" : "",
-        `${antigo ? "⚠️ " : ""}Estoque publicado em ${quandoExcluido(atualizadoEm)} — ${tempoDesde(decorrido)}`
+        `${antigo ? "⚠️ " : ""}Estoque publicado em ${dataHoraBR(atualizadoEm)} — ${tempoDesde(decorrido)}`
     );
 }
 

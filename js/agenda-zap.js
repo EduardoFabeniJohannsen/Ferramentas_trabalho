@@ -28,13 +28,7 @@ function textoDataZap(iso){
 
     const data = new Date(iso + "T00:00:00");
 
-    const dia =
-        String(data.getDate()).padStart(2, "0");
-
-    const mes =
-        String(data.getMonth() + 1).padStart(2, "0");
-
-    return `${dia}/${mes} - ${DIAS_SEMANA[data.getDay()]}`;
+    return `${formatarData(data).slice(0, 5)} - ${DIAS_SEMANA[data.getDay()]}`;
 }
 
 

@@ -47,22 +47,7 @@ async function carregarLixeira(){
 // "2026-10-30" -> "30/10/2026"
 function dataLixeira(iso){
 
-    const [ano, mes, dia] = String(iso || "").split("-");
-
-    return dia ? `${dia}/${mes}/${ano}` : "sem data";
-}
-
-
-function quandoExcluido(iso){
-
-    const data = new Date(iso);
-
-    if(isNaN(data)) return "";
-
-    const hora =
-        `${String(data.getHours()).padStart(2, "0")}:${String(data.getMinutes()).padStart(2, "0")}`;
-
-    return `${formatarData(data)} ${hora}`;
+    return dataBR(iso) || "sem data";
 }
 
 
@@ -101,7 +86,7 @@ function desenharLixeira(){
             criar(
                 "small",
                 "",
-                `Excluído em ${quandoExcluido(item.excluidoEm)}${item.excluidoPor ? ` por ${item.excluidoPor}` : ""}`
+                `Excluído em ${dataHoraBR(item.excluidoEm)}${item.excluidoPor ? ` por ${item.excluidoPor}` : ""}`
             )
         );
 

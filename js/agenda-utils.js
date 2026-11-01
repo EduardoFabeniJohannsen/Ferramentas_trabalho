@@ -1,31 +1,12 @@
 // ======================================
 // AGENDA - UTILITÁRIOS
 // ======================================
-// dataISO(), corDoDia(), tituloDoDia(), cidadeDoEndereco().
+// corDoDia(), tituloDoDia(), cidadeDoEndereco().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
 // UTILITÁRIOS
 // ======================================
-
-// data de hoje + deslocamento, no formato do input date (AAAA-MM-DD)
-function dataISO(deslocamentoDias){
-
-    const data = new Date();
-
-    data.setDate(data.getDate() + deslocamentoDias);
-
-    const ano = data.getFullYear();
-
-    const mes =
-        String(data.getMonth() + 1).padStart(2, "0");
-
-    const dia =
-        String(data.getDate()).padStart(2, "0");
-
-    return `${ano}-${mes}-${dia}`;
-}
-
 
 function corDoDia(iso){
 

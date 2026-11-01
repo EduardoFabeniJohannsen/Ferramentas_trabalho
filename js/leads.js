@@ -211,21 +211,6 @@ function linkSite(site){
 // UTILITÁRIOS
 // ======================================
 
-// 31/10/2026 14:30
-function dataHoraLead(iso){
-
-    const data = new Date(iso);
-
-    if(isNaN(data)) return "";
-
-    const hora = String(data.getHours()).padStart(2, "0");
-
-    const minuto = String(data.getMinutes()).padStart(2, "0");
-
-    return `${formatarData(data)} ${hora}:${minuto}`;
-}
-
-
 function rotuloStatusLead(valor){
 
     const status = STATUS_LEADS.find(item => item.valor === valor);
@@ -362,7 +347,7 @@ function desenharUltimaBusca(){
 
     aviso.textContent =
         `${atrasada ? "⚠️ O agente não rodou nas últimas 24 horas. " : "🤖 "}` +
-        `Última busca: ${dataHoraLead(busca.created_at)}, ` +
+        `Última busca: ${dataHoraBR(busca.created_at)}, ` +
         `${busca.inseridos} novo(s), ${busca.repetidos} já na lista`;
 }
 
@@ -583,7 +568,7 @@ function criarCardLead(lead){
             criar(
                 "div",
                 "lead-chamado",
-                `Chamado por ${quem} em ${dataHoraLead(lead.chamado_em)}`
+                `Chamado por ${quem} em ${dataHoraBR(lead.chamado_em)}`
             )
         );
     }
@@ -906,7 +891,7 @@ async function pegarLead(lead){
 
     mostrarToast(
         atual && atual.chamado_por
-            ? `${atual.chamado_por_email || "Outra pessoa"} pegou este lead em ${dataHoraLead(atual.chamado_em)}`
+            ? `${atual.chamado_por_email || "Outra pessoa"} pegou este lead em ${dataHoraBR(atual.chamado_em)}`
             : "Este lead mudou. A lista foi atualizada.",
         true
     );

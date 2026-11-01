@@ -1,7 +1,7 @@
 // ======================================
 // HELPERS GERAIS
 // ======================================
-// Versão do sistema, $, criar(), semAcento(), formatadores, copiar() e mostrarToast().
+// Versão do sistema, $, criar(), semAcento(), datas, formatadores, copiar() e mostrarToast().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.29.4";
+const VERSAO_SISTEMA = "16.29.5";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -98,6 +98,49 @@ const formatarData = (data) => {
 
     return `${dia}/${mes}/${ano}`;
 };
+
+
+// "2026-10-31" -> "31/10/2026" (sem passar por Date, pra não mudar o dia por fuso)
+function dataBR(iso){
+
+    const [ano, mes, dia] = String(iso || "").slice(0, 10).split("-");
+
+    return dia ? `${dia}/${mes}/${ano}` : "";
+}
+
+
+// data e hora gravadas pelo banco -> "31/10/2026 14:30" no horário do computador
+function dataHoraBR(iso){
+
+    const data = new Date(iso);
+
+    if(isNaN(data)) return "";
+
+    const hora = String(data.getHours()).padStart(2, "0");
+
+    const minuto = String(data.getMinutes()).padStart(2, "0");
+
+    return `${formatarData(data)} ${hora}:${minuto}`;
+}
+
+
+// data de hoje + deslocamento, no formato do input date (AAAA-MM-DD)
+function dataISO(deslocamentoDias){
+
+    const data = new Date();
+
+    data.setDate(data.getDate() + deslocamentoDias);
+
+    const ano = data.getFullYear();
+
+    const mes =
+        String(data.getMonth() + 1).padStart(2, "0");
+
+    const dia =
+        String(data.getDate()).padStart(2, "0");
+
+    return `${ano}-${mes}-${dia}`;
+}
 
 
 const brToNumber = (valor) => {

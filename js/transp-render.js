@@ -29,17 +29,6 @@ function numeroBR(valor){
 }
 
 
-// 2000-05-31 -> 31/05/2000 (sem passar por Date, pra não mudar o dia por fuso)
-function dataBR(iso){
-
-    if(!iso) return "";
-
-    const [ano, mes, dia] = String(iso).slice(0, 10).split("-");
-
-    return `${dia}/${mes}/${ano}`;
-}
-
-
 function placasDoVeiculo(veiculo){
 
     return veiculo.placa2

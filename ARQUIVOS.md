@@ -6,6 +6,15 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 > Este mapa foi regerado a partir dos arquivos do projeto (cabeçalhos e funções de cada um). Mudou ordem de scripts, funções ou criou arquivo? Atualize aqui.
 
+## Testes
+
+O site continua sem build: `package.json` e `node_modules` servem só para os testes (precisa do Node e do Chrome instalados). O banco é sempre simulado; nenhum teste acessa o Supabase de verdade.
+
+- Primeira vez: `npm install`. Rodar tudo: `npm test` (cerca de 7 minutos). Só um assunto: `npm test -- leads`.
+- `testes/teste-paginas.js`: abre todas as páginas com o `auth-guard.js` real (erros, arquivos faltando, funções dos botões, menu, login e acessos). Página nova entra na lista `PAGINAS`.
+- Os outros `testes/teste-*.js` cobrem uma área cada. `testes/capturas/` guarda as imagens geradas e não vai para o Git.
+- Os testes de SQL e do agente de leads não ficam aqui, porque este repositório é público.
+
 ## Ordem de carregamento por página
 
 **index.html** — Página inicial: conversor de texto e calculadora de boletos
@@ -292,6 +301,6 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 - Vários equipamentos no mesmo agendamento vão juntos na coluna `plataforma` (texto), ex: `2x WAD16 + WTE12`. Card, Zap, ordem e filtro leem esse texto; sem mudança no Supabase. A máquina de recolha da troca continua uma só.
 - Faturamento (forma, prazos, pedido) só em entregas; a coleta gerada de uma entrega não copia esses campos e o Zap não leva essas informações (só o card).
 - `menu.js` é a lista única dos links da topbar: página nova entra lá (nada de links digitados à mão). Página nova com acesso controlado entra também em `ACESSOS_ADMIN` (`admin-config.js`).
-- Leads: as tabelas e permissões estão em `leads.sql` (raiz), rodado à mão no SQL Editor. Policies com `tem_acesso('leads')`. A regra "só quem marcou registra o resultado" é da tela, não do banco.
+- Leads: as tabelas e permissões foram criadas à mão no SQL Editor e o SQL não fica neste repositório. Policies com `tem_acesso('leads')`. A regra "só quem marcou registra o resultado" é da tela, não do banco.
 - Agente de leads: tarefa agendada do Claude Code (conta individual, todo dia às 07:00). Lê e entrega pela Edge Function `agente-leads`, que valida tudo e grava com service_role; o token fica nos segredos do Supabase e no segredo de rede do ambiente da tarefa. O código da função e o SQL não ficam neste repositório, que é público.
 - Mudou VERSAO_SISTEMA? Fica em `helpers.js`.

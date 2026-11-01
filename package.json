@@ -1,0 +1,13 @@
+{
+  "name": "ferramentas-trabalho",
+  "private": true,
+  "description": "O site não usa build: isto serve só para rodar os testes da pasta testes/.",
+  "scripts": {
+    "test": "node testes/rodar.js"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "2.45.0",
+    "playwright-core": "1.48.2",
+    "ws": "8.22.1"
+  }
+}

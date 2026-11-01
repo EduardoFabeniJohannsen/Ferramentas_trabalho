@@ -1,0 +1,198 @@
+const { chromium } = require("playwright-core");
+const fs = require("fs");
+const path = require("path");
+
+const raiz = path.resolve(__dirname, "..");
+const saida = path.join(__dirname, "capturas");
+fs.mkdirSync(saida, { recursive: true });
+
+const clienteFalso = `
+window.supabase = { createClient(){
+    const consulta = () => {
+        const q = new Proxy(function(){}, {
+            get(_, nome){
+                if(nome === "then") return (ok) => ok({ data: [], error: null, count: 0 });
+                return () => q;
+            }
+        });
+        return q;
+    };
+    return {
+        from: consulta,
+        rpc: async () => ({ data: null, error: null }),
+        channel: () => ({ on(){ return this; }, subscribe(){ return this; }, track: async () => "ok", send: async () => "ok" }),
+        auth: {
+            getSession: async () => ({ data: { session: { user: { id: "u1", email: "t@t" } } } }),
+            onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })
+        },
+        storage: { from: () => ({}) }
+    };
+}};`;
+
+const authFalso = `
+function ehAdmin(){ return Promise.resolve(false); }
+function temAcesso(){ return true; }
+function temFilial(){ return true; }
+function existeLoginSalvo(){ return true; }
+function carregarPerfil(){ return Promise.resolve({}); }
+function fazerLogout(){}
+function recursoDaPagina(){ return "propostas"; }
+function nomeArquivoAtual(){ return "propostas.html"; }`;
+
+const tipos = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png" };
+
+let falhas = 0;
+const confere = (nome, ok, extra) => {
+    if(!ok) falhas++;
+    console.log(ok ? "ok   " : "FALHA", nome, extra !== undefined ? "-> " + JSON.stringify(extra) : "");
+};
+
+(async () => {
+
+    const navegador = await chromium.launch({ channel: "chrome", headless: true });
+    const contexto = await navegador.newContext({ viewport: { width: 1400, height: 900 } });
+    const erros = [];
+
+    await contexto.route("**/*", (rota) => {
+        const url = new URL(rota.request().url());
+        if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
+        if(url.hostname !== "agenda.test") return rota.abort();
+        if(url.pathname.endsWith("auth-guard.js")) return rota.fulfill({ contentType: "text/javascript", body: authFalso });
+        const arquivo = path.join(raiz, decodeURIComponent(url.pathname));
+        if(!fs.existsSync(arquivo)) return rota.fulfill({ status: 404, body: "" });
+        return rota.fulfill({ contentType: tipos[path.extname(arquivo)] || "text/plain", body: fs.readFileSync(arquivo) });
+    });
+
+    const pagina = await contexto.newPage();
+    pagina.on("pageerror", e => erros.push(e.message));
+    pagina.on("console", m => { if(m.type() === "error" && !/404|ERR_FAILED/.test(m.text())) erros.push(m.text()); });
+    pagina.on("dialog", d => d.accept());
+
+    const abrir = async () => {
+        await pagina.goto("http://agenda.test/propostas.html");
+        await pagina.waitForSelector("#formaPagamento", { state: "attached" });
+        await pagina.waitForTimeout(150);
+        await pagina.evaluate(() => {
+            window.__copiado = null;
+            Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (t) => { window.__copiado = t; } } });
+        });
+    };
+
+    const preencher = async () => {
+        await pagina.fill(".equipamento-linha .equipamento", "WAE18");
+        await pagina.fill("#periodo", "28");
+        await pagina.fill("#cidade", "Brusque");
+        await pagina.fill("#valorFrete", "500,00");
+    };
+
+    const abrirConfig = async () => { if(!(await pagina.isVisible("#formaPagamento"))) await pagina.click("[onclick='abrirConfiguracoes()']"); };
+    const fecharConfig = async () => { if(await pagina.isVisible("#formaPagamento")) await pagina.click("#modalConfig .btn-fechar"); };
+    const escolher = async (forma) => { await abrirConfig(); await pagina.selectOption("#formaPagamento", forma); };
+    const prazo = async (valor) => { await abrirConfig(); await pagina.fill("#prazoPagamento", valor); };
+
+    const mensagem = async () => {
+        await pagina.evaluate(() => {
+            window.__copiado = null;
+            if(!document.querySelector(".desconto-item")) gerarTextos();
+            document.querySelector(".desconto-item").dataset.valorFinal = "1000";
+        });
+        await fecharConfig();
+        await pagina.click("button:has-text('Copiar Proposta Zap')");
+        await pagina.waitForTimeout(60);
+        const texto = await pagina.evaluate(() => window.__copiado);
+        if(!texto) console.log("   toast:", await pagina.innerText("#toast"));
+        return texto || "";
+    };
+    const linhaPagamento = (texto) => (texto.split("\n").find(l => l.includes("Forma de pagamento")) || "").trim();
+
+    await pagina.goto("http://agenda.test/propostas.html");
+    await pagina.evaluate(() => localStorage.clear());
+    await abrir();
+
+    confere("fora do formulário: escondido até abrir Configurações", !(await pagina.isVisible("#formaPagamento")));
+    confere("nada de pagamento dentro do card", await pagina.locator(".card #formaPagamento").count() === 0);
+    await abrirConfig();
+    confere("está nas Configurações", await pagina.locator("#modalConfig #formaPagamento").isVisible());
+    confere("prazo escondido de início", !(await pagina.isVisible("#prazoPagamento")));
+    await pagina.screenshot({ path: path.join(saida, "21-config-padrao.png") });
+    await fecharConfig();
+    await preencher();
+
+    // ---------- padrão não muda ----------
+    let l = linhaPagamento(await mensagem());
+    confere("padrão com emojis igual a antes", l.endsWith("Forma de pagamento: Mediante aprovação cadastral."), l);
+    await pagina.evaluate(() => { emojisAtivo = false; });
+    l = linhaPagamento(await mensagem());
+    confere("padrão sem emojis igual a antes", l.endsWith("Forma de pagamento: 28 dias, mediante aprovação cadastral."), l);
+    await pagina.evaluate(() => { emojisAtivo = true; });
+
+    // ---------- boleto ----------
+    await escolher("Boleto");
+    confere("prazo aparece com 28", await pagina.isVisible("#prazoPagamento") && (await pagina.inputValue("#prazoPagamento")) === "28");
+    await pagina.screenshot({ path: path.join(saida, "22-config-boleto.png") });
+    l = linhaPagamento(await mensagem());
+    confere("boleto", l.endsWith("Forma de pagamento: Boleto com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 28 dias."), l);
+    await pagina.screenshot({ path: path.join(saida, "20-propostas-boleto.png") });
+
+    await prazo("45");
+    l = linhaPagamento(await mensagem());
+    confere("outro prazo", l.includes("prazo de 45 dias."), l);
+
+    await prazo("28 e 56");
+    l = linhaPagamento(await mensagem());
+    confere("dois vencimentos", l.includes("prazo de 28/56 dias."), l);
+
+    await prazo("");
+    l = linhaPagamento(await mensagem());
+    confere("sem prazo: não cita prazo", l.endsWith("mediante aprovação cadastral.") && !l.includes("prazo"), l);
+
+    // ---------- depósito ----------
+    await escolher("Depósito");
+    confere("volta a sugerir 28", (await pagina.inputValue("#prazoPagamento")) === "28");
+    await prazo("30");
+    l = linhaPagamento(await mensagem());
+    confere("depósito", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 30 dias."), l);
+
+    // ---------- mesmo texto sem emojis ----------
+    await pagina.evaluate(() => { emojisAtivo = false; });
+    l = linhaPagamento(await mensagem());
+    confere("sem emojis usa a escolha", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 30 dias."), l);
+    await pagina.evaluate(() => { emojisAtivo = true; });
+
+    // ---------- recarregar mantém ----------
+    await pagina.waitForTimeout(100);
+    await abrir();
+    confere("recarregar mantém a forma", (await pagina.inputValue("#formaPagamento")) === "Depósito");
+    await abrirConfig();
+    confere("recarregar mantém o prazo", (await pagina.inputValue("#prazoPagamento")) === "30" && await pagina.isVisible("#prazoPagamento"));
+    await pagina.selectOption("#formaPagamento", "Boleto");
+    await abrir();
+    confere("só trocar a forma já salva", (await pagina.inputValue("#formaPagamento")) === "Boleto");
+    await escolher("Depósito");
+
+    // ---------- trocar forma mantém o prazo digitado ----------
+    await escolher("Boleto");
+    confere("trocar a forma mantém o prazo", (await pagina.inputValue("#prazoPagamento")) === "30");
+
+    // ---------- voltar ao padrão ----------
+    await escolher("");
+    confere("padrão esconde o prazo", !(await pagina.isVisible("#prazoPagamento")));
+    await preencher();
+    l = linhaPagamento(await mensagem());
+    confere("padrão ignora o prazo escondido", l.endsWith("Forma de pagamento: Mediante aprovação cadastral."), l);
+
+    // ---------- limpar tudo ----------
+    await escolher("Boleto");
+    await fecharConfig();
+    await pagina.click(".btn-limpar-tudo");
+    await pagina.waitForTimeout(100);
+    confere("limpar tudo não mexe na configuração", (await pagina.inputValue("#formaPagamento")) === "Boleto");
+    confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "");
+
+    confere("sem erros no console", erros.length === 0, erros);
+
+    await navegador.close();
+    console.log(falhas ? `${falhas} falha(s)` : "todos ok");
+process.exitCode = falhas ? 1 : 0;
+
+})().catch(e => { console.error(e); process.exit(1); });

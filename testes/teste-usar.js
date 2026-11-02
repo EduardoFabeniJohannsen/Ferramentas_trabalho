@@ -291,7 +291,7 @@ const confere = (nome, ok, extra) => {
     // ---------- sem botão ----------
     await abrir(5);
     confere("coleta não tem Usar", (await pagina.locator("#listaEstoqueAgenda .estoque-usar").count()) === 0);
-    confere("coleta segue com 5 colunas", (await pagina.locator("#listaEstoqueAgenda tbody tr").first().locator("td").count()) === 5);
+    confere("coleta segue sem a coluna do Usar", (await pagina.locator("#listaEstoqueAgenda tbody tr").first().locator("td").count()) === 6);
     await fechar();
     await abrir(6);
     confere("cancelado não tem Usar", (await pagina.locator("#listaEstoqueAgenda .estoque-usar").count()) === 0);

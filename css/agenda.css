@@ -698,10 +698,13 @@ body.tema-claro .item-lixeira{
     font-size:13px;
 }
 /* mesmas colunas nas duas filiais; o aviso de reserva fica com o espaço maior */
-.estoque-tabela th:nth-child(5){
-    width:30%;
+.estoque-tabela th:nth-child(4){
+    width:52px;
 }
 .estoque-tabela th:nth-child(6){
+    width:30%;
+}
+.estoque-tabela th:nth-child(7){
     width:64px;
 }
 /* "Qual equipamento trocar?" (vários equipamentos no agendamento) */

@@ -2,7 +2,7 @@
 // AGENDA - CONSULTA AO ESTOQUE (botão 🔍 da linha)
 // ======================================
 // Mostra os patrimônios disponíveis e em manutenção no último estoque publicado
-// (patrimônio, marca, modelo e situação), começando pelos do mesmo modelo do
+// (patrimônio, marca, modelo, ano e situação), começando pelos do mesmo modelo do
 // agendamento. Só consulta, não muda nada. Lê pela função estoque_disponiveis do
 // banco, que libera só esses dois status, sem cliente, para quem tem acesso à
 // agenda. Destaca a máquina que já está em alguma demanda (o estoque não sabe disso).
@@ -72,6 +72,8 @@ function desenharEstoqueAgenda(){
 
     let semMarca = true;
 
+    let semAno = true;
+
     estoqueFiliais.forEach(filial => {
 
         const maquinas =
@@ -81,6 +83,8 @@ function desenharEstoqueAgenda(){
             maquinas.filter(maquina => maquina.situacao === "Manutenção").length;
 
         if(maquinas.some(maquina => maquina.m || maquina.e)) semMarca = false;
+
+        if(maquinas.some(maquina => maquina.a)) semAno = false;
 
         const secao = criar("div", "estoque-filial");
 
@@ -131,6 +135,17 @@ function desenharEstoqueAgenda(){
                 "p",
                 "estoque-nada",
                 "A marca aparece depois que o estoque for publicado de novo."
+            )
+        );
+    }
+
+    if(semAno){
+
+        corpo.appendChild(
+            criar(
+                "p",
+                "estoque-nada",
+                "O ano aparece depois que o estoque for publicado de novo, com a coluna de ano de fabricação no relatório."
             )
         );
     }

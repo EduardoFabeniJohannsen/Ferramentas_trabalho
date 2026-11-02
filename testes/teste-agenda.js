@@ -53,7 +53,7 @@ window.supabase = { createClient(){
             return { data: [
                 { filial_id: 2, atualizado_em: "2026-10-30T14:05:00Z", disponiveis: { WAE18: [{ p: "WAE18R003", m: "GENIE", f: "Z45" }] }, manutencao: null },
                 { filial_id: 1, atualizado_em: "2026-10-31T09:30:00Z", disponiveis: {
-                    WAE18: [{ p: "WAE18R002", m: "JLG", f: "E450" }, { p: "WAE18R001", m: "GENIE", f: "Z45" }],
+                    WAE18: [{ p: "WAE18R002", m: "JLG", f: "E450" }, { p: "WAE18R001", m: "GENIE", f: "Z45", a: "2019" }],
                     WTE14: [{ p: "WTE14046", e: "TESOURA 14M" }]
                 }, manutencao: { WAE18: [{ p: "WAE18R004", m: "JLG", f: "E450" }, { p: "WAE18R005", m: "GENIE", f: "Z45" }] } }
             ], error: null };
@@ -440,18 +440,20 @@ const confere = (nome, ok, extra) => {
     let le = await linhasEstoque();
     confere("abre com o mesmo modelo", le.every(l => l[0].startsWith("WAE18")) && le.length === 5, le);
     confere("patrimônio, marca e modelo", le[0][0] === "WAE18R001" && le[0][1] === "GENIE" && le[0][2] === "Z45", le[0]);
-    confere("marca neste agendamento", le[0][4] === "neste agendamento", le[0][4]);
+    confere("mostra o ano de fabricação", le[0][3] === "2019", le[0]);
+    confere("sem ano: mostra traço", le.find(l => l[0] === "WAE18R002")[3] === "—", le.find(l => l[0] === "WAE18R002"));
+    confere("marca neste agendamento", le[0][5] === "neste agendamento", le[0][5]);
     const outraReserva = le.find(l => l[0] === "WAE18R002");
-    confere("avisa máquina já agendada", outraReserva && outraReserva[4].includes("já em demanda") && outraReserva[4].includes("Cliente Três"), outraReserva);
-    confere("agendamento cancelado não reserva", le.find(l => l[0] === "WAE18R003")[4] === "", le.find(l => l[0] === "WAE18R003"));
+    confere("avisa máquina já agendada", outraReserva && outraReserva[5].includes("já em demanda") && outraReserva[5].includes("Cliente Três"), outraReserva);
+    confere("agendamento cancelado não reserva", le.find(l => l[0] === "WAE18R003")[5] === "", le.find(l => l[0] === "WAE18R003"));
     const texto = await pagina.innerText("#listaEstoqueAgenda");
     confere("separa as filiais", texto.includes("Itajaí: 2 disponível(is), 2 em manutenção") && texto.includes("Joinville: 1 disponível(is), 0 em manutenção"), texto.slice(0, 200));
     confere("mostra a data do estoque", texto.includes("Estoque publicado em"));
     const classeDa = (patrimonio) => pagina.$$eval("#listaEstoqueAgenda tbody tr", (l, p) => l.find(t => t.children[0].textContent.trim() === p).className, patrimonio);
     const fundoDa = (patrimonio) => pagina.$$eval("#listaEstoqueAgenda tbody tr", (l, p) => getComputedStyle(l.find(t => t.children[0].textContent.trim() === p).children[1]).backgroundColor, patrimonio);
     const man = le.find(l => l[0] === "WAE18R004");
-    confere("manutenção aparece com a situação", man && man[3] === "Manutenção", man);
-    confere("manutenção em demanda fica destacada", (await classeDa("WAE18R004")) === "estoque-em-demanda" && man[4].includes("Cliente Cinco"), man);
+    confere("manutenção aparece com a situação", man && man[4] === "Manutenção", man);
+    confere("manutenção em demanda fica destacada", (await classeDa("WAE18R004")) === "estoque-em-demanda" && man[5].includes("Cliente Cinco"), man);
     confere("manutenção livre sem destaque", (await classeDa("WAE18R005")) === "", await classeDa("WAE18R005"));
     confere("disponível em demanda fica destacada", (await classeDa("WAE18R002")) === "estoque-em-demanda");
     confere("disponível livre sem destaque", (await classeDa("WAE18R003")) === "");

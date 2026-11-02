@@ -97,9 +97,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-estoque-dados.js` (108 linhas): Consulta ao estoque: lê pela função `estoque_disponiveis` e descobre quais máquinas já estão em alguma demanda.
   - carregarEstoqueDisponivel, modelosDoAgendamento, agendamentoReservaMaquina, reservasDaAgenda, textoReserva, descricaoDemanda
-- `agenda-estoque-tabela.js` (159 linhas): Consulta ao estoque: data da publicação (destaque se antiga), máquinas de cada filial e a tabela da janela.
+- `agenda-estoque-tabela.js` (161 linhas): Consulta ao estoque: data da publicação (destaque se antiga), máquinas de cada filial e a tabela da janela.
   - tempoDesde, criarDataEstoque, maquinasDaFilial, criarTabelaEstoque
-- `agenda-estoque.js` (195 linhas): Botão 🔍 da linha: patrimônios disponíveis e em manutenção no último estoque publicado (patrimônio, marca, modelo, situação), por filial, começando pelo modelo do agendamento; destaca a máquina que já está em alguma demanda e, com mais de 12 horas sem publicar, o tempo desde a publicação do estoque. Lê pela função `estoque_disponiveis` do banco (só esses dois status, sem cliente, com `tem_acesso('agenda')`). Só consulta.
+- `agenda-estoque.js` (210 linhas): Botão 🔍 da linha: patrimônios disponíveis e em manutenção no último estoque publicado (patrimônio, marca, modelo, situação), por filial, começando pelo modelo do agendamento; destaca a máquina que já está em alguma demanda e, com mais de 12 horas sem publicar, o tempo desde a publicação do estoque. Lê pela função `estoque_disponiveis` do banco (só esses dois status, sem cliente, com `tem_acesso('agenda')`). Só consulta.
   - desenharEstoqueAgenda, abrirEstoqueAgenda, fecharEstoqueAgenda
 - `agenda-etapas.js` (139 linhas): Etapas do formulário (Demanda, Local e entrega, Faturamento) que recolhem ao clicar no título; salva por usuário; avisoFormulario() abre a etapa com erro. Carregar antes de agenda-modal.js.
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
@@ -166,8 +166,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `estoque-grupos.js` (94 linhas): Agrupa modelos por tipo (letras do patrimônio) para cada status.
   - tipoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
 - `estoque-init.js` (78 linhas): Ligações iniciais (restaura a filial salva). Sempre o ÚLTIMO script da página.
-- `estoque-parser.js` (317 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda.
-  - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, resumirEstoque
+- `estoque-parser.js` (365 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda.
+  - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, formatarAnoFabricacao, resumirEstoque
 - `estoque-render.js` (223 linhas): HTML dos cards de status e avisos.
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (123 linhas): Ler o Excel, prévia e publicar.
@@ -327,7 +327,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (438), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (356), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `estoque-parser.js` (317), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (438), `transp-render.js` (381), `auth-guard.js` (377), `estoque-parser.js` (365), `helpers.js` (356), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

@@ -79,7 +79,7 @@ function criarTabelaEstoque(maquinas, reservas){
     const podeUsar = agendamentoReservaMaquina(estoqueItemAberto);
 
     [
-        "Patrimônio", "Marca", "Modelo", "Situação", "",
+        "Patrimônio", "Marca", "Modelo", "Ano", "Situação", "",
         ...(podeUsar ? [""] : [])
     ].forEach(titulo => {
 
@@ -104,6 +104,8 @@ function criarTabelaEstoque(maquinas, reservas){
         linha.appendChild(criar("td", "", maquina.m || maquina.e || "—"));
 
         linha.appendChild(criar("td", "", maquina.f || maquina.modelo));
+
+        linha.appendChild(criar("td", "", maquina.a || "—"));
 
         linha.appendChild(
             criar(

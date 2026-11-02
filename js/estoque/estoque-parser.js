@@ -95,6 +95,35 @@ function formatarPrevisao(valor){
 }
 
 
+// Ano de fabricação: o Excel entrega número (2019), data (serial) ou texto
+// ("2019", "15/03/2019"). Devolve só o ano, em texto; não achou, devolve "".
+function formatarAnoFabricacao(valor){
+
+    if(valor instanceof Date){
+
+        return String(new Date(valor.getTime() + 12 * 3600 * 1000).getUTCFullYear());
+    }
+
+    if(typeof valor === "number"){
+
+        if(valor > 20000){
+
+            return String(
+                new Date(Date.UTC(1899, 11, 30) + Math.floor(valor) * 86400000)
+                    .getUTCFullYear()
+            );
+        }
+
+        return valor >= 1900 && valor <= 2100 ? String(Math.trunc(valor)) : "";
+    }
+
+    const achou =
+        String(valor ?? "").match(/\b(19|20)\d{2}\b/);
+
+    return achou ? achou[0] : "";
+}
+
+
 // linhas = matriz da planilha (array de arrays)
 function resumirEstoque(linhas, nomeArquivo){
 
@@ -129,12 +158,19 @@ function resumirEstoque(linhas, nomeArquivo){
     const colPrevisao =
         cabecalho.indexOf("previsao retorno");
 
-    // marca e modelo de fábrica: só guardados para a lupa da agenda
+    // marca, modelo de fábrica e ano: só guardados para a lupa da agenda
     const colMarca =
         cabecalho.findIndex(c => c.startsWith("marca") || c.startsWith("fabricante"));
 
     const colModeloFabrica =
         cabecalho.findIndex(c => c.startsWith("modelo"));
+
+    // "Ano", "Ano de fabricação", "Fabricação" (mas não "Anotações")
+    const colAno =
+        cabecalho.findIndex(c =>
+            /^ano\b/.test(c) ||
+            (c.includes("fabricacao") && !c.startsWith("modelo"))
+        );
 
     const statusPorTexto = {};
 
@@ -272,6 +308,11 @@ function resumirEstoque(linhas, nomeArquivo){
 
         if(modeloFabrica) item.f = modeloFabrica;
 
+        const ano =
+            colAno >= 0 ? formatarAnoFabricacao(linha[colAno]) : "";
+
+        if(ano) item.a = ano;
+
         if(equipamento.trim()) item.e = equipamento.trim();
 
         resultado.status[chave][modelo].push(item);
@@ -297,6 +338,13 @@ function resumirEstoque(linhas, nomeArquivo){
 
         resultado.avisos.push(
             "Não achei a coluna Marca no relatório: a lupa da agenda mostra o nome do equipamento no lugar."
+        );
+    }
+
+    if(colAno < 0){
+
+        resultado.avisos.push(
+            "Não achei a coluna de ano de fabricação no relatório: a lupa da agenda fica sem o ano."
         );
     }
 

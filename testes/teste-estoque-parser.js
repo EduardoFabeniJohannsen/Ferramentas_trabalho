@@ -26,8 +26,31 @@ const confere = (nome, ok, extra) => {
     const a = comMarca.status.disponivel.WAE18[0];
     confere("guarda marca, modelo e equipamento", a.m === "GENIE" && a.f === "Z45" && a.e === "ARTICULADA 18M", a);
     confere("continua guardando o resto", a.p === "WAE18R001" && a.c === "Pátio", a);
-    confere("sem aviso com a coluna Marca", comMarca.avisos.length === 0, comMarca.avisos);
+    confere("sem aviso com a coluna Marca", !comMarca.avisos.some(t => t.includes("Marca")), comMarca.avisos);
     confere("previsão continua", comMarca.status.locado.WTE14[0].r === "05/11/2026");
+
+    const anos = resumir([
+        ["Patrimônio", "Status", "Anotações", "Ano de Fabricação"],
+        ["WAE18R001", "Disponível", "1999", 2019],
+        ["WAE18R002", "Disponível", "", "2020"],
+        ["WAE18R003", "Disponível", "", 43555],
+        ["WAE18R004", "Disponível", "", "15/03/2018"],
+        ["WAE18R005", "Disponível", "", "sem informação"],
+        ["WAE18R006", "Disponível", "", ""]
+    ]);
+    confere(
+        "ano: número, texto, data e vazio",
+        anos.status.disponivel.WAE18.map(m => m.a || "").join() === "2019,2020,2019,2018,,",
+        anos.status.disponivel.WAE18.map(m => m.a)
+    );
+    confere("com a coluna de ano não avisa", !anos.avisos.some(t => t.includes("ano de fabricação")), anos.avisos);
+    confere("sem a coluna de ano: avisa e não guarda", comMarca.avisos.some(t => t.includes("ano de fabricação")) && !("a" in a), comMarca.avisos);
+    const soAno = resumir([["Patrimônio", "Status", "Ano"], ["WAE18R001", "Disponível", 2021]]);
+    confere("aceita coluna Ano", soAno.status.disponivel.WAE18[0].a === "2021");
+    const fabricacao = resumir([["Patrimônio", "Status", "Fabricação"], ["WAE18R001", "Disponível", 2017]]);
+    confere("aceita coluna Fabricação", fabricacao.status.disponivel.WAE18[0].a === "2017");
+    const modeloFab = resumir([["Patrimônio", "Status", "Modelo de Fabricação"], ["WAE18R001", "Disponível", "Z45 2015"]]);
+    confere("modelo de fabricação não vira ano", modeloFab.status.disponivel.WAE18[0].f === "Z45 2015" && !("a" in modeloFab.status.disponivel.WAE18[0]));
 
     const fabricante = resumir([
         ["PATRIMONIO", "STATUS", "Fabricante"],

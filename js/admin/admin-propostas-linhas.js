@@ -13,6 +13,17 @@ function moedaAdmin(valor){
 }
 
 
+// desconto sobre o valor de tabela, em % com 1 casa, como aparece na tabela
+// (0 = sem desconto; null = sem valor de tabela pra comparar). O filtro de
+// desconto (admin-propostas-filtros.js) usa o mesmo número.
+function descontoEquipamentoAdmin(item){
+
+    if(!item.valorTabela || !Number.isFinite(item.valorFinal)) return null;
+
+    return Math.max(0, Math.round((1 - item.valorFinal / item.valorTabela) * 1000) / 10);
+}
+
+
 // "2× WAE16: tabela R$ 2.000,00 → R$ 1.500,00 (−25%)"
 function textoEquipamentoAdmin(item){
 
@@ -25,9 +36,9 @@ function textoEquipamentoAdmin(item){
 
     partes.push(moedaAdmin(item.valorFinal));
 
-    if(item.valorTabela && item.valorFinal && item.valorFinal < item.valorTabela){
+    const desconto = descontoEquipamentoAdmin(item);
 
-        const desconto = (1 - item.valorFinal / item.valorTabela) * 100;
+    if(desconto > 0){
 
         partes.push(`(−${desconto.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%)`);
     }
@@ -88,11 +99,8 @@ function celulaUsuarioProposta(proposta){
 }
 
 
-function celulaClienteProposta(proposta){
-
-    const celula = criar("td", "col-proposta-cliente");
-
-    celula.appendChild(criar("strong", "", proposta.cliente || "(sem cliente)"));
+// "Brusque · 28 dias · frete R$ 500,00"
+function resumoClienteProposta(proposta){
 
     const dados = proposta.dados || {};
 
@@ -101,9 +109,17 @@ function celulaClienteProposta(proposta){
             ? `${dados.dias} dias × ${dados.multiplicador} períodos`
             : `${dados.dias || dados.periodo || "?"} dias`;
 
-    celula.appendChild(
-        criar("small", "", `${proposta.cidade || "—"} · ${periodo} · frete ${moedaAdmin(dados.frete)}`)
-    );
+    return `${proposta.cidade || "—"} · ${periodo} · frete ${moedaAdmin(dados.frete)}`;
+}
+
+
+function celulaClienteProposta(proposta){
+
+    const celula = criar("td", "col-proposta-cliente");
+
+    celula.appendChild(criar("strong", "", proposta.cliente || "(sem cliente)"));
+
+    celula.appendChild(criar("small", "", resumoClienteProposta(proposta)));
 
     return celula;
 }

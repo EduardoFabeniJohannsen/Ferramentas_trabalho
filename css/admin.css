@@ -1,7 +1,8 @@
 /* ===== Admin (usuários e acessos) ===== */
+/* usa a largura toda da tela: as tabelas são largas */
 .card-admin{
     width:100%;
-    max-width:1100px;
+    max-width:none;
     text-align:left;
 }
 /* online agora: a bolinha mostra o estado de cada pessoa */
@@ -141,6 +142,7 @@
 }
 
 /* ===== Erros do sistema ===== */
+.secao-propostas,
 .secao-erros{
     margin-top:28px;
     padding-top:4px;
@@ -184,6 +186,49 @@
     font-weight:bold;
 }
 /* ===== Propostas Zap copiadas ===== */
+.filtros-propostas{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
+    gap:8px 12px;
+    margin:12px 0 0;
+}
+.filtros-propostas label{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    color:#94a3b8;
+    font-size:12px;
+}
+.filtros-propostas input,
+.filtros-propostas select{
+    margin:0;
+    padding:7px 8px;
+    font-size:14px;
+}
+.filtros-propostas input[type="date"]{
+    color-scheme:dark;
+}
+/* a busca ocupa a linha toda; a faixa de datas, duas colunas */
+.filtros-propostas .busca-propostas{
+    grid-column:1 / -1;
+}
+.filtros-propostas .filtro-largo{
+    grid-column:span 2;
+}
+.faixa-filtro{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+.faixa-filtro input{
+    flex:1;
+    min-width:0;
+}
+@media(max-width:500px){
+    .filtros-propostas .filtro-largo{
+        grid-column:1 / -1;
+    }
+}
 .tabela-propostas td{
     text-align:left;
     font-size:13px;

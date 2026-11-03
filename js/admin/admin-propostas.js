@@ -3,8 +3,8 @@
 // ======================================
 // Tabela com cada "Copiar Proposta Zap" (propostas-registro.js grava): quem fez,
 // aparelho e cidade, cliente, equipamentos com desconto, total, configurações e a
-// mensagem copiada. Só o admin lê (RLS). As linhas são montadas em
-// admin-propostas-linhas.js.
+// mensagem copiada. Só o admin lê (RLS). Os filtros ficam em
+// admin-propostas-filtros.js e as linhas são montadas em admin-propostas-linhas.js.
 
 const TABELA_PROPOSTAS_ADMIN = "propostas_copiadas";
 
@@ -58,65 +58,26 @@ async function carregarPropostasAdmin(){
 
     carregandoPropostasAdmin = false;
 
+    // opções dos filtros (admin-propostas-filtros.js) vêm do que carregou
+    desenharFiltrosPropostas();
+
     desenharPropostasAdmin();
 }
 
 
-// filtro de usuário + busca por cliente, cidade ou modelo
-function propostasVisiveis(){
+function textoVazioPropostas(){
 
-    const usuario = $("filtroPropostasUsuario").value;
+    if(carregandoPropostasAdmin) return "Carregando...";
 
-    const busca = semAcento($("buscaPropostas").value).trim().toLowerCase();
+    if(falhaPropostasAdmin) return falhaPropostasAdmin;
 
-    return propostasAdmin.filter(proposta => {
-
-        if(usuario && proposta.usuario_email !== usuario) return false;
-
-        if(!busca) return true;
-
-        const modelos =
-            (proposta.dados?.equipamentos || []).map(item => item.modelo).join(" ");
-
-        return semAcento(`${proposta.cliente} ${proposta.cidade} ${modelos}`)
-            .toLowerCase()
-            .includes(busca);
-    });
-}
-
-
-function desenharFiltroPropostas(){
-
-    const select = $("filtroPropostasUsuario");
-
-    const escolhido = select.value;
-
-    const usuarios =
-        [...new Set(propostasAdmin.map(proposta => proposta.usuario_email))]
-            .sort((a, b) => a.localeCompare(b));
-
-    select.innerHTML = "";
-
-    select.appendChild(criar("option", "", "Todos os usuários"));
-
-    select.firstChild.value = "";
-
-    usuarios.forEach(email => {
-
-        const opcao = criar("option", "", email || "(sem e-mail)");
-
-        opcao.value = email;
-
-        select.appendChild(opcao);
-    });
-
-    select.value = usuarios.includes(escolhido) ? escolhido : "";
+    return propostasAdmin.length
+        ? "Nenhuma proposta com esses filtros"
+        : `Nenhuma Proposta Zap copiada nos últimos ${DIAS_PROPOSTAS_ADMIN} dias`;
 }
 
 
 function desenharPropostasAdmin(){
-
-    desenharFiltroPropostas();
 
     const visiveis = propostasVisiveis();
 
@@ -130,14 +91,7 @@ function desenharPropostasAdmin(){
 
         const linha = criar("tr");
 
-        const celula =
-            criar(
-                "td",
-                "erros-vazio",
-                carregandoPropostasAdmin
-                    ? "Carregando..."
-                    : (falhaPropostasAdmin || `Nenhuma Proposta Zap copiada nos últimos ${DIAS_PROPOSTAS_ADMIN} dias`)
-            );
+        const celula = criar("td", "erros-vazio", textoVazioPropostas());
 
         celula.colSpan = 7;
 
@@ -146,10 +100,19 @@ function desenharPropostasAdmin(){
         corpo.appendChild(linha);
     }
 
+    const filtrando = filtrandoPropostas();
+
+    $("btnLimparFiltrosPropostas").style.display = filtrando ? "" : "none";
+
     const noLimite = propostasAdmin.length >= LIMITE_PROPOSTAS_ADMIN;
 
+    const quantas =
+        filtrando
+            ? `${visiveis.length} de ${propostasAdmin.length} proposta(s)`
+            : `${visiveis.length} proposta(s)`;
+
     $("contagemPropostas").innerText =
-        visiveis.length
-            ? `${visiveis.length} proposta(s)${noLimite ? ` (só as ${LIMITE_PROPOSTAS_ADMIN} mais recentes)` : ""}`
+        propostasAdmin.length
+            ? `${quantas}${noLimite ? ` (só as ${LIMITE_PROPOSTAS_ADMIN} mais recentes)` : ""}`
             : "";
 }

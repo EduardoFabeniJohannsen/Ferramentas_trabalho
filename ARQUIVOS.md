@@ -52,9 +52,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - CSS: style
 - JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
-**admin.html** — Usuários e acessos, online agora e erros do sistema (só admin)
+**admin.html** — Usuários e acessos, online agora, propostas Zap copiadas e erros do sistema (só admin). Usa a largura toda da tela.
 - CSS: style → admin
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-linhas → admin-init
+- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-filtros → admin-propostas-linhas → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
@@ -73,13 +73,15 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - textoErroParaCopiar, copiarErroSite, copiarErrosVisiveis
 - `admin-erros.js` (293 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista, botão que grava um erro de teste e 📋 Copiar em cada erro (admin-erros-copiar.js). Nada entra como HTML.
   - mensagemFalhaErros, carregarErrosSite, errosVisiveis, desenharFiltroErros, criarCelulaMensagemErro, criarLinhaErro, criarLinhaAvisoErros, desenharErrosSite, limparErrosSite, testarRegistroErros
-- `admin-init.js` (46 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `admin-init.js` (48 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
 - `admin-online.js` (154 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada. Sem histórico.
   - nomePaginaOnline, tempoOnline, textoAbaOnline, textoAparelhoOnline, pessoasOnline, desenharUsuariosOnline
-- `admin-propostas-linhas.js` (178 linhas): Cada linha da tabela de propostas: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
-  - moedaAdmin, textoEquipamentoAdmin, configuracoesAdmin, textoAparelhoAdmin, celulaUsuarioProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
-- `admin-propostas.js` (155 linhas): Seção "Propostas Zap copiadas": carrega os registros dos últimos 90 dias (até 500), filtro por usuário e busca por cliente, cidade ou modelo. As linhas são montadas em admin-propostas-linhas.js.
-  - carregarPropostasAdmin, propostasVisiveis, desenharFiltroPropostas, desenharPropostasAdmin
+- `admin-propostas-filtros.js` (228 linhas): Filtros da tabela "Propostas Zap copiadas": busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, faixa de desconto (o mesmo % da tabela, junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
+  - normalizarBuscaAdmin, valoresFiltroProposta, textoBuscaProposta, numeroFiltroPropostas, diaProposta, descontoNoFiltro, propostasVisiveis, filtrandoPropostas, desenharFiltrosPropostas, limparFiltrosPropostas
+- `admin-propostas-linhas.js` (194 linhas): Cada linha da tabela de propostas: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
+  - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, textoAparelhoAdmin, celulaUsuarioProposta, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
+- `admin-propostas.js` (118 linhas): Seção "Propostas Zap copiadas": carrega os registros dos últimos 90 dias (até 500), contagem ("3 de 40" filtrando) e aviso de lista vazia. Os filtros ficam em admin-propostas-filtros.js e as linhas são montadas em admin-propostas-linhas.js.
+  - carregarPropostasAdmin, textoVazioPropostas, desenharPropostasAdmin
 - `admin-tela.js` (254 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (338 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras).
@@ -338,7 +340,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (459), `transp-render.js` (381), `auth-guard.js` (377), `estoque-parser.js` (385), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (459), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

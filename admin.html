@@ -113,7 +113,7 @@ CONTAINER
         </div>
 
         <!-- cada "Copiar Proposta Zap" (admin-propostas.js) -->
-        <div class="secao-erros">
+        <div class="secao-propostas">
 
             <h2>Propostas Zap copiadas</h2>
 
@@ -123,19 +123,70 @@ CONTAINER
                 total, configurações ativadas e a mensagem. Últimos 90 dias.
             </p>
 
-            <div class="barra-admin">
-
-                <select id="filtroPropostasUsuario" title="Usuário"></select>
+            <!-- filtros (admin-propostas-filtros.js) -->
+            <div class="filtros-propostas">
 
                 <input
                     type="search"
                     id="buscaPropostas"
-                    placeholder="Buscar cliente, cidade ou modelo"
+                    class="busca-propostas"
+                    placeholder="Buscar em qualquer campo: cliente, usuário, cidade, modelo, valor, configuração, mensagem..."
                     autocomplete="off"
                 >
 
+                <label>
+                    Usuário
+                    <select id="filtroPropostasUsuario"></select>
+                </label>
+
+                <label>
+                    Local de quem fez
+                    <select id="filtroPropostasLocal"></select>
+                </label>
+
+                <label>
+                    Aparelho
+                    <select id="filtroPropostasAparelho"></select>
+                </label>
+
+                <label>
+                    Modelo
+                    <select id="filtroPropostasModelo"></select>
+                </label>
+
+                <label>
+                    Desconto (%)
+                    <span class="faixa-filtro">
+                        <input type="number" id="filtroPropostasDescontoMin" min="0" max="100" step="any" placeholder="de">
+                        a
+                        <input type="number" id="filtroPropostasDescontoMax" min="0" max="100" step="any" placeholder="até">
+                    </span>
+                </label>
+
+                <label class="filtro-largo">
+                    Data
+                    <span class="faixa-filtro">
+                        <input type="date" id="filtroPropostasDataDe" title="De">
+                        a
+                        <input type="date" id="filtroPropostasDataAte" title="Até">
+                    </span>
+                </label>
+
+            </div>
+
+            <div class="barra-admin">
+
                 <button type="button" onclick="carregarPropostasAdmin()">
                     ↻ Atualizar
+                </button>
+
+                <button
+                    type="button"
+                    id="btnLimparFiltrosPropostas"
+                    style="display:none"
+                    onclick="limparFiltrosPropostas()"
+                >
+                    ✖ Limpar filtros
                 </button>
 
                 <span class="contagem" id="contagemPropostas"></span>
@@ -261,6 +312,7 @@ CONTAINER
 <script src="js/admin/admin-erros.js"></script>
 <script src="js/admin/admin-erros-copiar.js"></script>
 <script src="js/admin/admin-propostas.js"></script>
+<script src="js/admin/admin-propostas-filtros.js"></script>
 <script src="js/admin/admin-propostas-linhas.js"></script>
 <script src="js/admin/admin-init.js"></script>
 

@@ -28,9 +28,11 @@
         desenharErrosSite
     );
 
-    $("filtroPropostasUsuario").addEventListener("change", desenharPropostasAdmin);
+    // busca, selects, desconto e datas: todos avisam pelo "input"
+    IDS_FILTROS_PROPOSTAS.forEach(id => {
 
-    $("buscaPropostas").addEventListener("input", desenharPropostasAdmin);
+        $(id).addEventListener("input", desenharPropostasAdmin);
+    });
 
     desenharPerfis();
 

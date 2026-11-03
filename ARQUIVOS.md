@@ -4,7 +4,7 @@ Sem build e sem módulos: cada página carrega os scripts na ordem abaixo (vari�
 Toda página carrega antes o supabase-js 2.45.0 (CDN jsDelivr); ele não aparece nas listas abaixo.
 Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é sempre o último da página.
 
-**Pastas:** `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `supabase-config`, `registro-erros`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo.
+**Pastas:** `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `supabase-config`, `registro-erros`, `arquivo-faltando`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo.
 
 **Não mude `js/helpers.js` de lugar:** as abas abertas leem a versão publicada nesse endereço (`atualizacao-sistema.js`). Se ele mudar, elas param de se atualizar sozinhas.
 
@@ -17,7 +17,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - Primeira vez: `npm install`. Rodar tudo: `npm test` (cerca de 9 minutos). Só um assunto: `npm test -- leads`. Só os que não abrem o navegador (menos de 1 s): `npm test -- --rapidos`.
 - Antes de cada commit (`.githooks/pre-commit`, ligado pelo `npm install` via `testes/ligar-pre-commit.js`): atualiza este mapa, põe ele no mesmo commit e roda os testes rápidos; se um falhar, o commit não acontece. Sem Node no computador, só avisa e deixa commitar. Pular uma vez: `git commit --no-verify`.
 - `testes/teste-paginas.js`: abre todas as páginas com o `auth-guard.js` real (erros, arquivos faltando, funções dos botões, menu, login e acessos). Página nova entra na lista `PAGINAS`.
-- `testes/teste-erros.js`: registro de erros e a seção do Admin, com o supabase-js de verdade e o servidor simulado.
+- `testes/teste-erros.js`: registro de erros, recarga por arquivo que não carregou e a seção do Admin, com o supabase-js de verdade e o servidor simulado.
 - `testes/teste-mapa.js`: acusa este mapa desatualizado ou citando arquivo que não existe (`npm run mapa` resolve a primeira parte).
 - Os outros `testes/teste-*.js` cobrem uma área cada. `testes/capturas/` guarda as imagens geradas e não vai para o Git.
 - Os testes de SQL e do agente de leads não ficam aqui, porque este repositório é público.
@@ -27,39 +27,39 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **index.html** — Página inicial: conversor de texto e calculadora de boletos
 - CSS: style
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → status → index-ferramentas → menu
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → status → index-ferramentas → menu
 
 **propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes)
 - CSS: style → propostas
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → agenda
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
-- JS: [SheetJS 0.18.5/CDN] → supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
+- JS: [SheetJS 0.18.5/CDN] → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
 
 **tabelas.html** — Consulta e edição das tabelas de preços e fretes
 - CSS: style → tabelas
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
 **transportadoras.html** — Transportadoras: cadastro, veículos, motoristas e PDFs (ver: acesso "transportadoras"; editar: só admin)
 - CSS: style → transportadoras
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
 
 **WEG.html** — Contrato WEG (preços fixos)
 - CSS: style
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
 **admin.html** — Usuários e acessos, online agora, propostas Zap copiadas e erros do sistema (só admin). Usa a largura toda da tela.
 - CSS: style → admin
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-filtros → admin-propostas-linhas → admin-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-filtros → admin-propostas-linhas → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads-config → leads-contato → leads-utils → leads-dados → leads-filtros → leads-lista → leads-cards → leads-acoes → leads-busca-config → leads-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads-config → leads-contato → leads-utils → leads-dados → leads-filtros → leads-lista → leads-cards → leads-acoes → leads-busca-config → leads-init
 
 **login.html** — Login
 - CSS: style
@@ -161,6 +161,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - corDoDia, tituloDoDia, cidadeDoEndereco
 - `agenda-zap.js` (298 linhas): Texto de agendamento copiado para o grupo da transportadora. A referência digitada à mão sem o número da proposta ganha " - Proposta: N" no fim.
   - textoDataZap, ehLocalWR, modeloDaPlataforma, modelosDaPlataforma, textoPeriodoReferencia, referenciaZap, linhasLocalZap, montarTextoZap, copiarAgendamentoZap
+- `arquivo-faltando.js` (250 linhas): Em toda página menos o login, logo depois de registro-erros: se a página terminou de carregar com algum arquivo faltando (falha de rede; o supabase-js da CDN também conta), envia o registro e recarrega sozinha uma vez. Faltou de novo em 5 min, o site não respondeu ou não dá para guardar a marca no sessionStorage: mostra aviso com "Recarregar". Sem internet, recarrega quando a conexão voltar. Não depende do helpers.js.
+  - lerRecargaArquivo, gravarRecargaArquivo, listaArquivosFaltando, doProprioSite, esperarNoMaximo, renovarArquivosFaltando, enviarRegistroAntesDeRecarregar, recarregarPorArquivo, mostrarAvisoArquivoFaltando, recarregarSozinhaPorArquivo, conferirArquivosDaPagina
 - `atualizacao-sistema.js` (293 linhas): Em toda página menos o login: a cada 2 min e ao voltar para a aba compara VERSAO_SISTEMA com a do helpers.js publicado; se mudou, renova os arquivos no navegador e recarrega. Espera se houver janela aberta, trabalho não salvo ou uso no último minuto (mostra aviso com "Atualizar agora"). Carregar depois de helpers.js.
   - lerTentativaAtualizacao, gravarTentativaAtualizacao, lerVersaoPublicada, temTrabalhoAberto, paginaOcupada, esconderAvisoNovaVersao, mostrarAvisoNovaVersao, aplicarAtualizacao, tentarAtualizar, verificarVersaoSistema
 - `auth-guard.js` (377 linhas): Incluir em toda página que precisa de login (depois de supabase-config.js). Sem sessão ativa manda pra login.html antes da página aparecer; depois confere perfil (com cache), acesso à página e filial, e mostra os itens `.so-admin` para admin.
@@ -283,7 +285,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 ## CSS
 
-- `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta)
+- `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou)
 - `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `agenda.css`, `leads.css`: estilos de cada página
 - `transportadoras.css`: lista, modal, documentos e formulário de nova transportadora
 

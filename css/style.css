@@ -725,8 +725,10 @@ TOGGLE LOCAÇÃO COMPLEMENTAR
     background:#15803d;
 }
 
-/* ===== Versão nova do sistema (js/atualizacao-sistema.js) ===== */
-.aviso-nova-versao{
+/* ===== Versão nova do sistema (js/atualizacao-sistema.js) e arquivo que não
+   carregou (js/arquivo-faltando.js) ===== */
+.aviso-nova-versao,
+.aviso-arquivo-faltando{
     position:fixed;
     left:50%;
     bottom:16px;
@@ -747,7 +749,8 @@ TOGGLE LOCAÇÃO COMPLEMENTAR
     font-size:14px;
     box-shadow:0 8px 24px rgba(0,0,0,.45);
 }
-.aviso-nova-versao button{
+.aviso-nova-versao button,
+.aviso-arquivo-faltando button{
     width:auto;
     margin:0;
     padding:5px 12px;
@@ -755,6 +758,19 @@ TOGGLE LOCAÇÃO COMPLEMENTAR
     color:#1d4ed8;
     font-size:13px;
 }
-.aviso-nova-versao button:hover{
+.aviso-nova-versao button:hover,
+.aviso-arquivo-faltando button:hover{
     background:#dbeafe;
+}
+
+.aviso-arquivo-faltando{
+    top:16px;
+    bottom:auto;
+    background:#b45309;
+}
+.aviso-arquivo-faltando button{
+    color:#b45309;
+}
+.aviso-arquivo-faltando button:hover{
+    background:#fef3c7;
 }

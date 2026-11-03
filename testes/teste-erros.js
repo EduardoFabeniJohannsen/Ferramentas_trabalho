@@ -47,6 +47,7 @@ const confere = (nome, ok, extra) => {
     PAGINAS.forEach(arquivo => {
         const scripts = [...fs.readFileSync(path.join(raiz, arquivo), "utf8").matchAll(/<script[^>]+src="([^"]+)"/g)].map(a => a[1]);
         confere(`${arquivo}: registra erros logo depois de supabase-config`, scripts.indexOf("js/registro-erros.js") === scripts.indexOf("js/supabase-config.js") + 1 && scripts.includes("js/registro-erros.js"));
+        confere(`${arquivo}: confere arquivo faltando logo depois do registro`, scripts.indexOf("js/arquivo-faltando.js") === scripts.indexOf("js/registro-erros.js") + 1);
     });
     confere("login.html não registra (ainda não tem usuário)", !fs.readFileSync(path.join(raiz, "login.html"), "utf8").includes("registro-erros"));
 
@@ -62,6 +63,8 @@ const confere = (nome, ok, extra) => {
             linhas: opcoes.linhas || [],
             faltando: new Set(opcoes.faltando || []),
             semRede: new Set(opcoes.semRede || []),
+            // cai só no primeiro pedido (falha passageira)
+            falhaUmaVez: new Set(opcoes.falhaUmaVez || []),
             extras: opcoes.extras || {},
             respostaRpc: "ok",
             respostaErros: "ok"
@@ -74,6 +77,11 @@ const confere = (nome, ok, extra) => {
             const pedido = rota.request();
             const url = new URL(pedido.url());
             const json = (corpo, status = 200) => rota.fulfill({ status, contentType: "application/json", body: JSON.stringify(corpo) });
+
+            if(servidor.falhaUmaVez.delete(url.pathname)) return rota.abort();
+
+            // o site parou de responder depois de mandar a página
+            if(opcoes.paginaSemRede && pedido.resourceType() === "fetch" && url.pathname === `/${arquivo}`) return rota.abort();
 
             if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: umd });
             if(url.hostname.includes("cdnjs")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
@@ -121,6 +129,28 @@ const confere = (nome, ok, extra) => {
             window.WebSocket = class { constructor(){ this.readyState = 0; } close(){} send(){} };
         }, { sessao: SESSAO });
 
+        // o navegador acha que está sem internet até o teste dizer que voltou
+        if(opcoes.semInternet){
+            await contexto.addInitScript(() => {
+                window.__semInternet = true;
+                Object.defineProperty(Navigator.prototype, "onLine", { configurable: true, get: () => !window.__semInternet });
+            });
+        }
+
+        if(opcoes.semSessionStorage){
+            await contexto.addInitScript(() => {
+                Object.defineProperty(window, "sessionStorage", { configurable: true, get(){ throw new DOMException("bloqueado", "SecurityError"); } });
+            });
+        }
+
+        // quem já usou o site: sem o banco, o auth-guard.js usa esta cópia em vez de
+        // mandar para a página que todos podem ver
+        if(opcoes.perfilSalvo){
+            await contexto.addInitScript(() => {
+                localStorage.setItem("authPerfil", JSON.stringify({ id: "u1", perfil: { admin: true, acessos: [], filiais: [], ativo: true } }));
+            });
+        }
+
         const pagina = await contexto.newPage();
         const errosPagina = [];
         const consoleErros = [];
@@ -129,11 +159,14 @@ const confere = (nome, ok, extra) => {
         pagina.on("pageerror", e => errosPagina.push(e.message));
         pagina.on("console", m => { if(m.type() === "error") consoleErros.push(m.text()); });
         pagina.on("dialog", d => { dialogos.vistos.push(d.message()); return dialogos.aceitar ? d.accept() : d.dismiss(); });
+        let vezesCarregou = 0;
+        pagina.on("load", () => { vezesCarregou++; });
+        const cargas = () => vezesCarregou;
 
         await pagina.goto(`http://site.test/${arquivo}`);
         await pagina.waitForLoadState("networkidle");
 
-        return { contexto, pagina, servidor, errosPagina, consoleErros, dialogos };
+        return { contexto, pagina, servidor, errosPagina, consoleErros, dialogos, cargas };
     };
 
     const enviar = (pagina) => pagina.evaluate(() => enviarErrosPendentes());
@@ -150,18 +183,19 @@ const confere = (nome, ok, extra) => {
     // ---------- página funcionando não registra nada ----------
     for(const arquivo of PAGINAS){
 
-        const { contexto, pagina, servidor } = await abrir(arquivo);
+        const { contexto, pagina, servidor, cargas } = await abrir(arquivo);
 
         await enviar(pagina);
 
         confere(`${arquivo}: funcionando normal, não registra nada`, servidor.rpc.length === 0, servidor.rpc.length ? servidor.rpc.map(c => c.p_mensagem) : undefined);
+        confere(`${arquivo}: funcionando normal, não recarrega`, cargas() === 1, cargas());
 
         await contexto.close();
     }
 
     // ---------- o que é registrado ----------
     {
-        const { contexto, pagina, servidor, consoleErros } = await abrir("index.html", {
+        const { contexto, pagina, servidor, consoleErros, cargas } = await abrir("index.html", {
             extras: { "/js/erro-no-arquivo.js": "function quebrar(){ throw new Error('erro dentro do arquivo'); }\nquebrar();" }
         });
 
@@ -223,30 +257,117 @@ const confere = (nome, ok, extra) => {
         const arquivoFaltando = comTexto(servidor, "nao-existe")[0];
         confere("arquivo que não carrega é registrado", arquivoFaltando?.p_tipo === "arquivo", arquivoFaltando);
         confere("sem os parâmetros do endereço", arquivoFaltando?.p_mensagem === "Arquivo não carregou: /js/nao-existe.js", arquivoFaltando?.p_mensagem);
+        confere("arquivo que falha com a página já aberta não recarrega", cargas() === 1 && (await pagina.locator("#avisoArquivoFaltando").count()) === 0, cargas());
 
         await contexto.close();
     }
 
     // ---------- arquivo faltando desde a abertura ----------
+    // a página recarrega sozinha uma vez e, faltando de novo, mostra o aviso: cada
+    // abertura registra o seu (a anotação "[arquivos] ..." também cita o arquivo)
+    const soArquivo = (servidor, texto) => comTexto(servidor, texto).filter(chamada => chamada.p_tipo === "arquivo");
+
+    // recarregar troca a página no meio: espera do lado de cá, sem tempo fixo
+    const esperarCargas = async (aberta, quantas) => {
+        const limite = Date.now() + 15000;
+        while(aberta.cargas() < quantas && Date.now() < limite) await new Promise(pronto => setTimeout(pronto, 50));
+        await aberta.pagina.waitForLoadState("networkidle");
+    };
+
+    const avisoArquivo = (pagina) => pagina.locator("#avisoArquivoFaltando");
+
+    const menuMontado = async (pagina) => (await pagina.locator(".topbar a[href]").count()) > 0;
+
     {
         const { contexto, pagina, servidor } = await abrir("index.html", { faltando: ["/css/style.css", "/js/menu.js"] });
+        await avisoArquivo(pagina).waitFor();
         await enviar(pagina);
-        const cssFaltando = comTexto(servidor, "/css/style.css");
-        confere("CSS faltando é registrado, uma vez só", cssFaltando.length === 1 && cssFaltando[0].p_tipo === "arquivo" && cssFaltando[0].p_vezes === 1, cssFaltando);
-        confere("script faltando é registrado", comTexto(servidor, "/js/menu.js")[0]?.p_tipo === "arquivo", servidor.rpc.map(c => c.p_mensagem));
+        const cssFaltando = soArquivo(servidor, "/css/style.css");
+        confere("CSS faltando é registrado, uma vez por abertura", cssFaltando.length === 2 && cssFaltando.every(chamada => chamada.p_vezes === 1), cssFaltando);
+        confere("script faltando é registrado", soArquivo(servidor, "/js/menu.js").length === 2, servidor.rpc.map(c => c.p_mensagem));
         await contexto.close();
 
         const cssSemRede = await abrir("index.html", { semRede: ["/css/style.css"] });
+        await avisoArquivo(cssSemRede.pagina).waitFor();
         await enviar(cssSemRede.pagina);
-        const semRede = comTexto(cssSemRede.servidor, "/css/style.css");
-        confere("CSS que caiu no meio é registrado, uma vez só", semRede.length === 1 && semRede[0].p_vezes === 1, semRede);
+        const semRede = soArquivo(cssSemRede.servidor, "/css/style.css");
+        confere("CSS que caiu no meio é registrado, uma vez por abertura", semRede.length === 2 && semRede.every(chamada => chamada.p_vezes === 1), semRede);
         await cssSemRede.contexto.close();
 
         const semHelpers = await abrir("index.html", { faltando: ["/js/helpers.js"] });
+        await avisoArquivo(semHelpers.pagina).waitFor();
         await enviar(semHelpers.pagina);
-        const chamada = comTexto(semHelpers.servidor, "/js/helpers.js")[0];
+        const chamada = soArquivo(semHelpers.servidor, "/js/helpers.js")[0];
         confere("helpers.js faltando também é registrado, sem versão", chamada?.p_tipo === "arquivo" && chamada?.p_versao === "?", chamada);
+        confere("sem o helpers.js a página também se recupera", semHelpers.cargas() === 2, semHelpers.cargas());
         await semHelpers.contexto.close();
+    }
+
+    // ---------- arquivo que não carregou: a página se recupera ----------
+    {
+        const aberta = await abrir("index.html", { falhaUmaVez: ["/js/menu.js"] });
+        await esperarCargas(aberta, 2);
+        const { contexto, pagina, servidor } = aberta;
+        confere("falha passageira: recarrega sozinha uma vez", aberta.cargas() === 2, aberta.cargas());
+        confere("depois de recarregar, fica inteira e sem aviso", (await menuMontado(pagina)) && (await avisoArquivo(pagina).count()) === 0);
+        confere("registra o arquivo e a recarga antes de recarregar", soArquivo(servidor, "/js/menu.js").length === 1 && comTexto(servidor, "recarregou sozinha: /js/menu.js").length === 1, servidor.rpc.map(c => c.p_mensagem));
+        confere("abriu inteira: apaga a marca da recarga", (await pagina.evaluate(() => sessionStorage.getItem("sistemaRecargaArquivoFaltando"))) === null);
+        await contexto.close();
+    }
+
+    {
+        const aberta = await abrir("index.html", { faltando: ["/js/menu.js"] });
+        const { contexto, pagina, servidor } = aberta;
+        await avisoArquivo(pagina).waitFor();
+        await pagina.waitForTimeout(500);
+        confere("faltou de novo: recarrega uma vez só e mostra o aviso", aberta.cargas() === 2, aberta.cargas());
+        const texto = await avisoArquivo(pagina).innerText();
+        confere("o aviso pede para conferir a internet e tem Recarregar", texto.includes("Confira a internet") && texto.includes("Recarregar"), texto);
+        await enviar(pagina);
+        confere("registra que faltou de novo", comTexto(servidor, "de novo depois de recarregar sozinha: /js/menu.js").length === 1, servidor.rpc.map(c => c.p_mensagem));
+        await pagina.screenshot({ path: path.join(saida, "94-arquivo-faltando.png") });
+
+        servidor.faltando.clear();
+        await avisoArquivo(pagina).locator("button").click();
+        await esperarCargas(aberta, 3);
+        confere("Recarregar: com o arquivo de volta, fica inteira e sem aviso", aberta.cargas() === 3 && (await menuMontado(pagina)) && (await avisoArquivo(pagina).count()) === 0, aberta.cargas());
+        await contexto.close();
+    }
+
+    {
+        const aberta = await abrir("index.html", { faltando: ["/js/menu.js"], paginaSemRede: true });
+        await avisoArquivo(aberta.pagina).waitFor();
+        await aberta.pagina.waitForTimeout(500);
+        confere("o site não respondeu: não recarrega (cairia na tela de erro do navegador) e avisa", aberta.cargas() === 1, aberta.cargas());
+        await aberta.contexto.close();
+    }
+
+    {
+        const aberta = await abrir("index.html", { faltando: ["/js/menu.js"], semSessionStorage: true });
+        await avisoArquivo(aberta.pagina).waitFor();
+        await aberta.pagina.waitForTimeout(500);
+        confere("sem onde guardar a marca: não recarrega sozinha (poderia não parar) e avisa", aberta.cargas() === 1, aberta.cargas());
+        await aberta.contexto.close();
+    }
+
+    {
+        const aberta = await abrir("index.html", { semRede: ["/js/menu.js"], semInternet: true });
+        const { contexto, pagina, servidor } = aberta;
+        await avisoArquivo(pagina).waitFor();
+        const texto = await avisoArquivo(pagina).innerText();
+        confere("sem internet: avisa e espera a conexão voltar", aberta.cargas() === 1 && texto.includes("quando a conexão voltar"), texto);
+        servidor.semRede.clear();
+        await pagina.evaluate(() => { window.__semInternet = false; window.dispatchEvent(new Event("online")); });
+        await esperarCargas(aberta, 2);
+        confere("a internet voltou: recarrega sozinha e fica inteira", aberta.cargas() === 2 && (await menuMontado(pagina)) && (await avisoArquivo(pagina).count()) === 0, aberta.cargas());
+        await contexto.close();
+    }
+
+    {
+        const aberta = await abrir("index.html", { falhaUmaVez: ["/npm/@supabase/supabase-js@2.45.0"], perfilSalvo: true });
+        await esperarCargas(aberta, 2);
+        confere("supabase-js (vem de outro site) que não carregou também recarrega", aberta.cargas() === 2 && (await aberta.pagina.evaluate(() => typeof supabaseClient)) === "object", aberta.cargas());
+        await aberta.contexto.close();
     }
 
     // ---------- o que fica de fora ----------

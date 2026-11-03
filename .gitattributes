@@ -1,0 +1,2 @@
+# o pre-commit roda no sh: com CRLF ele quebra
+.githooks/* text eol=lf

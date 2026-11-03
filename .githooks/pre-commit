@@ -1,0 +1,21 @@
+#!/bin/sh
+# Antes de cada commit: atualiza o ARQUIVOS.md (o mesmo que `npm run mapa`), põe
+# ele no commit e roda os testes rápidos (os que não abrem o navegador, menos de
+# 1 s). Os testes completos continuam rodando no GitHub a cada envio.
+# Ligado pelo `npm install` (script "prepare" do package.json).
+# Pular uma vez: git commit --no-verify
+
+if ! command -v node >/dev/null 2>&1; then
+    echo "pre-commit: Node não encontrado; o mapa e os testes rápidos não rodaram."
+    exit 0
+fi
+
+node testes/gerar-mapa.js >/dev/null || exit 1
+
+git add ARQUIVOS.md || exit 1
+
+if ! node testes/rodar.js --rapidos; then
+    echo ""
+    echo "pre-commit: commit cancelado, algum teste rápido falhou (veja acima)."
+    exit 1
+fi

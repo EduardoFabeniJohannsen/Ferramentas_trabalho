@@ -14,7 +14,8 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 O site continua sem build: `package.json` e `node_modules` servem só para os testes (precisa do Node 20 ou mais novo e do Chrome instalados). O banco é sempre simulado; nenhum teste acessa o Supabase de verdade.
 
-- Primeira vez: `npm install`. Rodar tudo: `npm test` (cerca de 9 minutos). Só um assunto: `npm test -- leads`.
+- Primeira vez: `npm install`. Rodar tudo: `npm test` (cerca de 9 minutos). Só um assunto: `npm test -- leads`. Só os que não abrem o navegador (menos de 1 s): `npm test -- --rapidos`.
+- Antes de cada commit (`.githooks/pre-commit`, ligado pelo `npm install` via `testes/ligar-pre-commit.js`): atualiza este mapa, põe ele no mesmo commit e roda os testes rápidos; se um falhar, o commit não acontece. Sem Node no computador, só avisa e deixa commitar. Pular uma vez: `git commit --no-verify`.
 - `testes/teste-paginas.js`: abre todas as páginas com o `auth-guard.js` real (erros, arquivos faltando, funções dos botões, menu, login e acessos). Página nova entra na lista `PAGINAS`.
 - `testes/teste-erros.js`: registro de erros e a seção do Admin, com o supabase-js de verdade e o servidor simulado.
 - `testes/teste-mapa.js`: acusa este mapa desatualizado ou citando arquivo que não existe (`npm run mapa` resolve a primeira parte).

@@ -1,17 +1,23 @@
 // Roda todos os testes, um de cada vez, e mostra só o resumo e o que falhou.
 //   npm test              todos
 //   npm test -- leads     só os que têm "leads" no nome
+//   npm test -- --rapidos só os que não abrem o navegador (o pre-commit usa)
 const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
 const LIMITE_MS = 5 * 60 * 1000;
 
-const filtro = process.argv[2] || "";
+const rapidos = process.argv.includes("--rapidos");
+
+const filtro = process.argv.slice(2).find(arg => !arg.startsWith("--")) || "";
+
+const abreNavegador = (nome) => fs.readFileSync(path.join(__dirname, nome), "utf8").includes("chromium");
 
 const testes =
     fs.readdirSync(__dirname)
         .filter(nome => /^teste-.*\.js$/.test(nome) && nome.includes(filtro))
+        .filter(nome => !rapidos || !abreNavegador(nome))
         .sort();
 
 // no GitHub, a falha aparece na página da rodada, sem precisar abrir o registro

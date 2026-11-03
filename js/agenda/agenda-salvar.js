@@ -175,17 +175,42 @@ async function salvarAgendamento(){
     // salvou: o rascunho não serve mais
     removerRascunho(id ? `edit:${id}` : "novo");
 
-    // a data e o status do agendamento salvo precisam aparecer
-    // (se estavam desmarcados, voltam)
-    datasOcultas.delete(dados.data || "");
-
-    statusOcultos.delete(dados.status);
-
+    // os filtros ficam como o usuário deixou (status e datas desmarcados
+    // continuam desmarcados); se o salvo ficou escondido, o aviso diz por quê
     encerrarModalAgenda();
 
     renderizarAgenda();
 
-    mostrarToast("Agendamento salvo");
+    mostrarToast("Agendamento salvo" + avisoSalvoEscondido(salvo));
+}
+
+
+// salvou e o agendamento não aparece com os filtros atuais: diz o motivo,
+// pra ninguém achar que ele sumiu ("" = aparece)
+function avisoSalvoEscondido(item){
+
+    const aparece = (lista) => lista.some(ag => ag.id === item.id);
+
+    if(aparece(filtrarAgendamentos())) return "";
+
+    if(aparece(filtrarAgendamentos(false, false, true))){
+
+        return ` (escondido: status "${item.status}" desmarcado no filtro)`;
+    }
+
+    if(aparece(filtrarAgendamentos(false, true, false))){
+
+        return " (escondido: a data dele está desmarcada no filtro)";
+    }
+
+    if(!buscandoAgenda() && !visivelNoModo(item)){
+
+        return modoVisualizacao === "expedicao"
+            ? " (não aparece no modo Expedição)"
+            : " (sem data: não aparece no modo Transportador)";
+    }
+
+    return " (não aparece com os filtros atuais)";
 }
 
 

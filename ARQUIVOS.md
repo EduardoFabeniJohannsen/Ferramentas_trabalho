@@ -144,8 +144,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - chaveRascunho, lerRascunhos, gravarRascunhos, removerRascunho, salvarRascunho, agendarRascunho, atualizarBotoesModal
 - `agenda-render.js` (223 linhas): Chips de transportadora, select de ordem, controles do modo e renderizarAgenda().
   - desenharChips, atualizarSelectOrdem, definirOrdem, atualizarControlesModo, renderizarAgenda
-- `agenda-salvar.js` (233 linhas): salvarAgendamento() e excluirAgendamento() (manda para a lixeira; o PDF do pedido fica até apagar de vez).
-  - salvarAgendamento, excluirAgendamento
+- `agenda-salvar.js` (258 linhas): salvarAgendamento() (os filtros de status e datas ficam como estavam; se o salvo ficou escondido, o aviso diz por quê) e excluirAgendamento() (manda para a lixeira; o PDF do pedido fica até apagar de vez).
+  - salvarAgendamento, avisoSalvoEscondido, excluirAgendamento
 - `agenda-tema.js` (27 linhas): aplicarTema() e alternarTema() (fundo claro opcional; escuro é o padrão).
   - aplicarTema, alternarTema
 - `agenda-tempo-real.js` (151 linhas): Quem grava avisa os outros navegadores pelo canal de avisos do Supabase (sem dados, sem SQL) e cada um recarrega a lista. Espera a pessoa terminar se tiver formulário ou janela aberta, coluna sendo arrastada ou status sendo trocado; aba escondida recarrega ao voltar; a cada 5 min recarrega por segurança. Carregar antes de agenda-init.js.
@@ -178,7 +178,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (127 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
-- `helpers.js` (356 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
+- `helpers.js` (357 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
   - $, criar, semAcento, canalAgenda, avisarAgendaMudou, formatarData, dataBR, dataHoraBR, dataISO, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast, lerLocal, lerLocalJSON, gravarLocal, gravarLocalJSON, removerLocal
 - `index-ferramentas.js` (259 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados).
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
@@ -338,7 +338,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (459), `transp-render.js` (381), `auth-guard.js` (377), `estoque-parser.js` (385), `helpers.js` (356), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (459), `transp-render.js` (381), `auth-guard.js` (377), `estoque-parser.js` (385), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

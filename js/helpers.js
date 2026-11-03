@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.33.0";
+const VERSAO_SISTEMA = "16.33.1";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -260,7 +260,8 @@ const copiar = async (texto, mensagem) => {
 let toastTimer;
 
 
-// erro = true deixa o toast vermelho e um pouco mais na tela
+// erro = true deixa o toast vermelho e um pouco mais na tela; texto longo
+// também fica mais, pra dar tempo de ler
 const mostrarToast = (msg, erro = false) => {
 
     const toast = $("toast");
@@ -279,7 +280,7 @@ const mostrarToast = (msg, erro = false) => {
 
         toast.classList.remove("show");
 
-    }, erro ? Math.max(4000, msg.length * 70) : 2000);
+    }, erro ? Math.max(4000, msg.length * 70) : Math.max(2000, msg.length * 50));
 };
 
 

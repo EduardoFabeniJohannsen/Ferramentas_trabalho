@@ -256,6 +256,21 @@ const confere = (nome, ok, extra) => {
     confere("filtros continuam ativos", await bia.evaluate(() => filtroTransportadora === "__sem__" && statusOcultos.has("Cancelado")));
     await bia.evaluate(() => { filtroTransportadora = ""; statusOcultos.clear(); renderizarAgenda(); });
 
+    // ---------- salvar não mexe nos filtros de quem salvou ----------
+    const statusAntes = await ana.evaluate(() => agendamentos.find(a => a.id === 1).status);
+    await ana.evaluate(() => { encerrarModalAgenda(); statusOcultos.add("Concluído"); renderizarAgenda(); abrirModalAgenda(1); });
+    await ana.selectOption("#agStatus", "Concluído");
+    await ana.evaluate(() => salvarAgendamento());
+    confere("salvar como Concluído não volta a mostrar os concluídos", await ana.evaluate(() => statusOcultos.has("Concluído")));
+    confere("o salvo escondido sai da lista", !(await clientes(ana)).includes("Cliente Filtro"));
+    const avisoEscondido = await ana.innerText("#toast");
+    confere("o aviso diz por que ele não aparece", avisoEscondido.includes('status "Concluído" desmarcado'), avisoEscondido);
+    await ana.evaluate(() => abrirModalAgenda(1));
+    await ana.selectOption("#agStatus", statusAntes);
+    await ana.evaluate(() => salvarAgendamento());
+    await ana.evaluate(() => { statusOcultos.clear(); renderizarAgenda(); });
+    await bia.waitForFunction((s) => agendamentos.find(a => a.id === 1).status === s, statusAntes, { timeout: 4000 }).catch(() => {});
+
     // ---------- vários avisos seguidos ----------
     await bia.waitForTimeout(1200);
     const cargasRajada = await cargas(bia);

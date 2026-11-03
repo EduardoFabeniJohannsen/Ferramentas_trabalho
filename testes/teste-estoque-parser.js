@@ -71,6 +71,22 @@ const confere = (nome, ok, extra) => {
     ]);
     confere("linha quebrada ainda funciona", quebrada.status.disponivel.WAE18[0].e === "ARTICULADA 18M", quebrada.status.disponivel);
 
+    const repetidos = resumir([
+        ["Patrimônio", "Status"],
+        ["WAE18R001", "Disponível"],
+        ["WTE14046", "Disponível"],
+        ["WAE18R001", "Disponível"],
+        ["WTE14046", "Disponível"],
+        ["WTE14046", "Disponível"]
+    ]);
+    const avisoRepetidos = repetidos.avisos.find(t => t.includes("repetido")) || "";
+    confere("repetidos contados uma vez", repetidos.totais.disponivel === 2, repetidos.totais);
+    confere("aviso diz quais e em que linhas", avisoRepetidos.includes("2 patrimônio(s)") && avisoRepetidos.includes("WAE18R001 (linhas 2 e 4)") && avisoRepetidos.includes("WTE14046 (linhas 3, 5 e 6)"), avisoRepetidos);
+
+    ctx.__l = [["Patrimônio", "Status"], ["WAE18R001", "Disponível"], ["WAE18R001", "Disponível"]];
+    const deslocado = vm.runInContext("resumirEstoque(__l, 'x.xlsx', 4)", ctx);
+    confere("planilha que começa mais abaixo aponta a linha do Excel", deslocado.avisos.some(t => t.includes("WAE18R001 (linhas 5 e 6)")), deslocado.avisos);
+
     console.log(falhas ? `${falhas} falha(s)` : "todos ok");
 process.exitCode = falhas ? 1 : 0;
 

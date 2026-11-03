@@ -130,6 +130,16 @@ function criarCelulaMensagemErro(erro){
         criar("span", `tag-erro tag-erro-${erro.tipo}`, ROTULOS_TIPO_ERRO[erro.tipo] || erro.tipo)
     );
 
+    const botaoCopiar = criar("button", "btn-copiar-erro", "📋 Copiar");
+
+    botaoCopiar.type = "button";
+
+    botaoCopiar.title = "Copiar o erro com os detalhes, para colar numa conversa";
+
+    botaoCopiar.addEventListener("click", () => copiarErroSite(erro));
+
+    celula.appendChild(botaoCopiar);
+
     celula.appendChild(criar("div", "erro-mensagem", erro.mensagem));
 
     if(erro.detalhe){
@@ -218,6 +228,8 @@ function desenharErrosSite(){
             : "";
 
     $("btnLimparErros").disabled = !visiveis.length;
+
+    $("btnCopiarErros").disabled = !visiveis.length;
 }
 
 

@@ -227,9 +227,34 @@ function nomeArquivoAtual(){ return location.pathname.split("/").pop() || "index
     confere("sem login não informa nada", rastreados.length === antes);
 
     // ---------- o que trafega ----------
-    const chaves = [...new Set(rastreados.flatMap(p => Object.keys(p)))].sort().join();
-    confere("só vai página, estado e horário", chaves === "desde,estado,pagina", chaves);
+    const permitidas = ["aparelho", "cidade", "desde", "estado", "navegador", "pagina", "tipo"];
+    const chaves = [...new Set(rastreados.flatMap(p => Object.keys(p)))].sort();
+    confere("só vai página, estado, horário, aparelho e cidade", chaves.every(c => permitidas.includes(c)) && chaves.includes("tipo"), chaves);
     confere("nenhum e-mail no canal", !JSON.stringify(rastreados).includes("@"));
+
+    // ---------- aparelho ----------
+    l = await linhaDe("admin@exemplo.com");
+    confere("mostra o aparelho", l.texto.includes("💻 Computador") && l.texto.includes("Chrome"), l);
+    const aparelhos = await admin.evaluate(() => ({
+        iphone: descreverAparelho("Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1", "", 5),
+        ipad: descreverAparelho("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15", "", 5),
+        samsung: descreverAparelho("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36", "SM-S918B", 5),
+        samsungInternet: descreverAparelho("Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/25.0 Chrome/121.0.0.0 Mobile Safari/537.36", "", 5),
+        xiaomi: descreverAparelho("Mozilla/5.0 (Linux; Android 13; 23021RAAEG Build/TKQ1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36", "", 5),
+        redmi: descreverAparelho("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36", "Redmi Note 12", 5),
+        semModelo: descreverAparelho("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36", "", 5),
+        windows: descreverAparelho("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0", "", 0),
+        texto: textoAparelhoOnline({ tipo: "celular", aparelho: "iPhone", navegador: "Safari", cidade: "Itajaí/Santa Catarina" })
+    }));
+    confere("iPhone", aparelhos.iphone.tipo === "celular" && aparelhos.iphone.aparelho === "iPhone" && aparelhos.iphone.navegador === "Safari", aparelhos.iphone);
+    confere("iPad que se apresenta como Mac", aparelhos.ipad.tipo === "tablet" && aparelhos.ipad.aparelho === "iPad", aparelhos.ipad);
+    confere("Samsung pelo modelo do Chrome", aparelhos.samsung.aparelho === "Samsung SM-S918B" && aparelhos.samsung.navegador === "Chrome", aparelhos.samsung);
+    confere("Samsung Internet", aparelhos.samsungInternet.aparelho === "Samsung SM-A546E" && aparelhos.samsungInternet.navegador === "Samsung Internet", aparelhos.samsungInternet);
+    confere("Xiaomi pelo número do modelo", aparelhos.xiaomi.aparelho === "Xiaomi 23021RAAEG", aparelhos.xiaomi);
+    confere("Redmi vira Xiaomi", aparelhos.redmi.aparelho === "Xiaomi Redmi Note 12", aparelhos.redmi);
+    confere("Android sem modelo", aparelhos.semModelo.aparelho === "Android" && aparelhos.semModelo.tipo === "celular", aparelhos.semModelo);
+    confere("Windows com Edge", aparelhos.windows.tipo === "computador" && aparelhos.windows.aparelho === "Windows" && aparelhos.windows.navegador === "Edge", aparelhos.windows);
+    confere("texto do painel", aparelhos.texto === "📱 Celular: iPhone (Safari) · Itajaí/Santa Catarina", aparelhos.texto);
 
     // ---------- desconhecido ----------
     const ctxNovo = await contextoDe("fantasma");

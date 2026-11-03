@@ -54,7 +54,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **admin.html** — Usuários e acessos, online agora e erros do sistema (só admin)
 - CSS: style → admin
-- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-init
+- JS: supabase-config → registro-erros → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
@@ -69,11 +69,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `admin-config.js` (47 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
 - `admin-dados.js` (105 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
   - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
-- `admin-erros.js` (281 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista e botão que grava um erro de teste. Nada entra como HTML.
+- `admin-erros.js` (293 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista, botão que grava um erro de teste e 📋 Copiar em cada erro (admin-erros-copiar.js). Nada entra como HTML.
   - mensagemFalhaErros, carregarErrosSite, errosVisiveis, desenharFiltroErros, criarCelulaMensagemErro, criarLinhaErro, criarLinhaAvisoErros, desenharErrosSite, limparErrosSite, testarRegistroErros
+- `admin-erros-copiar.js` (43 linhas): Botões 📋 da seção "Erros do sistema": copia um erro (ou todos os da lista) com página, versão, usuário, horários, mensagem e detalhes, pronto para colar numa conversa. Carregar depois de admin-erros.js.
+  - textoErroParaCopiar, copiarErroSite, copiarErrosVisiveis
 - `admin-init.js` (40 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
-- `admin-online.js` (118 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano. Sem histórico.
-  - nomePaginaOnline, tempoOnline, textoAbaOnline, pessoasOnline, desenharUsuariosOnline
+- `admin-online.js` (154 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada. Sem histórico.
+  - nomePaginaOnline, tempoOnline, textoAbaOnline, textoAparelhoOnline, pessoasOnline, desenharUsuariosOnline
 - `admin-tela.js` (254 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (338 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras).
@@ -166,11 +168,11 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `estoque-grupos.js` (94 linhas): Agrupa modelos por tipo (letras do patrimônio) para cada status.
   - tipoDoModelo, alturaDoModelo, ordenarModelos, montarGrupos
 - `estoque-init.js` (78 linhas): Ligações iniciais (restaura a filial salva). Sempre o ÚLTIMO script da página.
-- `estoque-parser.js` (365 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda.
-  - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, formatarAnoFabricacao, resumirEstoque
-- `estoque-render.js` (223 linhas): HTML dos cards de status e avisos.
+- `estoque-parser.js` (385 linhas): Relatório bruto -> resumo (resumirEstoque). Guarda também marca, modelo de fábrica e equipamento, usados pela lupa da agenda. O aviso de patrimônio repetido diz quais são e em que linhas do Excel.
+  - normalizarTexto, modeloDoPatrimonio, formatarPrevisao, formatarAnoFabricacao, textoLinhasExcel, resumirEstoque
+- `estoque-render.js` (224 linhas): HTML dos cards de status e avisos (um aviso por linha).
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
-- `estoque-upload.js` (123 linhas): Ler o Excel, prévia e publicar.
+- `estoque-upload.js` (127 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
 - `helpers.js` (356 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
   - $, criar, semAcento, canalAgenda, avisarAgendaMudou, formatarData, dataBR, dataHoraBR, dataISO, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast, lerLocal, lerLocalJSON, gravarLocal, gravarLocalJSON, removerLocal
@@ -195,8 +197,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `leads-utils.js` (53 linhas): Rótulos de status e porte, nome a partir do e-mail e mensagem de erro.
   - rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads
 - `menu.js` (121 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
-- `presenca.js` (121 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai só o id, a página e o estado; não grava nada no banco. Carregar depois de helpers.js e auth-guard.js.
-  - calcularEstadoPresenca, enviarPresenca, iniciarPresenca
+- `presenca.js` (299 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai o id, a página, o estado, o aparelho (pelo navegador; no Android o modelo vem do Chrome) e a cidade aproximada pelo IP (get.geojs.io, guardada 6 h no navegador); não grava nada no banco. Carregar depois de helpers.js e auth-guard.js.
+  - calcularEstadoPresenca, enviarPresenca, navegadorDoTexto, aparelhoAndroid, descreverAparelho, modeloDoAndroid, cidadeDoIP, reenviarComAparelho, identificarAparelho, iniciarPresenca
 - `proposta-zap.js` (438 linhas): copiarPropostaZap(): mensagem completa para WhatsApp.
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
@@ -230,7 +232,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - limparTextoErro, anotarErro, anotarArquivoFaltando, cssCarregou, paginaDoErro, versaoDoErro, enviarLoteErros, enviarErrosPendentes, textoDoConsole, pilhaDoConsole
 - `status.js` (126 linhas): obterCidadeSaida() e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
   - obterCidadeSaida, gerarStatus
-- `supabase-config.js` (18 linhas): Cria o supabaseClient. Precisa vir DEPOIS do <script> do supabase-js (CDN) e ANTES de todos os outros scripts.
+- `supabase-config.js` (49 linhas): Cria o supabaseClient. Quando o banco recusa o login recém-renovado ("JWT issued at future", PGRST303), espera e repete a consulta (até 2 vezes). Precisa vir DEPOIS do <script> do supabase-js (CDN) e ANTES de todos os outros scripts.
+  - fetchSupabase
 - `tabelas-config.js` (109 linhas): Definição das tabelas editáveis (TABELAS: colunas, matriz de consulta e permissão de cada uma) e estado.
 - `tabelas-dados.js` (115 linhas): tratarValor() e carregarLinhasTabela().
   - tratarValor, carregarLinhasTabela
@@ -319,6 +322,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `leadsVendedor:<usuário>` | `leads-config.js` |
 | `authPerfil` | `auth-guard.js` |
 | `estoqueFilial` | `estoque-config.js` |
+| `presencaCidade` | `presenca.js` |
 | `propostaCache` | `propostas-cache.js` |
 | `cacheTabelaPrecos` | `propostas-tabelas-precos.js` |
 | `cacheTabelaFretes` | `propostas-tabelas-precos.js` |
@@ -327,7 +331,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (438), `transp-render.js` (381), `auth-guard.js` (377), `estoque-parser.js` (365), `helpers.js` (356), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `proposta-zap.js` (438), `transp-render.js` (381), `auth-guard.js` (377), `estoque-parser.js` (385), `helpers.js` (356), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `propostas-config.js` (331), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

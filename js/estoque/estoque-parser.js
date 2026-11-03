@@ -124,8 +124,18 @@ function formatarAnoFabricacao(valor){
 }
 
 
-// linhas = matriz da planilha (array de arrays)
-function resumirEstoque(linhas, nomeArquivo){
+// "12", "12 e 87", "12, 40 e 87"
+function textoLinhasExcel(numeros){
+
+    if(numeros.length < 2) return String(numeros[0] ?? "");
+
+    return `${numeros.slice(0, -1).join(", ")} e ${numeros[numeros.length - 1]}`;
+}
+
+
+// linhas = matriz da planilha (array de arrays). primeiraLinha = número
+// da linha do Excel de linhas[0] (para os avisos apontarem a linha certa)
+function resumirEstoque(linhas, nomeArquivo, primeiraLinha = 1){
 
     const indiceCabecalho =
         linhas.findIndex(linha =>
@@ -199,11 +209,10 @@ function resumirEstoque(linhas, nomeArquivo){
         resultado.totais[item.chave] = 0;
     });
 
-    const vistos = new Set();
+    // patrimônio -> linhas do Excel em que apareceu (repetido = mais de uma)
+    const vistos = new Map();
 
     const desconhecidos = new Set();
-
-    let duplicados = 0;
 
     for(let i = indiceCabecalho + 1; i < linhas.length; i++){
 
@@ -275,14 +284,16 @@ function resumirEstoque(linhas, nomeArquivo){
             continue;
         }
 
+        const linhaExcel = primeiraLinha + i;
+
         if(vistos.has(patrimonio)){
 
-            duplicados++;
+            vistos.get(patrimonio).push(linhaExcel);
 
             continue;
         }
 
-        vistos.add(patrimonio);
+        vistos.set(patrimonio, [linhaExcel]);
 
         const modelo =
             modeloDoPatrimonio(patrimonio, equipamento);
@@ -327,10 +338,19 @@ function resumirEstoque(linhas, nomeArquivo){
         );
     }
 
-    if(duplicados){
+    // quais são e em que linhas, para corrigir no relatório
+    const repetidos =
+        [...vistos].filter(([, numeros]) => numeros.length > 1);
+
+    if(repetidos.length){
+
+        const lista =
+            repetidos
+                .map(([patrimonio, numeros]) => `${patrimonio} (linhas ${textoLinhasExcel(numeros)})`)
+                .join(", ");
 
         resultado.avisos.push(
-            `${duplicados} patrimônio(s) repetido(s) no arquivo (contados uma vez)`
+            `${repetidos.length} patrimônio(s) repetido(s) no arquivo (contados uma vez): ${lista}`
         );
     }
 

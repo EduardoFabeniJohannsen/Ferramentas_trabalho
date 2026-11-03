@@ -33,8 +33,12 @@ async function lerArquivo(evento){
                 { header: 1, raw: true, defval: "" }
             );
 
+        // a primeira linha lida nem sempre é a 1 do Excel
+        const primeiraLinha =
+            XLSX.utils.decode_range(aba["!ref"] || "A1").s.r + 1;
+
         previaAtual =
-            resumirEstoque(linhas, arquivo.name);
+            resumirEstoque(linhas, arquivo.name, primeiraLinha);
 
     }catch(erro){
 

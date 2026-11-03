@@ -178,7 +178,8 @@ function mostrarAvisosEstoque(avisos){
 
     if(avisos && avisos.length){
 
-        campo.innerText = "⚠️ " + avisos.join(" | ");
+        // um aviso por linha (a lista de repetidos pode ser longa)
+        campo.innerText = avisos.map(aviso => "⚠️ " + aviso).join("\n");
 
         campo.classList.remove("oculto");
 

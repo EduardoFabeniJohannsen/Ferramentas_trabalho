@@ -28,9 +28,15 @@
         desenharErrosSite
     );
 
+    $("filtroPropostasUsuario").addEventListener("change", desenharPropostasAdmin);
+
+    $("buscaPropostas").addEventListener("input", desenharPropostasAdmin);
+
     desenharPerfis();
 
     carregarErrosSite();
+
+    carregarPropostasAdmin();
 
     // o tempo de "parado há 12 min" continua contando sem ninguém avisar
     setInterval(desenharUsuariosOnline, 30000);

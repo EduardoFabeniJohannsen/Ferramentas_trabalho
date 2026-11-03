@@ -112,6 +112,62 @@ CONTAINER
 
         </div>
 
+        <!-- cada "Copiar Proposta Zap" (admin-propostas.js) -->
+        <div class="secao-erros">
+
+            <h2>Propostas Zap copiadas</h2>
+
+            <p class="dica-admin">
+                Cada vez que alguém copia a Proposta Zap, fica registrado aqui: quem fez,
+                aparelho, cidade aproximada (pelo IP), cliente, equipamentos com o desconto,
+                total, configurações ativadas e a mensagem. Últimos 90 dias.
+            </p>
+
+            <div class="barra-admin">
+
+                <select id="filtroPropostasUsuario" title="Usuário"></select>
+
+                <input
+                    type="search"
+                    id="buscaPropostas"
+                    placeholder="Buscar cliente, cidade ou modelo"
+                    autocomplete="off"
+                >
+
+                <button type="button" onclick="carregarPropostasAdmin()">
+                    ↻ Atualizar
+                </button>
+
+                <span class="contagem" id="contagemPropostas"></span>
+
+            </div>
+
+            <div class="area-admin">
+
+                <table class="tabela-admin tabela-erros tabela-propostas">
+
+                    <thead>
+
+                        <tr>
+                            <th>Quando</th>
+                            <th>Usuário e aparelho</th>
+                            <th>Cliente</th>
+                            <th>Equipamentos</th>
+                            <th>Total</th>
+                            <th>Configurações</th>
+                            <th>Mensagem</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="corpoPropostas"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
         <!-- o que deu errado no navegador de cada pessoa (admin-erros.js) -->
         <div class="secao-erros">
 
@@ -204,6 +260,8 @@ CONTAINER
 <script src="js/admin/admin-online.js"></script>
 <script src="js/admin/admin-erros.js"></script>
 <script src="js/admin/admin-erros-copiar.js"></script>
+<script src="js/admin/admin-propostas.js"></script>
+<script src="js/admin/admin-propostas-linhas.js"></script>
 <script src="js/admin/admin-init.js"></script>
 
 </body>

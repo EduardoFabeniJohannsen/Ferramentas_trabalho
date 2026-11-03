@@ -238,6 +238,9 @@ function copiarPropostaZap(){
     let totalGeral =
         0;
 
+    // valores de cada item, para o registro do admin (propostas-registro.js)
+    const itensRegistro = [];
+
 
     dadosComValor.forEach(
         (equipamento, index) => {
@@ -329,6 +332,15 @@ function copiarPropostaZap(){
             totalGeral +=
                 valorLocacaoItem +
                 seguroItem;
+
+            itensRegistro.push({
+                id: equipamento.id,
+                modelo,
+                quantidade,
+                valorFinal: equipamento.valorFinal,
+                valorLocacao: valorLocacaoItem,
+                seguro: seguroItem
+            });
 
 
             if(index > 0){
@@ -435,4 +447,13 @@ ${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFi
 
 
     copiar(textoFinal, "Proposta Zap copiada");
+
+    // o admin vê quem fez e o que foi proposto
+    registrarPropostaCopiada({
+        texto: textoFinal,
+        itens: itensRegistro,
+        infoPeriodo,
+        frete: valorFreteNumero,
+        valorComplementar
+    });
 }

@@ -181,6 +181,35 @@ const confere = (nome, ok, extra) => {
     l = linhaPagamento(await mensagem());
     confere("padrão ignora o prazo escondido", l.endsWith("Forma de pagamento: Mediante aprovação cadastral."), l);
 
+    // ---------- registro para o admin ----------
+    await pagina.evaluate(() => {
+        window.__registros = [];
+        supabaseClient.from = (tabela) => ({ insert: async (linha) => { window.__registros.push({ tabela, linha }); return { error: null }; } });
+    });
+    await pagina.fill("#nomeCliente", "Cliente Teste");
+    const copiado = await mensagem();
+    let registros = await pagina.evaluate(() => window.__registros);
+    const r = registros[0]?.linha || {};
+    const equip = r.dados?.equipamentos?.[0] || {};
+    confere("copiar registra uma vez", registros.length === 1 && registros[0].tabela === "propostas_copiadas", registros.length);
+    confere("registro tem cliente, cidade e o texto copiado", r.cliente === "Cliente Teste" && r.cidade === "Brusque" && r.texto === copiado, { cliente: r.cliente, cidade: r.cidade });
+    confere("registro tem o equipamento e os valores", equip.modelo === "WAE18" && equip.quantidade === 1 && equip.valorFinal === 1000 && equip.seguro === 70 && r.valor_total === 1070, equip);
+    confere("registro tem período, frete e configurações", r.dados.diasTotal === 28 && r.dados.frete === 500 && r.dados.configuracoes.emojis === true && r.dados.configuracoes.locacaoComplementar === false && r.dados.cidadeSaida === "Itajaí", r.dados);
+    confere("registro tem o aparelho", r.aparelho?.tipo === "computador" && !!r.aparelho.navegador, r.aparelho);
+    confere("quem fez o banco preenche (não vai do navegador)", !("usuario_email" in r) && !("usuario_id" in r), Object.keys(r));
+    await mensagem();
+    registros = await pagina.evaluate(() => window.__registros);
+    confere("copiar a mesma proposta de novo não repete o registro", registros.length === 1, registros.length);
+    await pagina.fill("#nomeCliente", "Outro Cliente");
+    await mensagem();
+    registros = await pagina.evaluate(() => window.__registros);
+    confere("outro cliente com o mesmo texto registra", registros.length === 2, registros.length);
+    await pagina.evaluate(() => { supabaseClient.from = () => ({ insert: async () => { throw new Error("sem rede"); } }); });
+    await pagina.fill("#nomeCliente", "Terceiro");
+    const mesmoAssim = await mensagem();
+    confere("falha ao registrar não impede a cópia", mesmoAssim.length > 0);
+    erros.splice(0, erros.length, ...erros.filter(e => !e.includes("Falha ao registrar a Proposta Zap")));
+
     // ---------- limpar tudo ----------
     await escolher("Boleto");
     await fecharConfig();

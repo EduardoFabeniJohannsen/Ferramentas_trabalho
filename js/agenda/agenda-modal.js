@@ -98,6 +98,9 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 
     atualizarSugestoesPeriodo();
 
+    // clientes e locais dos agendamentos anteriores (agenda-clientes.js)
+    prepararSugestoesClientes();
+
     atualizarAvisoPatrimonio();
 
     // etapas recolhidas como o usuário deixou

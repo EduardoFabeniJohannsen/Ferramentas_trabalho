@@ -817,6 +817,23 @@ body.tema-claro .estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
     color:#cbd5e1;
 }
 
+/* locais que o cliente já usou (agenda-clientes.js): nome do local e cidade */
+.locais-cliente .chips{
+    margin-bottom:4px;
+}
+.chip-local{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1px;
+    text-align:left;
+    max-width:100%;
+}
+.chip-local small{
+    font-size:12px;
+    opacity:.8;
+}
+
 /* ===== Faturamento (pagamento e pedido de compra) ===== */
 #blocoFaturamento label{
     margin-top:6px;

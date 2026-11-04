@@ -436,7 +436,7 @@ MODAL (novo / editar)
 
                     <div>
                         <label for="agCliente">Cliente</label>
-                        <input type="text" id="agCliente" placeholder="Nome do cliente">
+                        <input type="text" id="agCliente" list="listaClientesAgenda" autocomplete="off" placeholder="Nome do cliente">
                     </div>
 
                     <div>
@@ -476,6 +476,15 @@ MODAL (novo / editar)
 
                 <div class="etapa-grade">
 
+                    <!-- locais que o cliente já usou: clique preenche (agenda-clientes.js) -->
+                    <div class="largo locais-cliente" id="blocoLocaisCliente" style="display:none">
+
+                        <p class="subtitulo-form" id="tituloLocaisCliente"></p>
+
+                        <div class="chips" id="chipsLocaisCliente"></div>
+
+                    </div>
+
                     <!-- em entrega vem recolhida (quase sempre é a W Rental); clique abre -->
                     <p
                         class="largo subtitulo-form titulo-retirada"
@@ -496,7 +505,7 @@ MODAL (novo / editar)
 
                     <div class="largo campo-retirada">
                         <label for="agOrigemEndereco">Endereço completo</label>
-                        <input type="text" id="agOrigemEndereco" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
+                        <input type="text" id="agOrigemEndereco" autocomplete="off" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
                     </div>
 
                     <div class="largo campo-retirada">
@@ -515,7 +524,7 @@ MODAL (novo / editar)
 
                     <div class="largo">
                         <label for="agDestinoEndereco">Endereço completo</label>
-                        <input type="text" id="agDestinoEndereco" placeholder="Ex: Rua B, 200, Centro, Brusque/SC">
+                        <input type="text" id="agDestinoEndereco" autocomplete="off" placeholder="Ex: Rua B, 200, Centro, Brusque/SC">
                     </div>
 
                     <div class="largo">
@@ -695,6 +704,9 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 </datalist>
 
 <datalist id="listaPeriodos"></datalist>
+<!-- clientes e locais dos agendamentos anteriores (agenda-clientes.js) -->
+<datalist id="listaClientesAgenda"></datalist>
+<datalist id="listaLocaisCliente"></datalist>
 
 <div id="toast"></div>
 
@@ -737,6 +749,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 <script src="js/agenda/agenda-salvar.js"></script>
 <script src="js/agenda/agenda-coleta.js"></script>
 <script src="js/agenda/agenda-pagamento.js"></script>
+<script src="js/agenda/agenda-clientes.js"></script>
 <script src="js/agenda/agenda-pedido.js"></script>
 <script src="js/agenda/agenda-pedido-pdf.js"></script>
 <script src="js/agenda/agenda-lixeira.js"></script>

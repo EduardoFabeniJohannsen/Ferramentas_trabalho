@@ -122,6 +122,9 @@
     // horário: números viram HH:MM sozinhos
     $("agHorario").addEventListener("input", mascararCampoHorario);
 
+    // cliente: sugere os anteriores e puxa endereço, contato e e-mails
+    ligarSugestoesClientes();
+
     // período: sugestões enquanto digita e formato certo ao sair do campo
     $("agPeriodo").addEventListener("input", atualizarSugestoesPeriodo);
 

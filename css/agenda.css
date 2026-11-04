@@ -538,6 +538,12 @@ tr.ag-item td.ag-proposta:first-child{
 .ag-botoes .btn-coleta:hover{
     background:#92400e;
 }
+.ag-botoes .btn-duplicar{
+    background:#be185d;
+}
+.ag-botoes .btn-duplicar:hover{
+    background:#9d174d;
+}
 .ag-botoes .btn-estoque{
     background:#6d28d9;
 }

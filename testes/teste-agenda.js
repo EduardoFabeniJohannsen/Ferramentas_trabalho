@@ -250,13 +250,13 @@ const confere = (nome, ok, extra) => {
     await modo("expedicao");
     const qtdBotoes = () => pagina.$eval("tr.ag-item .ag-botoes", b => b.children.length);
     const caixaBotao = (nome) => pagina.locator("#listaBotoesLinha label", { hasText: nome }).locator("input");
-    confere("todos os botões de início", (await qtdBotoes()) === 6, await qtdBotoes());
-    confere("texto do botão", (await pagina.innerText("#btnBotoes")).includes("6 de 6"), await pagina.innerText("#btnBotoes"));
+    confere("todos os botões de início", (await qtdBotoes()) === 7, await qtdBotoes());
+    confere("texto do botão", (await pagina.innerText("#btnBotoes")).includes("7 de 7"), await pagina.innerText("#btnBotoes"));
     await abreOpcao("#btnBotoes");
     await pagina.screenshot({ path: path.join(saida, "6-painel-botoes.png") });
     await caixaBotao("Copiar faturamento").uncheck();
     await caixaBotao("Criar coleta").uncheck();
-    confere("oculta dois botões", (await qtdBotoes()) === 4);
+    confere("oculta dois botões", (await qtdBotoes()) === 5);
     const classes = await pagina.$eval("tr.ag-item .ag-botoes", b => [...b.children].map(c => c.className).join("|"));
     confere("sumiram os botões certos", !classes.includes("btn-faturamento") && !classes.includes("btn-coleta"), classes);
     confere("painel segue aberto", await pagina.isVisible("#painelBotoes"));
@@ -265,9 +265,9 @@ const confere = (nome, ok, extra) => {
 
     await abrir();
     await pagina.waitForTimeout(100);
-    confere("escolha continua ao recarregar", (await qtdBotoes()) === 4);
+    confere("escolha continua ao recarregar", (await qtdBotoes()) === 5);
     await modo("transportador");
-    confere("vale também no transportador", (await qtdBotoes()) === 4);
+    confere("vale também no transportador", (await qtdBotoes()) === 5);
     await pagina.click("#btnFiltros"); confere("botão aparece no transportador", await pagina.isVisible("#btnBotoes")); await pagina.mouse.click(5, 5);
 
     // clique dos que ficaram continua certo
@@ -312,7 +312,7 @@ const confere = (nome, ok, extra) => {
     await pagina.screenshot({ path: path.join(saida, "8-fixa-cinco.png") });
 
     // só o excluir: sem margem sobrando, e o último não desliga
-    for(const nome of ["Copiar agendamento", "Copiar faturamento", "Criar coleta", "Consultar estoque", "Editar"]){
+    for(const nome of ["Copiar agendamento", "Copiar faturamento", "Criar coleta", "Duplicar", "Consultar estoque", "Editar"]){
         await caixaBotao(nome).uncheck();
     }
     confere("largura fixa: só excluir cabe", await cabe());
@@ -324,7 +324,7 @@ const confere = (nome, ok, extra) => {
     await pagina.evaluate(() => localStorage.setItem("agendaBotoes:u1", "{quebrado"));
     await abrir();
     await pagina.waitForTimeout(100);
-    confere("dado inválido é ignorado", (await qtdBotoes()) === 6);
+    confere("dado inválido é ignorado", (await qtdBotoes()) === 7);
     erros.length = erros.filter(e => !/inválidos/.test(e)).length;
 
     // ---------- botão único de filtros ----------
@@ -511,6 +511,44 @@ const confere = (nome, ok, extra) => {
     confere("lupa pode ser ocultada", await pagina.locator("tr.ag-item .btn-estoque").count() === 0);
     await pagina.mouse.click(5, 5);
     await pagina.evaluate(() => { localStorage.clear(); });
+
+    // ---------- duplicar (mesma demanda em outro dia) ----------
+    await abrir();
+    await pagina.waitForTimeout(100);
+    await pagina.locator("tr.ag-item", { hasText: "WAE18R001" }).locator(".btn-duplicar").click();
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    const copia = await pagina.evaluate(() => ({
+        novo: idEmEdicao === null,
+        titulo: $("tituloModalAgenda").innerText,
+        data: $("agData").value,
+        focoNaData: document.activeElement === $("agData"),
+        status: $("agStatus").value,
+        plataforma: $("agPlataforma").value,
+        cliente: $("agCliente").value,
+        destino: $("agDestinoEndereco").value,
+        contato: $("agContato").value,
+        emails: $("agEmails").value,
+        obs: $("agObsExpedicao").value,
+        horario: $("agHorario").value,
+        card: $("agCard").value,
+        forma: $("agFormaPagamento").value,
+        prazos: prazosDigitados(),
+        pedido: $("agPedidoCompra").value,
+        pedidoNumero: $("agPedidoNumero").value,
+        aviso: $("avisoRascunho").innerText
+    }));
+    confere("duplicar abre um agendamento novo", copia.novo && copia.titulo === "Novo agendamento", copia);
+    confere("duplicar: data em branco e com o cursor nela", copia.data === "" && copia.focoNaData, copia);
+    confere("duplicar: copia equipamento, cliente, local, contato, e-mails, obs e horário",
+        copia.plataforma === "WAE18R001" && copia.cliente === "Cliente Um" && copia.destino === "Rua B, 200, Centro, Brusque/SC" &&
+        copia.contato === "João 47 9999" && copia.emails === "a@cliente.com" && copia.obs === "levar chave" && copia.horario === "08:00", copia);
+    confere("duplicar: copia forma de pagamento e prazos", copia.forma === "Boleto" && copia.prazos.join("/") === "28/56", copia);
+    confere("duplicar: card e pedido de compra não vão", copia.card === "" && copia.pedido === "nao" && copia.pedidoNumero === "", copia);
+    confere("duplicar: status volta ao padrão e avisa", copia.status === "Confirmado" && copia.aviso.includes("Escolha a nova data"), copia);
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); });
+    await pagina.locator("tr.ag-item", { hasText: "WTE14" }).locator(".btn-duplicar").click();
+    confere("duplicar funciona em qualquer agendamento", (await pagina.inputValue("#agCliente")) === "Cliente Dois");
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); localStorage.clear(); });
 
     confere("sem erros no console", erros.length === 0, erros);
 

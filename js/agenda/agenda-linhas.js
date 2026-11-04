@@ -106,6 +106,20 @@ function criarItemAgenda(item){
 
     if(botaoLigado("coleta")) botoes.appendChild(botaoColeta);
 
+    // mesma demanda em outro dia (agenda-coleta.js)
+    const botaoDuplicar = criar("button", "btn-duplicar", "📆");
+
+    botaoDuplicar.type = "button";
+
+    botaoDuplicar.title = "Duplicar: o mesmo agendamento em outro dia";
+
+    botaoDuplicar.addEventListener(
+        "click",
+        () => duplicarAgendamento(item)
+    );
+
+    if(botaoLigado("duplicar")) botoes.appendChild(botaoDuplicar);
+
     const botaoEstoque = criar("button", "btn-estoque", "🔍");
 
     botaoEstoque.type = "button";

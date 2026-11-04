@@ -1,7 +1,8 @@
 // ======================================
-// AGENDA - COLETA A PARTIR DE ENTREGA
+// AGENDA - COLETA A PARTIR DE ENTREGA E DUPLICAR
 // ======================================
-// Cria uma coleta já preenchida a partir de uma entrega.
+// Cria uma coleta já preenchida a partir de uma entrega e duplica um
+// agendamento para outro dia.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -64,4 +65,54 @@ function copiarEntregaParaColeta(item){
         valoresColetaDaEntrega(item),
         `📋 Coleta criada a partir da entrega de ${item.plataforma}. Informe a data, o horário e o motorista.`
     );
+}
+
+
+// ======================================
+// DUPLICAR (MESMA DEMANDA EM OUTRO DIA)
+// ======================================
+// Copia tudo, menos a data (fica em branco pra escolher), o status (volta ao
+// padrão), o card e o pedido de compra (são de cada agendamento; o PDF do
+// pedido não pode ser de dois). Forma de pagamento e prazos vão junto.
+
+function valoresDuplicados(item){
+
+    const valores = {};
+
+    CAMPOS_AGENDA.forEach(([campo]) => {
+
+        valores[campo] = item[campo] ?? "";
+    });
+
+    return {
+        ...valores,
+        data: "",
+        status: STATUS_PADRAO,
+        card: "",
+        formaPagamento: item.formaPagamento || "",
+        prazosPagamento: [...(item.prazosPagamento || [])]
+    };
+}
+
+
+// abre o formulário de novo agendamento já preenchido. Nada é salvo até
+// clicar em Salvar.
+function duplicarAgendamento(item){
+
+    if(
+        lerRascunhos().novo &&
+        !confirm("Existe um rascunho de novo agendamento. Substituir por esta cópia?")
+    ){
+        return;
+    }
+
+    removerRascunho("novo");
+
+    abrirModalAgenda(
+        null,
+        valoresDuplicados(item),
+        `📆 Cópia do agendamento de ${item.cliente || item.plataforma}. Escolha a nova data.`
+    );
+
+    $("agData").focus();
 }

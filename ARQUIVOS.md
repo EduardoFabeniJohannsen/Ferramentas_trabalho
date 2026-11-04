@@ -99,13 +99,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - criarCelulasAgenda
 - `agenda-clientes.js` (533 linhas): Ao digitar o cliente, sugere o nome completo dos clientes de agendamentos
   - chaveCliente, carregarHistoricoClientes, compararRecentes, agendamentosComCliente, clientesConhecidos, localDoCliente, locaisDoCliente, camposLocalCliente, clienteDoFormulario, preencherOpcoes, rotuloLocal, desenharSugestoesClientes, desenharLocaisCliente, marcarLocalAtivo, preencherAuto, textoPagamentoFormulario, preencherPagamentoCliente, aplicarCliente, usarLocalCliente, aplicarLocalDaLista, escolheuDaLista, prepararSugestoesClientes, ligarSugestoesClientes
-- `agenda-coleta.js` (67 linhas): Cria uma coleta já preenchida a partir de uma entrega.
-  - valoresColetaDaEntrega, copiarEntregaParaColeta
+- `agenda-coleta.js` (118 linhas): Cria uma coleta já preenchida a partir de uma entrega.
+  - valoresColetaDaEntrega, copiarEntregaParaColeta, valoresDuplicados, duplicarAgendamento
 - `agenda-colunas-visiveis.js` (169 linhas): Botão 👁️ Colunas (só na expedição): mostrar e ocultar qualquer informação da tabela; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
 - `agenda-colunas.js` (261 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
-- `agenda-config.js` (227 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
+- `agenda-config.js` (228 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-estoque-dados.js` (108 linhas): Consulta ao estoque: lê pela função `estoque_disponiveis` e descobre quais máquinas já estão em alguma demanda.
@@ -127,7 +127,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `agenda-init.js` (202 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
 - `agenda-larguras.js` (349 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
-- `agenda-linhas.js` (153 linhas): Cabeçalho da tabela e a linha de cada agendamento, com os botões (📋 Zap, 🧾 faturamento, ↩️ coleta, 🔍 estoque, editar, excluir).
+- `agenda-linhas.js` (167 linhas): Cabeçalho da tabela e a linha de cada agendamento, com os botões (📋 Zap, 🧾 faturamento, ↩️ coleta, 🔍 estoque, editar, excluir).
   - criarCabecalhoAgenda, criarItemAgenda
 - `agenda-lixeira.js` (211 linhas): Lixeira (só admin): excluir manda o agendamento para a lixeira (`excluido_em`, pela função `mover_agendamento_lixeira` do banco; quem não é admin não vê mais). Botão 🗑️ Lixeira (`.so-admin`) lista os excluídos para restaurar ou apagar de vez (só admin pelo RLS; apaga junto o PDF do pedido). Carregar antes de agenda-init.js.
   - moverParaLixeiraBanco, carregarLixeira, dataLixeira, desenharLixeira, abrirLixeira, fecharLixeira, restaurarDaLixeira, apagarDeVez

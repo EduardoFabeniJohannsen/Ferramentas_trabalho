@@ -11,7 +11,8 @@ let freteNoTotalAtivo = false;
 // R$ 5.000 com seguro = locação R$ 4.672,90 + seguro R$ 327,10.
 // Com o frete de R$ 500 como locação complementar +20%:
 // R$ 1.200 de frete + locação R$ 3.551,40 + seguro R$ 248,60.
-function calcularPeloTotalComSeguro(bloco, valorTabela, totalSeguro){
+// A conta completa aparece no Resumo da proposta (propostas-resumo.js).
+function calcularPeloTotalComSeguro(bloco, totalSeguro){
 
     const campoDesejado =
         bloco.querySelector(".descValorDesejado");
@@ -52,43 +53,10 @@ function calcularPeloTotalComSeguro(bloco, valorTabela, totalSeguro){
     const valorFinal =
         locacao / periodos;
 
-    const valorDesconto =
-        valorTabela - valorFinal;
-
-    const percentual =
-        (valorDesconto / valorTabela) * 100;
-
     campoDesejado.value =
         formatarMoedaBR(valorFinal);
 
-    const textoLocacao =
-        periodos > 1
-            ? `R$ ${formatarMoedaBR(locacao)} (${periodos} × R$ ${formatarMoedaBR(valorFinal)})`
-            : `R$ ${formatarMoedaBR(locacao)}`;
-
-    const textoFrete =
-        frete
-            ? ` + frete R$ ${formatarMoedaBR(frete.total)}`
-            : "";
-
-    resultado.innerHTML =
-        textoDescontoBloco(
-            bloco,
-            valorDesconto,
-            `Desconto de ${percentual.toFixed(2)}%`
-        ) +
-        `<br><span class="desconto-conta-seguro" style="color:#94a3b8">
-            Locação ${textoLocacao} + seguro R$ ${formatarMoedaBR(locacao * TAXA_SEGURO)}${textoFrete}
-        </span>`;
-
-    // outro equipamento já levou o frete (o modelo entra como texto)
-    if(blocoDoFrete && blocoDoFrete !== bloco){
-
-        resultado.querySelector(".desconto-conta-seguro").append(
-            document.createElement("br"),
-            `Frete já entrou no total do ${blocoDoFrete.querySelector(".desconto-item-titulo").innerText}`
-        );
-    }
+    resultado.innerHTML = "";
 
     bloco.dataset.valorFinal = valorFinal;
 }
@@ -163,7 +131,7 @@ function recalcularDescontos(){
 
     document.querySelectorAll(".desconto-item").forEach(calcularDescontoBloco);
 
-    atualizarValorFinalProposta();
+    atualizarResumoProposta();
 }
 
 
@@ -188,29 +156,5 @@ function atualizarBotaoFreteNoTotal(){
             freteNoTotalAtivo && locacaoComplementarAtiva ? "" : "none";
     }
 
-    const conta = $("contaFreteTotal");
-
-    if(!conta) return;
-
-    conta.style.display = freteNoTotalAtivo ? "" : "none";
-
-    if(!freteNoTotalAtivo) return;
-
-    const frete = freteDoTotalSeguro();
-
-    if(!frete){
-
-        conta.innerText = "Informe o valor do frete.";
-        return;
-    }
-
-    const varios =
-        document.querySelectorAll(".desconto-item").length > 1
-            ? " Com mais de um equipamento, sai só do primeiro Total com seguro."
-            : "";
-
-    conta.innerText =
-        locacaoComplementarAtiva
-            ? `Locação complementar: R$ ${formatarMoedaBR(frete.frete)} x 2${frete.comBitributacao ? " + 20% bitributação" : ""} = R$ ${formatarMoedaBR(frete.total)}.${varios}`
-            : `Frete terceirizado: R$ ${formatarMoedaBR(frete.frete)} x 2 (ida e volta) = R$ ${formatarMoedaBR(frete.total)}. Sem bitributação: ela só existe com a locação complementar (⚙️).${varios}`;
+    // a conta do frete aparece no Resumo da proposta (propostas-resumo.js)
 }

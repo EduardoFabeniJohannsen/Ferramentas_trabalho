@@ -91,6 +91,50 @@
     text-align:center;
 }
 
+/* ===== Layout da página (grade) =====
+   Celular: uma coluna, nesta ordem: textos, desconto, resumo e fretes.
+   A partir de 800px: textos e resumo à esquerda, desconto e fretes à direita.
+   PC (1180px+, 3 cards de 350px + espaços): textos | resumo | desconto, com os
+   fretes embaixo do desconto. A linha "1fr" é a que estica: assim os fretes
+   começam logo depois do desconto, sem buraco. */
+.container.propostas-layout{
+    display:grid;
+    grid-template-columns:minmax(0, 350px);
+    grid-template-areas:
+        "textos"
+        "desconto"
+        "resumo"
+        "fretes";
+    justify-content:center;
+    align-items:start;
+    gap:12px 25px;
+}
+.propostas-layout > .card-com-engrenagem{ grid-area:textos; }
+.propostas-layout > .desconto-card{ grid-area:desconto; }
+.propostas-layout > .resumo-card{ grid-area:resumo; }
+.propostas-layout > .painel-fretes{ grid-area:fretes; }
+
+@media(min-width:800px){
+    .container.propostas-layout{
+        grid-template-columns:350px 350px;
+        grid-template-rows:auto 1fr auto;
+        grid-template-areas:
+            "textos desconto"
+            "textos fretes"
+            "resumo fretes";
+    }
+}
+
+@media(min-width:1180px){
+    .container.propostas-layout{
+        grid-template-columns:350px 350px 350px;
+        grid-template-rows:auto 1fr;
+        grid-template-areas:
+            "textos resumo desconto"
+            "textos resumo fretes";
+    }
+}
+
 /* ===== Período + Períodos (lado a lado) ===== */
 .periodo-linha{
     display:flex;
@@ -110,19 +154,25 @@
 }
 
 
-/* =========================
-LOCAÇÃO COMPLEMENTAR (valor pronto, embaixo do frete)
-========================= */
-
-.resumo-complementar{
-    margin:0 0 8px;
-    font-size:13px;
-    color:#cbd5e1;
+/* ===== Calcular Desconto: campos 2 a 2, com o nome em cima ===== */
+.desconto-campos{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 6px;
 }
-
-.resumo-complementar .conta-complementar{
-    font-size:12px;
+.desconto-campo{
+    display:block;
+    min-width:0;
+    text-align:left;
+}
+.desconto-campo span{
+    display:block;
+    margin:0 0 2px 2px;
+    font-size:11px;
     color:#94a3b8;
+}
+.desconto-campo input{
+    margin-bottom:6px;
 }
 
 /* ===== Frete no Total com seguro (Calcular Desconto) ===== */
@@ -132,8 +182,84 @@ LOCAÇÃO COMPLEMENTAR (valor pronto, embaixo do frete)
     width:100%;
     margin:0 0 6px;
 }
-.conta-frete-total{
-    margin:0 0 10px;
+
+/* ===== Resumo da proposta (propostas-resumo.js) ===== */
+.resumo-card{
+    text-align:left;
+}
+.resumo-card h2{
+    text-align:center;
+}
+.resumo-card .resumo-periodo{
+    margin:0 0 8px;
+    font-size:13px;
+    color:#94a3b8;
+    text-align:center;
+}
+.resumo-secao{
+    padding:8px 0;
+    border-top:1px solid #334155;
+}
+.resumo-card .resumo-titulo{
+    margin:0 0 4px;
+    font-weight:bold;
+    color:#f1f5f9;
+}
+.resumo-linha{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    font-size:14px;
+    line-height:1.6;
+}
+.resumo-rotulo{
+    color:#cbd5e1;
+}
+.resumo-valor{
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+}
+.resumo-forte{
+    font-weight:bold;
+}
+.resumo-diaria .resumo-valor{
+    font-weight:bold;
+    color:#93c5fd;
+}
+.resumo-final{
+    font-size:16px;
+    font-weight:bold;
+}
+.resumo-final .resumo-valor{
+    color:#4ade80;
+}
+.resumo-card .resumo-nota{
+    margin:0 0 2px;
     font-size:12px;
     color:#94a3b8;
+}
+.resumo-card .resumo-alerta{
+    color:#fbbf24;
+}
+/* desconto acima de 20% (LIMITE_DESCONTO_RESUMO em propostas-resumo.js) */
+.resumo-desconto-alto{
+    margin:2px -6px;
+    padding:2px 6px;
+    font-weight:bold;
+    background:rgba(239,68,68,.18);
+    border:1px solid rgba(239,68,68,.65);
+    border-radius:6px;
+}
+.resumo-desconto-alto .resumo-rotulo,
+.resumo-desconto-alto .resumo-valor{
+    color:#f87171;
+}
+.resumo-card .resumo-alerta-desconto{
+    margin:2px 0 4px;
+    font-weight:bold;
+    color:#f87171;
+}
+.resumo-card .resumo-vazio{
+    text-align:center;
 }

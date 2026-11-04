@@ -29,9 +29,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - CSS: style
 - JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → status → index-ferramentas → menu
 
-**propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes)
+**propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes). As contas ficam todas no card Resumo da proposta. No PC (~1180px+): textos | resumo | desconto, com os fretes embaixo do desconto; a partir de 800px, textos e resumo à esquerda, desconto e fretes à direita; no celular, um embaixo do outro (textos, desconto, resumo, fretes).
 - CSS: style → propostas
-- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → agenda
@@ -216,15 +216,15 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
   - mostrarAvisoDadosSalvos, avisarFalhaCarregamento, preencherListaEquipamentos, preencherListaCidades
-- `propostas-cache.js` (296 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.
+- `propostas-cache.js` (294 linhas): Salva/restaura o preenchimento no navegador e limpa a tela.
   - salvarCache, restaurarCache, limparTudo
-- `propostas-config.js` (342 linhas): Locação complementar (com o valor pronto embaixo do frete: frete x 2, +20% com bitributação), bitributação (o botão também aparece no Calcular Desconto com o frete no total), diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
-  - alternarLocacaoComplementar, atualizarBotaoLocacaoComplementar, alternarBitributacao, atualizarBotaoBitributacao, valorLocacaoComplementar, atualizarResumoComplementar, alternarValorDiaria, atualizarBotaoValorDiaria, alternarEmojis, atualizarBotaoEmojis, alternarCidadeSaida, atualizarBotaoCidadeSaida, alternarSepararPagamento, atualizarBotaoSepararPagamento, abrirConfiguracoes, fecharConfiguracoes
-- `propostas-desconto-calculo.js` (267 linhas): Cálculo por %, valor desejado ou total com seguro (a conta do total fica em propostas-desconto-total-seguro.js), valor final e eventos de input. Com 2+ máquinas, mostra o desconto por máquina (desconto total ÷ quantidade).
-  - textoDescontoBloco, calcularDescontoBloco, atualizarValorFinalProposta, recalcularAposDigitar, limparOutrosCamposDesconto
-- `propostas-desconto-total-seguro.js` (216 linhas): Campo "Total com seguro" (o "Total máquina + seguro" da Proposta Zap: tira os 7% do seguro e divide pelos períodos) e o botão 🚚 que põe o frete de ida e volta dentro desse total (com locação complementar, +20% se tiver bitributação). O frete entra uma vez só, no primeiro equipamento com Total com seguro.
+- `propostas-config.js` (318 linhas): Locação complementar (o valor pronto aparece no Resumo da proposta: frete x 2, +20% com bitributação), bitributação (o botão também aparece no Calcular Desconto com o frete no total), diária, emojis, cidade de saída, linha em branco e modal da engrenagem.
+  - alternarLocacaoComplementar, atualizarBotaoLocacaoComplementar, alternarBitributacao, atualizarBotaoBitributacao, valorLocacaoComplementar, alternarValorDiaria, atualizarBotaoValorDiaria, alternarEmojis, atualizarBotaoEmojis, alternarCidadeSaida, atualizarBotaoCidadeSaida, alternarSepararPagamento, atualizarBotaoSepararPagamento, abrirConfiguracoes, fecharConfiguracoes
+- `propostas-desconto-calculo.js` (195 linhas): Cálculo por %, valor desejado ou total com seguro (a conta do total fica em propostas-desconto-total-seguro.js) e eventos de input. O bloco só guarda o valor final; desconto, seguro, diária e totais aparecem no Resumo da proposta (propostas-resumo.js).
+  - calcularDescontoBloco, recalcularAposDigitar, limparOutrosCamposDesconto
+- `propostas-desconto-total-seguro.js` (160 linhas): Campo "Total com seguro" (o "Total máquina + seguro" da Proposta Zap: tira os 7% do seguro e divide pelos períodos) e o botão 🚚 que põe o frete de ida e volta dentro desse total (com locação complementar, +20% se tiver bitributação). O frete entra uma vez só, no primeiro equipamento com Total com seguro.
   - calcularPeloTotalComSeguro, alternarFreteNoTotal, freteDoTotalSeguro, usaTotalComSeguro, blocoComFreteDoTotal, recalcularDescontos, atualizarBotaoFreteNoTotal
-- `propostas-desconto.js` (188 linhas): Desenha e atualiza o bloco de desconto de cada equipamento.
+- `propostas-desconto.js` (204 linhas): Desenha e atualiza o bloco de desconto de cada equipamento (campos 2 a 2, com o nome em cima).
   - htmlPlaceholderDesconto, renderizarDescontosPorEquipamento
 - `propostas-equipamentos.js` (286 linhas): obterEquipamentos(), adicionar/remover linha e eventos.
   - obterEquipamentos, adicionarEquipamento, removerEquipamento, configurarEventosEquipamentos
@@ -232,11 +232,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - normalizarModelo, normalizarCidade
 - `propostas-fretes-painel.js` (144 linhas): mostrarFretes(): fretes encontrados por transportadora.
   - mostrarFretes
-- `propostas-init.js` (190 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página. Lê ?cliente= e ?cidade= (vindos de leads.html) depois do cache e limpa o endereço.
+- `propostas-init.js` (185 linhas): Carrega tabelas e liga eventos. Sempre o ÚLTIMO script da página. Lê ?cliente= e ?cidade= (vindos de leads.html) depois do cache e limpa o endereço.
 - `propostas-pagamento.js` (56 linhas): Boleto ou depósito e o prazo em dias (⚙️ Configurações) na mensagem da Proposta Zap; sem escolher, sai o texto padrão.
   - atualizarCampoPrazo, trocarFormaPagamento, prazoPagamentoTexto, textoFormaPagamento
 - `propostas-registro.js` (154 linhas): Cada "Copiar Proposta Zap" grava na tabela propostas_copiadas o aparelho, a cidade aproximada, os dados da proposta (cliente, período, frete, equipamentos com desconto e valores), as configurações e o texto. Copiar de novo a mesma proposta em 10 min não repete. Falhar não atrapalha a cópia.
   - arredondarRegistro, descontoDoEquipamento, aparelhoDoRegistro, montarRegistroProposta, registrarPropostaCopiada
+- `propostas-resumo.js` (295 linhas): Card "Resumo da proposta" (no PC na coluna do meio; no celular logo depois do Calcular Desconto): todas as contas num lugar só, iguais às da Proposta Zap. Por equipamento: tabela, desconto (em vermelho acima de 20%), locação, seguro, máquina + seguro e diária. Depois o frete (locação complementar ou terceirizado), o valor final e a diária da proposta. Os outros cards ficam só com os campos.
+  - moedaResumo, linhaResumo, notaResumo, textoPeriodoResumo, itensDoResumo, secaoEquipamentoResumo, secaoFreteResumo, secaoTotalResumo, atualizarResumoProposta
 - `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes.
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (161 linhas): Cópia offline (localStorage, de preços e de fretes) e carregamento de tabela_precos.
@@ -349,7 +351,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (459), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-larguras.js` (349), `propostas-config.js` (342), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `agenda-pagamento.js` (326), `leads-cards.js` (325), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (459), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".

@@ -39,7 +39,7 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
         lista.innerHTML =
             htmlPlaceholderDesconto();
 
-        $("valorFinalProposta").innerText = "";
+        atualizarResumoProposta();
 
         atualizarBotaoFreteNoTotal();
 
@@ -80,13 +80,29 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
             bloco.className = "desconto-item";
             bloco.dataset.equipId = equipamento.id;
 
+            // cada campo com o nome em cima: preenchido, o placeholder some
+            // (as contas ficam no Resumo da proposta)
             bloco.innerHTML = `
                 <p class="desconto-item-titulo"></p>
-                <input type="text" class="descValorTabela" placeholder="Valor tabela">
-                <input type="text" class="descValorDesejado" placeholder="Valor desejado">
-                <input type="text" class="descPercentual" placeholder="% desconto">
-                <input type="text" class="descTotalSeguro" placeholder="Total com seguro"
-                    title="Total da máquina com o seguro, como sai na Proposta Zap. O frete só entra com o botão 🚚 em Sim">
+                <div class="desconto-campos">
+                    <label class="desconto-campo">
+                        <span>Valor tabela</span>
+                        <input type="text" class="descValorTabela" placeholder="Valor tabela">
+                    </label>
+                    <label class="desconto-campo">
+                        <span>Valor desejado</span>
+                        <input type="text" class="descValorDesejado" placeholder="Valor desejado">
+                    </label>
+                    <label class="desconto-campo">
+                        <span>% desconto</span>
+                        <input type="text" class="descPercentual" placeholder="% desconto">
+                    </label>
+                    <label class="desconto-campo"
+                        title="Total da máquina com o seguro, como sai na Proposta Zap. O frete só entra com o botão 🚚 em Sim">
+                        <span>Total com seguro</span>
+                        <input type="text" class="descTotalSeguro" placeholder="Total com seguro">
+                    </label>
+                </div>
                 <p class="desconto-item-erro"></p>
                 <p class="desconto-item-resultado"></p>
             `;
@@ -183,6 +199,6 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
 
     }else{
 
-        atualizarValorFinalProposta();
+        atualizarResumoProposta();
     }
 }

@@ -98,17 +98,17 @@ function atualizarBotaoBitributacao(){
             }`;
     });
 
-    // o valor da locação complementar depende dos dois toggles
-    atualizarResumoComplementar();
+    // o botão do Calcular Desconto só aparece com a locação complementar
+    atualizarBotaoFreteNoTotal();
 }
 
 
 // ======================================
-// RESUMO DA LOCAÇÃO COMPLEMENTAR (embaixo do frete)
+// VALOR DA LOCAÇÃO COMPLEMENTAR
 // ======================================
-// Com a locação complementar ativada, mostra o valor pronto pra lançar
-// no sistema: frete (cada perna) x 2, com +20% se a bitributação estiver
-// ativada.
+// Com a locação complementar ativada, o valor pronto pra lançar no sistema
+// (aparece no Resumo da proposta, propostas-resumo.js): frete (cada perna)
+// x 2, com +20% se a bitributação estiver ativada.
 
 function valorLocacaoComplementar(){
 
@@ -128,30 +128,6 @@ function valorLocacaoComplementar(){
     };
 }
 
-
-function atualizarResumoComplementar(){
-
-    // a conta do frete no Calcular Desconto depende das mesmas coisas
-    atualizarBotaoFreteNoTotal();
-
-    const bloco = $("resumoComplementar");
-
-    if(!bloco) return;
-
-    const valor = valorLocacaoComplementar();
-
-    bloco.style.display = valor ? "" : "none";
-
-    if(!valor) return;
-
-    const conta =
-        `R$ ${formatarMoedaBR(valor.frete)} x 2 (ida e volta) = R$ ${formatarMoedaBR(valor.idaVolta)}` +
-        (bitributacaoAtiva ? " + 20% bitributação" : "");
-
-    $("contaComplementar").innerText = conta;
-
-    $("valorComplementar").innerText = `R$ ${formatarMoedaBR(valor.total)}`;
-}
 
 
 // ======================================

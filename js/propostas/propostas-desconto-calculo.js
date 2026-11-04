@@ -1,35 +1,13 @@
 // ======================================
 // PROPOSTAS - DESCONTO (cálculo)
 // ======================================
-// Cálculo por %, valor desejado ou total com seguro (a conta do total fica em propostas-desconto-total-seguro.js), valor final e eventos de input.
+// Cálculo por %, valor desejado ou total com seguro (a conta do total fica em propostas-desconto-total-seguro.js) e eventos de input. As contas aparecem no Resumo da proposta (propostas-resumo.js).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
-// Valor de tabela e valor desejado são do total (todas as máquinas), mas o
-// desconto é lançado por máquina: 2x de R$ 1.000 querendo R$ 1.500 dá
-// R$ 250 de desconto em cada uma (R$ 500 no total).
-function textoDescontoBloco(bloco, valorDesconto, detalhe){
-
-    const quantidade =
-        Math.max(1, Number(bloco.dataset.quantidade) || 1);
-
-    if(quantidade === 1){
-
-        return `
-            Desconto: <strong>R$ ${formatarNumeroPonto(valorDesconto)}</strong>
-            <br>
-            <span style="color:#94a3b8">${detalhe}</span>
-        `;
-    }
-
-    return `
-        Desconto por máquina: <strong>R$ ${formatarNumeroPonto(valorDesconto / quantidade)}</strong>
-        <br>
-        <span style="color:#94a3b8">
-            ${detalhe} · total R$ ${formatarMoedaBR(valorDesconto)} (${quantidade} máquinas)
-        </span>
-    `;
-}
-
+// Valor de tabela e valor desejado são de um período, de todas as máquinas
+// da linha. O bloco só guarda o valor final (dataset.valorFinal): desconto,
+// seguro, diária e totais aparecem no Resumo da proposta (propostas-resumo.js).
+// O espaço de resultado do bloco fica só para avisos.
 
 function calcularDescontoBloco(bloco){
 
@@ -45,7 +23,7 @@ function calcularDescontoBloco(bloco){
     ){
         resultado.innerHTML = "";
         bloco.dataset.valorFinal = "";
-        atualizarValorFinalProposta();
+        atualizarResumoProposta();
         return;
     }
 
@@ -92,15 +70,10 @@ function calcularDescontoBloco(bloco){
             campoDesejado.value =
                 formatarMoedaBR(valorFinal);
 
-            resultado.innerHTML =
-                textoDescontoBloco(
-                    bloco,
-                    valorDesconto,
-                    `${percentual.toFixed(2)}% → R$ ${formatarMoedaBR(valorFinal)}`
-                );
+            resultado.innerHTML = "";
 
             bloco.dataset.valorFinal = valorFinal;
-            atualizarValorFinalProposta();
+            atualizarResumoProposta();
             return;
         }
     }
@@ -121,8 +94,8 @@ function calcularDescontoBloco(bloco){
             totalSeguro > 0
         ){
 
-            calcularPeloTotalComSeguro(bloco, valorTabela, totalSeguro);
-            atualizarValorFinalProposta();
+            calcularPeloTotalComSeguro(bloco, totalSeguro);
+            atualizarResumoProposta();
             return;
         }
     }
@@ -142,21 +115,10 @@ function calcularDescontoBloco(bloco){
             valorDesejado > 0
         ){
 
-            const valorDesconto =
-                valorTabela - valorDesejado;
-
-            const percentual =
-                (valorDesconto / valorTabela) * 100;
-
-            resultado.innerHTML =
-                textoDescontoBloco(
-                    bloco,
-                    valorDesconto,
-                    `Desconto de ${percentual.toFixed(2)}%`
-                );
+            resultado.innerHTML = "";
 
             bloco.dataset.valorFinal = valorDesejado;
-            atualizarValorFinalProposta();
+            atualizarResumoProposta();
             return;
         }
     }
@@ -165,41 +127,7 @@ function calcularDescontoBloco(bloco){
     // sem desconto informado: valor final = valor de tabela
     resultado.innerHTML = "";
     bloco.dataset.valorFinal = valorTabela;
-    atualizarValorFinalProposta();
-}
-
-
-function atualizarValorFinalProposta(){
-
-    const blocos =
-        document.querySelectorAll(".desconto-item");
-
-    let total = 0;
-    let algumValido = false;
-
-    blocos.forEach(bloco => {
-
-        const valorFinal =
-            Number(bloco.dataset.valorFinal);
-
-        if(
-            Number.isFinite(valorFinal) &&
-            valorFinal > 0
-        ){
-            total += valorFinal;
-            algumValido = true;
-        }
-    });
-
-    const campo = $("valorFinalProposta");
-
-    if(campo){
-
-        campo.innerText =
-            algumValido
-                ? "R$ " + formatarMoedaBR(total)
-                : "";
-    }
+    atualizarResumoProposta();
 }
 
 

@@ -42,14 +42,10 @@ TOPBAR
 CONTAINER
 ========================= -->
 
-<div class="container">
-
-
-    <!-- =========================
-    COLUNA ESQUERDA
-    ========================= -->
-
-    <div class="coluna-esquerda">
+<!-- Grade (css/propostas.css): no PC, Gerar Textos | Resumo | Calcular
+     Desconto com os Fretes embaixo; no celular, um embaixo do outro nesta
+     ordem: textos, desconto, resumo e fretes. -->
+<div class="container propostas-layout">
 
 
         <!-- =========================
@@ -192,16 +188,6 @@ CONTAINER
             >
 
 
-            <!-- só com a locação complementar ativada (propostas-config.js) -->
-            <div id="resumoComplementar" class="resumo-complementar" style="display:none">
-
-                Locação complementar: <strong id="valorComplementar"></strong>
-
-                <div id="contaComplementar" class="conta-complementar"></div>
-
-            </div>
-
-
             <p id="textoOrcamento"></p>
 
 
@@ -254,21 +240,28 @@ CONTAINER
 
             </div>
 
-            <p id="contaFreteTotal" class="conta-frete-total" style="display:none"></p>
-
             <div id="listaDescontosEquipamentos">
                 <p class="desconto-placeholder" style="color:#94a3b8">
                     Adicione um equipamento e o período pra calcular.
                 </p>
             </div>
 
-            <hr>
+        </div>
 
-            <p>
-                Valor final da proposta:
-                <span id="valorFinalProposta"></span>
+
+    <!-- =========================
+    RESUMO DA PROPOSTA (propostas-resumo.js)
+    ========================= -->
+    <!-- todas as contas num lugar só, iguais às da Proposta Zap -->
+
+    <div id="resumoProposta" class="card resumo-card">
+
+        <h2>Resumo da proposta</h2>
+
+        <div id="conteudoResumo">
+            <p class="resumo-nota resumo-vazio">
+                Preencha equipamento, período e valores para ver o resumo.
             </p>
-
         </div>
 
     </div>
@@ -456,6 +449,7 @@ MODAL DE CONFIGURAÇÕES
 <script src="js/propostas/propostas-desconto.js"></script>
 <script src="js/propostas/propostas-desconto-calculo.js"></script>
 <script src="js/propostas/propostas-desconto-total-seguro.js"></script>
+<script src="js/propostas/propostas-resumo.js"></script>
 <script src="js/propostas/propostas-cache.js"></script>
 <script src="js/propostas/propostas-config.js"></script>
 <script src="js/propostas/propostas-pagamento.js"></script>

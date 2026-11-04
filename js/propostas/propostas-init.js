@@ -174,16 +174,11 @@
 
     if($("valorFrete")){
 
+        // gerarTextos refaz o Calcular Desconto e o Resumo da proposta
         $("valorFrete")
             .addEventListener(
                 "input",
                 gerarTextos
-            );
-
-        $("valorFrete")
-            .addEventListener(
-                "input",
-                atualizarResumoComplementar
             );
     }
 

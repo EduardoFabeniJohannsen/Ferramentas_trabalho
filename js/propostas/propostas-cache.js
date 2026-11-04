@@ -259,8 +259,6 @@ function limparTudo(){
     if($("cidade")) $("cidade").value = "";
     if($("valorFrete")) $("valorFrete").value = "";
 
-    atualizarResumoComplementar();
-
     // remove as linhas extras de equipamento, deixa só a primeira,
     // limpa ela
     document.querySelectorAll(".equipamento-linha").forEach((linha, index) => {

@@ -4,7 +4,8 @@
 // Tabela com cada "Copiar Proposta Zap" (propostas-registro.js grava): quem fez,
 // aparelho e cidade, cliente, equipamentos com desconto, total, configurações e a
 // mensagem copiada. Só o admin lê (RLS). Os filtros ficam em
-// admin-propostas-filtros.js e as linhas são montadas em admin-propostas-linhas.js.
+// admin-propostas-filtros.js, as linhas são montadas em admin-propostas-linhas.js e o
+// desconto médio por usuário em admin-propostas-descontos.js.
 
 const TABELA_PROPOSTAS_ADMIN = "propostas_copiadas";
 
@@ -99,6 +100,8 @@ function desenharPropostasAdmin(){
 
         corpo.appendChild(linha);
     }
+
+    desenharDescontosPorUsuario(visiveis);
 
     const filtrando = filtrandoPropostas();
 

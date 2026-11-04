@@ -120,6 +120,13 @@ const confere = (nome, ok, extra) => {
     confere("Limpar filtros escondido sem filtro", !(await pagina.isVisible("#btnLimparFiltrosPropostas")));
     confere("desconto continua na tabela", (await pagina.innerText("#corpoPropostas")).includes("(−25%)"));
 
+    // ---------- desconto médio por usuário ----------
+    const descontos = () => pagina.$$eval("#corpoDescontosUsuarios tr", l => l.map(t => [...t.cells].map(c => c.innerText.trim())));
+    confere("desconto médio por usuário (maior média primeiro; sem tabela não entra)", JSON.stringify(await descontos()) === JSON.stringify([
+        ["ana@exemplo.com", "2", "1", "25%", "25%", "R$ 500,00", "25%"],
+        ["bia@exemplo.com", "1", "2", "2,5%", "3%", "R$ 150,00", "5%"]
+    ]), await descontos());
+
     const opcoes = (id) => pagina.$$eval(`#${id} option`, l => l.map(o => o.innerText));
     confere("locais de quem fez", JSON.stringify(await opcoes("filtroPropostasLocal")) === JSON.stringify(["Todos os locais", "Itajaí/Santa Catarina", "Joinville/Santa Catarina", "(sem cidade)"]), await opcoes("filtroPropostasLocal"));
     confere("modelos", JSON.stringify(await opcoes("filtroPropostasModelo")) === JSON.stringify(["Todos os modelos", "THP", "WAE16", "WAE18"]), await opcoes("filtroPropostasModelo"));
@@ -150,6 +157,7 @@ const confere = (nome, ok, extra) => {
     await pagina.selectOption("#filtroPropostasAparelho", "");
     await pagina.selectOption("#filtroPropostasUsuario", "ana@exemplo.com");
     confere("usuário", JSON.stringify(await clientes()) === '["Gama","Construtora Alfa"]', await clientes());
+    confere("desconto médio segue os filtros", (await descontos()).length === 1 && (await descontos())[0][0] === "ana@exemplo.com", await descontos());
     await pagina.selectOption("#filtroPropostasUsuario", "");
     await pagina.selectOption("#filtroPropostasModelo", "WAE16");
     confere("modelo", JSON.stringify(await clientes()) === '["Beta Ltda","Construtora Alfa"]', await clientes());

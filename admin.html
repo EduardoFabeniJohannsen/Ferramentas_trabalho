@@ -193,6 +193,39 @@ CONTAINER
 
             </div>
 
+            <!-- desconto médio de cada usuário, com os filtros acima (admin-propostas-descontos.js) -->
+            <h3 class="titulo-descontos">Desconto médio por usuário</h3>
+
+            <p class="dica-admin">
+                Conta só os equipamentos com valor de tabela, nas propostas que passam nos
+                filtros acima. "Desconto médio" é a média do % de cada equipamento (contando a
+                quantidade); "Sobre a tabela" é quanto o desconto em R$ representa do total de tabela.
+            </p>
+
+            <div class="area-admin area-descontos">
+
+                <table class="tabela-admin tabela-erros tabela-descontos">
+
+                    <thead>
+
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Propostas</th>
+                            <th>Equip. com tabela</th>
+                            <th>Desconto médio</th>
+                            <th>Sobre a tabela</th>
+                            <th>Desconto em R$</th>
+                            <th>Maior desconto</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="corpoDescontosUsuarios"></tbody>
+
+                </table>
+
+            </div>
+
             <div class="area-admin">
 
                 <table class="tabela-admin tabela-erros tabela-propostas">
@@ -315,6 +348,7 @@ CONTAINER
 <script src="js/admin/admin-propostas.js"></script>
 <script src="js/admin/admin-propostas-filtros.js"></script>
 <script src="js/admin/admin-propostas-linhas.js"></script>
+<script src="js/admin/admin-propostas-descontos.js"></script>
 <script src="js/admin/admin-init.js"></script>
 
 </body>

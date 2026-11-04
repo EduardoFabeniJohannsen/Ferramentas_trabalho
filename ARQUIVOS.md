@@ -55,7 +55,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **admin.html** — Usuários e acessos, online agora, propostas Zap copiadas e erros do sistema (só admin). Usa a largura toda da tela.
 - CSS: style → admin
-- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-filtros → admin-propostas-linhas → admin-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-filtros → admin-propostas-linhas → admin-propostas-descontos → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
@@ -77,11 +77,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `admin-init.js` (48 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
 - `admin-online.js` (154 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada. Sem histórico.
   - nomePaginaOnline, tempoOnline, textoAbaOnline, textoAparelhoOnline, pessoasOnline, desenharUsuariosOnline
+- `admin-propostas-descontos.js` (125 linhas): Quadro acima da tabela "Propostas Zap copiadas": por usuário, quantas propostas,
+  - resumoDescontosPorUsuario, percentualAdmin, desenharDescontosPorUsuario
 - `admin-propostas-filtros.js` (228 linhas): Filtros da tabela "Propostas Zap copiadas": busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, faixa de desconto (o mesmo % da tabela, junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
   - normalizarBuscaAdmin, valoresFiltroProposta, textoBuscaProposta, numeroFiltroPropostas, diaProposta, descontoNoFiltro, propostasVisiveis, filtrandoPropostas, desenharFiltrosPropostas, limparFiltrosPropostas
 - `admin-propostas-linhas.js` (194 linhas): Cada linha da tabela de propostas: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
   - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, textoAparelhoAdmin, celulaUsuarioProposta, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
-- `admin-propostas.js` (118 linhas): Seção "Propostas Zap copiadas": carrega os registros dos últimos 90 dias (até 500), contagem ("3 de 40" filtrando) e aviso de lista vazia. Os filtros ficam em admin-propostas-filtros.js e as linhas são montadas em admin-propostas-linhas.js.
+- `admin-propostas.js` (121 linhas): Seção "Propostas Zap copiadas": carrega os registros dos últimos 90 dias (até 500), contagem ("3 de 40" filtrando) e aviso de lista vazia. Os filtros ficam em admin-propostas-filtros.js e as linhas são montadas em admin-propostas-linhas.js.
   - carregarPropostasAdmin, textoVazioPropostas, desenharPropostasAdmin
 - `admin-tela.js` (254 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario

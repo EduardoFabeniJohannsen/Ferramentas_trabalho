@@ -41,6 +41,8 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
 
         $("valorFinalProposta").innerText = "";
 
+        atualizarBotaoFreteNoTotal();
+
         return;
     }
 
@@ -83,6 +85,8 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
                 <input type="text" class="descValorTabela" placeholder="Valor tabela">
                 <input type="text" class="descValorDesejado" placeholder="Valor desejado">
                 <input type="text" class="descPercentual" placeholder="% desconto">
+                <input type="text" class="descTotalSeguro" placeholder="Total com seguro"
+                    title="Total da máquina com o seguro, como sai na Proposta Zap. O frete só entra com o botão 🚚 em Sim">
                 <p class="desconto-item-erro"></p>
                 <p class="desconto-item-resultado"></p>
             `;
@@ -169,5 +173,16 @@ function renderizarDescontosPorEquipamento(dadosPorEquipamento){
         });
     }
 
-    atualizarValorFinalProposta();
+    // com o frete no Total com seguro, o frete pode ter mudado de
+    // equipamento (outro ganhou erro, mudou de ordem, entrou ou saiu)
+    if(freteNoTotalAtivo){
+
+        recalcularDescontos();
+
+        atualizarBotaoFreteNoTotal();
+
+    }else{
+
+        atualizarValorFinalProposta();
+    }
 }

@@ -32,6 +32,10 @@ let erroTabelaFretes = "";
 // A linha fixa do HTML já nasce com data-equip-id="1"
 let proximoEquipId = 2;
 
+// Seguro contra acidentes e furtos: 7% sobre a locação (Proposta Zap e
+// campo "Total com seguro" do Calcular Desconto)
+const TAXA_SEGURO = 0.07;
+
 
 // ======================================
 // NORMALIZAR MODELO

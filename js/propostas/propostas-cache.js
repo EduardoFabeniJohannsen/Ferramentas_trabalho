@@ -42,7 +42,10 @@ function salvarCache(){
                 bloco?.querySelector(".descPercentual")?.value || "",
 
             valorDesejado:
-                bloco?.querySelector(".descValorDesejado")?.value || ""
+                bloco?.querySelector(".descValorDesejado")?.value || "",
+
+            totalComSeguro:
+                bloco?.querySelector(".descTotalSeguro")?.value || ""
         });
     });
 
@@ -61,6 +64,7 @@ function salvarCache(){
         emojisAtivo: emojisAtivo,
         cidadeSaida: cidadeSaidaAtual,
         separarPagamentoAtivo: separarPagamentoAtivo,
+        freteNoTotalAtivo: freteNoTotalAtivo,
         equipamentos: equipamentos
     };
 
@@ -112,6 +116,10 @@ function restaurarCache(){
     separarPagamentoAtivo = dados.separarPagamentoAtivo === true;
 
     atualizarBotaoSepararPagamento();
+
+    freteNoTotalAtivo = dados.freteNoTotalAtivo === true;
+
+    atualizarBotaoFreteNoTotal();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)
@@ -189,6 +197,12 @@ function restaurarCache(){
             bloco.querySelector(".descPercentual").value =
                 equip.percentual;
 
+        }else if(equip.totalComSeguro){
+
+            // o Valor desejado sai do total na hora do cálculo
+            bloco.querySelector(".descTotalSeguro").value =
+                equip.totalComSeguro;
+
         }else if(equip.valorDesejado){
 
             bloco.querySelector(".descValorDesejado").value =
@@ -198,7 +212,9 @@ function restaurarCache(){
         calcularDescontoBloco(bloco);
     });
 
-    atualizarValorFinalProposta();
+    // de novo com todos os campos no lugar: o frete do Total com
+    // seguro fica no primeiro equipamento que usa o total
+    recalcularDescontos();
 }
 
 

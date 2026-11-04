@@ -218,6 +218,92 @@ const confere = (nome, ok, extra) => {
     confere("limpar tudo não mexe na configuração", (await pagina.inputValue("#formaPagamento")) === "Boleto");
     confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "");
 
+    // ---------- total com seguro ----------
+    const usarTabela = () => pagina.evaluate(() => {
+        tabelaPrecos = { WAE18: { "28": 5500, "30": 6000 }, WTE12: { "28": 3000, "30": 3200 } };
+        erroTabelaPrecos = "";
+        supabaseClient.from = () => ({ insert: async () => ({ error: null }) });
+        gerarTextos();
+    });
+    const zapAtual = async () => {
+        await pagina.evaluate(() => { window.__copiado = null; });
+        await pagina.click("button:has-text('Copiar Proposta Zap')");
+        await pagina.waitForTimeout(60);
+        return (await pagina.evaluate(() => window.__copiado)) || "";
+    };
+    const linhaZap = (texto, trecho) => (texto.split("\n").find(l => l.includes(trecho)) || "").trim();
+
+    await usarTabela();
+    await preencher();
+    await pagina.fill(".descTotalSeguro", "5.000,00");
+    confere("total com seguro preenche o valor desejado", (await pagina.inputValue(".descValorDesejado")) === "4.672,90", await pagina.inputValue(".descValorDesejado"));
+    const resultadoSeguro = await pagina.innerText(".desconto-item-resultado");
+    confere("total com seguro mostra o desconto e a conta", resultadoSeguro.includes("15.04%") && resultadoSeguro.includes("Locação R$ 4.672,90 + seguro R$ 327,10"), resultadoSeguro);
+    let zap = await zapAtual();
+    confere("Zap: total máquina + seguro bate com o digitado", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), linhaZap(zap, "Total máquina + seguro"));
+    confere("Zap: locação e seguro", linhaZap(zap, "Valor da locação").endsWith("R$ 4.672,90") && linhaZap(zap, "Seguro contra").endsWith("R$ 327,10"), [linhaZap(zap, "Valor da locação"), linhaZap(zap, "Seguro contra")]);
+
+    await pagina.fill("#periodo", "60");
+    confere("com 2 períodos divide o total", (await pagina.inputValue(".descValorDesejado")) === "2.336,45" && (await pagina.innerText(".desconto-item-resultado")).includes("(2 × R$ 2.336,45)"), await pagina.inputValue(".descValorDesejado"));
+    zap = await zapAtual();
+    confere("Zap com 2 períodos continua no total digitado", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), linhaZap(zap, "Total máquina + seguro"));
+
+    await pagina.waitForTimeout(100);
+    await abrir();
+    confere("recarregar mantém o total com seguro", (await pagina.inputValue(".descTotalSeguro")) === "5.000,00");
+    await usarTabela();
+    confere("recarregado recalcula pelo total", (await pagina.inputValue(".descValorDesejado")) === "2.336,45", await pagina.inputValue(".descValorDesejado"));
+
+    await pagina.fill(".descPercentual", "10");
+    confere("digitar % limpa o total com seguro", (await pagina.inputValue(".descTotalSeguro")) === "" && (await pagina.inputValue(".descValorDesejado")) === "5.400,00");
+    await pagina.fill(".descTotalSeguro", "6420");
+    confere("digitar o total limpa o %", (await pagina.inputValue(".descPercentual")) === "" && (await pagina.inputValue(".descValorDesejado")) === "3.000,00", await pagina.inputValue(".descValorDesejado"));
+    await pagina.screenshot({ path: path.join(saida, "23-propostas-total-seguro.png") });
+
+    // ---------- frete no total com seguro ----------
+    const desejado = (n = 0) => pagina.locator(".descValorDesejado").nth(n).inputValue();
+    const resultadoBloco = (n = 0) => pagina.locator(".desconto-item-resultado").nth(n).innerText();
+    await pagina.fill("#periodo", "28");
+    await pagina.fill(".descTotalSeguro", "5.000,00");
+    confere("frete fora do total por padrão", (await pagina.innerText("#btnFreteNoTotal")).includes("Não") && (await desejado()) === "4.672,90" && !(await pagina.isVisible("#contaFreteTotal")));
+
+    await pagina.click("#btnFreteNoTotal");
+    confere("frete terceirizado: ida e volta sem bitributação", (await desejado()) === "3.738,32" && !(await pagina.isVisible("#btnBitributacaoDesconto")) && (await pagina.innerText("#contaFreteTotal")).includes("R$ 500,00 x 2 (ida e volta) = R$ 1.000,00"), [await desejado(), await pagina.innerText("#contaFreteTotal")]);
+    confere("a conta do bloco mostra o frete", (await resultadoBloco()).includes("Locação R$ 3.738,32 + seguro R$ 261,68 + frete R$ 1.000,00"), await resultadoBloco());
+
+    await pagina.evaluate(() => alternarLocacaoComplementar());
+    confere("locação complementar com bitributação: frete x 2 + 20%", (await desejado()) === "3.551,40" && await pagina.isVisible("#btnBitributacaoDesconto") && (await pagina.innerText("#contaFreteTotal")).includes("+ 20% bitributação = R$ 1.200,00"), [await desejado(), await pagina.innerText("#contaFreteTotal")]);
+    zap = await zapAtual();
+    confere("Zap: total com frete +20% bate com o digitado", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*") && linhaZap(zap, "Total máquina + seguro").includes("(+20%)"), linhaZap(zap, "Total máquina + seguro"));
+
+    await pagina.click("#btnBitributacaoDesconto");
+    confere("tirar a bitributação no card: frete x 2", (await desejado()) === "3.738,32" && (await pagina.innerText("#btnBitributacao")).includes("Desativada"), await desejado());
+    zap = await zapAtual();
+    confere("Zap: total com frete sem bitributação bate", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*") && !linhaZap(zap, "Total máquina + seguro").includes("(+20%)"), linhaZap(zap, "Total máquina + seguro"));
+    await pagina.screenshot({ path: path.join(saida, "24-propostas-frete-no-total.png") });
+
+    // dois equipamentos: o frete sai só do primeiro que usa o total
+    await pagina.click(".equipamento-linha .btn-add-equipamento");
+    await pagina.locator(".equipamento-linha .equipamento").nth(1).fill("WTE12");
+    await pagina.locator(".descTotalSeguro").nth(1).fill("3.000,00");
+    confere("segundo equipamento sem o frete", (await desejado(0)) === "3.738,32" && (await desejado(1)) === "2.803,74" && (await resultadoBloco(1)).includes("Frete já entrou no total do WAE18"), [await desejado(0), await desejado(1)]);
+    zap = await zapAtual();
+    confere("Zap: valor final = soma dos totais digitados", linhaZap(zap, "Valor final da proposta").endsWith("R$ 8.000,00"), linhaZap(zap, "Valor final da proposta"));
+    await pagina.locator(".descPercentual").nth(0).fill("10");
+    confere("o primeiro sai do total: o frete passa para o segundo", (await desejado(1)) === "1.869,16" && !(await resultadoBloco(1)).includes("Frete já entrou"), await desejado(1));
+    await pagina.locator(".descTotalSeguro").nth(0).fill("800");
+    confere("total que não cobre o frete avisa", (await desejado(0)) === "" && (await resultadoBloco(0)).includes("não cobre o frete") && (await desejado(1)) === "2.803,74", [await desejado(0), await resultadoBloco(0)]);
+
+    await pagina.click("#btnFreteNoTotal");
+    confere("desligar volta ao total sem frete", (await desejado(0)) === "747,66" && !(await pagina.isVisible("#contaFreteTotal")) && !(await pagina.isVisible("#btnBitributacaoDesconto")), await desejado(0));
+    await pagina.click("#btnFreteNoTotal");
+    await pagina.waitForTimeout(100);
+    await abrir();
+    confere("recarregar mantém o frete no total", (await pagina.innerText("#btnFreteNoTotal")).includes("Sim") && await pagina.isVisible("#contaFreteTotal"));
+    await usarTabela();
+    confere("recarregado recalcula com o frete", (await desejado(0)) === "" && (await desejado(1)) === "2.803,74", [await desejado(0), await desejado(1)]);
+    await pagina.evaluate(() => { alternarLocacaoComplementar(); alternarBitributacao(); });
+
     confere("sem erros no console", erros.length === 0, erros);
 
     await navegador.close();

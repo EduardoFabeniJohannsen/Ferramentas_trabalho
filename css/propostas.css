@@ -124,3 +124,16 @@ LOCAÇÃO COMPLEMENTAR (valor pronto, embaixo do frete)
     font-size:12px;
     color:#94a3b8;
 }
+
+/* ===== Frete no Total com seguro (Calcular Desconto) ===== */
+#btnFreteNoTotal,
+#btnBitributacaoDesconto{
+    display:block;
+    width:100%;
+    margin:0 0 6px;
+}
+.conta-frete-total{
+    margin:0 0 10px;
+    font-size:12px;
+    color:#94a3b8;
+}

@@ -307,7 +307,7 @@ function copiarPropostaZap(){
 
 
             const seguroItem =
-                valorLocacaoItem * 0.07;
+                valorLocacaoItem * TAXA_SEGURO;
 
 
             // Locação complementar só entra na linha de Total

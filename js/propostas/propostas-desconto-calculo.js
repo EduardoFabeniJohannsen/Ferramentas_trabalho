@@ -1,7 +1,7 @@
 // ======================================
 // PROPOSTAS - DESCONTO (cálculo)
 // ======================================
-// Cálculo por % ou valor desejado, valor final e eventos de input.
+// Cálculo por %, valor desejado ou total com seguro (a conta do total fica em propostas-desconto-total-seguro.js), valor final e eventos de input.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // Valor de tabela e valor desejado são do total (todas as máquinas), mas o
@@ -55,11 +55,17 @@ function calcularDescontoBloco(bloco){
     const campoPercentual =
         bloco.querySelector(".descPercentual");
 
+    const campoTotalSeguro =
+        bloco.querySelector(".descTotalSeguro");
+
     const desejadoTexto =
         campoDesejado.value.trim();
 
     const percentualTexto =
         campoPercentual.value.trim();
+
+    const totalSeguroTexto =
+        campoTotalSeguro.value.trim();
 
 
     // ==================================
@@ -101,7 +107,29 @@ function calcularDescontoBloco(bloco){
 
 
     // ==================================
-    // OPÇÃO 2 — USUÁRIO DIGITOU VALOR FINAL
+    // OPÇÃO 2 — USUÁRIO DIGITOU O TOTAL COM SEGURO
+    // ==================================
+    // Conta em propostas-desconto-total-seguro.js (com ou sem o frete).
+
+    if(totalSeguroTexto){
+
+        const totalSeguro =
+            brToNumber(totalSeguroTexto);
+
+        if(
+            Number.isFinite(totalSeguro) &&
+            totalSeguro > 0
+        ){
+
+            calcularPeloTotalComSeguro(bloco, valorTabela, totalSeguro);
+            atualizarValorFinalProposta();
+            return;
+        }
+    }
+
+
+    // ==================================
+    // OPÇÃO 3 — USUÁRIO DIGITOU VALOR FINAL
     // ==================================
 
     if(desejadoTexto){
@@ -175,9 +203,40 @@ function atualizarValorFinalProposta(){
 }
 
 
-// Delegação de evento: digitar % ou valor desejado em
-// QUALQUER bloco de desconto recalcula só aquele bloco,
-// sem mexer nos outros.
+// Delegação de evento: digitar %, valor desejado ou total com
+// seguro em QUALQUER bloco de desconto recalcula só aquele bloco,
+// sem mexer nos outros. Digitar num deles limpa os outros dois.
+// Com o frete no total, recalcula todos: o frete pode mudar de bloco.
+
+function recalcularAposDigitar(bloco){
+
+    if(freteNoTotalAtivo){
+
+        recalcularDescontos();
+
+    }else{
+
+        calcularDescontoBloco(bloco);
+    }
+}
+
+
+function limparOutrosCamposDesconto(campo){
+
+    const bloco =
+        campo.closest(".desconto-item");
+
+    [".descPercentual", ".descValorDesejado", ".descTotalSeguro"]
+        .forEach(seletor => {
+
+            const outro =
+                bloco.querySelector(seletor);
+
+            if(outro !== campo) outro.value = "";
+        });
+
+    return bloco;
+}
 
 document.addEventListener("input", (evento) => {
 
@@ -193,24 +252,16 @@ document.addEventListener("input", (evento) => {
         bloco.dataset.valorTabela =
             brToNumber(evento.target.value);
 
-        calcularDescontoBloco(bloco);
+        recalcularAposDigitar(bloco);
 
-    }else if(evento.target.classList.contains("descPercentual")){
+    }else if(
+        evento.target.classList.contains("descPercentual") ||
+        evento.target.classList.contains("descValorDesejado") ||
+        evento.target.classList.contains("descTotalSeguro")
+    ){
 
-        const bloco =
-            evento.target.closest(".desconto-item");
-
-        bloco.querySelector(".descValorDesejado").value = "";
-
-        calcularDescontoBloco(bloco);
-
-    }else if(evento.target.classList.contains("descValorDesejado")){
-
-        const bloco =
-            evento.target.closest(".desconto-item");
-
-        bloco.querySelector(".descPercentual").value = "";
-
-        calcularDescontoBloco(bloco);
+        recalcularAposDigitar(
+            limparOutrosCamposDesconto(evento.target)
+        );
     }
 });

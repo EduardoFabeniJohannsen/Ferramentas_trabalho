@@ -20,6 +20,9 @@ function alternarLocacaoComplementar(){
 
     atualizarBotaoLocacaoComplementar();
 
+    // muda o frete do Total com seguro (propostas-desconto-total-seguro.js)
+    recalcularDescontos();
+
     salvarCache();
 }
 
@@ -62,6 +65,9 @@ function alternarBitributacao(){
 
     atualizarBotaoBitributacao();
 
+    // muda o frete do Total com seguro (propostas-desconto-total-seguro.js)
+    recalcularDescontos();
+
     salvarCache();
 }
 
@@ -76,19 +82,21 @@ function atualizarBotaoBitributacao(){
             locacaoComplementarAtiva ? "" : "none";
     }
 
-    const botao = $("btnBitributacao");
+    // o mesmo botão aparece nas Configurações e no Calcular Desconto
+    [$("btnBitributacao"), $("btnBitributacaoDesconto")].forEach(botao => {
 
-    if(!botao) return;
+        if(!botao) return;
 
-    botao.classList.toggle(
-        "ativo",
-        bitributacaoAtiva
-    );
+        botao.classList.toggle(
+            "ativo",
+            bitributacaoAtiva
+        );
 
-    botao.innerText =
-        `Bitributação (+20%): ${
-            bitributacaoAtiva ? "Ativada" : "Desativada"
-        }`;
+        botao.innerText =
+            `Bitributação (+20%): ${
+                bitributacaoAtiva ? "Ativada" : "Desativada"
+            }`;
+    });
 
     // o valor da locação complementar depende dos dois toggles
     atualizarResumoComplementar();
@@ -122,6 +130,9 @@ function valorLocacaoComplementar(){
 
 
 function atualizarResumoComplementar(){
+
+    // a conta do frete no Calcular Desconto depende das mesmas coisas
+    atualizarBotaoFreteNoTotal();
 
     const bloco = $("resumoComplementar");
 

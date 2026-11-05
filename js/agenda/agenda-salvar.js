@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - SALVAR E EXCLUIR
 // ======================================
-// salvarAgendamento() e excluirAgendamento().
+// salvarAgendamento(), concluirAgendamento() (botão ✅) e excluirAgendamento().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 async function salvarAgendamento(){
@@ -211,6 +211,40 @@ function avisoSalvoEscondido(item){
     }
 
     return " (não aparece com os filtros atuais)";
+}
+
+
+// Botão ✅ da linha (só na expedição): marca como Concluído em vez de excluir.
+// Na expedição o concluído sai da lista (STATUS_OCULTOS_EXPEDICAO), mas
+// continua no histórico, na pesquisa e no modo transportador.
+async function concluirAgendamento(item){
+
+    const nome =
+        [item.plataforma, item.cliente].filter(Boolean).join(" — ") || "este agendamento";
+
+    if(!confirm(`Marcar ${nome} como concluído?\n\nEle sai da expedição, mas não é excluído.`)) return false;
+
+    try{
+
+        const atualizado =
+            await atualizarAgendamento(item.id, { status: STATUS_CONCLUIDO });
+
+        Object.assign(item, atualizado);
+
+    }catch(erro){
+
+        console.error("[agenda] Falha ao marcar como concluído:", detalhesErro(erro));
+
+        mostrarToast("Erro ao marcar como concluído", true);
+
+        return false;
+    }
+
+    renderizarAgenda();
+
+    mostrarToast("Agendamento concluído");
+
+    return true;
 }
 
 

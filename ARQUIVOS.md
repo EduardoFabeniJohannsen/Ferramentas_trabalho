@@ -89,7 +89,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (338 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras).
   - doBanco, paraBanco, detalhesErro, mensagemErroSalvar, carregarAgenda, inserirAgendamento, atualizarAgendamento, excluirAgendamentoBanco, recarregarAgenda
-- `agenda-botoes-linha.js` (144 linhas): Botão 🔘 Botões: cada usuário escolhe quais botões aparecem em cada agendamento (nos dois modos). Também mede a largura da coluna dos botões quando as larguras são fixas. Carregar antes de agenda-init.js.
+- `agenda-botoes-linha.js` (165 linhas): Botão 🔘 Botões: cada usuário escolhe quais botões aparecem em cada agendamento (nos dois modos). O 🗑️ Excluir começa oculto para todo mundo (ocultoPadrao em BOTOES_LINHA), inclusive quem já tinha salvo a escolha; só aparece se o usuário ligar. Também mede a largura da coluna dos botões quando as larguras são fixas. Carregar antes de agenda-init.js.
   - botaoLigado, chaveBotoesLinha, carregarBotoesLinha, salvarBotoesLinha, ligarBotaoLinha, larguraColunaBotoes, atualizarBotaoBotoesLinha, desenharPainelBotoes, alternarPainelBotoes, fecharPainelBotoes
 - `agenda-busca.js` (183 linhas): Pesquisa 🔍 da barra por endereço, cliente (ou nome do local) e patrimônio; todas as palavras precisam aparecer. Também busca no banco os agendamentos de antes dos DIAS_PASSADOS_AGENDA (até 200, marcados com `antigo`, somem ao limpar). Esc ou × limpa. Carregar antes de agenda-init.js.
   - palavrasBuscaAgenda, buscandoAgenda, itemCombinaBusca, removerAntigosBusca, buscarAntigosAgenda, digitarBuscaAgenda, limparBuscaAgenda
@@ -105,7 +105,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
 - `agenda-colunas.js` (261 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
-- `agenda-config.js` (228 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
+- `agenda-config.js` (238 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda.
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-estoque-dados.js` (108 linhas): Consulta ao estoque: lê pela função `estoque_disponiveis` e descobre quais máquinas já estão em alguma demanda.
@@ -127,7 +127,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `agenda-init.js` (202 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
 - `agenda-larguras.js` (349 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
-- `agenda-linhas.js` (167 linhas): Cabeçalho da tabela e a linha de cada agendamento, com os botões (📋 Zap, 🧾 faturamento, ↩️ coleta, 🔍 estoque, editar, excluir).
+- `agenda-linhas.js` (194 linhas): Cabeçalho da tabela e a linha de cada agendamento, com os botões (✅ concluir, só na expedição; 📋 Zap, 🧾 faturamento, ↩️ coleta, 📆 duplicar, 🔍 estoque, editar, excluir).
   - criarCabecalhoAgenda, criarItemAgenda
 - `agenda-lixeira.js` (211 linhas): Lixeira (só admin): excluir manda o agendamento para a lixeira (`excluido_em`, pela função `mover_agendamento_lixeira` do banco; quem não é admin não vê mais). Botão 🗑️ Lixeira (`.so-admin`) lista os excluídos para restaurar ou apagar de vez (só admin pelo RLS; apaga junto o PDF do pedido). Carregar antes de agenda-init.js.
   - moverParaLixeiraBanco, carregarLixeira, dataLixeira, desenharLixeira, abrirLixeira, fecharLixeira, restaurarDaLixeira, apagarDeVez
@@ -151,8 +151,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - chaveRascunho, lerRascunhos, gravarRascunhos, removerRascunho, salvarRascunho, agendarRascunho, atualizarBotoesModal
 - `agenda-render.js` (223 linhas): Chips de transportadora, select de ordem, controles do modo e renderizarAgenda().
   - desenharChips, atualizarSelectOrdem, definirOrdem, atualizarControlesModo, renderizarAgenda
-- `agenda-salvar.js` (258 linhas): salvarAgendamento() (os filtros de status e datas ficam como estavam; se o salvo ficou escondido, o aviso diz por quê) e excluirAgendamento() (manda para a lixeira; o PDF do pedido fica até apagar de vez).
-  - salvarAgendamento, avisoSalvoEscondido, excluirAgendamento
+- `agenda-salvar.js` (292 linhas): salvarAgendamento() (os filtros de status e datas ficam como estavam; se o salvo ficou escondido, o aviso diz por quê), concluirAgendamento() (botão ✅: marca Concluído e sai da expedição, sem excluir) e excluirAgendamento() (manda para a lixeira; o PDF do pedido fica até apagar de vez).
+  - salvarAgendamento, avisoSalvoEscondido, concluirAgendamento, excluirAgendamento
 - `agenda-tema.js` (27 linhas): aplicarTema() e alternarTema() (fundo claro opcional; escuro é o padrão).
   - aplicarTema, alternarTema
 - `agenda-tempo-real.js` (151 linhas): Quem grava avisa os outros navegadores pelo canal de avisos do Supabase (sem dados, sem SQL) e cada um recarrega a lista. Espera a pessoa terminar se tiver formulário ou janela aberta, coluna sendo arrastada ou status sendo trocado; aba escondida recarrega ao voltar; a cada 5 min recarrega por segurança. Carregar antes de agenda-init.js.

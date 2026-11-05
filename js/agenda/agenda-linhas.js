@@ -45,6 +45,33 @@ function criarItemAgenda(item){
 
     const botoes = criar("div", "ag-botoes");
 
+    // ✅ marca como concluído (agenda-salvar.js), só na expedição. Já
+    // concluído ou cancelado fica invisível, pra manter os botões alinhados.
+    if(modoVisualizacao === "expedicao" && botaoLigado("concluir")){
+
+        const botaoConcluir = criar("button", "btn-concluir", "✅");
+
+        botaoConcluir.type = "button";
+
+        if([STATUS_CONCLUIDO, "Cancelado"].includes(item.status)){
+
+            botaoConcluir.style.visibility = "hidden";
+
+            botaoConcluir.tabIndex = -1;
+
+        }else{
+
+            botaoConcluir.title = "Marcar como concluído (sai da expedição sem excluir)";
+
+            botaoConcluir.addEventListener(
+                "click",
+                () => concluirAgendamento(item)
+            );
+        }
+
+        botoes.appendChild(botaoConcluir);
+    }
+
     const botaoZap = criar("button", "btn-zap", "📋");
 
     botaoZap.type = "button";

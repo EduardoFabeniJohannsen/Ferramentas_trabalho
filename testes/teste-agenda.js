@@ -250,8 +250,9 @@ const confere = (nome, ok, extra) => {
     await modo("expedicao");
     const qtdBotoes = () => pagina.$eval("tr.ag-item .ag-botoes", b => b.children.length);
     const caixaBotao = (nome) => pagina.locator("#listaBotoesLinha label", { hasText: nome }).locator("input");
-    confere("todos os botões de início", (await qtdBotoes()) === 7, await qtdBotoes());
-    confere("texto do botão", (await pagina.innerText("#btnBotoes")).includes("7 de 7"), await pagina.innerText("#btnBotoes"));
+    const classesBotoes = () => pagina.$eval("tr.ag-item .ag-botoes", b => [...b.children].map(c => c.className).join("|"));
+    confere("de início: todos menos o excluir, com o ✅ primeiro", (await qtdBotoes()) === 7 && !(await classesBotoes()).includes("btn-excluir-ag") && (await classesBotoes()).startsWith("btn-concluir"), await classesBotoes());
+    confere("texto do botão", (await pagina.innerText("#btnBotoes")).includes("7 de 8"), await pagina.innerText("#btnBotoes"));
     await abreOpcao("#btnBotoes");
     await pagina.screenshot({ path: path.join(saida, "6-painel-botoes.png") });
     await caixaBotao("Copiar faturamento").uncheck();
@@ -267,7 +268,7 @@ const confere = (nome, ok, extra) => {
     await pagina.waitForTimeout(100);
     confere("escolha continua ao recarregar", (await qtdBotoes()) === 5);
     await modo("transportador");
-    confere("vale também no transportador", (await qtdBotoes()) === 5);
+    confere("vale também no transportador (sem o ✅, que é só da expedição)", (await qtdBotoes()) === 4 && !(await classesBotoes()).includes("btn-concluir"), await classesBotoes());
     await pagina.click("#btnFiltros"); confere("botão aparece no transportador", await pagina.isVisible("#btnBotoes")); await pagina.mouse.click(5, 5);
 
     // clique dos que ficaram continua certo
@@ -283,12 +284,12 @@ const confere = (nome, ok, extra) => {
         const antes = usuarioAgenda;
         usuarioAgenda = "u2";
         carregarBotoesLinha();
-        const qtd = botoesOcultos.length;
+        const ocultos = botoesOcultos.join();
         usuarioAgenda = antes;
         carregarBotoesLinha();
-        return qtd;
+        return ocultos;
     });
-    confere("outro usuário tem a própria escolha", outro === 0, outro);
+    confere("outro usuário tem a própria escolha (só o excluir oculto, o padrão)", outro === "excluir", outro);
 
     // larguras fixas: congela com 3 botões e liga os 5, tudo tem que caber
     const alcaMot = pagina.locator("th.ag-cab-motorista .ag-redimensiona");
@@ -311,20 +312,68 @@ const confere = (nome, ok, extra) => {
     confere("coluna cresceu com os botões", lado5 > lado3, [lado3, lado5]);
     await pagina.screenshot({ path: path.join(saida, "8-fixa-cinco.png") });
 
-    // só o excluir: sem margem sobrando, e o último não desliga
-    for(const nome of ["Copiar agendamento", "Copiar faturamento", "Criar coleta", "Duplicar", "Consultar estoque", "Editar"]){
+    // só o excluir (ligado à mão): sem margem sobrando, e o último não desliga
+    // (o ✅ não conta: no transportador a linha ficaria sem botão)
+    await caixaBotao("Excluir").check();
+    for(const nome of ["Marcar como concluído", "Copiar agendamento", "Copiar faturamento", "Criar coleta", "Duplicar", "Consultar estoque", "Editar"]){
         await caixaBotao(nome).uncheck();
     }
     confere("largura fixa: só excluir cabe", await cabe());
     confere("último botão não pode ser desligado", await caixaBotao("Excluir").isDisabled());
+    await caixaBotao("Marcar como concluído").check();
+    confere("com só o excluir, o ✅ liga e desliga", !(await caixaBotao("Marcar como concluído").isDisabled()) && (await caixaBotao("Excluir").isDisabled()));
     await pagina.mouse.click(5, 5);
     await pagina.screenshot({ path: path.join(saida, "9-so-excluir.png") });
+    await abrir();
+    await pagina.waitForTimeout(100);
+    confere("excluir ligado à mão continua ao recarregar", (await classesBotoes()) === "btn-concluir|btn-secundario btn-excluir-ag", await classesBotoes());
+
+    // escolha salva antes desta versão (só a lista dos ocultos): o excluir passa a ficar oculto
+    await pagina.evaluate(() => localStorage.setItem("agendaBotoes:u1", JSON.stringify(["coleta"])));
+    await abrir();
+    await pagina.waitForTimeout(100);
+    let cls = await classesBotoes();
+    confere("escolha antiga: mantém o que estava oculto e esconde o excluir", (await qtdBotoes()) === 6 && !cls.includes("btn-coleta") && !cls.includes("btn-excluir-ag") && cls.includes("btn-concluir"), cls);
 
     // lixo salvo não quebra
     await pagina.evaluate(() => localStorage.setItem("agendaBotoes:u1", "{quebrado"));
     await abrir();
     await pagina.waitForTimeout(100);
     confere("dado inválido é ignorado", (await qtdBotoes()) === 7);
+
+    // ---------- ✅ marcar como concluído (expedição) ----------
+    await pagina.evaluate(() => {
+        window.__atualizados = [];
+        atualizarAgendamento = async (id, dados) => {
+            window.__atualizados.push({ id, dados });
+            return { ...agendamentos.find(ag => ag.id === id), ...dados };
+        };
+    });
+    const linhaDe = (cliente) => pagina.locator("tr.ag-item", { hasText: cliente });
+    confere("Cliente Três aparece na expedição", (await linhaDe("Cliente Três").count()) === 1);
+    let aviso = "";
+    pagina.once("dialog", d => { aviso = d.message(); d.dismiss(); });
+    await linhaDe("Cliente Três").locator("button.btn-concluir").click();
+    await pagina.waitForTimeout(100);
+    confere("pergunta antes e, cancelando, não muda nada", aviso.includes("WAE18R002 — Cliente Três") && aviso.includes("não é excluído") && (await pagina.evaluate(() => window.__atualizados.length)) === 0 && (await linhaDe("Cliente Três").count()) === 1, aviso);
+    pagina.once("dialog", d => d.accept());
+    await linhaDe("Cliente Três").locator("button.btn-concluir").click();
+    await pagina.waitForTimeout(150);
+    const salvo = await pagina.evaluate(() => window.__atualizados);
+    confere("✅ salva o status Concluído", salvo.length === 1 && salvo[0].id === 3 && salvo[0].dados.status === "Concluído", salvo);
+    confere("concluído sai da expedição (sem excluir)", (await linhaDe("Cliente Três").count()) === 0 && (await pagina.evaluate(() => agendamentos.some(ag => ag.id === 3 && ag.status === "Concluído"))));
+    confere("avisa que concluiu", (await pagina.innerText("#toast")).includes("concluído"), await pagina.innerText("#toast"));
+    await modo("transportador");
+    confere("no transportador continua, como Concluído", (await linhaDe("Cliente Três").count()) === 1 && (await linhaDe("Cliente Três").locator("button.btn-concluir").count()) === 0);
+    await modo("expedicao");
+    await pagina.evaluate(() => { atualizarAgendamento = async () => { throw new Error("sem rede"); }; });
+    pagina.once("dialog", d => d.accept());
+    await linhaDe("Cliente Cinco").locator("button.btn-concluir").click();
+    await pagina.waitForTimeout(150);
+    confere("falha ao salvar: avisa e a linha fica", (await pagina.innerText("#toast")).includes("Erro ao marcar como concluído") && (await linhaDe("Cliente Cinco").count()) === 1, await pagina.innerText("#toast"));
+    erros.splice(0, erros.length, ...erros.filter(e => !/Falha ao marcar como concluído/.test(e)));
+    await abrir();
+    await pagina.waitForTimeout(100);
     erros.length = erros.filter(e => !/inválidos/.test(e)).length;
 
     // ---------- botão único de filtros ----------

@@ -4,6 +4,9 @@
 // Botão 🔘 Botões da barra: cada usuário escolhe quais botões aparecem em
 // cada agendamento. Vale nos dois modos e fica salvo neste navegador,
 // separado por usuário. Os botões em si são montados em criarItemAgenda.
+// Os marcados com ocultoPadrao (o 🗑️ Excluir) começam desligados para todo
+// mundo, inclusive quem já tinha salvo a escolha antes: só aparecem se o
+// usuário ligar.
 
 function botaoLigado(id){
 
@@ -17,25 +20,40 @@ function chaveBotoesLinha(){
 }
 
 
+// salvo: { ocultos: [...], mostrados: [...] }; antes desta versão era só a
+// lista dos ocultos (sem "mostrados": os ocultos por padrão ficam ocultos)
 function carregarBotoesLinha(){
-
-    botoesOcultos = [];
 
     const dados = lerLocalJSON(chaveBotoesLinha(), []);
 
-    if(Array.isArray(dados)){
+    const salvo =
+        Array.isArray(dados)
+            ? { ocultos: dados, mostrados: [] }
+            : {
+                ocultos: Array.isArray(dados?.ocultos) ? dados.ocultos : [],
+                mostrados: Array.isArray(dados?.mostrados) ? dados.mostrados : []
+            };
 
-        botoesOcultos =
-            BOTOES_LINHA
-                .map(botao => botao.id)
-                .filter(id => dados.includes(id));
-    }
+    botoesOcultos =
+        BOTOES_LINHA
+            .filter(botao =>
+                botao.ocultoPadrao
+                    ? !salvo.mostrados.includes(botao.id)
+                    : salvo.ocultos.includes(botao.id)
+            )
+            .map(botao => botao.id);
 }
 
 
 function salvarBotoesLinha(){
 
-    gravarLocalJSON(chaveBotoesLinha(), botoesOcultos);
+    gravarLocalJSON(chaveBotoesLinha(), {
+        ocultos: botoesOcultos,
+        mostrados:
+            BOTOES_LINHA
+                .filter(botao => botao.ocultoPadrao && botaoLigado(botao.id))
+                .map(botao => botao.id)
+    });
 }
 
 
@@ -92,7 +110,9 @@ function desenharPainelBotoes(){
 
     lista.innerHTML = "";
 
-    const ligados = BOTOES_LINHA.filter(botao => botaoLigado(botao.id));
+    // o ✅ (só na expedição) não conta: no transportador a linha ficaria sem botão
+    const ligados =
+        BOTOES_LINHA.filter(botao => !botao.soExpedicao && botaoLigado(botao.id));
 
     BOTOES_LINHA.forEach(botao => {
 
@@ -105,7 +125,8 @@ function desenharPainelBotoes(){
         caixa.checked = botaoLigado(botao.id);
 
         // a linha precisa de pelo menos um botão
-        caixa.disabled = caixa.checked && ligados.length === 1;
+        caixa.disabled =
+            !botao.soExpedicao && caixa.checked && ligados.length === 1;
 
         caixa.addEventListener(
             "change",

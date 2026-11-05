@@ -28,11 +28,14 @@ const HORARIO_PADRAO = "08:00";
 
 const STATUS_PADRAO = "Confirmado";
 
+// o botão ✅ da linha marca este (agenda-salvar.js)
+const STATUS_CONCLUIDO = "Concluído";
+
 const STATUS_AGENDA = [
     "A confirmar",
     "Confirmado",
     "Em rota",
-    "Concluído",
+    STATUS_CONCLUIDO,
     "Cancelado"
 ];
 
@@ -101,15 +104,20 @@ const COLUNAS_TRANSPORTADOR = [
     { id: "proposta", titulo: "Proposta", semQuebra: true }
 ];
 
-// botões de cada agendamento (a ordem na linha fica em criarItemAgenda)
+// botões de cada agendamento (a ordem na linha fica em criarItemAgenda).
+// soExpedicao: só aparece no modo expedição.
+// ocultoPadrao: começa desligado para todo mundo; quem quiser liga no 🔘 Botões.
+// (O excluir começa oculto: o pessoal excluía depois de carregar, em vez de
+// marcar como concluído com o ✅.)
 const BOTOES_LINHA = [
+    { id: "concluir", rotulo: "✅ Marcar como concluído (só na expedição)", soExpedicao: true },
     { id: "zap", rotulo: "📋 Copiar agendamento" },
     { id: "faturamento", rotulo: "🧾 Copiar faturamento" },
     { id: "coleta", rotulo: "↩️ Criar coleta da entrega" },
     { id: "duplicar", rotulo: "📆 Duplicar (outro dia)" },
     { id: "estoque", rotulo: "🔍 Consultar estoque" },
     { id: "editar", rotulo: "✏️ Editar" },
-    { id: "excluir", rotulo: "🗑️ Excluir" }
+    { id: "excluir", rotulo: "🗑️ Excluir", ocultoPadrao: true }
 ];
 
 const CHAVE_AGENDA_MODO = "agendaModo";
@@ -124,7 +132,9 @@ const CHAVE_AGENDA_COLUNAS = "agendaColunas";
 // colunas que cada usuário ligou ou desligou (uma lista por modo), neste navegador
 const CHAVE_AGENDA_COLUNAS_VISIVEIS = "agendaColunasVisiveis";
 
-// botões da linha que cada usuário ocultou (valem nos dois modos), neste navegador
+// botões da linha que cada usuário ocultou e os ocultos por padrão que ele
+// ligou (valem nos dois modos), neste navegador: { ocultos: [], mostrados: [] }.
+// Salvo antes desta versão é só a lista dos ocultos.
 const CHAVE_AGENDA_BOTOES = "agendaBotoes";
 
 // largura das colunas de cada usuário (uma por modo), neste navegador
@@ -196,7 +206,7 @@ let ordemColunas = { expedicao: [], transportador: [] };
 // (só o que difere do padrão de COLUNAS_*)
 let colunasVisiveis = { expedicao: {}, transportador: {} };
 
-// ids de BOTOES_LINHA que o usuário ocultou (vazio = todos aparecem)
+// ids de BOTOES_LINHA que não aparecem (escolha do usuário + os ocultos por padrão)
 let botoesOcultos = [];
 
 // coluna que está sendo arrastada pelo título

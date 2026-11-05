@@ -520,6 +520,12 @@ tr.ag-item td.ag-proposta:first-child{
     margin:0;
     padding:5px 10px;
 }
+.ag-botoes .btn-concluir{
+    background:#065f46;
+}
+.ag-botoes .btn-concluir:hover{
+    background:#064e3b;
+}
 .ag-botoes .btn-zap{
     background:#16a34a;
 }

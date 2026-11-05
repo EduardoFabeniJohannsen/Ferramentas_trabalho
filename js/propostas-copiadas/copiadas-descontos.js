@@ -1,12 +1,9 @@
 // ======================================
-// ADMIN - DESCONTO MÉDIO POR USUÁRIO
+// PROPOSTAS ZAP COPIADAS - DESCONTO MÉDIO POR USUÁRIO
 // ======================================
-// Quadro acima da tabela "Propostas Zap copiadas": por usuário, quantas propostas,
-// quantos equipamentos com valor de tabela, o desconto médio (média do % de cada
-// equipamento, contando a quantidade), o desconto sobre o total de tabela (R$ dado
-// ÷ R$ de tabela) e o maior desconto. Usa as propostas que passam nos filtros, então
-// dá para ver por período, modelo, local... Equipamento sem valor de tabela não
-// entra na média. Carregar depois de admin-propostas-linhas.js.
+// Quadro acima da tabela: por usuário, quantas propostas, equipamentos com valor de tabela, desconto médio (média do % de cada equipamento, contando a quantidade), desconto sobre o total de tabela e o maior desconto, só das propostas que passam nos filtros.
+// Equipamento sem valor de tabela não entra na média. Carregar depois de
+// copiadas-linhas.js.
 
 function resumoDescontosPorUsuario(propostas){
 

@@ -28,17 +28,9 @@
         desenharErrosSite
     );
 
-    // busca, selects, desconto e datas: todos avisam pelo "input"
-    IDS_FILTROS_PROPOSTAS.forEach(id => {
-
-        $(id).addEventListener("input", desenharPropostasAdmin);
-    });
-
     desenharPerfis();
 
     carregarErrosSite();
-
-    carregarPropostasAdmin();
 
     // o tempo de "parado há 12 min" continua contando sem ninguém avisar
     setInterval(desenharUsuariosOnline, 30000);

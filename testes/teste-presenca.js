@@ -268,6 +268,8 @@ function nomeArquivoAtual(){ return location.pathname.split("/").pop() || "index
 
     // ---------- a tabela de acessos segue igual ----------
     confere("tabela de usuários continua", (await admin.locator("#corpoAdmin tr").count()) === 3);
+    confere("Admin e Propostas Zap aparecem com nome", await admin.evaluate(() => nomePaginaOnline("admin") === "Admin" && nomePaginaOnline("propostas-copiadas") === "Propostas Zap"));
+    confere("Admin tem a coluna Propostas Zap (para liberar o acesso)", (await admin.innerText("#cabecalhoAdmin")).includes("Propostas Zap"));
 
     // ---------- reconexão ----------
     ws.clients.forEach(c => c.terminate());

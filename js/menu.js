@@ -29,6 +29,8 @@
 
         { arquivo: "leads.html", rotulo: "🎯 Leads", comAcesso: true },
 
+        { arquivo: "propostas-copiadas.html", rotulo: "📊 Propostas Zap", comAcesso: true },
+
         // soAdmin: o link só aparece para admin
 
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
@@ -117,5 +119,29 @@
 
             topbar.insertBefore(link, referencia);
         });
+
+
+    // A topbar é fixa e quebra em mais linhas conforme a largura e os links
+    // (os de acesso só aparecem depois de ler o perfil). O conteúdo (.container,
+    // em style.css) desce a altura real dela, guardada em --altura-topbar, pra
+    // nunca ficar nada escondido embaixo.
+    const atualizarAlturaTopbar = () => {
+
+        document.documentElement.style.setProperty(
+            "--altura-topbar",
+            `${topbar.offsetHeight}px`
+        );
+    };
+
+    atualizarAlturaTopbar();
+
+    if(typeof ResizeObserver === "function"){
+
+        new ResizeObserver(atualizarAlturaTopbar).observe(topbar);
+
+    }else{
+
+        window.addEventListener("resize", atualizarAlturaTopbar);
+    }
 
 })();

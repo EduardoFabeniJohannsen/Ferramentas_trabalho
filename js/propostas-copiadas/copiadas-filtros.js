@@ -1,10 +1,8 @@
 // ======================================
-// ADMIN - FILTROS DAS PROPOSTAS ZAP
+// PROPOSTAS ZAP COPIADAS - FILTROS
 // ======================================
-// Filtros da tabela "Propostas Zap copiadas": busca em qualquer campo (todas as
-// palavras digitadas precisam aparecer), usuário, local de quem fez (cidade pelo
-// IP), aparelho, modelo, faixa de desconto e faixa de data. Modelo e desconto
-// valem para o mesmo equipamento. Carregar depois de admin-propostas.js.
+// Busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, prazo de pagamento (o que saiu na mensagem), faixa de desconto (o mesmo % da tabela; junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
+// Carregar depois de copiadas-dados.js.
 
 const IDS_FILTROS_PROPOSTAS = [
     "buscaPropostas",
@@ -12,6 +10,7 @@ const IDS_FILTROS_PROPOSTAS = [
     "filtroPropostasLocal",
     "filtroPropostasAparelho",
     "filtroPropostasModelo",
+    "filtroPropostasPrazo",
     "filtroPropostasDescontoMin",
     "filtroPropostasDescontoMax",
     "filtroPropostasDataDe",
@@ -43,6 +42,13 @@ const SELECTS_FILTRO_PROPOSTAS = {
         todos: "Todos os modelos",
         vazio: "(sem modelo)",
         valores: (proposta) => (proposta.dados?.equipamentos || []).map(item => item.modelo)
+    },
+    // o prazo que saiu na mensagem (prazoPagamentoAdmin em copiadas-linhas.js)
+    filtroPropostasPrazo: {
+        todos: "Todos os prazos",
+        vazio: "Sem prazo na mensagem",
+        valores: (proposta) => [prazoPagamentoAdmin(proposta.dados)],
+        rotulo: (prazo) => `${prazo} dias`
     }
 };
 
@@ -200,7 +206,7 @@ function desenharFiltrosPropostas(){
             [...valores]
                 .filter(valor => valor !== VAZIO_FILTRO_PROPOSTAS)
                 .map(valor => [valor, select.rotulo ? select.rotulo(valor) : valor])
-                .sort((a, b) => a[1].localeCompare(b[1], "pt-BR"));
+                .sort((a, b) => a[1].localeCompare(b[1], "pt-BR", { numeric: true }));
 
         if(valores.has(VAZIO_FILTRO_PROPOSTAS)) opcoes.push([VAZIO_FILTRO_PROPOSTAS, select.vazio]);
 

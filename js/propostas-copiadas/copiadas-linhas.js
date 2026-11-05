@@ -1,9 +1,8 @@
 // ======================================
-// ADMIN - LINHAS DAS PROPOSTAS ZAP
+// PROPOSTAS ZAP COPIADAS - LINHAS
 // ======================================
-// Monta cada linha da tabela "Propostas Zap copiadas": usuário e aparelho,
-// cliente, equipamentos com o desconto, total, configurações e a mensagem.
-// Tudo como texto (nada entra como HTML). Carregar depois de admin-propostas.js.
+// Cada linha da tabela: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
+// Carregar depois de copiadas-dados.js.
 
 function moedaAdmin(valor){
 
@@ -15,7 +14,7 @@ function moedaAdmin(valor){
 
 // desconto sobre o valor de tabela, em % com 1 casa, como aparece na tabela
 // (0 = sem desconto; null = sem valor de tabela pra comparar). O filtro de
-// desconto (admin-propostas-filtros.js) usa o mesmo número.
+// desconto (copiadas-filtros.js) usa o mesmo número.
 function descontoEquipamentoAdmin(item){
 
     if(!item.valorTabela || !Number.isFinite(item.valorFinal)) return null;
@@ -77,11 +76,26 @@ function configuracoesAdmin(dados){
 }
 
 
+// Prazo que saiu na mensagem: "28", "28/56"... ("" = a mensagem não citou prazo).
+// Com Boleto ou Depósito é o prazo digitado. Sem escolher a forma sai o texto
+// padrão (propostas-pagamento.js): com emojis não cita prazo; sem emojis diz
+// "28 dias, mediante aprovação cadastral".
+const PRAZO_TEXTO_PADRAO_SEM_EMOJIS = "28";
+
+function prazoPagamentoAdmin(dados){
+
+    const pagamento = dados?.pagamento || {};
+
+    if(pagamento.forma) return pagamento.prazo || "";
+
+    return dados?.configuracoes?.emojis === false ? PRAZO_TEXTO_PADRAO_SEM_EMOJIS : "";
+}
+
+
+// textoAparelhoOnline fica em presenca.js (o mesmo texto do Online agora)
 function textoAparelhoAdmin(aparelho){
 
-    return typeof textoAparelhoOnline === "function"
-        ? textoAparelhoOnline(aparelho || {})
-        : "";
+    return textoAparelhoOnline(aparelho || {});
 }
 
 

@@ -155,6 +155,34 @@ function descreverAparelho(ua, modelo, toques){
 }
 
 
+// Como o aparelho aparece nas telas do admin (Online agora e Propostas Zap
+// copiadas). TEXTO_TIPO_APARELHO também dá nome às opções do filtro de aparelho.
+const TEXTO_TIPO_APARELHO = {
+    celular: "📱 Celular",
+    tablet: "📱 Tablet",
+    computador: "💻 Computador"
+};
+
+
+// "📱 Celular: Samsung SM-S918B (Chrome) · Itajaí/Santa Catarina". Aba de uma
+// versão antiga do sistema não manda o aparelho: fica vazio.
+function textoAparelhoOnline(aba){
+
+    if(!aba.tipo) return "";
+
+    const nome =
+        [aba.aparelho, aba.navegador && `(${aba.navegador})`]
+            .filter(Boolean)
+            .join(" ");
+
+    return [
+        `${TEXTO_TIPO_APARELHO[aba.tipo] || aba.tipo}${nome ? `: ${nome}` : ""}`,
+        aba.cidade
+    ]
+        .filter(Boolean)
+        .join(" · ");
+}
+
 async function modeloDoAndroid(){
 
     try{

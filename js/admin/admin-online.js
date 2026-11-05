@@ -48,33 +48,6 @@ function textoAbaOnline(aba){
 }
 
 
-const TEXTO_TIPO_APARELHO = {
-    celular: "📱 Celular",
-    tablet: "📱 Tablet",
-    computador: "💻 Computador"
-};
-
-
-// "📱 Celular: Samsung SM-S918B (Chrome) · Itajaí/Santa Catarina". Aba de uma
-// versão antiga do sistema não manda o aparelho: fica vazio.
-function textoAparelhoOnline(aba){
-
-    if(!aba.tipo) return "";
-
-    const nome =
-        [aba.aparelho, aba.navegador && `(${aba.navegador})`]
-            .filter(Boolean)
-            .join(" ");
-
-    return [
-        `${TEXTO_TIPO_APARELHO[aba.tipo] || aba.tipo}${nome ? `: ${nome}` : ""}`,
-        aba.cidade
-    ]
-        .filter(Boolean)
-        .join(" · ");
-}
-
-
 // [{ id, nome, estado, abas }], uma linha por pessoa (pode ter várias abas abertas
 // ou estar em mais de um computador)
 function pessoasOnline(){

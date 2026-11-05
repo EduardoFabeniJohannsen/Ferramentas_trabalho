@@ -3,8 +3,8 @@
 // ======================================
 // Cada "Copiar Proposta Zap" grava na tabela propostas_copiadas o aparelho, a
 // cidade aproximada, os dados da proposta, as configurações ativadas e o texto
-// copiado. Quem fez e o horário o próprio banco preenche. Só o admin lê (RLS),
-// na página de Admin (admin-propostas.js). Falhar ao gravar nunca atrapalha a cópia.
+// copiado. Quem fez e o horário o próprio banco preenche. Lê o admin e quem tem o
+// acesso "propostas-copiadas" (RLS), na página propostas-copiadas.html. Falhar ao gravar nunca atrapalha a cópia.
 
 const TABELA_PROPOSTAS_COPIADAS = "propostas_copiadas";
 

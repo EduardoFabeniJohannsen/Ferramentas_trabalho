@@ -17,6 +17,7 @@ const PAGINAS = {
     "transportadoras.html": "transportadoras",
     "WEG.html": "weg",
     "admin.html": "admin",
+    "propostas-copiadas.html": "propostas-copiadas",
     "leads.html": "leads"
 };
 
@@ -181,12 +182,21 @@ const confere = (nome, ok, extra) => {
                 versao: document.querySelector(".versao")?.innerText,
                 versaoCerta: "v" + new Function("return VERSAO_SISTEMA")(),
                 links: [...document.querySelectorAll(".topbar a[href]")].map(link => link.getAttribute("href")),
+                // a topbar é fixa: o conteúdo precisa começar abaixo dela (--altura-topbar, menu.js)
+                topbarCobre: (() => {
+                    const topbar = document.querySelector(".topbar");
+                    const container = document.querySelector(".container");
+                    if(!topbar || !container) return false;
+                    return parseFloat(getComputedStyle(container).paddingTop) < topbar.offsetHeight;
+                })(),
                 scripts: [...document.scripts].map(script => script.getAttribute("src")).filter(Boolean)
             };
         });
 
         confere(`${arquivo}: botões chamam funções que existem`, resumo.semFuncao.length === 0, resumo.semFuncao.length ? resumo.semFuncao : undefined);
         confere(`${arquivo}: mostra a versão`, resumo.versao === resumo.versaoCerta, resumo.versao);
+
+        confere(`${arquivo}: a topbar não cobre o conteúdo`, !resumo.topbarCobre);
 
         const linksQuebrados = resumo.links.filter(link => !fs.existsSync(path.join(raiz, link.split(/[?#]/)[0])));
         confere(`${arquivo}: menu montado e sem link quebrado`, resumo.links.length > 0 && linksQuebrados.length === 0, linksQuebrados.length ? linksQuebrados : undefined);
@@ -254,6 +264,38 @@ const confere = (nome, ok, extra) => {
     }
 
     await vendedor.contexto.close();
+
+    // ---------- acesso marcado no Admin ----------
+    // propostas-copiadas abre com o acesso dela; o Admin continua só de admin
+    const comAcessoMarcado = await novoContexto({ acessos: ["propostas", "admin", "propostas-copiadas"] });
+
+    {
+        const pagina = await comAcessoMarcado.contexto.newPage();
+
+        pagina.on("dialog", d => d.accept());
+
+        await pagina.goto("http://site.test/admin.html");
+        await pagina.waitForURL("**/propostas.html", { timeout: 5000 }).catch(() => {});
+
+        confere("admin.html: só admin, mesmo com \"admin\" marcado", pagina.url().endsWith("/propostas.html"), pagina.url());
+
+        // na página de propostas o link aparece (comAcesso) e o do Admin não
+        await pagina.waitForFunction(() => document.querySelector('.topbar a[href="propostas-copiadas.html"]')?.style.display === "", null, { timeout: 5000 }).catch(() => {});
+        const links = await pagina.$$eval(".topbar a", l => l.filter(a => a.style.display !== "none").map(a => a.getAttribute("href")));
+        confere("com o acesso, o link 📊 Propostas Zap aparece no menu", links.includes("propostas-copiadas.html") && !links.includes("admin.html"), links);
+
+        await pagina.close();
+    }
+
+    {
+        const { pagina, erros } = await abrir(comAcessoMarcado.contexto, "propostas-copiadas.html");
+
+        confere("propostas-copiadas.html: abre com o acesso marcado", pagina.url().endsWith("/propostas-copiadas.html") && erros.length === 0, erros.length ? erros : pagina.url());
+
+        await pagina.close();
+    }
+
+    await comAcessoMarcado.contexto.close();
 
     // ---------- usuário desativado ----------
     const desativado = await novoContexto({ acessos: ["propostas"], ativo: false });

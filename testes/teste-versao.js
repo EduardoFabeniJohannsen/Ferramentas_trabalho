@@ -292,7 +292,7 @@ servidor.listen(0, "127.0.0.1", async () => {
     await p.close();
 
     // ---------- todas as páginas ----------
-    for(const pagina of ["index.html", "propostas.html", "agenda.html", "estoque.html", "tabelas.html", "WEG.html", "admin.html", "transportadoras.html", "leads.html"]){
+    for(const pagina of ["index.html", "propostas.html", "agenda.html", "estoque.html", "tabelas.html", "WEG.html", "admin.html", "propostas-copiadas.html", "transportadoras.html", "leads.html"]){
         const ctx3 = await navegador.newContext();
         publicar("9.0.0");
         const q = await novaAba(ctx3, pagina);

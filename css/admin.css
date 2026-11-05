@@ -142,7 +142,6 @@
 }
 
 /* ===== Erros do sistema ===== */
-.secao-propostas,
 .secao-erros{
     margin-top:28px;
     padding-top:4px;
@@ -184,117 +183,6 @@
     color:#ffffff;
     font-size:11px;
     font-weight:bold;
-}
-/* ===== Propostas Zap copiadas ===== */
-.filtros-propostas{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
-    gap:8px 12px;
-    margin:12px 0 0;
-}
-.filtros-propostas label{
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-    color:#94a3b8;
-    font-size:12px;
-}
-.filtros-propostas input,
-.filtros-propostas select{
-    margin:0;
-    padding:7px 8px;
-    font-size:14px;
-}
-.filtros-propostas input[type="date"]{
-    color-scheme:dark;
-}
-/* a busca ocupa a linha toda; a faixa de datas, duas colunas */
-.filtros-propostas .busca-propostas{
-    grid-column:1 / -1;
-}
-.filtros-propostas .filtro-largo{
-    grid-column:span 2;
-}
-.faixa-filtro{
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-.faixa-filtro input{
-    flex:1;
-    min-width:0;
-}
-@media(max-width:500px){
-    .filtros-propostas .filtro-largo{
-        grid-column:1 / -1;
-    }
-}
-.titulo-descontos{
-    margin:18px 0 0;
-    font-size:16px;
-}
-.area-descontos{
-    margin-bottom:18px;
-}
-.tabela-descontos .col-desconto-usuario{
-    text-align:left;
-    overflow-wrap:anywhere;
-}
-.tabela-descontos .col-desconto-media{
-    font-weight:bold;
-}
-.tabela-propostas td{
-    text-align:left;
-    font-size:13px;
-}
-.tabela-propostas td strong,
-.tabela-propostas td small{
-    display:block;
-}
-.tabela-propostas td small{
-    margin-top:2px;
-    color:#94a3b8;
-    font-size:12px;
-}
-.tabela-propostas .col-proposta-usuario,
-.tabela-propostas .col-proposta-cliente{
-    min-width:180px;
-    overflow-wrap:anywhere;
-}
-.tabela-propostas .col-proposta-equip{
-    min-width:240px;
-}
-.tabela-propostas .col-proposta-total{
-    white-space:nowrap;
-    font-weight:bold;
-}
-.tabela-propostas .col-proposta-config{
-    min-width:160px;
-}
-.tag-config{
-    display:inline-block;
-    margin:0 4px 4px 0;
-    padding:1px 8px;
-    border-radius:999px;
-    background:#334155;
-    font-size:11px;
-}
-.tabela-propostas .col-proposta-msg{
-    min-width:120px;
-}
-.tabela-propostas .col-proposta-msg details{
-    margin-top:4px;
-    color:#94a3b8;
-    font-size:12px;
-}
-.tabela-propostas .col-proposta-msg summary{
-    cursor:pointer;
-}
-.tabela-propostas .col-proposta-msg pre{
-    margin:4px 0 0;
-    max-width:420px;
-    white-space:pre-wrap;
-    overflow-wrap:anywhere;
 }
 .btn-copiar-erro{
     margin:0 0 0 8px;

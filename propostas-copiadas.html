@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Propostas Zap copiadas</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<!-- admin.css: o visual das tabelas do admin (card largo, tabela, barra);
+     propostas-copiadas.css: filtros e colunas desta página -->
+<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/propostas-copiadas.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <!-- links das outras páginas: montados pelo js/menu.js -->
+
+    <button onclick="fazerLogout()">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER (admin ou acesso "propostas-copiadas" marcado no Admin)
+========================= -->
+
+<div class="container">
+
+    <div class="card card-admin">
+
+        <!-- cada "Copiar Proposta Zap" (copiadas-dados.js) -->
+        <div class="secao-propostas">
+
+            <h2>📊 Propostas Zap copiadas</h2>
+
+            <p class="dica-admin">
+                Cada vez que alguém copia a Proposta Zap, fica registrado aqui: quem fez,
+                aparelho, cidade aproximada (pelo IP), cliente, equipamentos com o desconto,
+                total, configurações ativadas e a mensagem. Últimos 90 dias.
+            </p>
+
+            <!-- filtros (copiadas-filtros.js) -->
+            <div class="filtros-propostas">
+
+                <input
+                    type="search"
+                    id="buscaPropostas"
+                    class="busca-propostas"
+                    placeholder="Buscar em qualquer campo: cliente, usuário, cidade, modelo, valor, configuração, mensagem..."
+                    autocomplete="off"
+                >
+
+                <label>
+                    Usuário
+                    <select id="filtroPropostasUsuario"></select>
+                </label>
+
+                <label>
+                    Local de quem fez
+                    <select id="filtroPropostasLocal"></select>
+                </label>
+
+                <label>
+                    Aparelho
+                    <select id="filtroPropostasAparelho"></select>
+                </label>
+
+                <label>
+                    Modelo
+                    <select id="filtroPropostasModelo"></select>
+                </label>
+
+                <label title="O prazo que saiu na mensagem (Boleto/Depósito com prazo, ou o texto padrão)">
+                    Prazo de pagamento
+                    <select id="filtroPropostasPrazo"></select>
+                </label>
+
+                <label>
+                    Desconto (%)
+                    <span class="faixa-filtro">
+                        <input type="number" id="filtroPropostasDescontoMin" min="0" max="100" step="any" placeholder="de">
+                        a
+                        <input type="number" id="filtroPropostasDescontoMax" min="0" max="100" step="any" placeholder="até">
+                    </span>
+                </label>
+
+                <label class="filtro-largo">
+                    Data
+                    <span class="faixa-filtro">
+                        <input type="date" id="filtroPropostasDataDe" title="De">
+                        a
+                        <input type="date" id="filtroPropostasDataAte" title="Até">
+                    </span>
+                </label>
+
+            </div>
+
+            <div class="barra-admin">
+
+                <button type="button" onclick="carregarPropostasAdmin()">
+                    ↻ Atualizar
+                </button>
+
+                <button
+                    type="button"
+                    id="btnLimparFiltrosPropostas"
+                    style="display:none"
+                    onclick="limparFiltrosPropostas()"
+                >
+                    ✖ Limpar filtros
+                </button>
+
+                <span class="contagem" id="contagemPropostas"></span>
+
+            </div>
+
+            <!-- desconto médio de cada usuário, com os filtros acima (copiadas-descontos.js) -->
+            <h3 class="titulo-descontos">Desconto médio por usuário</h3>
+
+            <p class="dica-admin">
+                Conta só os equipamentos com valor de tabela, nas propostas que passam nos
+                filtros acima. "Desconto médio" é a média do % de cada equipamento (contando a
+                quantidade); "Sobre a tabela" é quanto o desconto em R$ representa do total de tabela.
+            </p>
+
+            <div class="area-admin area-descontos">
+
+                <table class="tabela-admin tabela-erros tabela-descontos">
+
+                    <thead>
+
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Propostas</th>
+                            <th>Equip. com tabela</th>
+                            <th>Desconto médio</th>
+                            <th>Sobre a tabela</th>
+                            <th>Desconto em R$</th>
+                            <th>Maior desconto</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="corpoDescontosUsuarios"></tbody>
+
+                </table>
+
+            </div>
+
+            <div class="area-admin">
+
+                <table class="tabela-admin tabela-erros tabela-propostas">
+
+                    <thead>
+
+                        <tr>
+                            <th>Quando</th>
+                            <th>Usuário e aparelho</th>
+                            <th>Cliente</th>
+                            <th>Equipamentos</th>
+                            <th>Total</th>
+                            <th>Configurações</th>
+                            <th>Mensagem</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="corpoPropostas"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/registro-erros.js"></script>
+<script src="js/arquivo-faltando.js"></script>
+<script src="js/auth-guard.js"></script>
+
+<script src="js/helpers.js"></script>
+<script src="js/atualizacao-sistema.js"></script>
+<script src="js/presenca.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/propostas-copiadas/copiadas-dados.js"></script>
+<script src="js/propostas-copiadas/copiadas-filtros.js"></script>
+<script src="js/propostas-copiadas/copiadas-linhas.js"></script>
+<script src="js/propostas-copiadas/copiadas-descontos.js"></script>
+<script src="js/propostas-copiadas/copiadas-init.js"></script>
+
+</body>
+
+</html>

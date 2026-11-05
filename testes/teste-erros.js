@@ -12,7 +12,7 @@ const umd = fs.readFileSync(path.join(raiz, "node_modules/@supabase/supabase-js/
 
 const tipos = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png" };
 
-const PAGINAS = ["index.html", "propostas.html", "agenda.html", "estoque.html", "tabelas.html", "transportadoras.html", "WEG.html", "admin.html", "leads.html"];
+const PAGINAS = ["index.html", "propostas.html", "agenda.html", "estoque.html", "tabelas.html", "transportadoras.html", "WEG.html", "admin.html", "propostas-copiadas.html", "leads.html"];
 
 const base64 = (dados) => Buffer.from(JSON.stringify(dados)).toString("base64url");
 

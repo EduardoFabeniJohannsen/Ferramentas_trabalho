@@ -1,5 +1,6 @@
-// Seção "Propostas Zap copiadas" do Admin: largura da página e os filtros (busca em
-// qualquer campo, usuário, local de quem fez, aparelho, modelo, desconto e datas).
+// Página "Propostas Zap copiadas" (propostas-copiadas.html, acesso marcado no Admin; antes era uma
+// seção do Admin): largura da página e os filtros (busca em qualquer campo, usuário,
+// local de quem fez, aparelho, modelo, prazo de pagamento, desconto e datas).
 // Banco simulado: nada aqui toca o Supabase de produção.
 const { chromium } = require("playwright-core");
 const fs = require("fs");
@@ -40,8 +41,8 @@ function temFilial(){ return true; }
 function existeLoginSalvo(){ return true; }
 function carregarPerfil(){ return Promise.resolve({}); }
 function fazerLogout(){}
-function recursoDaPagina(){ return "admin"; }
-function nomeArquivoAtual(){ return "admin.html"; }`;
+function recursoDaPagina(){ return "propostas-copiadas"; }
+function nomeArquivoAtual(){ return "propostas-copiadas.html"; }`;
 
 const PROPOSTAS = [
     {
@@ -53,7 +54,7 @@ const PROPOSTAS = [
     {
         id: 2, criado_em: "2026-10-20T15:00:00Z", usuario_email: "bia@exemplo.com", cliente: "Beta Ltda", cidade: "Blumenau", valor_total: 5000,
         aparelho: { tipo: "computador", aparelho: "Windows", navegador: "Edge", cidade: "Joinville/Santa Catarina" },
-        dados: { dias: 28, frete: 300, configuracoes: { emojis: true }, equipamentos: [
+        dados: { dias: 28, frete: 300, configuracoes: { emojis: true }, pagamento: { forma: "Depósito", prazo: "28/56" }, equipamentos: [
             { modelo: "WAE18", quantidade: 1, valorTabela: 3000, valorFinal: 2850 },
             { modelo: "WAE16", quantidade: 1, valorTabela: 2000, valorFinal: 2000 }
         ] },
@@ -96,7 +97,7 @@ const confere = (nome, ok, extra) => {
         const erros = [];
         pagina.on("pageerror", e => erros.push(e.message));
         pagina.on("console", m => { if(m.type() === "error" && !/404|ERR_FAILED/.test(m.text())) erros.push(m.text()); });
-        await pagina.goto("http://admin.test/admin.html");
+        await pagina.goto("http://admin.test/propostas-copiadas.html");
         await pagina.waitForSelector("#corpoPropostas td.col-quando");
         return { contexto, pagina, erros };
     };
@@ -105,6 +106,13 @@ const confere = (nome, ok, extra) => {
 
     const clientes = () => pagina.$$eval("#corpoPropostas td.col-proposta-cliente strong", l => l.map(c => c.innerText));
     const contagem = () => pagina.innerText("#contagemPropostas");
+
+    // ---------- saiu do Admin ----------
+    const htmlAdmin = fs.readFileSync(path.join(raiz, "admin.html"), "utf8");
+    confere("o Admin não tem mais as propostas", !htmlAdmin.includes("corpoPropostas") && !htmlAdmin.includes("propostas-copiadas/"));
+    const menu = await pagina.$$eval(".topbar a", l => l.map(a => a.getAttribute("href")));
+    confere("menu: link do Admin e sem link para a própria página", menu.includes("admin.html") && !menu.includes("propostas-copiadas.html"), menu);
+    confere("título da página", (await pagina.title()) === "Propostas Zap copiadas");
 
     // ---------- largura ----------
     const larguras = await pagina.evaluate(() => {
@@ -131,6 +139,8 @@ const confere = (nome, ok, extra) => {
     confere("locais de quem fez", JSON.stringify(await opcoes("filtroPropostasLocal")) === JSON.stringify(["Todos os locais", "Itajaí/Santa Catarina", "Joinville/Santa Catarina", "(sem cidade)"]), await opcoes("filtroPropostasLocal"));
     confere("modelos", JSON.stringify(await opcoes("filtroPropostasModelo")) === JSON.stringify(["Todos os modelos", "THP", "WAE16", "WAE18"]), await opcoes("filtroPropostasModelo"));
     confere("aparelhos", (await opcoes("filtroPropostasAparelho")).length === 3, await opcoes("filtroPropostasAparelho"));
+    confere("aparelho com o nome (presenca.js)", (await pagina.innerText("#corpoPropostas")).includes("📱 Celular: Samsung SM-S918B (Chrome) · Itajaí/Santa Catarina"));
+    confere("prazos que saíram nas mensagens", JSON.stringify(await opcoes("filtroPropostasPrazo")) === JSON.stringify(["Todos os prazos", "28 dias", "28/56 dias", "Sem prazo na mensagem"]), await opcoes("filtroPropostasPrazo"));
 
     // ---------- busca em qualquer campo ----------
     const buscar = async (texto) => { await pagina.fill("#buscaPropostas", texto); return clientes(); };
@@ -161,6 +171,26 @@ const confere = (nome, ok, extra) => {
     await pagina.selectOption("#filtroPropostasUsuario", "");
     await pagina.selectOption("#filtroPropostasModelo", "WAE16");
     confere("modelo", JSON.stringify(await clientes()) === '["Beta Ltda","Construtora Alfa"]', await clientes());
+    await pagina.selectOption("#filtroPropostasModelo", "");
+
+    // ---------- prazo de pagamento ----------
+    await pagina.selectOption("#filtroPropostasPrazo", "28");
+    confere("prazo 28 dias (o 28/56 não entra)", JSON.stringify(await clientes()) === '["Construtora Alfa"]', await clientes());
+    await pagina.selectOption("#filtroPropostasPrazo", "28/56");
+    confere("prazo 28/56 dias", JSON.stringify(await clientes()) === '["Beta Ltda"]', await clientes());
+    confere("contagem com o prazo", (await contagem()) === "1 de 3 proposta(s)" && await pagina.isVisible("#btnLimparFiltrosPropostas"), await contagem());
+    await pagina.selectOption("#filtroPropostasPrazo", "__vazio__");
+    confere("sem prazo na mensagem", JSON.stringify(await clientes()) === '["Gama"]', await clientes());
+    await pagina.selectOption("#filtroPropostasPrazo", "");
+    const prazos = await pagina.evaluate(() => [
+        prazoPagamentoAdmin({ configuracoes: { emojis: false } }),
+        prazoPagamentoAdmin({ configuracoes: { emojis: true } }),
+        prazoPagamentoAdmin({ pagamento: { forma: "Boleto", prazo: "" } }),
+        prazoPagamentoAdmin({ pagamento: { forma: "", prazo: "45" }, configuracoes: { emojis: true } }),
+        prazoPagamentoAdmin(null)
+    ]);
+    confere("prazo do texto padrão: 28 só sem emojis; prazo escondido sem forma não conta", JSON.stringify(prazos) === JSON.stringify(["28", "", "", "", ""]), prazos);
+    await pagina.selectOption("#filtroPropostasModelo", "WAE16");
 
     // ---------- desconto ----------
     await pagina.fill("#filtroPropostasDescontoMin", "1");
@@ -191,14 +221,14 @@ const confere = (nome, ok, extra) => {
     confere("Limpar filtros mostra todas", (await clientes()).length === 3 && (await contagem()) === "3 proposta(s)", await contagem());
     confere("Limpar filtros esvazia os campos", await pagina.evaluate(() => IDS_FILTROS_PROPOSTAS.every(id => $(id).value === "")));
 
-    await pagina.screenshot({ path: path.join(saida, "92-propostas-admin.png"), fullPage: true });
+    await pagina.screenshot({ path: path.join(saida, "92-propostas-copiadas.png"), fullPage: true });
     confere("sem erros no console", erros.length === 0, erros);
     await contexto.close();
 
     // ---------- celular ----------
     {
         const { contexto, pagina, erros } = await abrir({ width: 400, height: 800 });
-        await pagina.screenshot({ path: path.join(saida, "93-propostas-admin-celular.png"), fullPage: true });
+        await pagina.screenshot({ path: path.join(saida, "93-propostas-copiadas-celular.png"), fullPage: true });
         confere("no celular: os filtros não estouram a tela", await pagina.evaluate(() => {
             const filtros = document.querySelector(".filtros-propostas").getBoundingClientRect();
             return filtros.left >= 0 && filtros.right <= document.documentElement.clientWidth;

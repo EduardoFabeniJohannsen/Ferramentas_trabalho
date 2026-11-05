@@ -1,11 +1,10 @@
 // ======================================
-// ADMIN - PROPOSTAS ZAP COPIADAS
+// PROPOSTAS ZAP COPIADAS - DADOS
 // ======================================
-// Tabela com cada "Copiar Proposta Zap" (propostas-registro.js grava): quem fez,
-// aparelho e cidade, cliente, equipamentos com desconto, total, configurações e a
-// mensagem copiada. Só o admin lê (RLS). Os filtros ficam em
-// admin-propostas-filtros.js, as linhas são montadas em admin-propostas-linhas.js e o
-// desconto médio por usuário em admin-propostas-descontos.js.
+// Carrega cada "Copiar Proposta Zap" dos últimos 90 dias (até 500; propostas-registro.js grava; lê o admin e quem tem o acesso "propostas-copiadas", pela policy com tem_acesso), a contagem ("3 de 40" filtrando) e o aviso de lista vazia.
+// Os filtros ficam em copiadas-filtros.js, as linhas em copiadas-linhas.js e o
+// desconto médio por usuário em copiadas-descontos.js. As funções terminam em
+// "Admin" porque a seção ficava na página Admin.
 
 const TABELA_PROPOSTAS_ADMIN = "propostas_copiadas";
 
@@ -59,7 +58,7 @@ async function carregarPropostasAdmin(){
 
     carregandoPropostasAdmin = false;
 
-    // opções dos filtros (admin-propostas-filtros.js) vêm do que carregou
+    // opções dos filtros (copiadas-filtros.js) vêm do que carregou
     desenharFiltrosPropostas();
 
     desenharPropostasAdmin();

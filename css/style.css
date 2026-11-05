@@ -112,7 +112,9 @@ LAYOUT
 
     flex-wrap:wrap;
 
-    padding:90px 20px 40px;
+    /* desce a altura real da topbar fixa (--altura-topbar, medida no
+       menu.js; ela quebra em mais linhas com mais links) + 20px de folga */
+    padding:calc(var(--altura-topbar, 70px) + 20px) 20px 40px;
 }
 
 
@@ -474,10 +476,11 @@ TOAST
 RESPONSIVO
 ========================= */
 
+/* até o menu.js medir a topbar, conta com ela em duas linhas */
 @media(max-width:1200px){
 
     .container{
-        padding-top:130px;
+        padding-top:calc(var(--altura-topbar, 110px) + 20px);
     }
 
 }

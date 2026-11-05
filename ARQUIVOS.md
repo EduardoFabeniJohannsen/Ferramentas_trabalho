@@ -53,9 +53,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - CSS: style
 - JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
-**admin.html** — Usuários e acessos, online agora, propostas Zap copiadas e erros do sistema (só admin). Usa a largura toda da tela.
+**admin.html** — Usuários e acessos, online agora e erros do sistema (só admin). Usa a largura toda da tela. As Propostas Zap copiadas ficam na própria página (propostas-copiadas.html).
 - CSS: style → admin
-- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-propostas → admin-propostas-filtros → admin-propostas-linhas → admin-propostas-descontos → admin-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
@@ -65,26 +65,22 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - CSS: style
 - JS: supabase-config
 
+**propostas-copiadas.html** — Propostas Zap copiadas (link 📊 Propostas Zap): cada "Copiar Proposta Zap" com quem fez, aparelho, cliente, equipamentos com desconto, total e a mensagem; filtros (inclusive prazo de pagamento) e desconto médio por usuário. Acesso "propostas-copiadas" no Admin (os dados vêm pela policy de SELECT com `tem_acesso('propostas-copiadas')`). Usa o admin.css (card largo e tabelas) mais o propostas-copiadas.css, e a largura toda da tela.
+- CSS: style → admin → propostas-copiadas
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → copiadas-dados → copiadas-filtros → copiadas-linhas → copiadas-descontos → copiadas-init
+
 ## Arquivos (responsabilidade e funções)
 
-- `admin-config.js` (47 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
+- `admin-config.js` (51 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
 - `admin-dados.js` (105 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
   - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
 - `admin-erros-copiar.js` (43 linhas): Botões 📋 da seção "Erros do sistema": copia um erro (ou todos os da lista) com página, versão, usuário, horários, mensagem e detalhes, pronto para colar numa conversa. Carregar depois de admin-erros.js.
   - textoErroParaCopiar, copiarErroSite, copiarErrosVisiveis
 - `admin-erros.js` (293 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista, botão que grava um erro de teste e 📋 Copiar em cada erro (admin-erros-copiar.js). Nada entra como HTML.
   - mensagemFalhaErros, carregarErrosSite, errosVisiveis, desenharFiltroErros, criarCelulaMensagemErro, criarLinhaErro, criarLinhaAvisoErros, desenharErrosSite, limparErrosSite, testarRegistroErros
-- `admin-init.js` (48 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
-- `admin-online.js` (154 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada. Sem histórico.
-  - nomePaginaOnline, tempoOnline, textoAbaOnline, textoAparelhoOnline, pessoasOnline, desenharUsuariosOnline
-- `admin-propostas-descontos.js` (125 linhas): Quadro acima da tabela "Propostas Zap copiadas": por usuário, quantas propostas,
-  - resumoDescontosPorUsuario, percentualAdmin, desenharDescontosPorUsuario
-- `admin-propostas-filtros.js` (228 linhas): Filtros da tabela "Propostas Zap copiadas": busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, faixa de desconto (o mesmo % da tabela, junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
-  - normalizarBuscaAdmin, valoresFiltroProposta, textoBuscaProposta, numeroFiltroPropostas, diaProposta, descontoNoFiltro, propostasVisiveis, filtrandoPropostas, desenharFiltrosPropostas, limparFiltrosPropostas
-- `admin-propostas-linhas.js` (194 linhas): Cada linha da tabela de propostas: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
-  - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, textoAparelhoAdmin, celulaUsuarioProposta, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
-- `admin-propostas.js` (121 linhas): Seção "Propostas Zap copiadas": carrega os registros dos últimos 90 dias (até 500), contagem ("3 de 40" filtrando) e aviso de lista vazia. Os filtros ficam em admin-propostas-filtros.js e as linhas são montadas em admin-propostas-linhas.js.
-  - carregarPropostasAdmin, textoVazioPropostas, desenharPropostasAdmin
+- `admin-init.js` (40 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `admin-online.js` (127 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada (o texto vem de textoAparelhoOnline, em presenca.js). Sem histórico.
+  - nomePaginaOnline, tempoOnline, textoAbaOnline, pessoasOnline, desenharUsuariosOnline
 - `admin-tela.js` (254 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
 - `agenda-banco.js` (338 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras).
@@ -173,6 +169,15 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - existeLoginSalvo, ehAdmin, carregarPerfil, salvarPerfilCache, lerPerfilCache, buscarPerfil, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES (uma tabela por transportadora) e buscarLinhasFretes() (busca em páginas de 1000 linhas).
   - buscarLinhasFretes
+- `copiadas-dados.js` (120 linhas): Carrega cada "Copiar Proposta Zap" dos últimos 90 dias (até 500; propostas-registro.js grava e só o admin lê, pelo RLS), a contagem ("3 de 40" filtrando) e o aviso de lista vazia.
+  - carregarPropostasAdmin, textoVazioPropostas, desenharPropostasAdmin
+- `copiadas-descontos.js` (122 linhas): Quadro acima da tabela: por usuário, quantas propostas, equipamentos com valor de tabela, desconto médio (média do % de cada equipamento, contando a quantidade), desconto sobre o total de tabela e o maior desconto, só das propostas que passam nos filtros.
+  - resumoDescontosPorUsuario, percentualAdmin, desenharDescontosPorUsuario
+- `copiadas-filtros.js` (234 linhas): Busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, prazo de pagamento (o que saiu na mensagem), faixa de desconto (o mesmo % da tabela; junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
+  - normalizarBuscaAdmin, valoresFiltroProposta, textoBuscaProposta, numeroFiltroPropostas, diaProposta, descontoNoFiltro, propostasVisiveis, filtrandoPropostas, desenharFiltrosPropostas, limparFiltrosPropostas
+- `copiadas-init.js` (16 linhas): Ligações iniciais e a primeira carga. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `copiadas-linhas.js` (208 linhas): Cada linha da tabela: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
+  - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, prazoPagamentoAdmin, textoAparelhoAdmin, celulaUsuarioProposta, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
 - `estoque-busca.js` (114 linhas): Barra de pesquisa: mostra só o modelo digitado, num card. (Usa compararMaquinas, escaparHtml e STATUS_COM_PREVISAO do estoque-render.js.)
   - textoBusca, modelosDaBusca, htmlCardBusca, htmlBusca
 - `estoque-config.js` (95 linhas): Status, tipos, listas fixas, filiais e estado.
@@ -209,9 +214,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - atualizarContadoresLeads, desenharLeads
 - `leads-utils.js` (53 linhas): Rótulos de status e porte, nome a partir do e-mail e mensagem de erro.
   - rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads
-- `menu.js` (121 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html).
-- `presenca.js` (299 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai o id, a página, o estado, o aparelho (pelo navegador; no Android o modelo vem do Chrome) e a cidade aproximada pelo IP (get.geojs.io, guardada 6 h no navegador); não grava nada no banco. Carregar depois de helpers.js e auth-guard.js.
-  - calcularEstadoPresenca, enviarPresenca, navegadorDoTexto, aparelhoAndroid, descreverAparelho, modeloDoAndroid, cidadeDoIP, reenviarComAparelho, identificarAparelho, iniciarPresenca
+- `menu.js` (147 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html, leads.html, propostas-copiadas.html). Também mede a altura da topbar (fixa, quebra em mais linhas) e guarda em `--altura-topbar`, que o `.container` (style.css) usa para começar abaixo dela.
+- `presenca.js` (327 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai o id, a página, o estado, o aparelho (pelo navegador; no Android o modelo vem do Chrome) e a cidade aproximada pelo IP (get.geojs.io, guardada 6 h no navegador); não grava nada no banco. Também tem o texto do aparelho para as telas do admin (TEXTO_TIPO_APARELHO, textoAparelhoOnline). Carregar depois de helpers.js e auth-guard.js.
+  - calcularEstadoPresenca, enviarPresenca, navegadorDoTexto, aparelhoAndroid, descreverAparelho, textoAparelhoOnline, modeloDoAndroid, cidadeDoIP, reenviarComAparelho, identificarAparelho, iniciarPresenca
 - `proposta-zap.js` (459 linhas): copiarPropostaZap(): mensagem completa para WhatsApp. Depois de copiar, manda os dados para o registro do admin (propostas-registro.js).
   - copiarPropostaZap
 - `propostas-avisos.js` (129 linhas): Avisos de falha/offline e datalists de equipamentos e cidades.
@@ -294,7 +299,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 ## CSS
 
 - `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou)
-- `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `agenda.css`, `leads.css`: estilos de cada página
+- `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `agenda.css`, `leads.css`, `propostas-copiadas.css`: estilos de cada página (a propostas-copiadas.html carrega também o admin.css)
 - `transportadoras.css`: lista, modal, documentos e formulário de nova transportadora
 
 ## Supabase (tabelas, bucket e função)
@@ -314,7 +319,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 | `motoristas` | `agenda-banco.js` (leitura em `agenda-motoristas.js`), `transp-config.js` |
 | `motoristas_dados` | `transp-config.js` |
 | `perfis` | `admin-config.js`, `auth-guard.js` |
-| `propostas_copiadas` | `propostas-registro.js` (grava; usuário, e-mail e horário quem preenche é o banco), `admin-propostas.js` (só o admin lê e apaga). O SQL não fica neste repositório. |
+| `propostas_copiadas` | `propostas-registro.js` (grava; usuário, e-mail e horário quem preenche é o banco), `copiadas-dados.js` (propostas-copiadas.html; lê o admin e quem tem o acesso "propostas-copiadas", pela policy com `tem_acesso`; só o admin apaga). O SQL não fica neste repositório. |
 | `resumo_estoque` | `estoque-dados.js`, `estoque-upload.js`, `agenda-estoque-dados.js` (função `estoque_disponiveis`) |
 | `tabela_fretes` | `propostas-tabelas-fretes.js`, `tabelas-config.js` |
 | `tabela_precos` | `propostas-tabelas-precos.js`, `tabelas-config.js` |
@@ -351,9 +356,10 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (459), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (459), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (338), `agenda-form-campos.js` (337), `presenca.js` (327), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
+- `propostas-copiadas.html` para quem não é admin (acesso "propostas-copiadas", v16.41.0): os dados só aparecem com a policy de SELECT com `tem_acesso('propostas-copiadas')` em `propostas_copiadas`. Apagar continua só com o admin.
 - Acesso à agenda no Supabase: policies com `tem_acesso('agenda')` (admin ou perfil ativo com 'agenda'), não "qualquer logado".
 - Vários equipamentos no mesmo agendamento vão juntos na coluna `plataforma` (texto), ex: `2x WAD16 + WTE12`. Card, Zap, ordem e filtro leem esse texto; sem mudança no Supabase. A máquina de recolha da troca continua uma só.
 - Faturamento (forma, prazos, pedido) só em entregas; a coleta gerada de uma entrega não copia esses campos e o Zap não leva essas informações (só o card).

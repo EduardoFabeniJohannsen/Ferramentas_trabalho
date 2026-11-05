@@ -30,6 +30,10 @@ const ACESSOS_ADMIN = [
 
     { chave: "leads", rotulo: "Leads" },
 
+    // ver as Propostas Zap copiadas de todo mundo (propostas-copiadas.html);
+    // os dados vêm pela policy com tem_acesso('propostas-copiadas')
+    { chave: "propostas-copiadas", rotulo: "Propostas Zap" },
+
     { chave: "fretes", rotulo: "Dados de frete" }
 ];
 

@@ -111,3 +111,121 @@
     white-space:pre-wrap;
     overflow-wrap:anywhere;
 }
+
+/* ===== Filtro das colunas, estilo Excel (copiadas-filtro-colunas.js e -painel.js) ===== */
+.tabela-propostas th.th-filtro{
+    cursor:pointer;
+    user-select:none;
+}
+.tabela-propostas th.th-filtro:hover{
+    background:#1e293b;
+}
+.seta-filtro-coluna{
+    margin-left:6px;
+    padding:0 5px;
+    border:1px solid #475569;
+    border-radius:4px;
+    color:#94a3b8;
+    font-size:11px;
+}
+/* coluna filtrando: título e seta em azul, como o funil do Excel */
+.tabela-propostas th.filtrando{
+    color:#93c5fd;
+}
+.tabela-propostas th.filtrando .seta-filtro-coluna{
+    background:#2563eb;
+    border-color:#2563eb;
+    color:#ffffff;
+}
+.painel-filtro-coluna{
+    display:none;
+    position:absolute;
+    z-index:1200;
+    width:300px;
+    max-width:calc(100vw - 16px);
+    padding:10px 12px;
+    box-sizing:border-box;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+    text-align:left;
+    font-size:13px;
+}
+.painel-filtro-coluna.aberto{
+    display:block;
+}
+.filtro-coluna-topo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:8px;
+}
+.painel-filtro-coluna button{
+    margin:0;
+}
+.btn-fechar-filtro-coluna{
+    padding:2px 8px;
+    font-size:12px;
+}
+.painel-filtro-coluna .filtro-coluna-busca,
+.filtro-coluna-faixa input{
+    margin:0 0 8px;
+    padding:6px 8px;
+    font-size:13px;
+}
+.filtro-coluna-lista{
+    max-height:320px;
+    overflow-y:auto;
+    padding-right:4px;
+}
+.filtro-coluna-grupo + .filtro-coluna-grupo{
+    margin-top:8px;
+    padding-top:6px;
+    border-top:1px solid #334155;
+}
+.painel-filtro-coluna .filtro-coluna-titulo-grupo{
+    margin:0 0 4px;
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+.filtro-coluna-todos,
+.filtro-coluna-opcao{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:3px 0;
+    cursor:pointer;
+    overflow-wrap:anywhere;
+}
+.filtro-coluna-todos input,
+.filtro-coluna-opcao input{
+    width:auto;
+    margin:0;
+    flex:none;
+}
+.filtro-coluna-quantos{
+    margin-left:auto;
+    padding-left:6px;
+    color:#94a3b8;
+    font-size:12px;
+    white-space:nowrap;
+}
+.filtro-coluna-faixa label{
+    display:block;
+    color:#94a3b8;
+    font-size:12px;
+}
+.painel-filtro-coluna .btn-limpar-filtro-coluna{
+    width:100%;
+    margin-top:10px;
+    padding:6px 10px;
+    font-size:12px;
+}
+.btn-limpar-filtro-coluna:disabled{
+    opacity:.5;
+    cursor:default;
+}

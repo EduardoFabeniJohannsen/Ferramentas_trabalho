@@ -205,6 +205,73 @@ const confere = (nome, ok, extra) => {
     confere("sem desconto (até 0%); sem valor de tabela não entra", JSON.stringify(await clientes()) === '["Beta Ltda"]', await clientes());
     await pagina.fill("#filtroPropostasDescontoMax", "");
 
+    // ---------- filtro nos títulos da tabela (estilo Excel) ----------
+    const abrirColuna = async (coluna) => {
+        await pagina.click(`th[data-coluna="${coluna}"]`);
+        await pagina.waitForSelector("#painelFiltroColuna.aberto");
+    };
+    // "texto (quantas)" de cada caixinha (grupo = posição do grupo no painel, 1 em diante)
+    const opcoesPainel = (grupo = 1) => pagina.$$eval(
+        `#painelFiltroColuna .filtro-coluna-grupo:nth-child(${grupo}) .filtro-coluna-opcao`,
+        l => l.map(o => `${o.dataset.texto} ${o.querySelector(".filtro-coluna-quantos").textContent}`)
+    );
+    const opcaoPainel = (texto) => pagina.locator("#painelFiltroColuna .filtro-coluna-opcao", { hasText: texto }).locator("input");
+    const todosPainel = () => pagina.locator("#painelFiltroColuna .filtro-coluna-todos input").first();
+    const colunaEmDestaque = (coluna) => pagina.$eval(`th[data-coluna="${coluna}"]`, th => th.classList.contains("filtrando"));
+
+    confere("títulos com filtro têm a setinha (Mensagem não)", (await pagina.$$eval(".tabela-propostas th .seta-filtro-coluna", l => l.length)) === 6);
+    await abrirColuna("equipamentos");
+    confere("Equipamentos: modelos com quantas propostas têm cada um", JSON.stringify(await opcoesPainel()) === JSON.stringify(["THP (1)", "WAE16 (2)", "WAE18 (1)"]), await opcoesPainel());
+    await todosPainel().uncheck();
+    confere("desmarcar tudo esconde todas", (await clientes()).length === 0, await clientes());
+    await opcaoPainel("WAE18").check();
+    confere("só WAE18", JSON.stringify(await clientes()) === '["Beta Ltda"]', await clientes());
+    confere("coluna em destaque, contagem e Limpar filtros", (await colunaEmDestaque("equipamentos")) && (await contagem()) === "1 de 3 proposta(s)" && await pagina.isVisible("#btnLimparFiltrosPropostas"), await contagem());
+    confere("(Selecionar tudo) fica no meio-termo", await todosPainel().evaluate(c => c.indeterminate));
+    await opcaoPainel("WAE16").check();
+    confere("WAE18 ou WAE16: a proposta com algum deles aparece", JSON.stringify(await clientes()) === '["Beta Ltda","Construtora Alfa"]', await clientes());
+    await pagina.screenshot({ path: path.join(saida, "94-propostas-filtro-coluna.png") });
+    await pagina.keyboard.press("Escape");
+    confere("Esc fecha o painel", !(await pagina.isVisible("#painelFiltroColuna")));
+
+    await abrirColuna("config");
+    const grupos = await pagina.$$eval("#painelFiltroColuna .filtro-coluna-titulo-grupo", l => l.map(g => g.textContent));
+    confere("Configurações: um grupo por tipo", JSON.stringify(grupos) === JSON.stringify(["Cidade de saída", "Locação complementar", "Pagamento", "Diária", "Emojis", "Linha em branco no pagamento"]), grupos);
+    confere("lista só o que existe com os outros filtros (como no Excel)", JSON.stringify(await opcoesPainel(3)) === JSON.stringify(["Boleto 28 dias (1)", "Depósito 28/56 dias (1)"]), await opcoesPainel(3));
+    await opcaoPainel("Depósito 28/56 dias").uncheck();
+    confere("desmarcar Depósito tira a Beta (junto com o filtro de Equipamentos)", JSON.stringify(await clientes()) === '["Construtora Alfa"]', await clientes());
+    await pagina.click("h2");
+    confere("clicar fora fecha o painel", !(await pagina.isVisible("#painelFiltroColuna")));
+    await pagina.click("#btnLimparFiltrosPropostas");
+    confere("Limpar filtros tira também os das colunas", (await clientes()).length === 3 && !(await colunaEmDestaque("equipamentos")) && !(await colunaEmDestaque("config")), await clientes());
+
+    await abrirColuna("config");
+    await pagina.fill("#painelFiltroColuna .filtro-coluna-busca", "boleto");
+    const achadas = await pagina.$$eval("#painelFiltroColuna .filtro-coluna-opcao", l => l.filter(o => o.style.display !== "none").map(o => o.dataset.texto));
+    confere("pesquisa dentro do painel", JSON.stringify(achadas) === '["Boleto 28 dias"]', achadas);
+    await pagina.fill("#painelFiltroColuna .filtro-coluna-busca", "padrão");
+    await opcaoPainel("Pagamento padrão").uncheck();
+    confere("desmarcar Pagamento padrão tira a Gama; a pesquisa continua", JSON.stringify(await clientes()) === '["Beta Ltda","Construtora Alfa"]' && (await pagina.inputValue("#painelFiltroColuna .filtro-coluna-busca")) === "padrão", await clientes());
+
+    await abrirColuna("total");
+    await pagina.fill("#painelFiltroColuna input[data-campo='minimo']", "1500");
+    confere("Total a partir de R$ 1.500", JSON.stringify(await clientes()) === '["Beta Ltda","Construtora Alfa"]', await clientes());
+    await pagina.fill("#painelFiltroColuna input[data-campo='minimo']", "1000");
+    await pagina.fill("#painelFiltroColuna input[data-campo='maximo']", "2000");
+    confere("Total de R$ 1.000 a R$ 2.000 (Gama segue fora pelo pagamento)", JSON.stringify(await clientes()) === '["Construtora Alfa"]', await clientes());
+    confere("digitando, o campo não perde o foco", await pagina.evaluate(() => document.activeElement?.dataset.campo === "maximo"));
+    await pagina.click("#painelFiltroColuna .btn-limpar-filtro-coluna");
+    confere("Limpar filtro da coluna tira só o do Total", JSON.stringify(await clientes()) === '["Beta Ltda","Construtora Alfa"]' && !(await colunaEmDestaque("total")) && (await colunaEmDestaque("config")), await clientes());
+
+    await abrirColuna("quando");
+    confere("Quando: dias do mais novo pro mais antigo (com os outros filtros)", JSON.stringify(await opcoesPainel()) === JSON.stringify(["20/10/2026 (1)", "05/10/2026 (1)"]), await opcoesPainel());
+    await abrirColuna("usuario");
+    await opcaoPainel("📱 Celular").uncheck();
+    confere("Usuário e aparelho: tirar o celular", JSON.stringify(await clientes()) === '["Beta Ltda"]', await clientes());
+    await pagina.keyboard.press("Escape");
+    await pagina.click("#btnLimparFiltrosPropostas");
+    confere("tudo limpo de novo", (await clientes()).length === 3, await clientes());
+
     // ---------- datas ----------
     await pagina.fill("#filtroPropostasDataDe", "2026-10-20");
     confere("data a partir de", JSON.stringify(await clientes()) === '["Gama","Beta Ltda"]', await clientes());
@@ -232,6 +299,12 @@ const confere = (nome, ok, extra) => {
         confere("no celular: os filtros não estouram a tela", await pagina.evaluate(() => {
             const filtros = document.querySelector(".filtros-propostas").getBoundingClientRect();
             return filtros.left >= 0 && filtros.right <= document.documentElement.clientWidth;
+        }));
+        await pagina.click('th[data-coluna="config"]');
+        await pagina.waitForSelector("#painelFiltroColuna.aberto");
+        confere("no celular: o painel do filtro cabe na tela", await pagina.evaluate(() => {
+            const painel = document.querySelector("#painelFiltroColuna").getBoundingClientRect();
+            return painel.left >= 0 && painel.right <= document.documentElement.clientWidth;
         }));
         confere("no celular: sem erros", erros.length === 0, erros);
         await contexto.close();

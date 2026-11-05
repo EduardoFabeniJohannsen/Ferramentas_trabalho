@@ -135,7 +135,9 @@ function descontoNoFiltro(proposta, modelo, minimo, maximo){
 }
 
 
-function propostasVisiveis(){
+// ignorarColuna: um grupo do filtro das colunas que não conta (a lista dele
+// mostra o que existe com os outros filtros; copiadas-filtro-colunas.js)
+function propostasVisiveis(ignorarColuna){
 
     const termos =
         normalizarBuscaAdmin($("buscaPropostas").value).split(/\s+/).filter(Boolean);
@@ -172,6 +174,9 @@ function propostasVisiveis(){
 
         if(!descontoNoFiltro(proposta, modelo, descontoMin, descontoMax)) return false;
 
+        // caixinhas dos títulos da tabela (estilo Excel)
+        if(!passaFiltrosColuna(proposta, ignorarColuna)) return false;
+
         const texto = textoBuscaProposta(proposta);
 
         return termos.every(termo => texto.includes(termo));
@@ -181,7 +186,7 @@ function propostasVisiveis(){
 
 function filtrandoPropostas(){
 
-    return IDS_FILTROS_PROPOSTAS.some(id => $(id).value.trim() !== "");
+    return IDS_FILTROS_PROPOSTAS.some(id => $(id).value.trim() !== "") || filtrandoColunas();
 }
 
 
@@ -226,9 +231,14 @@ function desenharFiltrosPropostas(){
 }
 
 
+// os de cima e os das colunas
 function limparFiltrosPropostas(){
 
     IDS_FILTROS_PROPOSTAS.forEach(id => { $(id).value = ""; });
+
+    limparFiltrosColuna();
+
+    fecharPainelFiltroColuna();
 
     desenharPropostasAdmin();
 }

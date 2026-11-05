@@ -65,9 +65,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - CSS: style
 - JS: supabase-config
 
-**propostas-copiadas.html** — Propostas Zap copiadas (link 📊 Propostas Zap): cada "Copiar Proposta Zap" com quem fez, aparelho, cliente, equipamentos com desconto, total e a mensagem; filtros (inclusive prazo de pagamento) e desconto médio por usuário. Acesso "propostas-copiadas" no Admin (os dados vêm pela policy de SELECT com `tem_acesso('propostas-copiadas')`). Usa o admin.css (card largo e tabelas) mais o propostas-copiadas.css, e a largura toda da tela.
+**propostas-copiadas.html** — Propostas Zap copiadas (link 📊 Propostas Zap): cada "Copiar Proposta Zap" com quem fez, aparelho, cliente, equipamentos com desconto, total e a mensagem; filtros em cima (inclusive prazo de pagamento), filtro estilo Excel nos títulos da tabela (clicar no título abre as caixinhas) e desconto médio por usuário. Acesso "propostas-copiadas" no Admin (os dados vêm pela policy de SELECT com `tem_acesso('propostas-copiadas')`). Usa o admin.css (card largo e tabelas) mais o propostas-copiadas.css, e a largura toda da tela.
 - CSS: style → admin → propostas-copiadas
-- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → copiadas-dados → copiadas-filtros → copiadas-linhas → copiadas-descontos → copiadas-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → copiadas-dados → copiadas-filtros → copiadas-linhas → copiadas-descontos → copiadas-filtro-colunas → copiadas-filtro-painel → copiadas-init
 
 ## Arquivos (responsabilidade e funções)
 
@@ -169,15 +169,19 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - existeLoginSalvo, ehAdmin, carregarPerfil, salvarPerfilCache, lerPerfilCache, buscarPerfil, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES (uma tabela por transportadora) e buscarLinhasFretes() (busca em páginas de 1000 linhas).
   - buscarLinhasFretes
-- `copiadas-dados.js` (120 linhas): Carrega cada "Copiar Proposta Zap" dos últimos 90 dias (até 500; propostas-registro.js grava e só o admin lê, pelo RLS), a contagem ("3 de 40" filtrando) e o aviso de lista vazia.
+- `copiadas-dados.js` (123 linhas): Carrega cada "Copiar Proposta Zap" dos últimos 90 dias (até 500; propostas-registro.js grava e só o admin lê, pelo RLS), a contagem ("3 de 40" filtrando) e o aviso de lista vazia.
   - carregarPropostasAdmin, textoVazioPropostas, desenharPropostasAdmin
 - `copiadas-descontos.js` (122 linhas): Quadro acima da tabela: por usuário, quantas propostas, equipamentos com valor de tabela, desconto médio (média do % de cada equipamento, contando a quantidade), desconto sobre o total de tabela e o maior desconto, só das propostas que passam nos filtros.
   - resumoDescontosPorUsuario, percentualAdmin, desenharDescontosPorUsuario
-- `copiadas-filtros.js` (234 linhas): Busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, prazo de pagamento (o que saiu na mensagem), faixa de desconto (o mesmo % da tabela; junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
+- `copiadas-filtro-colunas.js` (239 linhas): Clicar no título de uma coluna da tabela abre caixinhas como no filtro do Excel: desmarcou, some. Usuário, Cliente e Configurações têm um grupo por tipo de informação; Equipamentos mostra a proposta se algum modelo dela estiver marcado; Total tem faixa de valor. Vale junto com os filtros de cima.
+  - gruposFiltroColuna, valoresDoGrupo, textoValorGrupo, passaFiltrosColuna, colunaFiltrando, filtrandoColunas, limparFiltrosColuna, opcoesDoGrupo, marcarValorColuna, prepararCabecalhoFiltros, atualizarCabecalhoFiltros
+- `copiadas-filtro-painel.js` (279 linhas): O painel que abre embaixo do título da coluna: pesquisa, "(Selecionar tudo)" de cada grupo, as caixinhas com quantas propostas têm cada valor e "Limpar filtro"; no Total, a faixa de valor. Marcar ou desmarcar filtra na hora. Fecha com Esc, no ✖ ou clicando fora. As regras ficam em copiadas-filtro-colunas.js.
+  - painelFiltroColuna, alternarPainelFiltroColuna, fecharPainelFiltroColuna, aplicarFiltroColuna, filtrarOpcoesPainel, caixaFiltroColuna, grupoPainelFiltro, faixaPainelFiltro, desenharPainelFiltroColuna
+- `copiadas-filtros.js` (244 linhas): Busca em qualquer campo (todas as palavras precisam aparecer, inclusive na mensagem), usuário, local de quem fez (cidade pelo IP), aparelho, modelo, prazo de pagamento (o que saiu na mensagem), faixa de desconto (o mesmo % da tabela; junto com o modelo vale para o mesmo equipamento) e faixa de data. As opções dos selects vêm das propostas carregadas.
   - normalizarBuscaAdmin, valoresFiltroProposta, textoBuscaProposta, numeroFiltroPropostas, diaProposta, descontoNoFiltro, propostasVisiveis, filtrandoPropostas, desenharFiltrosPropostas, limparFiltrosPropostas
-- `copiadas-init.js` (16 linhas): Ligações iniciais e a primeira carga. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
-- `copiadas-linhas.js` (208 linhas): Cada linha da tabela: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
-  - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, prazoPagamentoAdmin, textoAparelhoAdmin, celulaUsuarioProposta, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
+- `copiadas-init.js` (27 linhas): Ligações iniciais e a primeira carga. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `copiadas-linhas.js` (225 linhas): Cada linha da tabela: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
+  - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, textoComplementarAdmin, textoPagamentoAdmin, prazoPagamentoAdmin, textoAparelhoAdmin, celulaUsuarioProposta, textoPeriodoAdmin, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
 - `estoque-busca.js` (114 linhas): Barra de pesquisa: mostra só o modelo digitado, num card. (Usa compararMaquinas, escaparHtml e STATUS_COM_PREVISAO do estoque-render.js.)
   - textoBusca, modelosDaBusca, htmlCardBusca, htmlBusca
 - `estoque-config.js` (95 linhas): Status, tipos, listas fixas, filiais e estado.

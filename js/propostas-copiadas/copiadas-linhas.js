@@ -53,10 +53,7 @@ function configuracoesAdmin(dados){
 
     const lista = [`Saída ${dados?.cidadeSaida || "Itajaí"}`];
 
-    if(config.locacaoComplementar){
-
-        lista.push(config.bitributacao ? "Locação complementar +20%" : "Locação complementar");
-    }
+    if(config.locacaoComplementar) lista.push(textoComplementarAdmin(dados));
 
     if(config.diaria) lista.push("Diária");
 
@@ -64,15 +61,31 @@ function configuracoesAdmin(dados){
 
     if(config.separarPagamento) lista.push("Linha em branco no pagamento");
 
-    const pagamento = dados?.pagamento || {};
-
-    lista.push(
-        pagamento.forma
-            ? `${pagamento.forma}${pagamento.prazo ? ` ${pagamento.prazo} dias` : ""}`
-            : "Pagamento padrão"
-    );
+    lista.push(textoPagamentoAdmin(dados));
 
     return lista;
+}
+
+
+// "Locação complementar +20%", "Locação complementar" ou "" (sem ela)
+function textoComplementarAdmin(dados){
+
+    const config = dados?.configuracoes || {};
+
+    if(!config.locacaoComplementar) return "";
+
+    return config.bitributacao ? "Locação complementar +20%" : "Locação complementar";
+}
+
+
+// "Boleto 28 dias", "Depósito", "Pagamento padrão" (a tag e o filtro da coluna)
+function textoPagamentoAdmin(dados){
+
+    const pagamento = dados?.pagamento || {};
+
+    return pagamento.forma
+        ? `${pagamento.forma}${pagamento.prazo ? ` ${pagamento.prazo} dias` : ""}`
+        : "Pagamento padrão";
 }
 
 
@@ -113,17 +126,21 @@ function celulaUsuarioProposta(proposta){
 }
 
 
+// "28 dias", "30 dias × 2 períodos" (o resumo do cliente e o filtro da coluna)
+function textoPeriodoAdmin(dados){
+
+    return dados?.multiplicador > 1
+        ? `${dados.dias} dias × ${dados.multiplicador} períodos`
+        : `${dados?.dias || dados?.periodo || "?"} dias`;
+}
+
+
 // "Brusque · 28 dias · frete R$ 500,00"
 function resumoClienteProposta(proposta){
 
     const dados = proposta.dados || {};
 
-    const periodo =
-        dados.multiplicador > 1
-            ? `${dados.dias} dias × ${dados.multiplicador} períodos`
-            : `${dados.dias || dados.periodo || "?"} dias`;
-
-    return `${proposta.cidade || "—"} · ${periodo} · frete ${moedaAdmin(dados.frete)}`;
+    return `${proposta.cidade || "—"} · ${textoPeriodoAdmin(dados)} · frete ${moedaAdmin(dados.frete)}`;
 }
 
 

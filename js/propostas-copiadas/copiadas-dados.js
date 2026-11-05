@@ -102,6 +102,9 @@ function desenharPropostasAdmin(){
 
     desenharDescontosPorUsuario(visiveis);
 
+    // título da coluna em destaque quando ela filtra (copiadas-filtro-colunas.js)
+    atualizarCabecalhoFiltros();
+
     const filtrando = filtrandoPropostas();
 
     $("btnLimparFiltrosPropostas").style.display = filtrando ? "" : "none";

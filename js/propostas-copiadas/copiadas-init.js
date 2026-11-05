@@ -11,6 +11,17 @@
         $(id).addEventListener("input", desenharPropostasAdmin);
     });
 
+    // filtro estilo Excel nos títulos da tabela (copiadas-filtro-colunas.js)
+    prepararCabecalhoFiltros();
+
+    // o painel do filtro fecha clicando fora ou com Esc
+    document.addEventListener("click", fecharPainelFiltroColuna);
+
+    document.addEventListener("keydown", (evento) => {
+
+        if(evento.key === "Escape") fecharPainelFiltroColuna();
+    });
+
     carregarPropostasAdmin();
 
 })();

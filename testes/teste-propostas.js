@@ -286,6 +286,7 @@ const confere = (nome, ok, extra) => {
     let zap = await zapAtual();
     confere("Zap: total máquina + seguro bate com o digitado", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), linhaZap(zap, "Total máquina + seguro"));
     confere("Zap: locação e seguro iguais aos do resumo", linhaZap(zap, "Valor da locação").endsWith("R$ 4.672,90") && linhaZap(zap, "Seguro contra").endsWith("R$ 327,10"), [linhaZap(zap, "Valor da locação"), linhaZap(zap, "Seguro contra")]);
+    confere("Zap: frete terceirizado avisa o boleto de 14 dias da transportadora", zap.includes("(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada. A transportadora cobra por boleto com vencimento em 14 dias, enviado via WhatsApp.)"), linhaZap(zap, "terceirizado"));
 
     await pagina.fill("#periodo", "60");
     rs = await resumo();

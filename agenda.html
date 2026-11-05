@@ -434,7 +434,7 @@ MODAL (novo / editar)
                         <select id="agTransportadora"></select>
                     </div>
 
-                    <div>
+                    <div class="esconde-entre-unidades">
                         <label for="agCliente">Cliente</label>
                         <input type="text" id="agCliente" list="listaClientesAgenda" autocomplete="off" placeholder="Nome do cliente">
                     </div>
@@ -476,8 +476,22 @@ MODAL (novo / editar)
 
                 <div class="etapa-grade">
 
+                    <!-- transferência entre unidades: saída e destino são unidades da
+                         W Rental; retirada, entrega e cliente saem daqui (agenda-unidades.js) -->
+                    <div class="so-entre-unidades">
+                        <label for="agUnidadeSaida">Saída (unidade)</label>
+                        <select id="agUnidadeSaida"></select>
+                    </div>
+
+                    <div class="so-entre-unidades">
+                        <label for="agUnidadeDestino">Para qual unidade</label>
+                        <select id="agUnidadeDestino"></select>
+                    </div>
+
+                    <p class="largo so-entre-unidades enderecos-unidades" id="enderecosUnidades"></p>
+
                     <!-- locais que o cliente já usou: clique preenche (agenda-clientes.js) -->
-                    <div class="largo locais-cliente" id="blocoLocaisCliente" style="display:none">
+                    <div class="largo locais-cliente esconde-entre-unidades" id="blocoLocaisCliente" style="display:none">
 
                         <p class="subtitulo-form" id="tituloLocaisCliente"></p>
 
@@ -487,7 +501,7 @@ MODAL (novo / editar)
 
                     <!-- em entrega vem recolhida (quase sempre é a W Rental); clique abre -->
                     <p
-                        class="largo subtitulo-form titulo-retirada"
+                        class="largo subtitulo-form titulo-retirada esconde-entre-unidades"
                         id="tituloRetirada"
                         tabindex="0"
                         role="button"
@@ -498,36 +512,36 @@ MODAL (novo / editar)
                         <span class="retirada-seta">▾</span>
                     </p>
 
-                    <div class="largo campo-retirada">
+                    <div class="largo campo-retirada esconde-entre-unidades">
                         <label for="agOrigemNome">Nome do local</label>
                         <input type="text" id="agOrigemNome" placeholder="Ex: Obra A">
                     </div>
 
-                    <div class="largo campo-retirada">
+                    <div class="largo campo-retirada esconde-entre-unidades">
                         <label for="agOrigemEndereco">Endereço completo</label>
                         <input type="text" id="agOrigemEndereco" autocomplete="off" placeholder="Ex: Rua A, 100, Fazenda, Itajaí/SC">
                     </div>
 
-                    <div class="largo campo-retirada">
+                    <div class="largo campo-retirada esconde-entre-unidades">
                         <label for="agLinkOrigem">Link (opcional)</label>
                         <input type="text" id="agLinkOrigem" placeholder="https://maps...">
                     </div>
 
-                    <p class="largo subtitulo-form">
+                    <p class="largo subtitulo-form esconde-entre-unidades">
                         📍 Entrega (vazio em coleta = W Rental)
                     </p>
 
-                    <div class="largo">
+                    <div class="largo esconde-entre-unidades">
                         <label for="agDestinoNome">Nome do local</label>
                         <input type="text" id="agDestinoNome" placeholder="Ex: Cliente X">
                     </div>
 
-                    <div class="largo">
+                    <div class="largo esconde-entre-unidades">
                         <label for="agDestinoEndereco">Endereço completo</label>
                         <input type="text" id="agDestinoEndereco" autocomplete="off" placeholder="Ex: Rua B, 200, Centro, Brusque/SC">
                     </div>
 
-                    <div class="largo">
+                    <div class="largo esconde-entre-unidades">
                         <label for="agLinkDestino">Link (opcional)</label>
                         <input type="text" id="agLinkDestino" placeholder="https://maps...">
                     </div>
@@ -550,7 +564,7 @@ MODAL (novo / editar)
                         <input type="text" id="agCard">
                     </div>
 
-                    <div class="largo" id="blocoEmails">
+                    <div class="largo esconde-entre-unidades" id="blocoEmails">
                         <label for="agEmails">E-mails do cliente (faturamento)</label>
                         <input type="text" id="agEmails" placeholder="a@cliente.com; b@cliente.com">
                     </div>
@@ -742,6 +756,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 <script src="js/agenda/agenda-transportadoras.js"></script>
 <script src="js/agenda/agenda-motoristas.js"></script>
 <script src="js/agenda/agenda-form-campos.js"></script>
+<script src="js/agenda/agenda-unidades.js"></script>
 <script src="js/agenda/agenda-plataformas.js"></script>
 <script src="js/agenda/agenda-rascunho.js"></script>
 <script src="js/agenda/agenda-etapas.js"></script>

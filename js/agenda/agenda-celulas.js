@@ -36,7 +36,7 @@ function criarCelulasAgenda(item){
 
     // ---------- tipo ----------
 
-    const tagTipo = criar("span", "tag", item.tipo);
+    const tagTipo = criar("span", "tag", rotuloTipo(item.tipo));
 
     tagTipo.dataset.tipo = item.tipo;
 

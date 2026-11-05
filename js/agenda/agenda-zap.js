@@ -120,6 +120,9 @@ function referenciaZap(item){
             .filter(Boolean)
             .join("_");
 
+    // entre unidades não tem proposta: só "W RENTAL JOINVILLE_WAE18"
+    if(item.tipo === TIPO_TRANSFERENCIA_UNIDADES && !proposta) return nome;
+
     return `${nome} - Proposta: ${proposta}`.trimEnd();
 }
 

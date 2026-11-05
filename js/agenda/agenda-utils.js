@@ -1,12 +1,19 @@
 // ======================================
 // AGENDA - UTILITÁRIOS
 // ======================================
-// corDoDia(), tituloDoDia(), cidadeDoEndereco().
+// corDoDia(), tituloDoDia(), cidadeDoEndereco(), rotuloTipo().
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
 // UTILITÁRIOS
 // ======================================
+
+// "Transferência" aparece como "Transferência entre obras" (ROTULOS_TIPO)
+function rotuloTipo(tipo){
+
+    return ROTULOS_TIPO[tipo] || tipo;
+}
+
 
 function corDoDia(iso){
 

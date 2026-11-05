@@ -33,6 +33,12 @@ async function salvarAgendamento(){
         return avisoFormulario("Informe a plataforma", "demanda");
     }
 
+    // entre unidades: o cliente é a unidade de destino (agenda-unidades.js)
+    if(dados.tipo === TIPO_TRANSFERENCIA_UNIDADES && erroTransferenciaUnidades()){
+
+        return avisoFormulario(erroTransferenciaUnidades(), "local");
+    }
+
     if(!dados.cliente){
 
         return avisoFormulario("Informe o cliente", "demanda");

@@ -37,7 +37,8 @@ const CAMPOS_AGENDA = [
 ];
 
 
-function preencherSelect(id, valores, textoVazio){
+// rotulo(valor): o texto da opção, quando é diferente do valor salvo
+function preencherSelect(id, valores, textoVazio, rotulo){
 
     const select = $(id);
 
@@ -54,7 +55,7 @@ function preencherSelect(id, valores, textoVazio){
 
     valores.forEach(valor => {
 
-        const opcao = criar("option", "", valor);
+        const opcao = criar("option", "", rotulo ? rotulo(valor) : valor);
 
         opcao.value = valor;
 
@@ -268,6 +269,9 @@ function atualizarCamposTipo(){
         troca ? "Máquina de entrega" : "Plataforma";
 
     atualizarRetirada();
+
+    // entre unidades: saída e destino viram as caixas das unidades
+    atualizarBlocoUnidades();
 }
 
 

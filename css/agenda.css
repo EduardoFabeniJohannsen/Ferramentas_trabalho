@@ -442,8 +442,30 @@ tr.ag-item select.tag-select option{
 .tag[data-tipo="Transferência"]{
     background:#7e22ce;
 }
+.tag[data-tipo="Transferência entre unidades"]{
+    background:#a21caf;
+}
 .tag[data-tipo="Troca técnica"]{
     background:#0f766e;
+}
+
+/* ===== Transferência entre unidades (agenda-unidades.js) =====
+   O modal ganha a classe form-entre-unidades: aparecem as caixas de saída e
+   destino; somem retirada, entrega, cliente e e-mails (preenchidos sozinhos) */
+.so-entre-unidades{
+    display:none;
+}
+.form-entre-unidades .so-entre-unidades{
+    display:block;
+}
+.form-entre-unidades .esconde-entre-unidades{
+    display:none;
+}
+.enderecos-unidades{
+    margin:0;
+    font-size:12px;
+    color:#94a3b8;
+    white-space:pre-line;
 }
 /* transportadora "A definir": discreto, só o texto (sem etiqueta colorida) */
 .tag.sem-transp{

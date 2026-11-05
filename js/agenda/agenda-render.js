@@ -122,7 +122,7 @@ function atualizarControlesModo(){
 
     $("dicaModo").innerText =
         expedicao
-            ? "Só entregas e trocas que ainda não saíram. Inclui as sem data (preparar). Escolha as informações em ⚙️ Filtros. Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura."
+            ? "Só entregas, trocas e transferências entre unidades que ainda não saíram. Inclui as sem data (preparar). Escolha as informações em ⚙️ Filtros. Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura."
             : "Informação completa. Só o que já tem data definida. Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura.";
 }
 

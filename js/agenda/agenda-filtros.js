@@ -29,8 +29,9 @@ function visivelNoModo(item){
 
     if(modoVisualizacao === "expedicao"){
 
+        // entrega, troca e transferência entre unidades (TIPOS_EXPEDICAO)
         return (
-            (item.tipo === "Entrega" || item.tipo === "Troca técnica") &&
+            TIPOS_EXPEDICAO.includes(item.tipo) &&
             !STATUS_OCULTOS_EXPEDICAO.includes(item.status)
         );
     }
@@ -218,7 +219,7 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
             }
         }
 
-        // na expedição só tem entrega, então o filtro de tipo não vale
+        // na expedição os tipos já são os de TIPOS_EXPEDICAO: o filtro de tipo não vale
         if(!expedicao && tipo && item.tipo !== tipo) return false;
 
         // só as máquinas sem patrimônio definido

@@ -182,6 +182,14 @@ function mensagemErroSalvar(erro){
         return "Sem permissão para salvar na agenda. Confira seu acesso à agenda ou entre de novo no sistema.";
     }
 
+    // tipo novo que o banco ainda não aceita (regra da coluna tipo ou enum)
+    if(
+        (codigo === "23514" && /tipo/i.test(texto)) ||
+        (codigo === "22P02" && /enum/i.test(texto))
+    ){
+        return "O banco ainda não aceita este tipo de agendamento. Aplique o SQL da transferência entre unidades no Supabase.";
+    }
+
     if(codigo === "23514"){
 
         return "O banco recusou os dados: confira forma de pagamento e pedido de compra.";

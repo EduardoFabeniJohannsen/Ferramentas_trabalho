@@ -46,8 +46,8 @@ function ordenarAgendamentos(lista){
 
     const ordemTipos =
         ordem === "coletas"
-            ? ["Coleta", "Entrega", "Troca técnica", "Transferência"]
-            : ["Entrega", "Troca técnica", "Coleta", "Transferência"];
+            ? ["Coleta", "Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES, "Transferência"]
+            : ["Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES, "Coleta", "Transferência"];
 
     return lista.sort((a, b) => {
 

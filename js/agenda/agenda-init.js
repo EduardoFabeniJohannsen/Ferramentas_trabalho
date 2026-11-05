@@ -10,9 +10,17 @@
 
 (function init(){
 
-    preencherSelect("filtroTipo", TIPOS, "Todos os tipos");
+    preencherSelect("filtroTipo", TIPOS, "Todos os tipos", rotuloTipo);
 
-    preencherSelect("agTipo", TIPOS);
+    preencherSelect("agTipo", TIPOS, undefined, rotuloTipo);
+
+    // transferência entre unidades: as caixas de saída e destino (agenda-unidades.js)
+    prepararSelectsUnidades();
+
+    ["agUnidadeSaida", "agUnidadeDestino"].forEach(id => {
+
+        $(id).addEventListener("change", aplicarUnidades);
+    });
 
     preencherSelect("agStatus", STATUS_AGENDA);
 

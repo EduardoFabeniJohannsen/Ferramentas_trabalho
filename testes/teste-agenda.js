@@ -599,6 +599,92 @@ const confere = (nome, ok, extra) => {
     confere("duplicar funciona em qualquer agendamento", (await pagina.inputValue("#agCliente")) === "Cliente Dois");
     await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); localStorage.clear(); });
 
+    // ---------- transferência entre obras e entre unidades ----------
+    await pagina.evaluate(() => {
+        window.__inseridos = [];
+        inserirAgendamento = async (dados) => { window.__inseridos.push(dados); return { ...dados, id: 99 }; };
+    });
+    const tiposForm = await pagina.$$eval("#agTipo option", l => l.map(o => `${o.value}=${o.textContent}`));
+    confere("tipos: entre obras (o valor de sempre) e entre unidades", JSON.stringify(tiposForm) === JSON.stringify([
+        "Entrega=Entrega", "Coleta=Coleta", "Transferência=Transferência entre obras",
+        "Transferência entre unidades=Transferência entre unidades", "Troca técnica=Troca técnica"
+    ]), tiposForm);
+    const tiposFiltro = await pagina.$$eval("#filtroTipo option", l => l.map(o => o.textContent));
+    confere("o filtro de tipo usa os mesmos nomes", tiposFiltro.includes("Transferência entre obras") && tiposFiltro.includes("Transferência entre unidades"), tiposFiltro);
+
+    await pagina.evaluate(() => { removerRascunho("novo"); abrirModalAgenda(); });
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    await pagina.locator(".ag-plataforma-item").first().fill("WAE18R009");
+    confere("entrega: caixas das unidades escondidas", !(await pagina.isVisible("#agUnidadeDestino")) && await pagina.isVisible("#agCliente"));
+    await pagina.selectOption("#agTipo", "Transferência entre unidades");
+    const visivel = (sel) => pagina.isVisible(sel);
+    confere("entre unidades: só as caixas; somem retirada, entrega, cliente, e-mails e faturamento",
+        await visivel("#agUnidadeSaida") && await visivel("#agUnidadeDestino") &&
+        !(await visivel("#agCliente")) && !(await visivel("#tituloRetirada")) && !(await visivel("#agOrigemNome")) &&
+        !(await visivel("#agDestinoNome")) && !(await visivel("#agDestinoEndereco")) && !(await visivel("#agEmails")) &&
+        !(await visivel(".etapa-faturamento")) && await visivel("#agFrete"));
+    confere("saída Itajaí por padrão; destino a escolher, sem a própria Itajaí",
+        (await pagina.inputValue("#agUnidadeSaida")) === "Itajaí" && (await pagina.inputValue("#agUnidadeDestino")) === "" &&
+        (await pagina.$eval('#agUnidadeDestino option[value="Itajaí"]', o => o.disabled)) &&
+        (await pagina.$$eval("#agUnidadeDestino option", l => l.length)) === 10);
+
+    await pagina.evaluate(() => salvarAgendamento());
+    confere("sem destino não salva e avisa", (await pagina.evaluate(() => window.__inseridos.length)) === 0 && (await pagina.innerText("#toast")).includes("Escolha para qual unidade"), await pagina.innerText("#toast"));
+
+    await pagina.selectOption("#agUnidadeDestino", "Joinville");
+    const campos = await pagina.evaluate(() => ({
+        origem: $("agOrigemNome").value, origemEnd: $("agOrigemEndereco").value,
+        destino: $("agDestinoNome").value, destinoEnd: $("agDestinoEndereco").value,
+        cliente: $("agCliente").value, enderecos: $("enderecosUnidades").innerText
+    }));
+    confere("escolher a unidade preenche retirada, entrega e cliente com o endereço do site",
+        campos.origem === "W Rental Itajaí" && campos.origemEnd === "Av. Vereador Abrahão João Francisco, 3455, Itajaí/SC" &&
+        campos.destino === "W Rental Joinville" && campos.destinoEnd === "Rodovia BR-101, 47305, Km 47,5 (Pista Norte), Joinville/SC" &&
+        campos.cliente === "W Rental Joinville" && campos.enderecos.includes("Destino: Rodovia BR-101"), campos);
+
+    await pagina.selectOption("#agUnidadeSaida", "Joinville");
+    confere("saída igual ao destino: o destino volta a ser escolhido", (await pagina.inputValue("#agUnidadeDestino")) === "" && (await pagina.$eval('#agUnidadeDestino option[value="Joinville"]', o => o.disabled)));
+    await pagina.selectOption("#agUnidadeSaida", "Itajaí");
+    await pagina.selectOption("#agUnidadeDestino", "Curitiba");
+    await pagina.fill("#agFrete", "900,00");
+    await pagina.fill("#agData", hoje);
+    await pagina.evaluate(() => salvarAgendamento());
+    await pagina.waitForTimeout(150);
+    const transferencia = await pagina.evaluate(() => window.__inseridos[0] || {});
+    confere("salva como entre unidades, para a unidade, sem faturamento",
+        transferencia.tipo === "Transferência entre unidades" && transferencia.origemNome === "W Rental Itajaí" && transferencia.destinoNome === "W Rental Curitiba" &&
+        transferencia.destinoEndereco === "Rua João Ferreira Sobrinho, 44, Curitiba/PR" && transferencia.cliente === "W Rental Curitiba" &&
+        !transferencia.formaPagamento && !(transferencia.prazosPagamento || []).length, transferencia);
+
+    await modo("expedicao");
+    const linhaUnidade = pagina.locator("tr.ag-item", { hasText: "W Rental Curitiba" });
+    confere("entre unidades aparece na expedição, com o nome do tipo", (await linhaUnidade.count()) === 1, await linhaUnidade.count());
+    confere("sem 🧾 faturamento nem ↩️ coleta", (await linhaUnidade.locator(".btn-faturamento").evaluate(b => b.style.visibility)) === "hidden" && (await linhaUnidade.locator(".btn-coleta").evaluate(b => b.style.visibility)) === "hidden");
+
+    // entre obras (o "Transferência" de sempre) continua fora da expedição
+    await pagina.evaluate(() => {
+        agendamentos.push({ ...agendamentos[0], id: 98, tipo: "Transferência", cliente: "Obra para Obra", status: "Confirmado" });
+        renderizarAgenda();
+    });
+    confere("entre obras não aparece na expedição", (await pagina.locator("tr.ag-item", { hasText: "Obra para Obra" }).count()) === 0);
+    await modo("transportador");
+    const tagObras = await pagina.locator("tr.ag-item", { hasText: "Obra para Obra" }).locator('.tag[data-tipo="Transferência"]').innerText().catch(() => "");
+    confere("no transportador aparece como Transferência entre obras", tagObras === "Transferência entre obras", tagObras);
+
+    const zap = await pagina.evaluate(() => montarTextoZap(agendamentos.find(ag => ag.id === 99)).texto || "");
+    confere("Zap: título, saída e entrega com as unidades e a referência sem proposta",
+        zap.startsWith("🚚 AGENDAMENTO DE TRANSFERÊNCIA ENTRE UNIDADES") && zap.includes("W Rental Itajaí") &&
+        zap.includes("Rua João Ferreira Sobrinho, 44, Curitiba/PR") && zap.includes("* W RENTAL CURITIBA_WAE18") && !zap.includes("Proposta:"), zap);
+
+    // abrir o salvo de novo: as caixas voltam com as unidades dele
+    await pagina.evaluate(() => abrirModalAgenda(99));
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    confere("editar: as caixas mostram as unidades salvas", (await pagina.inputValue("#agUnidadeSaida")) === "Itajaí" && (await pagina.inputValue("#agUnidadeDestino")) === "Curitiba" && await pagina.isVisible("#agUnidadeDestino"));
+    await pagina.screenshot({ path: path.join(saida, "10-transferencia-unidades.png") });
+    await pagina.selectOption("#agTipo", "Entrega");
+    confere("trocar para entrega volta os campos de sempre", await pagina.isVisible("#agCliente") && !(await pagina.isVisible("#agUnidadeDestino")) && await pagina.isVisible(".etapa-faturamento"));
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); removerRascunho("edit:99"); localStorage.clear(); });
+
     confere("sem erros no console", erros.length === 0, erros);
 
     await navegador.close();

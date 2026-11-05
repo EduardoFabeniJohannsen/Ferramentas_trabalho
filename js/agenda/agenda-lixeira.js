@@ -74,7 +74,7 @@ function desenharLixeira(){
             criar(
                 "strong",
                 "",
-                `${item.tipo} · ${dataLixeira(item.data)} · ${item.plataforma || "sem equipamento"}`
+                `${rotuloTipo(item.tipo)} · ${dataLixeira(item.data)} · ${item.plataforma || "sem equipamento"}`
             )
         );
 

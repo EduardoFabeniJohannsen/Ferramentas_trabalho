@@ -7,7 +7,7 @@
 const NOMES_FILIAIS_ESTOQUE = { 1: "Itajaí", 2: "Joinville" };
 
 // tipos em que a máquina sai do pátio (coleta é a máquina voltando)
-const TIPOS_RESERVAM_MAQUINA = ["Entrega", "Troca técnica", "Transferência"];
+const TIPOS_RESERVAM_MAQUINA = ["Entrega", "Troca técnica", "Transferência", TIPO_TRANSFERENCIA_UNIDADES];
 
 // passou disso sem publicar: a data do estoque fica em destaque
 const LIMITE_ESTOQUE_ANTIGO_MS = 12 * 60 * 60 * 1000;

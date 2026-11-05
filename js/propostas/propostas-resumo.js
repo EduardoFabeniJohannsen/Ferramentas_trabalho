@@ -194,7 +194,7 @@ function secaoFreteResumo(){
 
         secao.append(
             linhaResumo("Entrega + retirada", moedaResumo(frete * 2)),
-            notaResumo("Terceirizado: um boleto na entrega e outro na retirada (14 dias, pela transportadora via WhatsApp), fora do valor final.")
+            notaResumo("Terceirizado: um boleto na entrega e outro na retirada (boleto com vencimento em 14 dias), fora do valor final.")
         );
     }
 

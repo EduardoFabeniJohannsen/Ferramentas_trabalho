@@ -416,7 +416,7 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
     const notaFrete =
         locacaoComplementarAtiva
             ? `(Frete incluso como "Locação Complementar")`
-            : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada. A transportadora cobra por boleto com vencimento em 14 dias, enviado via WhatsApp.)`;
+            : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada, boleto com vencimento em 14 dias)`;
 
 
     // boleto ou depósito e o prazo (propostas-pagamento.js)

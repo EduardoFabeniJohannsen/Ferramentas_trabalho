@@ -188,6 +188,9 @@
 
         carregarBotoesLinha();
 
+        // os status desmarcados no filtro (salvos por usuário e por modo)
+        carregarStatusFiltro();
+
         recarregarAgenda(false);
 
         // mudou algo em outro navegador: atualiza aqui (agenda-tempo-real.js)

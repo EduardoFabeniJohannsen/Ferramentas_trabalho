@@ -21,6 +21,9 @@ function definirModo(modo){
 
     gravarLocal(CHAVE_AGENDA_MODO, modoVisualizacao);
 
+    // cada modo tem o seu filtro de status salvo (agenda-filtro-status.js)
+    carregarStatusFiltro();
+
     renderizarAgenda();
 }
 
@@ -129,6 +132,9 @@ function limparFiltros(){
     datasOcultas.clear();
 
     statusOcultos.clear();
+
+    // o status fica salvo (agenda-filtro-status.js): limpo também fica
+    salvarStatusFiltro();
 
     $("filtroTipo").value = "";
 

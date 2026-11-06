@@ -452,6 +452,31 @@ const confere = (nome, ok, extra) => {
     confere("limpar mostra tudo de novo", (await pagina.innerText("#contagemAgenda")).startsWith("5 "), await pagina.innerText("#contagemAgenda"));
     confere("limpar solta os selects", (await pagina.$eval("#filtroTipo", e => e.value)) === "");
 
+    // ---------- status fica salvo (por usuário e por modo) ----------
+    const statusSalvo = () => pagina.evaluate(() => JSON.stringify((JSON.parse(localStorage.getItem("agendaStatus:u1") || "{}")).transportador || []));
+    const recarregar = async () => { await abrir(); await pagina.waitForTimeout(150); };
+    await abreOpcao("#btnStatus");
+    await pagina.locator("#listaStatusFiltro label", { hasText: "A confirmar" }).locator("input").uncheck();
+    confere("status desmarcado fica salvo no navegador", (await statusSalvo()) === '["A confirmar"]', await statusSalvo());
+    await recarregar();
+    confere("recarregar mantém o status desmarcado no transportador", (await pagina.innerText("#contagemAgenda")).startsWith("4 ") && (await pagina.innerText("#resumoFiltros")).includes("status"), [await pagina.innerText("#contagemAgenda"), await pagina.innerText("#resumoFiltros")]);
+    await abreOpcao("#btnStatus");
+    confere("a caixinha do status desmarcado continua desmarcada", !(await pagina.locator("#listaStatusFiltro label", { hasText: "A confirmar" }).locator("input").isChecked()));
+    await pagina.mouse.click(5, 5);
+    await modo("expedicao");
+    confere("a expedição tem o próprio filtro de status", !(await pagina.innerText("#resumoFiltros")).includes("status"), await pagina.innerText("#resumoFiltros"));
+    await modo("transportador");
+    confere("voltar ao transportador traz o status desmarcado", (await pagina.innerText("#contagemAgenda")).startsWith("4 "), await pagina.innerText("#contagemAgenda"));
+    await pagina.click("#btnLimparFiltros");
+    await recarregar();
+    confere("limpar filtros também fica salvo", (await statusSalvo()) === "[]" && (await pagina.innerText("#contagemAgenda")).startsWith("5 "), [await statusSalvo(), await pagina.innerText("#contagemAgenda")]);
+    await pagina.evaluate(() => localStorage.setItem("agendaStatus:u1", "{quebrado"));
+    await recarregar();
+    confere("salvo quebrado: mostra todos os status", (await pagina.innerText("#contagemAgenda")).startsWith("5 "), await pagina.innerText("#contagemAgenda"));
+    // o aviso do salvo quebrado vai de propósito para o console
+    erros.splice(0, erros.length, ...erros.filter(e => !/agendaStatus/.test(e)));
+    await pagina.evaluate(() => localStorage.removeItem("agendaStatus:u1"));
+
     // Esc fecha
     await pagina.click("#btnFiltros");
     await pagina.keyboard.press("Escape");

@@ -155,6 +155,10 @@ const CHAVE_AGENDA_BOTOES = "agendaBotoes";
 // largura das colunas de cada usuário (uma por modo), neste navegador
 const CHAVE_AGENDA_LARGURAS = "agendaLarguras";
 
+// status desmarcados no filtro por cada usuário (uma lista por modo), neste
+// navegador: { expedicao: [], transportador: [] } (agenda-filtro-status.js)
+const CHAVE_AGENDA_STATUS = "agendaStatus";
+
 // etapas do formulário que cada usuário deixou recolhidas, neste navegador
 const CHAVE_AGENDA_ETAPAS = "agendaEtapas";
 
@@ -244,8 +248,9 @@ let etapasChave = "";
 // ("" = agendamentos sem data). Vazio = todas as datas aparecem.
 let datasOcultas = new Set();
 
-// filtro de status (igual ao de datas): os status DESMARCADOS ficam aqui.
-// Vazio = todos os status aparecem.
+// filtro de status (igual ao de datas): os status DESMARCADOS do modo atual
+// ficam aqui. Vazio = todos os status aparecem. Fica salvo por usuário e por
+// modo (carregarStatusFiltro); as datas não ficam salvas.
 let statusOcultos = new Set();
 
 // valores que o agendamento tinha ao abrir (valores antigos fora do

@@ -104,7 +104,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
 - `agenda-colunas.js` (261 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
-- `agenda-config.js` (253 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Tipos: "Transferência" é a entre obras (o valor salvo de sempre, que aparece como "Transferência entre obras" em ROTULOS_TIPO) e TIPO_TRANSFERENCIA_UNIDADES vai pra expedição (TIPOS_EXPEDICAO) sem faturamento.
+- `agenda-config.js` (258 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Tipos: "Transferência" é a entre obras (o valor salvo de sempre, que aparece como "Transferência entre obras" em ROTULOS_TIPO) e TIPO_TRANSFERENCIA_UNIDADES vai pra expedição (TIPOS_EXPEDICAO) sem faturamento.
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-estoque-dados.js` (108 linhas): Consulta ao estoque: lê pela função `estoque_disponiveis` e descobre quais máquinas já estão em alguma demanda.
@@ -117,13 +117,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
 - `agenda-filtro-datas.js` (211 linhas): Painel de datas estilo Excel e atalhos (hoje / próximos dias).
   - semAcentoMinusculo, datasDoFiltro, rotuloDataFiltro, atualizarBotaoDatas, desenharPainelDatas, alternarPainelDatas, fecharPainelDatas, alternarTodasDatas, selecionarProximosDias
-- `agenda-filtro-status.js` (177 linhas): Painel de status estilo Excel.
-  - statusDoFiltro, contagemPorStatus, atualizarBotaoStatus, desenharPainelStatus, alternarPainelStatus, fecharPainelStatus, alternarTodosStatus
-- `agenda-filtros.js` (238 linhas): Modo expedição/transportador, botão "Só sem patrimônio", botão ⚙️ Filtros (painel único com filtros e opções; o botão e a linha da contagem avisam o que está filtrando) e filtrarAgendamentos() (pesquisando, o modo, as datas e os status não escondem nada; os antigos só aparecem na pesquisa).
+- `agenda-filtro-status.js` (220 linhas): Painel de status estilo Excel. Os status desmarcados ficam salvos por usuário e por modo (agendaStatus); as datas não.
+  - chaveStatusFiltro, carregarStatusFiltro, salvarStatusFiltro, statusDoFiltro, contagemPorStatus, atualizarBotaoStatus, desenharPainelStatus, alternarPainelStatus, fecharPainelStatus, alternarTodosStatus
+- `agenda-filtros.js` (244 linhas): Modo expedição/transportador, botão "Só sem patrimônio", botão ⚙️ Filtros (painel único com filtros e opções; o botão e a linha da contagem avisam o que está filtrando) e filtrarAgendamentos() (pesquisando, o modo, as datas e os status não escondem nada; os antigos só aparecem na pesquisa).
   - definirModo, visivelNoModo, filtrandoSemPatrimonio, alternarSemPatrimonio, filtrosAtivos, atualizarBotaoFiltros, limparFiltros, alternarPainelFiltros, fecharPainelFiltros, filtrarAgendamentos
 - `agenda-form-campos.js` (353 linhas): CAMPOS_AGENDA, máscaras de horário/período e regras dos campos. Em entrega, a retirada vem recolhida ("— W Rental"); abre sozinha se tiver algo preenchido ou em outro tipo.
   - preencherSelect, forcarMaiusculo, mascararHorario, mascararCampoHorario, horarioValido, textoDias, textoPeriodos, normalizarPeriodo, atualizarSugestoesPeriodo, atualizarCamposTipo, retiradaPreenchida, mostrarRetirada, atualizarRetirada, alternarRetirada, preencherSelectComAtual, garantirOpcaoTransportadora, garantirOpcaoVendedor
-- `agenda-init.js` (210 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
+- `agenda-init.js` (213 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
 - `agenda-larguras.js` (349 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
 - `agenda-linhas.js` (194 linhas): Cabeçalho da tabela e a linha de cada agendamento, com os botões (✅ concluir, só na expedição; 📋 Zap, 🧾 faturamento, ↩️ coleta, 📆 duplicar, 🔍 estoque, editar, excluir).
@@ -353,6 +353,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `agendaColunasVisiveis` | `agenda-config.js` |
 | `agendaBotoes` | `agenda-config.js` |
 | `agendaLarguras` | `agenda-config.js` |
+| `agendaStatus` | `agenda-config.js` |
 | `agendaEtapas` | `agenda-config.js` |
 | `agendaRascunhos` | `agenda-config.js` |
 | `leadsVendedor:<usuário>` | `leads-config.js` |

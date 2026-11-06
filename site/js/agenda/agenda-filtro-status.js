@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - FILTRO DE STATUS
 // ======================================
-// Painel de status estilo Excel.
+// Painel de status estilo Excel. Os status desmarcados ficam salvos por usuário e por modo (agendaStatus); as datas não.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -9,6 +9,45 @@
 // ======================================
 // No botão "Status" você vê a lista com caixinhas e marca a combinação
 // que quer ver (ex: Confirmado + Em rota).
+// A escolha fica salva neste navegador, separada por usuário e por modo (a
+// da expedição não mexe na do transportador): recarregar a página ou a
+// atualização sozinha do sistema não traz de volta os status desmarcados.
+
+
+function chaveStatusFiltro(){
+
+    return `${CHAVE_AGENDA_STATUS}:${usuarioAgenda || "local"}`;
+}
+
+
+// põe em statusOcultos o que está salvo para o modo atual (ao abrir e ao trocar de modo)
+function carregarStatusFiltro(){
+
+    const dados = lerLocalJSON(chaveStatusFiltro(), {});
+
+    const lista = dados ? dados[modoVisualizacao] : null;
+
+    statusOcultos = new Set(
+        Array.isArray(lista)
+            ? lista.filter(nome => STATUS_AGENDA.includes(nome))
+            : []
+    );
+}
+
+
+function salvarStatusFiltro(){
+
+    const dados = lerLocalJSON(chaveStatusFiltro(), {});
+
+    const salvo =
+        dados && typeof dados === "object" && !Array.isArray(dados)
+            ? dados
+            : {};
+
+    salvo[modoVisualizacao] = [...statusOcultos];
+
+    gravarLocalJSON(chaveStatusFiltro(), salvo);
+}
 
 // status da lista: os que existem nos agendamentos que aparecem no modo atual
 // (respeitando os outros filtros), na ordem de STATUS_AGENDA. Os desmarcados
@@ -110,6 +149,8 @@ function desenharPainelStatus(){
                     statusOcultos.add(nome);
                 }
 
+                salvarStatusFiltro();
+
                 renderizarAgenda();
 
                 desenharPainelStatus();
@@ -170,6 +211,8 @@ function alternarTodosStatus(){
 
         statusDoFiltro().forEach(nome => statusOcultos.add(nome));
     }
+
+    salvarStatusFiltro();
 
     renderizarAgenda();
 

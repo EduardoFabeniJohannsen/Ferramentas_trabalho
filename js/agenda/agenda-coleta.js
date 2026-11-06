@@ -26,6 +26,7 @@ function valoresColetaDaEntrega(item){
         cliente: item.cliente,
         proposta: item.proposta,
         periodo: item.periodo,
+        vendedor: item.vendedor,
         origemNome: item.destinoNome,
         origemEndereco: item.destinoEndereco,
         linkOrigem: item.linkDestino,

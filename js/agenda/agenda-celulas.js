@@ -211,6 +211,8 @@ function criarCelulasAgenda(item){
                 : ""
         );
 
+    celulas.vendedor = celulaTexto("vendedor", item.vendedor);
+
     // ---------- proposta ----------
 
     celulas.proposta = celulaTexto("proposta", item.proposta);

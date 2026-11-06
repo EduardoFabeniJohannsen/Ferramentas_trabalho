@@ -34,6 +34,7 @@ const CAMPOS_BANCO = {
     transportadora: "transportadora",
     motorista: "motorista",
     periodo: "periodo",
+    vendedor: "vendedor",
     origemNome: "origem_nome",
     origemEndereco: "origem_endereco",
     linkOrigem: "link_origem",
@@ -173,7 +174,7 @@ function mensagemErroSalvar(erro){
         return (
             "Banco desatualizado: falta a coluna" +
             (achou ? ` "${achou[1]}"` : "") +
-            " na tabela agendamentos. Aplique o SQL do faturamento no Supabase."
+            " na tabela agendamentos. Aplique o SQL mais recente da agenda no Supabase."
         );
     }
 

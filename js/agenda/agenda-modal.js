@@ -52,6 +52,8 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
     // transportadora e motorista: só os cadastrados na transportadora
     garantirOpcaoTransportadora(origem ? origem.transportadora : "");
 
+    garantirOpcaoVendedor(origem ? origem.vendedor : "");
+
     atualizarOpcoesMotorista(
         origem ? origem.transportadora : "",
         origem ? origem.motorista : ""

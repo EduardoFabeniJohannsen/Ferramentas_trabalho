@@ -83,7 +83,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - nomePaginaOnline, tempoOnline, textoAbaOnline, pessoasOnline, desenharUsuariosOnline
 - `admin-tela.js` (254 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
   - alternarItemLista, criarCaixaAdmin, desenharCabecalhoAdmin, desenharPerfis, criarUsuario
-- `agenda-banco.js` (346 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras).
+- `agenda-banco.js` (347 linhas): Leitura/gravação dos agendamentos (só os fora da lixeira; inclui as colunas de faturamento em CAMPOS_BANCO), mensagem de erro ao salvar e recarga geral (agendamentos, motoristas, transportadoras).
   - doBanco, paraBanco, detalhesErro, mensagemErroSalvar, carregarAgenda, inserirAgendamento, atualizarAgendamento, excluirAgendamentoBanco, recarregarAgenda
 - `agenda-botoes-linha.js` (165 linhas): Botão 🔘 Botões: cada usuário escolhe quais botões aparecem em cada agendamento (nos dois modos). O 🗑️ Excluir começa oculto para todo mundo (ocultoPadrao em BOTOES_LINHA), inclusive quem já tinha salvo a escolha; só aparece se o usuário ligar. Também mede a largura da coluna dos botões quando as larguras são fixas. Carregar antes de agenda-init.js.
   - botaoLigado, chaveBotoesLinha, carregarBotoesLinha, salvarBotoesLinha, ligarBotaoLinha, larguraColunaBotoes, atualizarBotaoBotoesLinha, desenharPainelBotoes, alternarPainelBotoes, fecharPainelBotoes
@@ -91,17 +91,17 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - palavrasBuscaAgenda, buscandoAgenda, itemCombinaBusca, removerAntigosBusca, buscarAntigosAgenda, digitarBuscaAgenda, limparBuscaAgenda
 - `agenda-celula-partes.js` (153 linhas): Peças das células: bloco de local, seletor de status, célula com a coluna e nome da máquina.
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarMaquina
-- `agenda-celulas.js` (221 linhas): Conteúdo de cada coluna de um agendamento.
+- `agenda-celulas.js` (223 linhas): Conteúdo de cada coluna de um agendamento.
   - criarCelulasAgenda
 - `agenda-clientes.js` (533 linhas): Ao digitar o cliente, sugere o nome completo dos clientes de agendamentos
   - chaveCliente, carregarHistoricoClientes, compararRecentes, agendamentosComCliente, clientesConhecidos, localDoCliente, locaisDoCliente, camposLocalCliente, clienteDoFormulario, preencherOpcoes, rotuloLocal, desenharSugestoesClientes, desenharLocaisCliente, marcarLocalAtivo, preencherAuto, textoPagamentoFormulario, preencherPagamentoCliente, aplicarCliente, usarLocalCliente, aplicarLocalDaLista, escolheuDaLista, prepararSugestoesClientes, ligarSugestoesClientes
-- `agenda-coleta.js` (118 linhas): Cria uma coleta já preenchida a partir de uma entrega.
+- `agenda-coleta.js` (119 linhas): Cria uma coleta já preenchida a partir de uma entrega.
   - valoresColetaDaEntrega, copiarEntregaParaColeta, valoresDuplicados, duplicarAgendamento
 - `agenda-colunas-visiveis.js` (169 linhas): Botão 👁️ Colunas (só na expedição): mostrar e ocultar qualquer informação da tabela; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
 - `agenda-colunas.js` (261 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
-- `agenda-config.js` (249 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Tipos: "Transferência" é a entre obras (o valor salvo de sempre, que aparece como "Transferência entre obras" em ROTULOS_TIPO) e TIPO_TRANSFERENCIA_UNIDADES vai pra expedição (TIPOS_EXPEDICAO) sem faturamento.
+- `agenda-config.js` (253 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Tipos: "Transferência" é a entre obras (o valor salvo de sempre, que aparece como "Transferência entre obras" em ROTULOS_TIPO) e TIPO_TRANSFERENCIA_UNIDADES vai pra expedição (TIPOS_EXPEDICAO) sem faturamento.
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-estoque-dados.js` (108 linhas): Consulta ao estoque: lê pela função `estoque_disponiveis` e descobre quais máquinas já estão em alguma demanda.
@@ -118,8 +118,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - statusDoFiltro, contagemPorStatus, atualizarBotaoStatus, desenharPainelStatus, alternarPainelStatus, fecharPainelStatus, alternarTodosStatus
 - `agenda-filtros.js` (238 linhas): Modo expedição/transportador, botão "Só sem patrimônio", botão ⚙️ Filtros (painel único com filtros e opções; o botão e a linha da contagem avisam o que está filtrando) e filtrarAgendamentos() (pesquisando, o modo, as datas e os status não escondem nada; os antigos só aparecem na pesquisa).
   - definirModo, visivelNoModo, filtrandoSemPatrimonio, alternarSemPatrimonio, filtrosAtivos, atualizarBotaoFiltros, limparFiltros, alternarPainelFiltros, fecharPainelFiltros, filtrarAgendamentos
-- `agenda-form-campos.js` (341 linhas): CAMPOS_AGENDA, máscaras de horário/período e regras dos campos. Em entrega, a retirada vem recolhida ("— W Rental"); abre sozinha se tiver algo preenchido ou em outro tipo.
-  - preencherSelect, forcarMaiusculo, mascararHorario, mascararCampoHorario, horarioValido, textoDias, textoPeriodos, normalizarPeriodo, atualizarSugestoesPeriodo, atualizarCamposTipo, retiradaPreenchida, mostrarRetirada, atualizarRetirada, alternarRetirada, garantirOpcaoTransportadora
+- `agenda-form-campos.js` (353 linhas): CAMPOS_AGENDA, máscaras de horário/período e regras dos campos. Em entrega, a retirada vem recolhida ("— W Rental"); abre sozinha se tiver algo preenchido ou em outro tipo.
+  - preencherSelect, forcarMaiusculo, mascararHorario, mascararCampoHorario, horarioValido, textoDias, textoPeriodos, normalizarPeriodo, atualizarSugestoesPeriodo, atualizarCamposTipo, retiradaPreenchida, mostrarRetirada, atualizarRetirada, alternarRetirada, preencherSelectComAtual, garantirOpcaoTransportadora, garantirOpcaoVendedor
 - `agenda-init.js` (210 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
 - `agenda-larguras.js` (349 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
@@ -127,7 +127,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - criarCabecalhoAgenda, criarItemAgenda
 - `agenda-lixeira.js` (211 linhas): Lixeira (só admin): excluir manda o agendamento para a lixeira (`excluido_em`, pela função `mover_agendamento_lixeira` do banco; quem não é admin não vê mais). Botão 🗑️ Lixeira (`.so-admin`) lista os excluídos para restaurar ou apagar de vez (só admin pelo RLS; apaga junto o PDF do pedido). Carregar antes de agenda-init.js.
   - moverParaLixeiraBanco, carregarLixeira, dataLixeira, desenharLixeira, abrirLixeira, fecharLixeira, restaurarDaLixeira, apagarDeVez
-- `agenda-modal.js` (235 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
+- `agenda-modal.js` (237 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card só por nossa conta; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente.
   - abrirModalAgenda, atualizarCamposConta, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista
@@ -362,7 +362,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (460), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-larguras.js` (349), `agenda-banco.js` (346), `agenda-form-campos.js` (341), `presenca.js` (327), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310), `agenda-zap.js` (301).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (460), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-form-campos.js` (353), `agenda-larguras.js` (349), `agenda-banco.js` (347), `presenca.js` (327), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310), `agenda-zap.js` (301).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - `propostas-copiadas.html` para quem não é admin (acesso "propostas-copiadas", v16.41.0): os dados só aparecem com a policy de SELECT com `tem_acesso('propostas-copiadas')` em `propostas_copiadas`. Apagar continua só com o admin.

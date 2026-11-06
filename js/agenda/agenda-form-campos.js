@@ -20,6 +20,7 @@ const CAMPOS_AGENDA = [
     ["cliente", "agCliente"],
     ["proposta", "agProposta"],
     ["periodo", "agPeriodo"],
+    ["vendedor", "agVendedor"],
     ["origemNome", "agOrigemNome"],
     ["origemEndereco", "agOrigemEndereco"],
     ["linkOrigem", "agLinkOrigem"],
@@ -323,19 +324,30 @@ function alternarRetirada(){
 }
 
 
-// mantém no select a transportadora do agendamento mesmo que ela não
-// esteja mais no cadastro, pra não perder o dado ao salvar
+// mantém no select o valor do agendamento mesmo que ele não esteja mais
+// na lista, pra não perder o dado ao salvar
+function preencherSelectComAtual(id, valores, textoVazio, atual, aviso){
+
+    preencherSelect(id, valores, textoVazio);
+
+    if(atual && !valores.includes(atual)){
+
+        const extra = criar("option", "", `${atual} (${aviso})`);
+
+        extra.value = atual;
+
+        $(id).appendChild(extra);
+    }
+}
+
+
 function garantirOpcaoTransportadora(nome){
 
-    preencherSelect("agTransportadora", TRANSPORTADORAS, "Sem transportadora");
+    preencherSelectComAtual("agTransportadora", TRANSPORTADORAS, "Sem transportadora", nome, "fora do cadastro");
+}
 
-    if(nome && !TRANSPORTADORAS.includes(nome)){
 
-        const extra =
-            criar("option", "", `${nome} (fora do cadastro)`);
+function garantirOpcaoVendedor(nome){
 
-        extra.value = nome;
-
-        $("agTransportadora").appendChild(extra);
-    }
+    preencherSelectComAtual("agVendedor", VENDEDORES, "Escolha o vendedor", nome, "fora da lista");
 }

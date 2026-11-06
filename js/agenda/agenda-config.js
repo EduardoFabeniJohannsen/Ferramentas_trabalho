@@ -34,6 +34,9 @@ const ROTULOS_TIPO = { "Transferência": "Transferência entre obras" };
 // o que a expedição mostra: o que sai da W Rental
 const TIPOS_EXPEDICAO = ["Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES];
 
+// quem vendeu (campo Vendedor do formulário)
+const VENDEDORES = ["Eduardo", "Maria Luiza", "Fernanda", "Abdan", "Julie"];
+
 // horário e status que já vêm preenchidos num agendamento novo
 const HORARIO_PADRAO = "08:00";
 
@@ -97,6 +100,7 @@ const COLUNAS_EXPEDICAO = [
     { id: "emails", titulo: "E-mails do cliente", maxLargura: "420px", oculta: true },
     { id: "pagamento", titulo: "Pagamento", semQuebra: true, oculta: true },
     { id: "pedido", titulo: "Pedido de compra", semQuebra: true, oculta: true },
+    { id: "vendedor", titulo: "Vendedor", semQuebra: true, oculta: true },
     { id: "proposta", titulo: "Proposta", semQuebra: true }
 ];
 

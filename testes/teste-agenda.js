@@ -19,9 +19,9 @@ const linhas = [
       destino_nome: "Obra Um", destino_endereco: "Rua B, 200, Centro, Brusque/SC",
       contato: "João 47 9999", obs_expedicao: "levar chave", obs_entrega: "ligar antes",
       forma_pagamento: "Boleto", prazos_pagamento: ["28", "56"], pedido_compra: true, pedido_numero: "PC-9",
-      emails: "a@cliente.com", referencia: "FICHA 1", card: "CARD-1" },
+      emails: "a@cliente.com", referencia: "FICHA 1", card: "CARD-1", vendedor: "Maria Luiza" },
     { ...base, id: 2, horario: "10:00", plataforma: "WTE14", cliente: "Cliente Dois", proposta: "712900",
-      destino_endereco: "Rua sem cidade, 10", status: "A confirmar" },
+      destino_endereco: "Rua sem cidade, 10", status: "A confirmar", vendedor: "Carlos" },
     { ...base, id: 3, horario: "11:00", plataforma: "WAE18R002", cliente: "Cliente Três", proposta: "1" },
     { ...base, id: 4, horario: "12:00", plataforma: "WAE18R003", cliente: "Cliente Quatro", proposta: "2", status: "Cancelado" },
     { ...base, id: 5, horario: "13:00", plataforma: "WAE18R004", cliente: "Cliente Cinco", proposta: "3" }
@@ -127,7 +127,7 @@ const confere = (nome, ok, extra) => {
     await modo("expedicao");
     t = await titulos();
     confere("expedição: colunas padrão", t.join() === "Horário,Plataforma / Cliente,Transportadora,Motorista,Período,Status,Observação,Proposta,", t);
-    confere("botão mostra contagem", (await pagina.innerText("#btnColunas")).includes("8 de 21"), await pagina.innerText("#btnColunas"));
+    confere("botão mostra contagem", (await pagina.innerText("#btnColunas")).includes("8 de 22"), await pagina.innerText("#btnColunas"));
     confere("traço de corte na proposta", (await borda("tr.ag-item td.ag-proposta")) === "2px");
     confere("colunas padrão oculto de início", !(await pagina.isVisible("#btnColunasPadrao")));
     await pagina.screenshot({ path: path.join(saida, "1-expedicao-padrao.png") });
@@ -684,6 +684,52 @@ const confere = (nome, ok, extra) => {
     await pagina.selectOption("#agTipo", "Entrega");
     confere("trocar para entrega volta os campos de sempre", await pagina.isVisible("#agCliente") && !(await pagina.isVisible("#agUnidadeDestino")) && await pagina.isVisible(".etapa-faturamento"));
     await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); removerRascunho("edit:99"); localStorage.clear(); });
+
+    // ---------- vendedor ----------
+    await pagina.evaluate(() => {
+        window.__inseridos = [];
+        inserirAgendamento = async (dados) => { window.__inseridos.push(dados); return { ...dados, id: 97 }; };
+        removerRascunho("novo");
+        abrirModalAgenda();
+    });
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    const opcoesVendedor = await pagina.$$eval("#agVendedor option", l => l.map(o => o.value || o.textContent));
+    confere("vendedor: a caixa traz os 5 vendedores", JSON.stringify(opcoesVendedor) === JSON.stringify(["Escolha o vendedor", "Eduardo", "Maria Luiza", "Fernanda", "Abdan", "Julie"]), opcoesVendedor);
+    confere("vendedor: novo começa sem vendedor", (await pagina.inputValue("#agVendedor")) === "");
+    await pagina.locator(".ag-plataforma-item").first().fill("WTE10010");
+    await pagina.selectOption("#agTipo", "Coleta");
+    await pagina.fill("#agCliente", "Cliente Vendedor");
+    await pagina.selectOption("#agVendedor", "Fernanda");
+    await pagina.evaluate(() => salvarAgendamento());
+    await pagina.waitForTimeout(150);
+    const comVendedor = await pagina.evaluate(() => window.__inseridos[0] || {});
+    confere("vendedor: salva o escolhido", comVendedor.vendedor === "Fernanda", comVendedor);
+    confere("vendedor: vai para a coluna vendedor do banco", (await pagina.evaluate(() => paraBanco({ vendedor: "Julie" }).vendedor)) === "Julie");
+
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); abrirModalAgenda(1); });
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    confere("vendedor: editar mostra o salvo", (await pagina.inputValue("#agVendedor")) === "Maria Luiza");
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("edit:1"); abrirModalAgenda(2); });
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    const foraDaLista = await pagina.$eval("#agVendedor", s => [s.value, s.options[s.selectedIndex].textContent]);
+    confere("vendedor fora da lista continua no agendamento", foraDaLista[0] === "Carlos" && foraDaLista[1] === "Carlos (fora da lista)", foraDaLista);
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("edit:2"); });
+
+    const copiasVendedor = await pagina.evaluate(() => {
+        const entrega = agendamentos.find(ag => ag.id === 1);
+        return [valoresDuplicados(entrega).vendedor, valoresColetaDaEntrega(entrega).vendedor];
+    });
+    confere("vendedor: duplicar e criar coleta levam o vendedor", copiasVendedor.join() === "Maria Luiza,Maria Luiza", copiasVendedor);
+
+    await modo("expedicao");
+    await abreOpcao("#btnColunas");
+    await pagina.locator("#listaColunasVisiveis label").filter({ hasText: /^Vendedor$/ }).locator("input").check();
+    await pagina.mouse.click(5, 5);
+    const titulosVendedor = await titulos();
+    const celulaVendedor = await pagina.locator("tr.ag-item", { hasText: "WAE18R001" }).first()
+        .evaluate((l, i) => l.children[i].textContent.trim(), titulosVendedor.indexOf("Vendedor"));
+    confere("expedição: coluna Vendedor (oculta de início) mostra o vendedor", titulosVendedor.includes("Vendedor") && celulaVendedor === "Maria Luiza", [titulosVendedor, celulaVendedor]);
+    await pagina.evaluate(() => localStorage.clear());
 
     confere("sem erros no console", erros.length === 0, erros);
 

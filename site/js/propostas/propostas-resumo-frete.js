@@ -5,6 +5,7 @@
 
 // O mesmo frete da Proposta Zap: como locação complementar entra no valor
 // final (frete x 2, +20% com bitributação); terceirizado fica fora dele.
+// Com a entrega ou a retirada bonificada, conta um frete só.
 function secaoFreteResumo(){
 
     const secao = criar("div", "resumo-secao resumo-frete");
@@ -22,11 +23,28 @@ function secaoFreteResumo(){
 
     const complementar = valorLocacaoComplementar();
 
+    // com um bonificado, o cliente paga só o outro
+    const bonificado = obterFreteBonificado();
+
+    const cobrado = bonificado === "entrega" ? "retirada" : "entrega";
+
+    const vezes =
+        bonificado
+            ? `x 1 (${bonificado} bonificada)`
+            : "x 2 (ida e volta)";
+
     if(complementar){
 
         secao.append(
             linhaResumo("Locação complementar", moedaResumo(complementar.total), "", complementar.total),
-            notaResumo(`${moedaResumo(frete)} x 2 (ida e volta)${bitributacaoAtiva ? " + 20% bitributação" : ""}`)
+            notaResumo(`${moedaResumo(frete)} ${vezes}${bitributacaoAtiva ? " + 20% bitributação" : ""}`)
+        );
+
+    }else if(bonificado){
+
+        secao.append(
+            linhaResumo(`Só a ${cobrado}`, moedaResumo(frete)),
+            notaResumo(`${bonificado === "entrega" ? "Entrega" : "Retirada"} bonificada. Terceirizado: um boleto na ${cobrado} (boleto com vencimento em 14 dias), fora do valor final.`)
         );
 
     }else{
@@ -50,7 +68,7 @@ function secaoFreteResumo(){
     return {
         secao,
         complementar: complementar ? complementar.total : 0,
-        terceirizado: complementar ? 0 : frete * 2
+        terceirizado: complementar ? 0 : frete * fretesCobrados()
     };
 }
 

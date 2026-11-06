@@ -203,11 +203,12 @@ function copiarPropostaZap(){
     // ==================================
     // LOCAÇÃO COMPLEMENTAR (frete)
     // ==================================
-    // Frete x 2, com +20% (bitributação) quando ativada.
+    // Frete x 2 (x 1 com a entrega ou a retirada bonificada), com +20%
+    // (bitributação) quando ativada.
 
     const valorComplementar =
         locacaoComplementarAtiva
-            ? (valorFreteNumero * 2) * (bitributacaoAtiva ? 1.2 : 1)
+            ? (valorFreteNumero * fretesCobrados()) * (bitributacaoAtiva ? 1.2 : 1)
             : 0;
 
 
@@ -412,11 +413,22 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
             : "";
 
 
+    // entrega ou retirada bonificada (status.js): sai "Bonificado" no lugar do valor
+    const bonificado =
+        obterFreteBonificado();
+
+    const valorFreteZap = (qual) =>
+        bonificado === qual ? "Bonificado" : `R$ ${valorFreteTexto}`;
+
+
     // frete terceirizado: a transportadora cobra direto do cliente
+    // (com um bonificado, só um boleto)
     const notaFrete =
         locacaoComplementarAtiva
             ? `(Frete incluso como "Locação Complementar")`
-            : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada, boleto com vencimento em 14 dias)`;
+            : bonificado
+                ? `(Nosso frete é terceirizado, sendo um boleto na ${bonificado === "entrega" ? "retirada" : "entrega"}, boleto com vencimento em 14 dias)`
+                : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada, boleto com vencimento em 14 dias)`;
 
 
     // boleto ou depósito e o prazo (propostas-pagamento.js)
@@ -436,12 +448,8 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 
     let textoFinal =
 `${blocosEquipamentos}${linhaValorFinal}
-${prefixoFrete}🚚 Frete entrega: R$ ${
-    valorFreteTexto || "0,00"
-} de ${cidadeSaidaTexto} x ${cidadeFormatada}
-${prefixoFrete}🚚 Frete retirada: R$ ${
-    valorFreteTexto || "0,00"
-} de ${cidadeFormatada} x ${cidadeSaidaTexto}
+${prefixoFrete}🚚 Frete entrega: ${valorFreteZap("entrega")} de ${cidadeSaidaTexto} x ${cidadeFormatada}
+${prefixoFrete}🚚 Frete retirada: ${valorFreteZap("retirada")} de ${cidadeFormatada} x ${cidadeSaidaTexto}
 ${notaFrete}
 
 ${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFinal}${marca("📄")}Forma de pagamento: ${textoPagamento}`;

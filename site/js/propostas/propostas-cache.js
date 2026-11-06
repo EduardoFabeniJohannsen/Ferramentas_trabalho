@@ -56,6 +56,7 @@ function salvarCache(){
         periodos: $("periodos")?.value || "",
         cidade: $("cidade")?.value || "",
         valorFrete: $("valorFrete")?.value || "",
+        freteBonificado: obterFreteBonificado(),
         formaPagamento: $("formaPagamento")?.value || "",
         prazoPagamento: $("prazoPagamento")?.value || "",
         locacaoComplementarAtiva: locacaoComplementarAtiva,
@@ -83,6 +84,14 @@ function restaurarCache(){
     if($("periodos")) $("periodos").value = dados.periodos || "";
     if($("cidade")) $("cidade").value = dados.cidade || "";
     if($("valorFrete")) $("valorFrete").value = dados.valorFrete || "";
+
+    if($("freteBonificado")){
+
+        $("freteBonificado").value =
+            ["entrega", "retirada"].includes(dados.freteBonificado)
+                ? dados.freteBonificado
+                : "";
+    }
 
     $("formaPagamento").value = dados.formaPagamento || "";
 
@@ -258,6 +267,7 @@ function limparTudo(){
     if($("periodos")) $("periodos").value = "";
     if($("cidade")) $("cidade").value = "";
     if($("valorFrete")) $("valorFrete").value = "";
+    if($("freteBonificado")) $("freteBonificado").value = "";
 
     // remove as linhas extras de equipamento, deixa só a primeira,
     // limpa ela

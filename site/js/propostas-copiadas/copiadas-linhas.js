@@ -55,6 +55,8 @@ function configuracoesAdmin(dados){
 
     if(config.locacaoComplementar) lista.push(textoComplementarAdmin(dados));
 
+    if(textoBonificadoAdmin(dados)) lista.push(textoBonificadoAdmin(dados));
+
     if(config.diaria) lista.push("Diária");
 
     if(config.emojis === false) lista.push("Sem emojis");
@@ -75,6 +77,17 @@ function textoComplementarAdmin(dados){
     if(!config.locacaoComplementar) return "";
 
     return config.bitributacao ? "Locação complementar +20%" : "Locação complementar";
+}
+
+
+// "Entrega bonificada", "Retirada bonificada" ou "" (os dois fretes cobrados)
+function textoBonificadoAdmin(dados){
+
+    if(dados?.freteBonificado === "entrega") return "Entrega bonificada";
+
+    if(dados?.freteBonificado === "retirada") return "Retirada bonificada";
+
+    return "";
 }
 
 

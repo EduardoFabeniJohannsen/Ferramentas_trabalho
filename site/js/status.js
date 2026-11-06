@@ -1,7 +1,7 @@
 // ======================================
 // CIDADE DE SAÍDA E MENSAGENS DE STATUS
 // ======================================
-// obterCidadeSaida() e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
+// obterCidadeSaida(), obterFreteBonificado() (entrega ou retirada de graça) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -35,6 +35,28 @@ function obterCidadeSaida(){
             : "ITAJAI";
 
     return CIDADES_SAIDA[chave] || CIDADES_SAIDA.ITAJAI;
+}
+
+
+// ======================================
+// FRETE BONIFICADO
+// ======================================
+// A entrega ou a retirada sai de graça para o cliente. A caixa fica embaixo
+// do Valor frete (propostas.html); em outra página, as duas são cobradas.
+// "" = as duas cobradas, "entrega" ou "retirada" = a bonificada.
+
+function obterFreteBonificado(){
+
+    const valor = $("freteBonificado")?.value;
+
+    return valor === "entrega" || valor === "retirada" ? valor : "";
+}
+
+
+// quantos fretes o cliente paga: ida e volta, ou só um com o outro bonificado
+function fretesCobrados(){
+
+    return obterFreteBonificado() ? 1 : 2;
 }
 
 
@@ -86,6 +108,18 @@ function gerarStatus(tipo){
         obterCidadeSaida().zoho;
 
 
+    // o frete bonificado sai sem valor (BONIFICADO no lugar do R$)
+    const bonificado =
+        obterFreteBonificado();
+
+    // qual = "entrega" ou "retirada"
+    const valorZoho = (qual) =>
+        bonificado === qual ? "BONIFICADO" : `R$ ${frete}`;
+
+    const nomeZoho = (qual, nome) =>
+        bonificado === qual ? `${nome} BONIFICADA` : nome;
+
+
     const mensagens = {
 
 
@@ -96,8 +130,8 @@ function gerarStatus(tipo){
         FreteZOHO:
 `- FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE ( Boleto - 14 DD )
 
-- Frete entrega: R$ ${frete} - ${saida} x ${cidade}
-- Frete retirada: R$ ${frete} - ${cidade} x ${saida}
+- Frete entrega: ${valorZoho("entrega")} - ${saida} x ${cidade}
+- Frete retirada: ${valorZoho("retirada")} - ${cidade} x ${saida}
 
 - Valores sujeitos à alteração no retorno conforme reajustes de mercado, combustível, pedágios e inflação do período (IPCA).
 - Alteração de endereço de entrega/coleta poderá alterar o valor do frete.
@@ -118,7 +152,7 @@ JGR Guinchos:
 
         // o valor do frete já está no item, então vai só a rota
         FreteZOHOLocComp:
-`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( ${saida} x ${cidade} ) - RETIRADA ( ${cidade} x ${saida} )`,
+`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ${nomeZoho("entrega", "ENTREGA")} ( ${saida} x ${cidade} ) - ${nomeZoho("retirada", "RETIRADA")} ( ${cidade} x ${saida} )`,
 
 
         ICMS:

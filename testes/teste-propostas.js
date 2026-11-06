@@ -235,10 +235,11 @@ const confere = (nome, ok, extra) => {
     // ---------- limpar tudo ----------
     await escolher("Boleto");
     await fecharConfig();
+    await pagina.selectOption("#freteBonificado", "entrega");
     await pagina.click(".btn-limpar-tudo");
     await pagina.waitForTimeout(100);
     confere("limpar tudo não mexe na configuração", (await pagina.inputValue("#formaPagamento")) === "Boleto");
-    confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "");
+    confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "" && (await pagina.inputValue("#freteBonificado")) === "");
 
     // ---------- total com seguro ----------
     const usarTabela = () => pagina.evaluate(() => {
@@ -360,6 +361,54 @@ const confere = (nome, ok, extra) => {
     locComp = await freteLocComp();
     confere("Frete ZOHO - Loc Complementar: sem cidade não copia e avisa", locComp === null && (await pagina.innerText("#toast")).includes("Informe a cidade"), [locComp, await pagina.innerText("#toast")]);
     await pagina.fill("#cidade", "Brusque");
+
+    // ---------- frete bonificado (a entrega ou a retirada de graça) ----------
+    const freteZoho = async () => {
+        await pagina.evaluate(() => { window.__copiado = null; gerarStatus("FreteZOHO"); });
+        await pagina.waitForTimeout(60);
+        return (await pagina.evaluate(() => window.__copiado)) || "";
+    };
+    const bordaBonificado = () => pagina.evaluate(() => getComputedStyle(document.getElementById("freteBonificado")).borderColor);
+    const VERDE = "rgb(22, 163, 74)";
+    confere("frete bonificado: nenhum por padrão, sem destaque", (await pagina.inputValue("#freteBonificado")) === "" && (await bordaBonificado()) !== VERDE, await bordaBonificado());
+    await pagina.selectOption("#freteBonificado", "entrega");
+    rs = await resumo();
+    confere("entrega bonificada: locação complementar de um frete só", (await desejado()) === "4.112,15" && rs.frete.linhas["Locação complementar"] === "R$ 600,00" && rs.frete.notas.includes("R$ 500,00 x 1 (entrega bonificada) + 20% bitributação") && rs.total.linhas["Valor final com frete"] === "R$ 5.000,00", [await desejado(), rs.frete, rs.total]);
+    confere("frete bonificado fica em verde", (await bordaBonificado()) === VERDE, await bordaBonificado());
+    await pagina.screenshot({ path: path.join(saida, "28-propostas-frete-bonificado.png") });
+    zap = await zapAtual();
+    confere("Zap: entrega bonificada e a retirada com o valor", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: Bonificado de Itajai x Brusque" && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: R$ 500,00 de Brusque x Itajai" && linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), [linhaZap(zap, "Frete entrega"), linhaZap(zap, "Frete retirada"), linhaZap(zap, "Total máquina + seguro")]);
+    locComp = await freteLocComp();
+    confere("Frete ZOHO - Loc Complementar: entrega bonificada", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA BONIFICADA ( ITAJAÍ x BRUSQUE ) - RETIRADA ( BRUSQUE x ITAJAÍ )", locComp);
+    let zohoFrete = await freteZoho();
+    confere("Frete ZOHO: BONIFICADO no lugar do valor da entrega", zohoFrete.includes("- Frete entrega: BONIFICADO - ITAJAÍ x BRUSQUE\n- Frete retirada: R$ 500,00 - BRUSQUE x ITAJAÍ"), zohoFrete);
+
+    await pagina.selectOption("#freteBonificado", "retirada");
+    zap = await zapAtual();
+    confere("Zap: retirada bonificada", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: R$ 500,00 de Itajai x Brusque" && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: Bonificado de Brusque x Itajai", [linhaZap(zap, "Frete entrega"), linhaZap(zap, "Frete retirada")]);
+    locComp = await freteLocComp();
+    confere("Frete ZOHO - Loc Complementar: retirada bonificada", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( ITAJAÍ x BRUSQUE ) - RETIRADA BONIFICADA ( BRUSQUE x ITAJAÍ )", locComp);
+    zohoFrete = await freteZoho();
+    confere("Frete ZOHO: retirada bonificada", zohoFrete.includes("- Frete entrega: R$ 500,00 - ITAJAÍ x BRUSQUE\n- Frete retirada: BONIFICADO - BRUSQUE x ITAJAÍ"), zohoFrete);
+
+    // terceirizado: um boleto só
+    await pagina.evaluate(() => alternarLocacaoComplementar());
+    rs = await resumo();
+    confere("terceirizado com a retirada bonificada: um frete no total e no resumo", (await desejado()) === "4.205,61" && rs.frete.linhas["Só a entrega"] === "R$ 500,00" && rs.frete.notas.includes("Retirada bonificada. Terceirizado: um boleto na entrega") && rs.total.linhas["Valor final"] === "R$ 4.500,00" && rs.total.linhas["Com o frete terceirizado"] === "R$ 5.000,00", [await desejado(), rs.frete, rs.total]);
+    zap = await zapAtual();
+    confere("Zap: terceirizado com um boleto só", zap.includes("(Nosso frete é terceirizado, sendo um boleto na entrega, boleto com vencimento em 14 dias)"), linhaZap(zap, "terceirizado"));
+
+    // fica salvo (até trocar ou Limpar tudo)
+    await pagina.waitForTimeout(100);
+    confere("frete bonificado vai para o cache", (await pagina.evaluate(() => JSON.parse(localStorage.getItem("propostaCache")).freteBonificado)) === "retirada");
+    await abrir();
+    confere("recarregar mantém o frete bonificado", (await pagina.inputValue("#freteBonificado")) === "retirada" && (await bordaBonificado()) === VERDE, await bordaBonificado());
+    await usarTabela();
+    confere("recarregado recalcula com um frete só", (await desejado()) === "4.205,61", await desejado());
+    await pagina.evaluate(() => alternarLocacaoComplementar());
+    await pagina.selectOption("#freteBonificado", "");
+    rs = await resumo();
+    confere("nenhum bonificado: volta ao frete x 2", (await desejado()) === "3.551,40" && rs.frete.notas.includes("R$ 500,00 x 2 (ida e volta) + 20% bitributação") && (await bordaBonificado()) !== VERDE, [await desejado(), rs.frete]);
 
     await pagina.click("#btnBitributacaoDesconto");
     rs = await resumo();

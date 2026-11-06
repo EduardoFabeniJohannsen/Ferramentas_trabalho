@@ -54,7 +54,7 @@ const PROPOSTAS = [
     {
         id: 2, criado_em: "2026-10-20T15:00:00Z", usuario_email: "bia@exemplo.com", cliente: "Beta Ltda", cidade: "Blumenau", valor_total: 5000,
         aparelho: { tipo: "computador", aparelho: "Windows", navegador: "Edge", cidade: "Joinville/Santa Catarina" },
-        dados: { dias: 28, frete: 300, configuracoes: { emojis: true }, pagamento: { forma: "Depósito", prazo: "28/56" }, equipamentos: [
+        dados: { dias: 28, frete: 300, freteBonificado: "entrega", configuracoes: { emojis: true }, pagamento: { forma: "Depósito", prazo: "28/56" }, equipamentos: [
             { modelo: "WAE18", quantidade: 1, valorTabela: 3000, valorFinal: 2850 },
             { modelo: "WAE16", quantidade: 1, valorTabela: 2000, valorFinal: 2000 }
         ] },
@@ -146,6 +146,7 @@ const confere = (nome, ok, extra) => {
     const buscar = async (texto) => { await pagina.fill("#buscaPropostas", texto); return clientes(); };
     confere("busca pelo cliente", JSON.stringify(await buscar("alfa")) === '["Construtora Alfa"]');
     confere("busca pela configuração", JSON.stringify(await buscar("boleto")) === '["Construtora Alfa"]');
+    confere("busca pelo frete bonificado", JSON.stringify(await buscar("bonificada")) === '["Beta Ltda"]');
     confere("busca pelo aparelho", JSON.stringify(await buscar("samsung")) === '["Construtora Alfa"]');
     confere("busca pela mensagem, sem acento", JSON.stringify(await buscar("observacao")) === '["Gama"]');
     confere("busca pelo usuário", (await buscar("bia@")).length === 1);
@@ -236,7 +237,7 @@ const confere = (nome, ok, extra) => {
 
     await abrirColuna("config");
     const grupos = await pagina.$$eval("#painelFiltroColuna .filtro-coluna-titulo-grupo", l => l.map(g => g.textContent));
-    confere("Configurações: um grupo por tipo", JSON.stringify(grupos) === JSON.stringify(["Cidade de saída", "Locação complementar", "Pagamento", "Diária", "Emojis", "Linha em branco no pagamento"]), grupos);
+    confere("Configurações: um grupo por tipo", JSON.stringify(grupos) === JSON.stringify(["Cidade de saída", "Locação complementar", "Pagamento", "Diária", "Emojis", "Linha em branco no pagamento", "Frete bonificado"]), grupos);
     confere("lista só o que existe com os outros filtros (como no Excel)", JSON.stringify(await opcoesPainel(3)) === JSON.stringify(["Boleto 28 dias (1)", "Depósito 28/56 dias (1)"]), await opcoesPainel(3));
     await opcaoPainel("Depósito 28/56 dias").uncheck();
     confere("desmarcar Depósito tira a Beta (junto com o filtro de Equipamentos)", JSON.stringify(await clientes()) === '["Construtora Alfa"]', await clientes());

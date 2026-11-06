@@ -99,6 +99,8 @@ function montarRegistroProposta({ texto, itens, infoPeriodo, frete, valorComplem
             diasTotal: infoPeriodo.diasTotal,
             multiplicador: infoPeriodo.multiplicador,
             frete: arredondarRegistro(frete),
+            // "", "entrega" ou "retirada" (status.js)
+            freteBonificado: obterFreteBonificado(),
             cidadeSaida: cidadeSaidaAtual === "JOINVILLE" ? "Joinville" : "Itajaí",
             pagamento: {
                 forma: $("formaPagamento")?.value || "",

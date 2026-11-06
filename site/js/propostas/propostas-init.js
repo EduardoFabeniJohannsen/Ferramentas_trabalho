@@ -182,4 +182,15 @@
             );
     }
 
+
+    // frete bonificado: muda a locação complementar, o Total com seguro e o Resumo
+    if($("freteBonificado")){
+
+        $("freteBonificado")
+            .addEventListener(
+                "change",
+                gerarTextos
+            );
+    }
+
 })();

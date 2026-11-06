@@ -108,7 +108,8 @@ function atualizarBotaoBitributacao(){
 // ======================================
 // Com a locação complementar ativada, o valor pronto pra lançar no sistema
 // (aparece no Resumo da proposta, propostas-resumo.js): frete (cada perna)
-// x 2, com +20% se a bitributação estiver ativada.
+// x 2 (x 1 com a entrega ou a retirada bonificada), com +20% se a
+// bitributação estiver ativada.
 
 function valorLocacaoComplementar(){
 
@@ -119,7 +120,7 @@ function valorLocacaoComplementar(){
         return null;
     }
 
-    const idaVolta = frete * 2;
+    const idaVolta = frete * fretesCobrados();
 
     return {
         frete: frete,

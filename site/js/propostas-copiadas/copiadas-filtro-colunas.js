@@ -49,7 +49,8 @@ const COLUNAS_FILTRO_PROPOSTAS = {
             { id: "pagamento", rotulo: "Pagamento", valores: (p) => [textoPagamentoAdmin(p.dados)] },
             { id: "diaria", rotulo: "Diária", valores: (p) => [p.dados?.configuracoes?.diaria ? "Com diária" : "Sem diária"] },
             { id: "emojis", rotulo: "Emojis", valores: (p) => [p.dados?.configuracoes?.emojis === false ? "Sem emojis" : "Com emojis"] },
-            { id: "linha", rotulo: "Linha em branco no pagamento", valores: (p) => [p.dados?.configuracoes?.separarPagamento ? "Com linha em branco" : "Sem linha em branco"] }
+            { id: "linha", rotulo: "Linha em branco no pagamento", valores: (p) => [p.dados?.configuracoes?.separarPagamento ? "Com linha em branco" : "Sem linha em branco"] },
+            { id: "bonificado", rotulo: "Frete bonificado", valores: (p) => [textoBonificadoAdmin(p.dados) || "Sem frete bonificado"] }
         ]
     }
 };

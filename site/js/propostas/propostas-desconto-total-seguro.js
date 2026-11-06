@@ -74,9 +74,10 @@ function alternarFreteNoTotal(){
 }
 
 
-// O mesmo frete que a Proposta Zap soma: ida e volta (frete x 2). Como
-// locação complementar, ganha +20% com a bitributação ativada; sem ela o
-// frete é terceirizado (boletos da transportadora) e não tem bitributação.
+// O mesmo frete que a Proposta Zap soma: ida e volta (frete x 2; x 1 com a
+// entrega ou a retirada bonificada). Como locação complementar, ganha +20%
+// com a bitributação ativada; sem ela o frete é terceirizado (boletos da
+// transportadora) e não tem bitributação.
 function freteDoTotalSeguro(){
 
     const frete =
@@ -87,7 +88,7 @@ function freteDoTotalSeguro(){
     const comBitributacao =
         locacaoComplementarAtiva && bitributacaoAtiva;
 
-    const idaVolta = frete * 2;
+    const idaVolta = frete * fretesCobrados();
 
     return {
         frete,

@@ -6,10 +6,10 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 const saida = path.join(__dirname, "capturas");
 fs.mkdirSync(saida, { recursive: true });
-const umd = fs.readFileSync(path.join(raiz, "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
+const umd = fs.readFileSync(path.join(__dirname, "..", "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
 
 let falhas = 0;
 const confere = (nome, ok, extra) => {

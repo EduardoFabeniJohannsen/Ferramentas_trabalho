@@ -2,7 +2,7 @@ const { chromium } = require("playwright-core");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 
 const clienteFalso = `window.supabase = { createClient(){ return {
     from: () => new Proxy(function(){}, { get(t, n, q){ return n === "then" ? (ok) => ok({ data: [], error: null }) : () => q; } }),

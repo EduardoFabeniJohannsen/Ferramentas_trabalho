@@ -2,7 +2,7 @@ const { chromium } = require("playwright-core");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 
 const hoje = new Date().toLocaleDateString("en-CA");
 const ontem = new Date(Date.now() - 86400000).toLocaleDateString("en-CA");

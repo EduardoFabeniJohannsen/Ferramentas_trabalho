@@ -1,0 +1,42 @@
+# Publica o site no GitHub Pages a cada envio para a main: vai para o ar só a
+# pasta site/ (páginas, css, js e icon.png), que vira a raiz do site, então os
+# endereços continuam os mesmos. Precisa de Settings → Pages → Source: GitHub Actions.
+# Não espera os testes (testes.yml roda ao lado). Também dá para rodar à mão na
+# aba Actions (Run workflow), por exemplo se o site sair do ar.
+name: Publicar site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# dois envios seguidos: publica um de cada vez, sem cortar uma publicação no meio
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - id: publicacao
+        uses: actions/deploy-pages@v5

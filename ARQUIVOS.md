@@ -4,9 +4,11 @@ Sem build e sem módulos: cada página carrega os scripts na ordem abaixo (vari�
 Toda página carrega antes o supabase-js 2.45.0 (CDN jsDelivr); ele não aparece nas listas abaixo.
 Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é sempre o último da página.
 
-**Pastas:** `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `supabase-config`, `registro-erros`, `arquivo-faltando`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo.
+**Pastas:** tudo que vai para o ar fica em `site/`: as páginas `.html`, o `icon.png`, `css/` e `js/`. A pasta `site/` é a raiz do site publicado, então os endereços continuam sem "site/" (ex: `agenda.html`, `js/helpers.js`). Na raiz do repositório fica só o que o Git, o GitHub e o npm exigem ali (`.github/`, `.githooks/`, `.gitignore`, `.gitattributes`, `.mcp.json`, `package.json`, `package-lock.json`), este mapa e `testes/`.
 
-**Não mude `js/helpers.js` de lugar:** as abas abertas leem a versão publicada nesse endereço (`atualizacao-sistema.js`). Se ele mudar, elas param de se atualizar sozinhas.
+Dentro de `site/`, `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `supabase-config`, `registro-erros`, `arquivo-faltando`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo.
+
+**Não mude `site/js/helpers.js` de lugar:** as abas abertas leem a versão publicada nesse endereço (`js/helpers.js` no site; ver `atualizacao-sistema.js`). Se ele mudar, elas param de se atualizar sozinhas.
 
 > Mudou ordem de scripts, funções ou criou arquivo? Rode `npm run mapa`: ele atualiza a ordem das páginas, as linhas, as funções e a lista de arquivos grandes. As descrições e as outras seções são escritas à mão; arquivo novo pega a descrição do próprio cabeçalho.
 
@@ -22,6 +24,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - Os outros `testes/teste-*.js` cobrem uma área cada. `testes/capturas/` guarda as imagens geradas e não vai para o Git.
 - Os testes de SQL e do agente de leads não ficam aqui, porque este repositório é público.
 - No GitHub: `.github/workflows/testes.yml` roda `npm test` a cada envio para a `main` (aba Actions), em Ubuntu e no fuso de São Paulo. Não bloqueia a publicação do site: se algo falhar, o commit ganha um X vermelho e o GitHub avisa por e-mail. O motivo aparece na página da rodada.
+- Publicação: `.github/workflows/publicar.yml` envia só a pasta `site/` para o GitHub Pages a cada envio para a `main` (precisa de Settings → Pages → Source: GitHub Actions). Saiu do ar ou não atualizou: aba Actions → "Publicar site" → Re-run.
 
 ## Ordem de carregamento por página
 

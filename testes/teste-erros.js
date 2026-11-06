@@ -4,11 +4,11 @@ const { chromium } = require("playwright-core");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 const saida = path.join(__dirname, "capturas");
 fs.mkdirSync(saida, { recursive: true });
 
-const umd = fs.readFileSync(path.join(raiz, "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
+const umd = fs.readFileSync(path.join(__dirname, "..", "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
 
 const tipos = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png" };
 

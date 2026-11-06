@@ -6,8 +6,8 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
-const umd = fs.readFileSync(path.join(raiz, "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
+const raiz = path.resolve(__dirname, "..", "site");
+const umd = fs.readFileSync(path.join(__dirname, "..", "node_modules/@supabase/supabase-js/dist/umd/supabase.js"));
 const hoje = new Date().toLocaleDateString("en-CA");
 
 let falhas = 0;

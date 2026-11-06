@@ -125,7 +125,8 @@ if(require.main === module){
     const raiz = path.resolve(__dirname, "..");
     const caminho = path.join(raiz, "ARQUIVOS.md");
     const atual = fs.readFileSync(caminho, "utf8");
-    const novo = gerarMapa(raiz, atual);
+    // o site (páginas, css e js) fica em site/
+    const novo = gerarMapa(path.join(raiz, "site"), atual);
     const final = atual.includes("\r\n") ? novo.replace(/\n/g, "\r\n") : novo;
 
     if(final === atual){

@@ -6,6 +6,9 @@ const { gerarMapa } = require("./gerar-mapa.js");
 
 const raiz = path.resolve(__dirname, "..");
 
+// o site (páginas, css e js) fica em site/
+const site = path.join(raiz, "site");
+
 let falhas = 0;
 const confere = (nome, ok, extra) => {
     if(!ok) falhas++;
@@ -14,7 +17,7 @@ const confere = (nome, ok, extra) => {
 
 const mapa = fs.readFileSync(path.join(raiz, "ARQUIVOS.md"), "utf8").replace(/\r\n/g, "\n");
 
-confere("o mapa está em dia (se não: npm run mapa)", gerarMapa(raiz, mapa) === mapa);
+confere("o mapa está em dia (se não: npm run mapa)", gerarMapa(site, mapa) === mapa);
 confere("nenhum arquivo sem descrição", !mapa.includes("(sem descrição)"));
 
 // todo arquivo citado no texto existe
@@ -34,7 +37,7 @@ confere("todo arquivo citado existe", inexistentes.length === 0, inexistentes.le
 
 // todo CSS tem a sua explicação (a seção é escrita à mão)
 const semExplicacao =
-    fs.readdirSync(path.join(raiz, "css"))
+    fs.readdirSync(path.join(site, "css"))
         .filter(nome => !mapa.includes("`" + nome + "`"));
 
 confere("todo CSS está explicado", semExplicacao.length === 0, semExplicacao.length ? semExplicacao : undefined);

@@ -1,7 +1,7 @@
 const fs = require("fs");
 const vm = require("vm");
 const path = require("path");
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 
 let falhas = 0;
 const confere = (nome, ok, extra) => {

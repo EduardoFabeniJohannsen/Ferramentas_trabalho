@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 const ctx = {};
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(raiz + "/js/agenda/agenda-utils.js", "utf8"), ctx);

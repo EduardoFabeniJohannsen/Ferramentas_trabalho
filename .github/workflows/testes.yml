@@ -1,5 +1,5 @@
 # Roda os testes a cada envio para a main. Não bloqueia a publicação do site, que o
-# GitHub Pages faz à parte: se algo falhar, o commit ganha um X vermelho e o GitHub
+# publicar.yml faz à parte: se algo falhar, o commit ganha um X vermelho e o GitHub
 # avisa por e-mail. Também dá para rodar à mão na aba Actions (Run workflow).
 name: Testes
 

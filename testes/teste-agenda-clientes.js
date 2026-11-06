@@ -5,7 +5,7 @@ const { chromium } = require("playwright-core");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 
 const hoje = new Date().toISOString().slice(0, 10);
 

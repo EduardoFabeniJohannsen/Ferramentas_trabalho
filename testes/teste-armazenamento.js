@@ -4,7 +4,7 @@ const { chromium } = require("playwright-core");
 const fs = require("fs");
 const path = require("path");
 
-const raiz = path.resolve(__dirname, "..");
+const raiz = path.resolve(__dirname, "..", "site");
 
 const PAGINAS = ["index.html", "propostas.html", "agenda.html", "estoque.html", "tabelas.html", "transportadoras.html", "WEG.html", "leads.html"];
 

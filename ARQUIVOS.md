@@ -24,7 +24,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - Os outros `testes/teste-*.js` cobrem uma área cada. `testes/capturas/` guarda as imagens geradas e não vai para o Git.
 - Os testes de SQL e do agente de leads não ficam aqui, porque este repositório é público.
 - No GitHub: `.github/workflows/testes.yml` roda `npm test` a cada envio para a `main` (aba Actions), em Ubuntu e no fuso de São Paulo. Não bloqueia a publicação do site: se algo falhar, o commit ganha um X vermelho e o GitHub avisa por e-mail. O motivo aparece na página da rodada.
-- Publicação: `.github/workflows/publicar.yml` envia só a pasta `site/` para o GitHub Pages a cada envio para a `main` (precisa de Settings → Pages → Source: GitHub Actions). Saiu do ar ou não atualizou: aba Actions → "Publicar site" → Re-run.
+- Publicação: `.github/workflows/publicar.yml` envia só a pasta `site/` para o GitHub Pages a cada envio para a `main` (precisa de Settings → Pages → Source: GitHub Actions). Saiu do ar ou não atualizou: Re-run na rodada que falhou, ou aba Actions → "Publicar site" → Run workflow (cada tentativa envia o site com o próprio nome, `github-pages-<tentativa>`, então o Re-run funciona).
 
 ## Ordem de carregamento por página
 

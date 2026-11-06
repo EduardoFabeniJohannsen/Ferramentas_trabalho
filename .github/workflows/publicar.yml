@@ -1,8 +1,8 @@
 # Publica o site no GitHub Pages a cada envio para a main: vai para o ar só a
 # pasta site/ (páginas, css, js e icon.png), que vira a raiz do site, então os
 # endereços continuam os mesmos. Precisa de Settings → Pages → Source: GitHub Actions.
-# Não espera os testes (testes.yml roda ao lado). Também dá para rodar à mão na
-# aba Actions (Run workflow), por exemplo se o site sair do ar.
+# Não espera os testes (testes.yml roda ao lado). Falhou ou o site saiu do ar:
+# Re-run na rodada, ou Run workflow na aba Actions (rodada nova).
 name: Publicar site
 
 on:
@@ -34,9 +34,14 @@ jobs:
 
       - uses: actions/configure-pages@v6
 
+      # um nome por tentativa: no Re-run o pacote da tentativa anterior continua
+      # na rodada, e com dois "github-pages" o deploy-pages não publica
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
+          name: github-pages-${{ github.run_attempt }}
 
       - id: publicacao
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}

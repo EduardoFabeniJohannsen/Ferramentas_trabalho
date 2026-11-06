@@ -342,6 +342,25 @@ const confere = (nome, ok, extra) => {
     confere("📋 Zoho: sem o ponto do milhar e com ponto nos centavos", /^\d+\.\d\d$/.test(descontoZoho) && zoho.copiados[0][1] === descontoZoho && zoho.copiados[1][1] === "1200.00" && zoho.toast.includes("1200.00 copiado"), [zoho, descontoTela]);
     confere("formato Zoho: milhões e centavos", (await pagina.evaluate(() => [formatarNumeroPonto(1234567.891), formatarNumeroPonto(0.5), formatarNumeroPonto(2160)].join())) === "1234567.89,0.50,2160.00");
 
+    // botão "Frete ZOHO - Loc Complementar": a rota da entrega e da retirada
+    const freteLocComp = async () => {
+        await pagina.evaluate(() => { window.__copiado = null; });
+        await pagina.click("button:has-text('Frete ZOHO - Loc Complementar')");
+        await pagina.waitForTimeout(60);
+        return pagina.evaluate(() => window.__copiado);
+    };
+    await pagina.fill("#cidade", " Brusque ");
+    let locComp = await freteLocComp();
+    confere("Frete ZOHO - Loc Complementar: entrega e retirada com as cidades", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( ITAJAÍ x BRUSQUE ) - RETIRADA ( BRUSQUE x ITAJAÍ )", locComp);
+    await pagina.evaluate(() => { cidadeSaidaAtual = "JOINVILLE"; });
+    locComp = await freteLocComp();
+    confere("Frete ZOHO - Loc Complementar: sai da cidade de saída escolhida", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( JOINVILLE x BRUSQUE ) - RETIRADA ( BRUSQUE x JOINVILLE )", locComp);
+    await pagina.evaluate(() => { cidadeSaidaAtual = "ITAJAI"; });
+    await pagina.fill("#cidade", "");
+    locComp = await freteLocComp();
+    confere("Frete ZOHO - Loc Complementar: sem cidade não copia e avisa", locComp === null && (await pagina.innerText("#toast")).includes("Informe a cidade"), [locComp, await pagina.innerText("#toast")]);
+    await pagina.fill("#cidade", "Brusque");
+
     await pagina.click("#btnBitributacaoDesconto");
     rs = await resumo();
     confere("tirar a bitributação no card: frete x 2", (await desejado()) === "3.738,32" && (await pagina.innerText("#btnBitributacao")).includes("Desativada") && rs.frete.linhas["Locação complementar"] === "R$ 1.000,00" && !rs.frete.notas.includes("20%"), [await desejado(), rs.frete]);

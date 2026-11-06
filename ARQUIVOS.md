@@ -265,7 +265,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - obterPeriodoProposta, preencherValorTabela
 - `registro-erros.js` (310 linhas): Em toda página menos o login, logo depois de supabase-config: guarda erro de código, arquivo que não carregou e o que passa por console.error, e envia pela função `registrar_erro_site`. O mesmo erro soma em "vezes". Sem login ou sem internet não registra, e falhar aqui nunca atrapalha a página.
   - limparTextoErro, anotarErro, anotarArquivoFaltando, cssCarregou, paginaDoErro, versaoDoErro, enviarLoteErros, enviarErrosPendentes, textoDoConsole, pilhaDoConsole
-- `status.js` (126 linhas): obterCidadeSaida() e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
+- `status.js` (138 linhas): obterCidadeSaida() e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
   - obterCidadeSaida, gerarStatus
 - `supabase-config.js` (49 linhas): Cria o supabaseClient. Quando o banco recusa o login recém-renovado ("JWT issued at future", PGRST303), espera e repete a consulta (até 2 vezes). Precisa vir DEPOIS do <script> do supabase-js (CDN) e ANTES de todos os outros scripts.
   - fetchSupabase

@@ -48,6 +48,7 @@ function gerarStatus(tipo){
         $("cidade")
             ? $("cidade")
                 .value
+                .trim()
                 .toUpperCase()
             : "CIDADE";
 
@@ -66,6 +67,16 @@ function gerarStatus(tipo){
 
         return mostrarToast(
             "Informe cidade e frete",
+            true
+        );
+    }
+
+
+    // locação complementar: a mensagem diz a rota, precisa da cidade
+    if(tipo === "FreteZOHOLocComp" && !cidade){
+
+        return mostrarToast(
+            "Informe a cidade",
             true
         );
     }
@@ -105,8 +116,9 @@ JGR Guinchos:
 47 9720-5094`,
 
 
+        // o valor do frete já está no item, então vai só a rota
         FreteZOHOLocComp:
-`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR`,
+`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( ${saida} x ${cidade} ) - RETIRADA ( ${cidade} x ${saida} )`,
 
 
         ICMS:

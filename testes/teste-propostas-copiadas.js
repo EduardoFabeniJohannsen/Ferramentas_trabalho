@@ -54,7 +54,7 @@ const PROPOSTAS = [
     {
         id: 2, criado_em: "2026-10-20T15:00:00Z", usuario_email: "bia@exemplo.com", cliente: "Beta Ltda", cidade: "Blumenau", valor_total: 5000,
         aparelho: { tipo: "computador", aparelho: "Windows", navegador: "Edge", cidade: "Joinville/Santa Catarina" },
-        dados: { dias: 28, frete: 300, freteBonificado: "entrega", configuracoes: { emojis: true }, pagamento: { forma: "Depósito", prazo: "28/56" }, equipamentos: [
+        dados: { dias: 28, frete: 300, freteBonificado: "entrega", freteWRental: 100, configuracoes: { emojis: true }, pagamento: { forma: "Depósito", prazo: "28/56" }, equipamentos: [
             { modelo: "WAE18", quantidade: 1, valorTabela: 3000, valorFinal: 2850 },
             { modelo: "WAE16", quantidade: 1, valorTabela: 2000, valorFinal: 2000 }
         ] },
@@ -146,6 +146,7 @@ const confere = (nome, ok, extra) => {
     const buscar = async (texto) => { await pagina.fill("#buscaPropostas", texto); return clientes(); };
     confere("busca pelo cliente", JSON.stringify(await buscar("alfa")) === '["Construtora Alfa"]');
     confere("busca pela configuração", JSON.stringify(await buscar("boleto")) === '["Construtora Alfa"]');
+    confere("busca pela parte da W Rental", JSON.stringify(await buscar("w rental paga")) === '["Beta Ltda"]' && (await pagina.innerText("#corpoPropostas")).includes("W Rental paga R$ 100,00 por frete"));
     confere("busca pelo frete bonificado", JSON.stringify(await buscar("bonificada")) === '["Beta Ltda"]');
     const textosBonificado = await pagina.evaluate(() => ["entrega", "retirada", "ambas", ""].map(v => textoBonificadoAdmin({ freteBonificado: v })).join("|"));
     confere("frete bonificado: o texto de cada opção", textosBonificado === "Entrega bonificada|Retirada bonificada|Entrega e retirada bonificadas|", textosBonificado);

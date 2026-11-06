@@ -100,6 +100,21 @@ function copiarPropostaZap(){
     }
 
 
+    // parte da W Rental (status.js): precisa ser menor que o frete
+    if(!semFrete && parteWRentalInvalida(valorFreteNumero)){
+
+        return mostrarToast(
+            "A parte da W Rental precisa ser menor que o frete",
+            true
+        );
+    }
+
+
+    // o que o cliente paga em cada frete (o frete menos a parte da W Rental)
+    const freteClienteNumero =
+        freteDoCliente(valorFreteNumero);
+
+
     // O texto depende do padrão do modelo: 2ª letra A/T/M,
     // 3ª letra E/D e número = altura de trabalho.
     const modeloForaPadrao =
@@ -213,7 +228,7 @@ function copiarPropostaZap(){
 
     const valorComplementar =
         (locacaoComplementarAtiva && !semFrete)
-            ? (valorFreteNumero * fretesCobrados()) * (bitributacaoAtiva ? 1.2 : 1)
+            ? (freteClienteNumero * fretesCobrados()) * (bitributacaoAtiva ? 1.2 : 1)
             : 0;
 
 
@@ -422,8 +437,15 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
     const bonificado =
         obterFreteBonificado();
 
+    // com a parte da W Rental: a do cliente e, no fim da linha, a nota
+    const cobrado =
+        valorFreteMensagem(valorFreteTexto);
+
     const valorFreteZap = (qual) =>
-        freteEstaBonificado(qual) ? "Bonificado" : `R$ ${valorFreteTexto}`;
+        freteEstaBonificado(qual) ? "Bonificado" : cobrado.valor;
+
+    const notaWRentalZap = (qual) =>
+        freteEstaBonificado(qual) ? "" : cobrado.nota;
 
 
     // frete terceirizado: a transportadora cobra direto do cliente
@@ -459,8 +481,8 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 
     let textoFinal =
 `${blocosEquipamentos}${linhaValorFinal}
-${prefixoFrete}🚚 Frete entrega: ${valorFreteZap("entrega")} de ${cidadeSaidaTexto} x ${cidadeFormatada}
-${prefixoFrete}🚚 Frete retirada: ${valorFreteZap("retirada")} de ${cidadeFormatada} x ${cidadeSaidaTexto}
+${prefixoFrete}🚚 Frete entrega: ${valorFreteZap("entrega")} de ${cidadeSaidaTexto} x ${cidadeFormatada}${notaWRentalZap("entrega")}
+${prefixoFrete}🚚 Frete retirada: ${valorFreteZap("retirada")} de ${cidadeFormatada} x ${cidadeSaidaTexto}${notaWRentalZap("retirada")}
 ${linhaNotaFrete}
 ${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFinal}${marca("📄")}Forma de pagamento: ${textoPagamento}`;
 

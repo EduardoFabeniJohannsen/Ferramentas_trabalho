@@ -77,18 +77,25 @@ function alternarFreteNoTotal(){
 // O mesmo frete que a Proposta Zap soma: ida e volta (frete x 2; x 1 com a
 // entrega ou a retirada bonificada; nada com as duas). Como locação
 // complementar, ganha +20% com a bitributação ativada; sem ela o frete é
-// terceirizado (boletos da transportadora) e não tem bitributação.
+// terceirizado (boletos da transportadora) e não tem bitributação. Com a parte
+// da W Rental, entra só a do cliente.
 function freteDoTotalSeguro(){
 
     const frete =
         brToNumber($("valorFrete")?.value);
 
-    if(fretesCobrados() === 0 || !Number.isFinite(frete) || frete <= 0) return null;
+    if(
+        fretesCobrados() === 0 || !Number.isFinite(frete) || frete <= 0 ||
+        parteWRentalInvalida(frete)
+    ){
+        return null;
+    }
 
     const comBitributacao =
         locacaoComplementarAtiva && bitributacaoAtiva;
 
-    const idaVolta = frete * fretesCobrados();
+    // o cliente paga o frete menos a parte da W Rental (status.js)
+    const idaVolta = freteDoCliente(frete) * fretesCobrados();
 
     return {
         frete,

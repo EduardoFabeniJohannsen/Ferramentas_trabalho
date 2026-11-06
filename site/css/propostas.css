@@ -70,12 +70,31 @@
     color:#94a3b8;
 }
 
-/* ===== Frete bonificado (embaixo do Valor frete) =====
-   Verde com a entrega ou a retirada bonificada: fica salvo, então não pode
+/* ===== Frete bonificado e W Rental paga (embaixo do Valor frete) =====
+   Verde com algum frete bonificado ou com a parte da W Rental: fica salvo, então não pode
    passar despercebido na proposta seguinte. */
-#freteBonificado:has(option:checked:not([value=""])){
+#freteBonificado:has(option:checked:not([value=""])),
+#freteWRental:not(:placeholder-shown){
     border-color:#16a34a;
     color:#86efac;
+}
+
+/* rótulo "W Rental paga" ao lado do campo */
+.frete-wrental-linha{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+}
+.frete-wrental-linha label{
+    flex:none;
+    font-size:14px;
+    color:#94a3b8;
+}
+.frete-wrental-linha input{
+    flex:1;
+    min-width:0;
+    margin:0;
 }
 
 /* ===== Forma de pagamento + prazo (lado a lado) ===== */

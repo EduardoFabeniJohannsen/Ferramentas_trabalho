@@ -183,6 +183,17 @@
     }
 
 
+    // parte da W Rental no frete: o mesmo que mudar o frete
+    if($("freteWRental")){
+
+        $("freteWRental")
+            .addEventListener(
+                "input",
+                gerarTextos
+            );
+    }
+
+
     // frete bonificado: muda a locação complementar, o Total com seguro e o Resumo
     if($("freteBonificado")){
 

@@ -73,7 +73,12 @@ function copiarPropostaZap(){
     }
 
 
-    if(!valorFreteTexto){
+    // entrega e retirada bonificadas (status.js): não precisa do valor do frete
+    const semFrete =
+        fretesCobrados() === 0;
+
+
+    if(!valorFreteTexto && !semFrete){
 
         return mostrarToast(
             "Informe o frete",
@@ -86,7 +91,7 @@ function copiarPropostaZap(){
         brToNumber(valorFreteTexto);
 
 
-    if(!Number.isFinite(valorFreteNumero)){
+    if(!Number.isFinite(valorFreteNumero) && !semFrete){
 
         return mostrarToast(
             "Frete inválido",
@@ -203,11 +208,11 @@ function copiarPropostaZap(){
     // ==================================
     // LOCAÇÃO COMPLEMENTAR (frete)
     // ==================================
-    // Frete x 2 (x 1 com a entrega ou a retirada bonificada), com +20%
-    // (bitributação) quando ativada.
+    // Frete x 2 (x 1 com a entrega ou a retirada bonificada; nada com as
+    // duas), com +20% (bitributação) quando ativada.
 
     const valorComplementar =
-        locacaoComplementarAtiva
+        (locacaoComplementarAtiva && !semFrete)
             ? (valorFreteNumero * fretesCobrados()) * (bitributacaoAtiva ? 1.2 : 1)
             : 0;
 
@@ -418,17 +423,23 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
         obterFreteBonificado();
 
     const valorFreteZap = (qual) =>
-        bonificado === qual ? "Bonificado" : `R$ ${valorFreteTexto}`;
+        freteEstaBonificado(qual) ? "Bonificado" : `R$ ${valorFreteTexto}`;
 
 
     // frete terceirizado: a transportadora cobra direto do cliente
-    // (com um bonificado, só um boleto)
+    // (com um bonificado, só um boleto; com os dois, nenhuma observação)
     const notaFrete =
-        locacaoComplementarAtiva
+        semFrete
+            ? ""
+            : locacaoComplementarAtiva
             ? `(Frete incluso como "Locação Complementar")`
             : bonificado
                 ? `(Nosso frete é terceirizado, sendo um boleto na ${bonificado === "entrega" ? "retirada" : "entrega"}, boleto com vencimento em 14 dias)`
                 : `(Nosso frete é terceirizado, sendo um boleto na entrega e outro na retirada, boleto com vencimento em 14 dias)`;
+
+    // sem observação, a linha some (não fica uma linha em branco a mais)
+    const linhaNotaFrete =
+        notaFrete ? `${notaFrete}\n` : "";
 
 
     // boleto ou depósito e o prazo (propostas-pagamento.js)
@@ -450,8 +461,7 @@ ${marca("💵")}*${rotuloTotal}: R$ ${formatarMoedaBR(totalItem)}*
 `${blocosEquipamentos}${linhaValorFinal}
 ${prefixoFrete}🚚 Frete entrega: ${valorFreteZap("entrega")} de ${cidadeSaidaTexto} x ${cidadeFormatada}
 ${prefixoFrete}🚚 Frete retirada: ${valorFreteZap("retirada")} de ${cidadeFormatada} x ${cidadeSaidaTexto}
-${notaFrete}
-
+${linhaNotaFrete}
 ${marca("🎁")}Cortesia: Entrega técnica (mediante solicitação)${separadorFinal}${marca("📄")}Forma de pagamento: ${textoPagamento}`;
 
 

@@ -147,6 +147,8 @@ const confere = (nome, ok, extra) => {
     confere("busca pelo cliente", JSON.stringify(await buscar("alfa")) === '["Construtora Alfa"]');
     confere("busca pela configuração", JSON.stringify(await buscar("boleto")) === '["Construtora Alfa"]');
     confere("busca pelo frete bonificado", JSON.stringify(await buscar("bonificada")) === '["Beta Ltda"]');
+    const textosBonificado = await pagina.evaluate(() => ["entrega", "retirada", "ambas", ""].map(v => textoBonificadoAdmin({ freteBonificado: v })).join("|"));
+    confere("frete bonificado: o texto de cada opção", textosBonificado === "Entrega bonificada|Retirada bonificada|Entrega e retirada bonificadas|", textosBonificado);
     confere("busca pelo aparelho", JSON.stringify(await buscar("samsung")) === '["Construtora Alfa"]');
     confere("busca pela mensagem, sem acento", JSON.stringify(await buscar("observacao")) === '["Gama"]');
     confere("busca pelo usuário", (await buscar("bia@")).length === 1);

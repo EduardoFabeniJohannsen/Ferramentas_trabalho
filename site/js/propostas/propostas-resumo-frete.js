@@ -5,12 +5,23 @@
 
 // O mesmo frete da Proposta Zap: como locação complementar entra no valor
 // final (frete x 2, +20% com bitributação); terceirizado fica fora dele.
-// Com a entrega ou a retirada bonificada, conta um frete só.
+// Com a entrega ou a retirada bonificada, conta um frete só; com as duas, nenhum.
 function secaoFreteResumo(){
 
     const secao = criar("div", "resumo-secao resumo-frete");
 
     secao.append(criar("p", "resumo-titulo", "🚚 Frete"));
+
+    // as duas bonificadas: nem precisa do valor do frete
+    if(fretesCobrados() === 0){
+
+        secao.append(
+            linhaResumo("Entrega e retirada", "Bonificadas"),
+            notaResumo("O cliente não paga frete.")
+        );
+
+        return { secao, complementar: 0, terceirizado: 0 };
+    }
 
     const frete = brToNumber($("valorFrete")?.value);
 

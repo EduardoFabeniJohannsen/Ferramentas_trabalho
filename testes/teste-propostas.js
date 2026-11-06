@@ -406,6 +406,24 @@ const confere = (nome, ok, extra) => {
     await usarTabela();
     confere("recarregado recalcula com um frete só", (await desejado()) === "4.205,61", await desejado());
     await pagina.evaluate(() => alternarLocacaoComplementar());
+
+    // as duas bonificadas: sem frete nenhum (nem precisa do valor)
+    await pagina.selectOption("#freteBonificado", "ambas");
+    rs = await resumo();
+    confere("entrega e retirada bonificadas: nada de frete nas contas", (await desejado()) === "4.672,90" && rs.frete.linhas["Entrega e retirada"] === "Bonificadas" && !("Locação complementar" in rs.frete.linhas) && !rs.frete.notas.includes("Dentro do Total") && rs.total.linhas["Valor final"] === "R$ 5.000,00" && !("Com o frete terceirizado" in rs.total.linhas), [await desejado(), rs.frete, rs.total]);
+    await pagina.fill("#valorFrete", "");
+    zap = await zapAtual();
+    confere("Zap: as duas bonificadas, sem o valor do frete e sem a observação", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: Bonificado de Itajai x Brusque" && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: Bonificado de Brusque x Itajai" && zap.includes("de Brusque x Itajai\n\n🎁 Cortesia") && !zap.includes("terceirizado") && !zap.includes("Locação Complementar") && linhaZap(zap, "Total máquina + seguro") === "💵 *Total máquina + seguro: R$ 5.000,00*", zap);
+    const soBonificados = "- Frete entrega: BONIFICADO - ITAJAÍ x BRUSQUE\n- Frete retirada: BONIFICADO - BRUSQUE x ITAJAÍ";
+    zohoFrete = await freteZoho();
+    locComp = await freteLocComp();
+    confere("Frete ZOHO e Loc Complementar: as duas bonificadas copiam só as duas linhas", zohoFrete === soBonificados && locComp === soBonificados, [zohoFrete, locComp]);
+    await pagina.fill("#cidade", "");
+    zohoFrete = await freteZoho();
+    confere("Frete ZOHO com as duas bonificadas ainda pede a cidade", zohoFrete === "" && (await pagina.innerText("#toast")).includes("Informe a cidade"), [zohoFrete, await pagina.innerText("#toast")]);
+    await pagina.fill("#cidade", "Brusque");
+    await pagina.fill("#valorFrete", "500,00");
+
     await pagina.selectOption("#freteBonificado", "");
     rs = await resumo();
     confere("nenhum bonificado: volta ao frete x 2", (await desejado()) === "3.551,40" && rs.frete.notas.includes("R$ 500,00 x 2 (ida e volta) + 20% bitributação") && (await bordaBonificado()) !== VERDE, [await desejado(), rs.frete]);

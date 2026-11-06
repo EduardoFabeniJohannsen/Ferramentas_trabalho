@@ -88,7 +88,7 @@ function restaurarCache(){
     if($("freteBonificado")){
 
         $("freteBonificado").value =
-            ["entrega", "retirada"].includes(dados.freteBonificado)
+            FRETES_BONIFICADOS.includes(dados.freteBonificado)
                 ? dados.freteBonificado
                 : "";
     }

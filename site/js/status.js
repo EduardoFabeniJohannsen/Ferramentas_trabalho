@@ -1,7 +1,7 @@
 // ======================================
 // CIDADE DE SAÍDA E MENSAGENS DE STATUS
 // ======================================
-// obterCidadeSaida(), obterFreteBonificado() (entrega ou retirada de graça) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
+// obterCidadeSaida(), obterFreteBonificado() (entrega, retirada ou as duas de graça) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -41,22 +41,36 @@ function obterCidadeSaida(){
 // ======================================
 // FRETE BONIFICADO
 // ======================================
-// A entrega ou a retirada sai de graça para o cliente. A caixa fica embaixo
-// do Valor frete (propostas.html); em outra página, as duas são cobradas.
-// "" = as duas cobradas, "entrega" ou "retirada" = a bonificada.
+// A entrega, a retirada ou as duas saem de graça para o cliente. A caixa fica
+// embaixo do Valor frete (propostas.html); em outra página, as duas são cobradas.
+// "" = as duas cobradas, "entrega" ou "retirada" = a bonificada, "ambas" = as duas.
+
+const FRETES_BONIFICADOS = ["entrega", "retirada", "ambas"];
+
 
 function obterFreteBonificado(){
 
     const valor = $("freteBonificado")?.value;
 
-    return valor === "entrega" || valor === "retirada" ? valor : "";
+    return FRETES_BONIFICADOS.includes(valor) ? valor : "";
 }
 
 
-// quantos fretes o cliente paga: ida e volta, ou só um com o outro bonificado
+// qual = "entrega" ou "retirada"
+function freteEstaBonificado(qual){
+
+    const bonificado = obterFreteBonificado();
+
+    return bonificado === qual || bonificado === "ambas";
+}
+
+
+// quantos fretes o cliente paga: 2 (ida e volta), 1 ou 0 (os dois bonificados)
 function fretesCobrados(){
 
-    return obterFreteBonificado() ? 1 : 2;
+    const bonificado = obterFreteBonificado();
+
+    return bonificado === "ambas" ? 0 : bonificado ? 1 : 2;
 }
 
 
@@ -81,14 +95,19 @@ function gerarStatus(tipo){
             : "0,00";
 
 
+    // entrega e retirada bonificadas: o cliente não paga frete, não precisa do valor
+    const semFrete =
+        fretesCobrados() === 0;
+
+
     // FreteZOHO só faz sentido com cidade e frete preenchidos
     if(
         tipo === "FreteZOHO" &&
-        (!cidade.trim() || !frete.trim())
+        (!cidade || (!frete.trim() && !semFrete))
     ){
 
         return mostrarToast(
-            "Informe cidade e frete",
+            semFrete ? "Informe a cidade" : "Informe cidade e frete",
             true
         );
     }
@@ -109,15 +128,25 @@ function gerarStatus(tipo){
 
 
     // o frete bonificado sai sem valor (BONIFICADO no lugar do R$)
-    const bonificado =
-        obterFreteBonificado();
-
     // qual = "entrega" ou "retirada"
     const valorZoho = (qual) =>
-        bonificado === qual ? "BONIFICADO" : `R$ ${frete}`;
+        freteEstaBonificado(qual) ? "BONIFICADO" : `R$ ${frete}`;
 
     const nomeZoho = (qual, nome) =>
-        bonificado === qual ? `${nome} BONIFICADA` : nome;
+        freteEstaBonificado(qual) ? `${nome} BONIFICADA` : nome;
+
+
+    const linhasFreteZoho =
+`- Frete entrega: ${valorZoho("entrega")} - ${saida} x ${cidade}
+- Frete retirada: ${valorZoho("retirada")} - ${cidade} x ${saida}`;
+
+
+    // os dois bonificados: os dois botões copiam só essas duas linhas
+    // (sem boleto, valores, transportadores nem locação complementar)
+    if(semFrete && (tipo === "FreteZOHO" || tipo === "FreteZOHOLocComp")){
+
+        return copiar(linhasFreteZoho, "Frete bonificado copiado");
+    }
 
 
     const mensagens = {
@@ -130,8 +159,7 @@ function gerarStatus(tipo){
         FreteZOHO:
 `- FRETE POR CONTA DO CLIENTE / FATURADOS DO TRANSPORTADOR DIRETO PARA O CLIENTE ( Boleto - 14 DD )
 
-- Frete entrega: ${valorZoho("entrega")} - ${saida} x ${cidade}
-- Frete retirada: ${valorZoho("retirada")} - ${cidade} x ${saida}
+${linhasFreteZoho}
 
 - Valores sujeitos à alteração no retorno conforme reajustes de mercado, combustível, pedágios e inflação do período (IPCA).
 - Alteração de endereço de entrega/coleta poderá alterar o valor do frete.

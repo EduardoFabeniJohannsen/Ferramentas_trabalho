@@ -80,8 +80,11 @@ function textoComplementarAdmin(dados){
 }
 
 
-// "Entrega bonificada", "Retirada bonificada" ou "" (os dois fretes cobrados)
+// "Entrega bonificada", "Retirada bonificada", "Entrega e retirada bonificadas"
+// ou "" (os dois fretes cobrados)
 function textoBonificadoAdmin(dados){
+
+    if(dados?.freteBonificado === "ambas") return "Entrega e retirada bonificadas";
 
     if(dados?.freteBonificado === "entrega") return "Entrega bonificada";
 

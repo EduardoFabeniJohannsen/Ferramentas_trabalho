@@ -31,7 +31,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes). As contas ficam todas no card Resumo da proposta. No PC (~1180px+): textos | resumo | desconto, com os fretes embaixo do desconto; a partir de 800px, textos e resumo à esquerda, desconto e fretes à direita; no celular, um embaixo do outro (textos, desconto, resumo, fretes).
 - CSS: style → propostas
-- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
+- JS: supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-resumo-frete → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → agenda
@@ -198,7 +198,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (127 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
-- `helpers.js` (357 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
+- `helpers.js` (359 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
   - $, criar, semAcento, canalAgenda, avisarAgendaMudou, formatarData, dataBR, dataHoraBR, dataISO, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast, lerLocal, lerLocalJSON, gravarLocal, gravarLocalJSON, removerLocal
 - `index-ferramentas.js` (259 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados).
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
@@ -248,8 +248,10 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - atualizarCampoPrazo, trocarFormaPagamento, prazoPagamentoTexto, textoFormaPagamento
 - `propostas-registro.js` (154 linhas): Cada "Copiar Proposta Zap" grava na tabela propostas_copiadas o aparelho, a cidade aproximada, os dados da proposta (cliente, período, frete, equipamentos com desconto e valores), as configurações e o texto. Copiar de novo a mesma proposta em 10 min não repete. Falhar não atrapalha a cópia.
   - arredondarRegistro, descontoDoEquipamento, aparelhoDoRegistro, montarRegistroProposta, registrarPropostaCopiada
-- `propostas-resumo.js` (295 linhas): Card "Resumo da proposta" (no PC na coluna do meio; no celular logo depois do Calcular Desconto): todas as contas num lugar só, iguais às da Proposta Zap. Por equipamento: tabela, desconto (em vermelho acima de 20%), locação, seguro, máquina + seguro e diária. Depois o frete (locação complementar ou terceirizado), o valor final e a diária da proposta. Os outros cards ficam só com os campos.
-  - moedaResumo, linhaResumo, notaResumo, textoPeriodoResumo, itensDoResumo, secaoEquipamentoResumo, secaoFreteResumo, secaoTotalResumo, atualizarResumoProposta
+- `propostas-resumo-frete.js` (97 linhas): Seções de baixo do Resumo da proposta (propostas-resumo.js): o frete (locação complementar, com o 📋 do formato Zoho, ou terceirizado) e o valor final com a diária da proposta.
+  - secaoFreteResumo, secaoTotalResumo
+- `propostas-resumo.js` (222 linhas): Card "Resumo da proposta" (no PC na coluna do meio; no celular logo depois do Calcular Desconto): todas as contas num lugar só, iguais às da Proposta Zap. Por equipamento: tabela, desconto (em vermelho acima de 20%), locação, seguro, máquina + seguro e diária. Depois o frete (locação complementar ou terceirizado), o valor final e a diária da proposta. Os outros cards ficam só com os campos.
+  - moedaResumo, botaoZohoResumo, linhaResumo, notaResumo, textoPeriodoResumo, itensDoResumo, secaoEquipamentoResumo, atualizarResumoProposta
 - `propostas-tabelas-fretes.js` (151 linhas): Carregamento de tabela_fretes.
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (161 linhas): Cópia offline (localStorage, de preços e de fretes) e carregamento de tabela_precos.
@@ -362,7 +364,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (460), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (357), `agenda-form-campos.js` (353), `agenda-larguras.js` (349), `agenda-banco.js` (347), `presenca.js` (327), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310), `agenda-zap.js` (301).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (460), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (359), `agenda-form-campos.js` (353), `agenda-larguras.js` (349), `agenda-banco.js` (347), `presenca.js` (327), `agenda-pagamento.js` (326), `leads-cards.js` (325), `propostas-config.js` (318), `transp-docs.js` (312), `registro-erros.js` (310), `agenda-zap.js` (301).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - `propostas-copiadas.html` para quem não é admin (acesso "propostas-copiadas", v16.41.0): os dados só aparecem com a policy de SELECT com `tem_acesso('propostas-copiadas')` em `propostas_copiadas`. Apagar continua só com o admin.

@@ -214,7 +214,20 @@
     line-height:1.6;
 }
 .resumo-rotulo{
+    margin-right:auto;
     color:#cbd5e1;
+}
+/* 📋 que copia o valor no formato do Zoho (propostas-resumo.js) */
+.resumo-card .resumo-zoho{
+    margin:0 0 0 -4px;
+    padding:0 5px;
+    font-size:12px;
+    line-height:1.5;
+    background:#334155;
+    border-radius:5px;
+}
+.resumo-card .resumo-zoho:hover{
+    background:#475569;
 }
 .resumo-valor{
     white-space:nowrap;

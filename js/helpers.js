@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.44.0";
+const VERSAO_SISTEMA = "16.45.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -196,9 +196,11 @@ const formatarMoedaBR = (valor) => {
 };
 
 
+// formato do Zoho: "2160.00" (sem o ponto do milhar, ponto nos centavos).
+// Sai do texto de formatarMoedaBR, então os centavos batem com os da tela.
 const formatarNumeroPonto = (valor) => {
 
-    return Number(valor).toFixed(2);
+    return formatarMoedaBR(valor).replace(/\./g, "").replace(",", ".");
 };
 
 

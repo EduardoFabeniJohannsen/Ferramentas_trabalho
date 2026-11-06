@@ -325,6 +325,23 @@ const confere = (nome, ok, extra) => {
     zap = await zapAtual();
     confere("Zap: total com frete +20% bate com o digitado", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*") && linhaZap(zap, "Total máquina + seguro").includes("(+20%)"), linhaZap(zap, "Total máquina + seguro"));
 
+    // 📋 do resumo: copia desconto e locação complementar no formato do Zoho
+    const zoho = await pagina.evaluate(async () => {
+        const copiados = [];
+        for(const botao of document.querySelectorAll("#conteudoResumo .resumo-zoho")){
+            window.__copiado = null;
+            botao.click();
+            await new Promise(r => setTimeout(r, 30));
+            copiados.push([botao.closest(".resumo-linha").querySelector(".resumo-rotulo").innerText.trim(), window.__copiado]);
+        }
+        return { copiados, toast: document.getElementById("toast").innerText };
+    });
+    const descontoTela = rs.eq[0].linhas["Desconto"] || "";
+    const descontoZoho = descontoTela.replace(/^R\$ /, "").replace(/ \(.*$/, "").replace(/\./g, "").replace(",", ".");
+    confere("📋 Zoho: só no desconto e na locação complementar", zoho.copiados.map(z => z[0]).join() === "Desconto,Locação complementar", zoho);
+    confere("📋 Zoho: sem o ponto do milhar e com ponto nos centavos", /^\d+\.\d\d$/.test(descontoZoho) && zoho.copiados[0][1] === descontoZoho && zoho.copiados[1][1] === "1200.00" && zoho.toast.includes("1200.00 copiado"), [zoho, descontoTela]);
+    confere("formato Zoho: milhões e centavos", (await pagina.evaluate(() => [formatarNumeroPonto(1234567.891), formatarNumeroPonto(0.5), formatarNumeroPonto(2160)].join())) === "1234567.89,0.50,2160.00");
+
     await pagina.click("#btnBitributacaoDesconto");
     rs = await resumo();
     confere("tirar a bitributação no card: frete x 2", (await desejado()) === "3.738,32" && (await pagina.innerText("#btnBitributacao")).includes("Desativada") && rs.frete.linhas["Locação complementar"] === "R$ 1.000,00" && !rs.frete.notas.includes("20%"), [await desejado(), rs.frete]);

@@ -6,7 +6,6 @@
 // O mesmo frete da Proposta Zap: como locação complementar entra no valor
 // final (frete x 2, +20% com bitributação); terceirizado fica fora dele.
 // Com a entrega ou a retirada bonificada, conta um frete só; com as duas, nenhum.
-// Com a parte da W Rental (status.js), conta só a do cliente.
 function secaoFreteResumo(){
 
     const secao = criar("div", "resumo-secao resumo-frete");
@@ -33,17 +32,6 @@ function secaoFreteResumo(){
         return { secao, complementar: 0, terceirizado: 0 };
     }
 
-    // a parte da W Rental (status.js) precisa ser menor que o frete
-    if(parteWRentalInvalida(frete)){
-
-        secao.append(notaResumo("A parte da W Rental precisa ser menor que o frete (o frete todo de graça é no Frete bonificado).", "resumo-alerta"));
-
-        return { secao, complementar: 0, terceirizado: 0 };
-    }
-
-    // o que o cliente paga em cada frete (sem a parte da W Rental, o frete todo)
-    const cliente = freteDoCliente(frete);
-
     const complementar = valorLocacaoComplementar();
 
     // com um bonificado, o cliente paga só o outro
@@ -60,30 +48,22 @@ function secaoFreteResumo(){
 
         secao.append(
             linhaResumo("Locação complementar", moedaResumo(complementar.total), "", complementar.total),
-            notaResumo(`${moedaResumo(cliente)} ${vezes}${bitributacaoAtiva ? " + 20% bitributação" : ""}`)
+            notaResumo(`${moedaResumo(frete)} ${vezes}${bitributacaoAtiva ? " + 20% bitributação" : ""}`)
         );
 
     }else if(bonificado){
 
         secao.append(
-            linhaResumo(`Só a ${cobrado}`, moedaResumo(cliente)),
+            linhaResumo(`Só a ${cobrado}`, moedaResumo(frete)),
             notaResumo(`${bonificado === "entrega" ? "Entrega" : "Retirada"} bonificada. Terceirizado: um boleto na ${cobrado} (boleto com vencimento em 14 dias), fora do valor final.`)
         );
 
     }else{
 
         secao.append(
-            linhaResumo("Entrega + retirada", moedaResumo(cliente * 2)),
+            linhaResumo("Entrega + retirada", moedaResumo(frete * 2)),
             notaResumo("Terceirizado: um boleto na entrega e outro na retirada (boleto com vencimento em 14 dias), fora do valor final.")
         );
-    }
-
-    // a conta da parte da W Rental
-    if(freteWRental()){
-
-        secao.append(notaResumo(
-            `Frete ${moedaResumo(frete)} − ${moedaResumo(freteWRental())} da W Rental = ${moedaResumo(cliente)} do cliente${fretesCobrados() === 2 ? " em cada um" : ""}.`
-        ));
     }
 
     // botão 🚚 do Calcular Desconto (propostas-desconto-total-seguro.js)
@@ -99,7 +79,7 @@ function secaoFreteResumo(){
     return {
         secao,
         complementar: complementar ? complementar.total : 0,
-        terceirizado: complementar ? 0 : cliente * fretesCobrados()
+        terceirizado: complementar ? 0 : frete * fretesCobrados()
     };
 }
 

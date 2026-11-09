@@ -236,11 +236,10 @@ const confere = (nome, ok, extra) => {
     await escolher("Boleto");
     await fecharConfig();
     await pagina.selectOption("#freteBonificado", "entrega");
-    await pagina.fill("#freteWRental", "100");
     await pagina.click(".btn-limpar-tudo");
     await pagina.waitForTimeout(100);
     confere("limpar tudo não mexe na configuração", (await pagina.inputValue("#formaPagamento")) === "Boleto");
-    confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "" && (await pagina.inputValue("#freteBonificado")) === "" && (await pagina.inputValue("#freteWRental")) === "");
+    confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "" && (await pagina.inputValue("#freteBonificado")) === "");
 
     // ---------- total com seguro ----------
     const usarTabela = () => pagina.evaluate(() => {
@@ -428,45 +427,6 @@ const confere = (nome, ok, extra) => {
     await pagina.selectOption("#freteBonificado", "");
     rs = await resumo();
     confere("nenhum bonificado: volta ao frete x 2", (await desejado()) === "3.551,40" && rs.frete.notas.includes("R$ 500,00 x 2 (ida e volta) + 20% bitributação") && (await bordaBonificado()) !== VERDE, [await desejado(), rs.frete]);
-
-    // ---------- parte do frete paga pela W Rental ----------
-    const bordaWRental = () => pagina.evaluate(() => getComputedStyle(document.getElementById("freteWRental")).borderColor);
-    const notaWR = " (frete R$ 500,00, sendo R$ 200,00 por conta da W Rental)";
-    confere("W Rental paga: vazio e sem destaque", (await pagina.inputValue("#freteWRental")) === "" && (await bordaWRental()) !== VERDE, await bordaWRental());
-    await pagina.fill("#freteWRental", "200,00");
-    rs = await resumo();
-    confere("W Rental paga 200 de 500: a locação complementar conta só os 300 do cliente", (await desejado()) === "4.000,00" && rs.frete.linhas["Locação complementar"] === "R$ 720,00" && rs.frete.notas.includes("R$ 300,00 x 2 (ida e volta) + 20% bitributação") && rs.frete.notas.includes("Frete R$ 500,00 − R$ 200,00 da W Rental = R$ 300,00 do cliente em cada um.") && rs.total.linhas["Valor final com frete"] === "R$ 5.000,00", [await desejado(), rs.frete, rs.total]);
-    confere("W Rental paga fica em verde", (await bordaWRental()) === VERDE, await bordaWRental());
-    await pagina.screenshot({ path: path.join(saida, "29-propostas-frete-w-rental.png") });
-    zap = await zapAtual();
-    confere("Zap: parte do cliente e a da W Rental nos dois fretes", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: R$ 300,00 de Itajai x Brusque" + notaWR && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: R$ 300,00 de Brusque x Itajai" + notaWR && linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), [linhaZap(zap, "Frete entrega"), linhaZap(zap, "Frete retirada"), linhaZap(zap, "Total máquina + seguro")]);
-    zohoFrete = await freteZoho();
-    confere("Frete ZOHO: parte do cliente e a da W Rental", zohoFrete.includes("- Frete entrega: R$ 300,00 - ITAJAÍ x BRUSQUE" + notaWR + "\n- Frete retirada: R$ 300,00 - BRUSQUE x ITAJAÍ" + notaWR), zohoFrete);
-
-    await pagina.selectOption("#freteBonificado", "entrega");
-    rs = await resumo();
-    zap = await zapAtual();
-    confere("W Rental + entrega bonificada: a nota só no frete cobrado", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: Bonificado de Itajai x Brusque" && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: R$ 300,00 de Brusque x Itajai" + notaWR && (await desejado()) === "4.336,45" && rs.frete.linhas["Locação complementar"] === "R$ 360,00" && rs.frete.notas.includes("= R$ 300,00 do cliente.") && !rs.frete.notas.includes("em cada um"), [linhaZap(zap, "Frete entrega"), linhaZap(zap, "Frete retirada"), await desejado(), rs.frete]);
-    await pagina.selectOption("#freteBonificado", "");
-
-    await pagina.evaluate(() => alternarLocacaoComplementar());
-    rs = await resumo();
-    confere("W Rental no terceirizado: o cliente paga 300 em cada boleto", (await desejado()) === "4.112,15" && rs.frete.linhas["Entrega + retirada"] === "R$ 600,00" && rs.total.linhas["Valor final"] === "R$ 4.400,00" && rs.total.linhas["Com o frete terceirizado"] === "R$ 5.000,00", [await desejado(), rs.frete, rs.total]);
-    await pagina.evaluate(() => alternarLocacaoComplementar());
-
-    await pagina.fill("#freteWRental", "500,00");
-    rs = await resumo();
-    zap = await zapAtual();
-    const toastWR = await pagina.innerText("#toast");
-    zohoFrete = await freteZoho();
-    confere("W Rental pagando o frete todo: avisa e não copia", zap === "" && toastWR.includes("A parte da W Rental precisa ser menor que o frete") && zohoFrete === "" && rs.frete.notas.includes("A parte da W Rental precisa ser menor que o frete") && (await desejado()) === "4.672,90", [zap, toastWR, zohoFrete, rs.frete, await desejado()]);
-
-    await pagina.fill("#freteWRental", "200,00");
-    await pagina.waitForTimeout(100);
-    confere("W Rental paga vai para o cache", (await pagina.evaluate(() => JSON.parse(localStorage.getItem("propostaCache")).freteWRental)) === "200,00");
-    await pagina.fill("#freteWRental", "");
-    rs = await resumo();
-    confere("sem a parte da W Rental volta ao frete todo", (await desejado()) === "3.551,40" && !rs.frete.notas.includes("W Rental"), [await desejado(), rs.frete]);
 
     await pagina.click("#btnBitributacaoDesconto");
     rs = await resumo();

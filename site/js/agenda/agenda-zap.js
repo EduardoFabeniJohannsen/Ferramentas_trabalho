@@ -193,8 +193,22 @@ function montarTextoZap(item){
         return { erro: "Informe a máquina de recolha da troca" };
     }
 
+    // dividido (agenda-utils.js): o cliente paga uma parte e nós a outra
+    const dividido =
+        partesFrete(item);
+
+    if(dividido && !freteDivididoValido(dividido)){
+
+        return { erro: "Confira a parte do frete por nossa conta" };
+    }
+
+    // o cliente paga algo: vão os contatos dele (no dividido também)
     const porCliente =
-        item.freteConta === "cliente";
+        item.freteConta === "cliente" || !!dividido;
+
+    // nós pagamos algo: vai o CARD (no dividido também)
+    const porNossa =
+        item.freteConta !== "cliente";
 
     const horario =
         String(item.horario || "").trim();
@@ -264,12 +278,27 @@ function montarTextoZap(item){
 
     linhas.push("");
 
-    linhas.push(
-        `* FRETE POR ${porCliente ? "CONTA DO CLIENTE" : "NOSSA CONTA"} - R$ ${formatarMoedaBR(frete)}`
-    );
+    if(dividido){
+
+        // uma linha para cada parte, com as mesmas palavras de sempre
+        linhas.push(`* FRETE POR CONTA DO CLIENTE - R$ ${formatarMoedaBR(dividido.cliente)}`);
+
+        linhas.push(`* FRETE POR NOSSA CONTA - R$ ${formatarMoedaBR(dividido.nossa)}`);
+
+    }else{
+
+        linhas.push(
+            `* FRETE POR ${porCliente ? "CONTA DO CLIENTE" : "NOSSA CONTA"} - R$ ${formatarMoedaBR(frete)}`
+        );
+    }
 
     // ficha digitada à mão, ou o nome da proposta montado sozinho
     linhas.push(`* ${referenciaZap(item)}`.trimEnd());
+
+    if(porNossa){
+
+        linhas.push(`* CARD:${item.card || ""}`.trimEnd());
+    }
 
     if(porCliente){
 
@@ -278,10 +307,6 @@ function montarTextoZap(item){
         linhas.push("📍Financeiro:");
 
         if(item.emails) linhas.push(item.emails);
-
-    }else{
-
-        linhas.push(`* CARD:${item.card || ""}`.trimEnd());
     }
 
     return { texto: linhas.join("\n") };

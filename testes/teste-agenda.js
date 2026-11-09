@@ -756,6 +756,75 @@ const confere = (nome, ok, extra) => {
     confere("expedição: coluna Vendedor (oculta de início) mostra o vendedor", titulosVendedor.includes("Vendedor") && celulaVendedor === "Maria Luiza", [titulosVendedor, celulaVendedor]);
     await pagina.evaluate(() => localStorage.clear());
 
+    // ---------- frete dividido (parte do cliente, parte nossa) ----------
+    await modo("transportador");
+    await pagina.evaluate(() => {
+        window.__inseridos = [];
+        inserirAgendamento = async (dados) => { window.__inseridos.push(dados); return { ...dados, id: 96 }; };
+        removerRascunho("novo");
+        abrirModalAgenda();
+    });
+    await pagina.waitForSelector(".modal-overlay.aberto");
+    confere("frete dividido: a parte por nossa conta começa escondida", !(await pagina.isVisible("#agFreteNossa")));
+    await pagina.locator(".ag-plataforma-item").first().fill("WAE18R010");
+    await pagina.selectOption("#agTipo", "Coleta");
+    await pagina.fill("#agCliente", "Cliente Dividido");
+    await pagina.fill("#agFrete", "500,00");
+    await pagina.selectOption("#agFreteConta", "dividido");
+    confere("dividido: aparecem a parte por nossa conta e o Card", await pagina.isVisible("#agFreteNossa") && await pagina.isVisible("#agCard"));
+    await pagina.selectOption("#agFreteConta", "nossa");
+    confere("voltar para nossa conta esconde a parte", !(await pagina.isVisible("#agFreteNossa")));
+    await pagina.selectOption("#agFreteConta", "dividido");
+    await pagina.fill("#agFreteNossa", "600,00");
+    confere("dividido: avisa quando a parte não cabe no frete", (await pagina.innerText("#textoFreteCliente")).includes("menor que o frete"), await pagina.innerText("#textoFreteCliente"));
+    await pagina.evaluate(() => salvarAgendamento());
+    confere("dividido: não salva com a parte maior que o frete", (await pagina.evaluate(() => window.__inseridos.length)) === 0 && (await pagina.innerText("#toast")).includes("A parte por nossa conta precisa ser maior que zero e menor que o frete"), await pagina.innerText("#toast"));
+    await pagina.fill("#agFreteNossa", "200,00");
+    confere("dividido: mostra quanto o cliente paga", (await pagina.innerText("#textoFreteCliente")) === "O cliente paga R$ 300,00", await pagina.innerText("#textoFreteCliente"));
+    await pagina.locator("#agFreteNossa").scrollIntoViewIfNeeded();
+    await pagina.screenshot({ path: path.join(saida, "16-agenda-frete-dividido.png") });
+    await pagina.evaluate(() => salvarAgendamento());
+    await pagina.waitForTimeout(150);
+    const salvoDividido = await pagina.evaluate(() => window.__inseridos[0] || {});
+    confere("dividido: salva a conta e a parte por nossa conta", salvoDividido.freteConta === "dividido" && salvoDividido.freteNossa === "200,00" && salvoDividido.frete === "500,00", salvoDividido);
+    const banco = await pagina.evaluate(() => [paraBanco({ freteNossa: "200,00" }).frete_nossa, paraBanco({ freteNossa: "" }).frete_nossa, doBanco({ id: 1, frete: 500, frete_conta: "dividido", frete_nossa: 200 }).freteNossa, doBanco({ id: 2, frete: 500 }).freteNossa]);
+    confere("dividido: coluna frete_nossa numérica no banco", JSON.stringify(banco) === JSON.stringify([200, null, "200,00", ""]), banco);
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); });
+
+    const zaps = await pagina.evaluate(() => {
+        const entrega = agendamentos.find(ag => ag.id === 1);
+        return {
+            dividido: montarTextoZap({ ...entrega, freteConta: "dividido", frete: "500,00", freteNossa: "200,00" }).texto || "",
+            nossa: montarTextoZap({ ...entrega, freteConta: "nossa" }).texto || "",
+            cliente: montarTextoZap({ ...entrega, freteConta: "cliente" }).texto || "",
+            errado: montarTextoZap({ ...entrega, freteConta: "dividido", frete: "500,00", freteNossa: "" }).erro || ""
+        };
+    });
+    confere("Zap dividido: uma linha para a parte do cliente e outra para a nossa", zaps.dividido.includes("* FRETE POR CONTA DO CLIENTE - R$ 300,00\n* FRETE POR NOSSA CONTA - R$ 200,00\n"), zaps.dividido);
+    confere("Zap dividido: vão o CARD e os contatos do financeiro", zaps.dividido.includes("* CARD:CARD-1\n* Contatos: ⤵️\n📍Financeiro:\na@cliente.com"), zaps.dividido);
+    confere("Zap por nossa conta continua igual (CARD, sem financeiro)", zaps.nossa.includes("* FRETE POR NOSSA CONTA - R$ 1.150,00") && zaps.nossa.includes("* CARD:CARD-1") && !zaps.nossa.includes("Financeiro"), zaps.nossa);
+    confere("Zap por conta do cliente continua igual (financeiro, sem CARD)", zaps.cliente.includes("* FRETE POR CONTA DO CLIENTE - R$ 1.150,00") && !zaps.cliente.includes("CARD") && zaps.cliente.includes("📍Financeiro:"), zaps.cliente);
+    confere("Zap dividido sem a parte nossa: avisa", zaps.errado === "Confira a parte do frete por nossa conta", zaps.errado);
+
+    const copiasDividido = await pagina.evaluate(() => {
+        const entrega = { ...agendamentos.find(ag => ag.id === 1), freteConta: "dividido", freteNossa: "200,00" };
+        return [valoresDuplicados(entrega).freteNossa, valoresColetaDaEntrega(entrega).freteNossa];
+    });
+    confere("dividido: duplicar e criar coleta levam a parte por nossa conta", copiasDividido.join() === "200,00,200,00", copiasDividido);
+
+    await pagina.evaluate(() => {
+        agendamentos.push({ ...agendamentos.find(ag => ag.id === 1), id: 95, plataforma: "WAE18R095", freteConta: "dividido", frete: "500,00", freteNossa: "200,00" });
+    });
+    await modo("expedicao");
+    await abreOpcao("#btnColunas");
+    await pagina.locator("#listaColunasVisiveis label").filter({ hasText: /^Frete por conta de$/ }).locator("input").check();
+    await pagina.mouse.click(5, 5);
+    const titulosConta = await titulos();
+    const celulaConta = await pagina.locator("tr.ag-item", { hasText: "WAE18R095" }).first()
+        .evaluate((l, i) => l.children[i].textContent.trim(), titulosConta.indexOf("Frete por conta de"));
+    confere("expedição: a coluna Frete por conta de mostra as duas partes", celulaConta === "Cliente R$ 300,00 + nossa R$ 200,00", [titulosConta, celulaConta]);
+    await pagina.evaluate(() => { agendamentos = agendamentos.filter(ag => ag.id !== 95); localStorage.clear(); renderizarAgenda(); });
+
     confere("sem erros no console", erros.length === 0, erros);
 
     await navegador.close();

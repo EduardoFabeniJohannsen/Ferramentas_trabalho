@@ -1,7 +1,7 @@
 // ======================================
 // CIDADE DE SAÍDA E MENSAGENS DE STATUS
 // ======================================
-// obterCidadeSaida(), obterFreteBonificado() (entrega, retirada ou as duas de graça), freteWRental() (a parte do frete paga pela W Rental) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
+// obterCidadeSaida(), obterFreteBonificado() (entrega, retirada ou as duas de graça) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -75,55 +75,6 @@ function fretesCobrados(){
 
 
 // ======================================
-// PARTE DA W RENTAL NO FRETE
-// ======================================
-// Campo "W Rental paga" (embaixo do Valor frete, propostas.html): quanto a
-// W Rental paga de cada frete cobrado; o cliente paga o resto. Ex: frete
-// R$ 1.000,00 e W Rental R$ 400,00 = o cliente paga R$ 600,00 na entrega e
-// R$ 600,00 na retirada. Vazio ou em outra página = 0.
-
-function freteWRental(){
-
-    const valor = brToNumber($("freteWRental")?.value || "");
-
-    return Number.isFinite(valor) && valor > 0 ? valor : 0;
-}
-
-
-// o que o cliente paga em cada frete (0 ou menos = a parte da W Rental não cabe no frete)
-function freteDoCliente(frete){
-
-    return frete - freteWRental();
-}
-
-
-// a parte da W Rental precisa ser menor que o frete (o frete todo é o Frete bonificado)
-function parteWRentalInvalida(frete){
-
-    return freteWRental() > 0 && !(freteDoCliente(frete) > 0);
-}
-
-
-// Valor de um frete cobrado nas mensagens (Proposta Zap e Frete ZOHO), a partir
-// do Valor frete digitado. Sem a parte da W Rental, o texto digitado e sem nota.
-// Com ela: valor = "R$ 600,00" e nota = " (frete R$ 1.000,00, sendo R$ 400,00
-// por conta da W Rental)".
-function valorFreteMensagem(textoFrete){
-
-    const parte = freteWRental();
-
-    if(!parte) return { valor: `R$ ${textoFrete}`, nota: "" };
-
-    const frete = brToNumber(textoFrete);
-
-    return {
-        valor: `R$ ${formatarMoedaBR(freteDoCliente(frete))}`,
-        nota: ` (frete R$ ${formatarMoedaBR(frete)}, sendo R$ ${formatarMoedaBR(parte)} por conta da W Rental)`
-    };
-}
-
-
-// ======================================
 // STATUS
 // ======================================
 
@@ -162,16 +113,6 @@ function gerarStatus(tipo){
     }
 
 
-    // a parte da W Rental precisa caber no frete
-    if(tipo === "FreteZOHO" && !semFrete && parteWRentalInvalida(brToNumber(frete))){
-
-        return mostrarToast(
-            "A parte da W Rental precisa ser menor que o frete",
-            true
-        );
-    }
-
-
     // locação complementar: a mensagem diz a rota, precisa da cidade
     if(tipo === "FreteZOHOLocComp" && !cidade){
 
@@ -186,25 +127,18 @@ function gerarStatus(tipo){
         obterCidadeSaida().zoho;
 
 
-    // o frete cobrado (com a parte da W Rental, a do cliente e a nota)
-    const cobrado =
-        valorFreteMensagem(frete.trim());
-
     // o frete bonificado sai sem valor (BONIFICADO no lugar do R$)
     // qual = "entrega" ou "retirada"
     const valorZoho = (qual) =>
-        freteEstaBonificado(qual) ? "BONIFICADO" : cobrado.valor;
-
-    const notaZoho = (qual) =>
-        freteEstaBonificado(qual) ? "" : cobrado.nota;
+        freteEstaBonificado(qual) ? "BONIFICADO" : `R$ ${frete}`;
 
     const nomeZoho = (qual, nome) =>
         freteEstaBonificado(qual) ? `${nome} BONIFICADA` : nome;
 
 
     const linhasFreteZoho =
-`- Frete entrega: ${valorZoho("entrega")} - ${saida} x ${cidade}${notaZoho("entrega")}
-- Frete retirada: ${valorZoho("retirada")} - ${cidade} x ${saida}${notaZoho("retirada")}`;
+`- Frete entrega: ${valorZoho("entrega")} - ${saida} x ${cidade}
+- Frete retirada: ${valorZoho("retirada")} - ${cidade} x ${saida}`;
 
 
     // os dois bonificados: os dois botões copiam só essas duas linhas

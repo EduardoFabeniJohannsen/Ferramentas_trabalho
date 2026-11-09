@@ -35,6 +35,7 @@ function valoresColetaDaEntrega(item){
         linkDestino: item.linkOrigem,
         frete: item.frete,
         freteConta: item.freteConta,
+        freteNossa: item.freteNossa,
         obsExpedicao: "",
         obsEntrega: item.obsEntrega,
         referencia: item.referencia,

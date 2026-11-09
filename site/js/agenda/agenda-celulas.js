@@ -179,10 +179,15 @@ function criarCelulasAgenda(item){
 
     celulas.referencia = celulaTexto("referencia", item.referencia);
 
+    // dividido: "Cliente R$ 300,00 + nossa R$ 200,00" (agenda-utils.js)
+    const partes = partesFrete(item);
+
     celulas.freteConta =
         celulaTexto(
             "freteConta",
-            item.freteConta === "cliente" ? "Conta do cliente" : "Nossa conta"
+            partes
+                ? `Cliente R$ ${formatarMoedaBR(partes.cliente)} + nossa R$ ${formatarMoedaBR(partes.nossa)}`
+                : item.freteConta === "cliente" ? "Conta do cliente" : "Nossa conta"
         );
 
     celulas.card = celulaTexto("card", item.card);

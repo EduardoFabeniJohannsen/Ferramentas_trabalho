@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - UTILITÁRIOS
 // ======================================
-// corDoDia(), tituloDoDia(), cidadeDoEndereco(), rotuloTipo().
+// corDoDia(), tituloDoDia(), cidadeDoEndereco(), rotuloTipo() e partesFrete() (frete dividido entre o cliente e nossa conta).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -69,4 +69,26 @@ function cidadeDoEndereco(endereco){
     if(!/^\p{L}/u.test(cidade)) return "";
 
     return `${cidade}/${ultimo[2].toUpperCase()}`;
+}
+
+
+// Frete dividido ("Frete por conta de: Cliente e nossa conta"): o cliente
+// paga o frete menos a parte por nossa conta. { cliente, nossa } em número,
+// ou null se o frete não for dividido. Ex: frete 500 e nossa 200 = cliente 300.
+function partesFrete(item){
+
+    if(item.freteConta !== "dividido") return null;
+
+    const frete = brToNumber(item.frete);
+
+    const nossa = brToNumber(item.freteNossa);
+
+    return { cliente: frete - nossa, nossa };
+}
+
+
+// a parte por nossa conta precisa ser maior que zero e menor que o frete
+function freteDivididoValido(partes){
+
+    return !!partes && partes.nossa > 0 && partes.cliente > 0;
 }

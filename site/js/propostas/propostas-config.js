@@ -109,23 +109,18 @@ function atualizarBotaoBitributacao(){
 // Com a locação complementar ativada, o valor pronto pra lançar no sistema
 // (aparece no Resumo da proposta, propostas-resumo.js): frete (cada perna)
 // x 2 (x 1 com a entrega ou a retirada bonificada; com as duas não tem),
-// com +20% se a bitributação estiver ativada. Com a parte da W Rental, conta
-// só a do cliente.
+// com +20% se a bitributação estiver ativada.
 
 function valorLocacaoComplementar(){
 
     const frete = brToNumber($("valorFrete")?.value);
 
-    if(
-        !locacaoComplementarAtiva || fretesCobrados() === 0 ||
-        !Number.isFinite(frete) || frete <= 0 || parteWRentalInvalida(frete)
-    ){
+    if(!locacaoComplementarAtiva || fretesCobrados() === 0 || !Number.isFinite(frete) || frete <= 0){
 
         return null;
     }
 
-    // o cliente paga o frete menos a parte da W Rental (status.js)
-    const idaVolta = freteDoCliente(frete) * fretesCobrados();
+    const idaVolta = frete * fretesCobrados();
 
     return {
         frete: frete,

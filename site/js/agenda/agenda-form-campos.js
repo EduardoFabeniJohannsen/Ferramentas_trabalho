@@ -29,6 +29,7 @@ const CAMPOS_AGENDA = [
     ["linkDestino", "agLinkDestino"],
     ["frete", "agFrete"],
     ["freteConta", "agFreteConta"],
+    ["freteNossa", "agFreteNossa"],
     ["obsExpedicao", "agObsExpedicao"],
     ["obsEntrega", "agObsEntrega"],
     ["referencia", "agReferencia"],

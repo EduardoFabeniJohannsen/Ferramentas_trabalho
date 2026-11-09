@@ -51,6 +51,24 @@ async function salvarAgendamento(){
         return avisoFormulario("Frete inválido", "local");
     }
 
+    // frete dividido entre o cliente e nossa conta (agenda-utils.js)
+    if(dados.freteConta === "dividido"){
+
+        if(!(brToNumber(dados.frete) > 0)){
+
+            return avisoFormulario("Informe o frete", "local");
+        }
+
+        if(!freteDivididoValido(partesFrete(dados))){
+
+            return avisoFormulario("A parte por nossa conta precisa ser maior que zero e menor que o frete", "local");
+        }
+
+    }else{
+
+        dados.freteNossa = "";
+    }
+
     // troca técnica precisa da máquina de recolha; nos outros tipos não vale
     if(dados.tipo === "Troca técnica"){
 

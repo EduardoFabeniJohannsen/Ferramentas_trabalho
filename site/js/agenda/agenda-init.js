@@ -45,6 +45,11 @@
         atualizarCamposConta
     );
 
+    // frete dividido: a conta do cliente acompanha o que for digitado
+    ["agFrete", "agFreteNossa"].forEach(id =>
+        $(id).addEventListener("input", atualizarTextoFreteCliente)
+    );
+
     // filtro de datas: busca, "selecionar tudo" e fechar ao clicar fora
     $("buscaDatas").addEventListener("input", desenharPainelDatas);
 

@@ -101,8 +101,6 @@ function montarRegistroProposta({ texto, itens, infoPeriodo, frete, valorComplem
             frete: arredondarRegistro(frete),
             // "", "entrega", "retirada" ou "ambas" (status.js)
             freteBonificado: obterFreteBonificado(),
-            // quanto a W Rental paga de cada frete (0 = nada); frete é o frete todo
-            freteWRental: arredondarRegistro(freteWRental()),
             cidadeSaida: cidadeSaidaAtual === "JOINVILLE" ? "Joinville" : "Itajaí",
             pagamento: {
                 forma: $("formaPagamento")?.value || "",

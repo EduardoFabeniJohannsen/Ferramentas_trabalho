@@ -561,7 +561,16 @@ MODAL (novo / editar)
                         <select id="agFreteConta">
                             <option value="nossa">Nossa conta</option>
                             <option value="cliente">Conta do cliente</option>
+                            <option value="dividido">Cliente e nossa conta</option>
                         </select>
+                    </div>
+
+                    <!-- frete dividido: o que fica por nossa conta; o resto é do
+                         cliente (atualizarCamposConta, em agenda-modal.js) -->
+                    <div id="blocoFreteNossa" style="display:none">
+                        <label for="agFreteNossa">Parte por nossa conta (R$)</label>
+                        <input type="text" id="agFreteNossa" placeholder="Ex: 200,00">
+                        <p class="aviso-frete-cliente" id="textoFreteCliente"></p>
                     </div>
 
                     <div class="largo" id="blocoCard">

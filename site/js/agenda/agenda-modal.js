@@ -130,13 +130,44 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 
 // por nossa conta aparece o Card. Os e-mails aparecem sempre (servem
 // pro faturamento da locação), mas só vão no agendamento por conta do cliente.
+// Dividido (cliente e nossa conta): aparecem o Card e a parte por nossa conta.
 function atualizarCamposConta(){
 
-    const porCliente =
-        $("agFreteConta").value === "cliente";
+    const conta =
+        $("agFreteConta").value;
 
     $("blocoCard").style.display =
-        porCliente ? "none" : "";
+        conta === "cliente" ? "none" : "";
+
+    $("blocoFreteNossa").style.display =
+        conta === "dividido" ? "" : "none";
+
+    atualizarTextoFreteCliente();
+}
+
+
+// embaixo da parte por nossa conta: quanto fica para o cliente
+function atualizarTextoFreteCliente(){
+
+    const partes = partesFrete({
+        freteConta: $("agFreteConta").value,
+        frete: $("agFrete").value,
+        freteNossa: $("agFreteNossa").value
+    });
+
+    const texto = $("textoFreteCliente");
+
+    if(!partes || !$("agFreteNossa").value.trim()){
+
+        texto.innerText = "";
+
+        return;
+    }
+
+    texto.innerText =
+        freteDivididoValido(partes)
+            ? `O cliente paga R$ ${formatarMoedaBR(partes.cliente)}`
+            : "Precisa ser maior que zero e menor que o frete";
 }
 
 

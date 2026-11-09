@@ -43,6 +43,8 @@ const CAMPOS_BANCO = {
     linkDestino: "link_destino",
     frete: "frete",
     freteConta: "frete_conta",
+    // frete dividido (frete_conta "dividido"): a parte por nossa conta
+    freteNossa: "frete_nossa",
     referencia: "referencia",
     contato: "contato",
     card: "card",
@@ -74,13 +76,19 @@ function doBanco(linha){
                 : valor;
     });
 
-    // o frete é numérico no banco; no código segue como texto "1.150,00"
+    // o frete (e a parte por nossa conta) é numérico no banco; no código segue
+    // como texto "1.150,00"
     item.frete =
         (linha.frete === null || linha.frete === undefined)
             ? ""
             : formatarMoedaBR(linha.frete);
 
     item.freteConta = linha.frete_conta || "nossa";
+
+    item.freteNossa =
+        (linha.frete_nossa === null || linha.frete_nossa === undefined)
+            ? ""
+            : formatarMoedaBR(linha.frete_nossa);
 
     // patrimônio sempre no formato certo (O minúsculo depois dos números)
     item.plataforma = plataformasFormatadas(item.plataforma);
@@ -115,7 +123,7 @@ function paraBanco(dados){
             // data vazia vira null (agendamento ainda sem data)
             linha[coluna] = valor || null;
 
-        }else if(campo === "frete"){
+        }else if(campo === "frete" || campo === "freteNossa"){
 
             const numero = brToNumber(valor);
 

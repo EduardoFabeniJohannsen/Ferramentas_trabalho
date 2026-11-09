@@ -57,8 +57,6 @@ function configuracoesAdmin(dados){
 
     if(textoBonificadoAdmin(dados)) lista.push(textoBonificadoAdmin(dados));
 
-    if(dados?.freteWRental > 0) lista.push(`W Rental paga ${moedaAdmin(dados.freteWRental)} por frete`);
-
     if(config.diaria) lista.push("Diária");
 
     if(config.emojis === false) lista.push("Sem emojis");

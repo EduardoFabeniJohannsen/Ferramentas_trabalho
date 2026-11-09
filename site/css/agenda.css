@@ -953,6 +953,13 @@ body.tema-claro .estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
     color:#fbbf24;
 }
 
+/* frete dividido: quanto o cliente paga (embaixo da parte por nossa conta) */
+.aviso-frete-cliente{
+    margin:4px 0 0;
+    font-size:12px;
+    color:#94a3b8;
+}
+
 /* ===== Etapas do formulário (demanda → local → faturamento) ===== */
 .etapa{
     grid-column:1 / -1;

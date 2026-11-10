@@ -70,7 +70,7 @@
 
     // os links entram antes do botão Sair (ou da versão)
     let referencia =
-        topbar.querySelector('button[onclick*="fazerLogout"]') ||
+        topbar.querySelector('button[data-clique="fazerLogout"]') ||
         topbar.querySelector(".versao");
 
     if(referencia && referencia.parentNode !== topbar){

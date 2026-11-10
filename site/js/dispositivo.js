@@ -118,12 +118,65 @@ async function sairPorAparelhoBloqueado(){
 
 
 // ======================================
+// CÓDIGO DO APARELHO
+// ======================================
+// 6 letras do sha256 da chave: o mesmo que o admin vê na lista de aparelhos
+// (o banco guarda esse sha256). Mesmo login em dois PCs da mesma rede: o
+// admin pergunta "qual código aparece aí?" e sabe qual linha é qual.
+// O código não abre nada: a chave em si nunca aparece.
+
+async function codigoDoDispositivo(){
+
+    try{
+
+        // crypto.subtle só existe em https (o site publicado sempre é)
+        if(!window.crypto?.subtle) return "";
+
+        const resumo =
+            await crypto.subtle.digest("SHA-256", new TextEncoder().encode(CHAVE_DISPOSITIVO));
+
+        return Array.from(new Uint8Array(resumo), byte => byte.toString(16).padStart(2, "0"))
+            .join("")
+            .slice(0, 6)
+            .toUpperCase();
+
+    }catch(erro){
+
+        return "";
+    }
+}
+
+
+// no topo, ao lado da versão: "Aparelho A3F9C2"
+async function mostrarCodigoNaTopbar(){
+
+    const versao = document.querySelector(".topbar .versao");
+
+    if(!versao || document.querySelector(".codigo-aparelho")) return;
+
+    const codigo = await codigoDoDispositivo();
+
+    if(!codigo) return;
+
+    const marca = document.createElement("span");
+
+    marca.className = "codigo-aparelho";
+
+    marca.title = "Código deste aparelho (o admin vê o mesmo na lista de aparelhos)";
+
+    marca.textContent = `Aparelho ${codigo}`;
+
+    versao.insertAdjacentElement("afterend", marca);
+}
+
+
+// ======================================
 // AVISO: AGUARDANDO LIBERAÇÃO
 // ======================================
-// Só o aviso e o "Sair" (para entrar com outro login). Não pede nada à pessoa:
-// o admin vê o aparelho na lista e, se quiser, dá um nome pelo ✏️.
+// Só o aviso, o código do aparelho (para o admin saber qual é) e o "Sair"
+// (para entrar com outro login). Não pede nada à pessoa.
 
-function mostrarAvisoPendente(){
+async function mostrarAvisoPendente(){
 
     if(document.getElementById("avisoDispositivo")) return;
 
@@ -151,7 +204,22 @@ function mostrarAvisoPendente(){
 
     sair.addEventListener("click", fazerLogout);
 
-    card.append(titulo, sair);
+    card.appendChild(titulo);
+
+    const codigo = await codigoDoDispositivo();
+
+    if(codigo){
+
+        const linhaCodigo = document.createElement("p");
+
+        linhaCodigo.className = "aviso-dispositivo-codigo";
+
+        linhaCodigo.textContent = `Código deste aparelho: ${codigo}`;
+
+        card.appendChild(linhaCodigo);
+    }
+
+    card.appendChild(sair);
 
     fundo.appendChild(card);
 
@@ -182,6 +250,8 @@ async function conferirDispositivo(){
     if(situacao === "liberado"){
 
         ligarConferenciaDispositivo();
+
+        mostrarCodigoNaTopbar();
 
         return true;
     }

@@ -176,7 +176,8 @@ const confere = (nome, ok, extra) => {
     };
 
     // abre e devolve a página já parada, com tudo o que deu errado no caminho
-    const abrir = async (contexto, arquivo) => {
+    // https: o código do aparelho (crypto.subtle) só existe em conexão segura
+    const abrir = async (contexto, arquivo, protocolo = "http") => {
 
         const pagina = await contexto.newPage();
         const erros = [];
@@ -187,7 +188,7 @@ const confere = (nome, ok, extra) => {
         });
         pagina.on("dialog", d => d.accept());
 
-        await pagina.goto(`http://site.test/${arquivo}`);
+        await pagina.goto(`${protocolo}://site.test/${arquivo}`);
         await pagina.waitForLoadState("networkidle");
 
         return { pagina, erros };
@@ -227,6 +228,11 @@ const confere = (nome, ok, extra) => {
                 versao: document.querySelector(".versao")?.innerText,
                 versaoCerta: "v" + new Function("return VERSAO_SISTEMA")(),
                 links: [...document.querySelectorAll(".topbar a[href]")].map(link => link.getAttribute("href")),
+                // os links do menu entram antes do Sair (menu.js)
+                linksDepoisDoSair: (() => {
+                    const sair = document.querySelector('.topbar button[data-clique="fazerLogout"]');
+                    return !!sair && [...document.querySelectorAll(".topbar a[href]")].some(link => sair.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_PRECEDING ? false : true);
+                })(),
                 // a topbar é fixa: o conteúdo precisa começar abaixo dela (--altura-topbar, menu.js)
                 topbarCobre: (() => {
                     const topbar = document.querySelector(".topbar");
@@ -255,6 +261,7 @@ const confere = (nome, ok, extra) => {
         confere(`${arquivo}: mostra a versão`, resumo.versao === resumo.versaoCerta, resumo.versao);
 
         confere(`${arquivo}: a topbar não cobre o conteúdo`, !resumo.topbarCobre);
+        confere(`${arquivo}: os links do menu ficam antes do Sair`, !resumo.linksDepoisDoSair);
 
         const linksQuebrados = resumo.links.filter(link => !fs.existsSync(path.join(raiz, link.split(/[?#]/)[0])));
         confere(`${arquivo}: menu montado e sem link quebrado`, resumo.links.length > 0 && linksQuebrados.length === 0, linksQuebrados.length ? linksQuebrados : undefined);
@@ -433,7 +440,7 @@ const confere = (nome, ok, extra) => {
     {
         // liberado: a chave do aparelho vai em toda chamada e continua a mesma depois de recarregar
         const liberado = await novoContexto({ acessos: ["propostas"] });
-        const { pagina, erros } = await abrir(liberado.contexto, "propostas.html");
+        const { pagina, erros } = await abrir(liberado.contexto, "propostas.html", "https");
         const chave = () => pagina.evaluate(() => window.__opcoesCliente?.global?.headers?.["x-dispositivo"]);
         const primeira = await chave();
         await pagina.reload();
@@ -442,6 +449,8 @@ const confere = (nome, ok, extra) => {
         confere("aparelho: a chave vai no cabeçalho x-dispositivo", /^[0-9a-f]{64}$/.test(primeira || ""), primeira);
         confere("aparelho: a chave é a mesma depois de recarregar", primeira === (await chave()));
         confere("aparelho: confere no banco com a chave e o aparelho", registro?.[1]?.p_chave === primeira && /Computador/.test(registro?.[1]?.p_aparelho || "") && typeof registro?.[1]?.p_cidade === "string", registro);
+        const codigoEsperado = (chave) => require("crypto").createHash("sha256").update(chave || "").digest("hex").slice(0, 6).toUpperCase();
+        confere("aparelho liberado: código do aparelho ao lado da versão (o mesmo do admin)", (await pagina.innerText(".topbar .codigo-aparelho")) === `Aparelho ${codigoEsperado(await chave())}`);
         confere("aparelho liberado: página normal", erros.length === 0 && (await pagina.evaluate(() => document.documentElement.style.visibility)) === "" && (await pagina.locator("#avisoDispositivo").count()) === 0);
         await liberado.contexto.close();
     }
@@ -449,11 +458,13 @@ const confere = (nome, ok, extra) => {
     {
         // pendente: só "Aguardando liberação" e o Sair (não pede nada à pessoa)
         const pendente = await novoContexto({ acessos: ["propostas"], dispositivo: "pendente" });
-        const { pagina, erros } = await abrir(pendente.contexto, "propostas.html");
+        const { pagina, erros } = await abrir(pendente.contexto, "propostas.html", "https");
+        const chavePendente = await pagina.evaluate(() => window.__opcoesCliente?.global?.headers?.["x-dispositivo"]);
+        const codigoPendente = require("crypto").createHash("sha256").update(chavePendente || "").digest("hex").slice(0, 6).toUpperCase();
         confere("aparelho pendente: mostra o aviso", await pagina.locator("#avisoDispositivo").isVisible(), erros.length ? erros : undefined);
         confere("aparelho pendente: a página fica escondida", (await pagina.evaluate(() => document.documentElement.style.visibility)) === "hidden" && !(await pagina.locator(".topbar").isVisible()));
         const aviso = (await pagina.innerText("#avisoDispositivo")).replace(/\s+/g, " ").trim();
-        confere("aparelho pendente: só 'Aguardando liberação' e Sair", aviso === "🔒 Aguardando liberação Sair" && (await pagina.locator("#avisoDispositivo input").count()) === 0, aviso);
+        confere("aparelho pendente: só 'Aguardando liberação', o código e Sair", aviso === `🔒 Aguardando liberação Código deste aparelho: ${codigoPendente} Sair` && (await pagina.locator("#avisoDispositivo input").count()) === 0, aviso);
         await pagina.click("#avisoDispositivo button:has-text('Sair')");
         await pagina.waitForURL("**/login.html", { timeout: 5000 }).catch(() => {});
         confere("aparelho pendente: Sair vai para o login", pagina.url().endsWith("/login.html"), pagina.url());
@@ -478,7 +489,7 @@ const confere = (nome, ok, extra) => {
             perfis: [{ id: "u2", email: "filial@empresa.com", acessos: ["propostas"], filiais: [], ativo: true }],
             dispositivos: [
                 { id: 1, usuario: "u2", situacao: "liberado", aparelho: "Computador · Windows · Chrome", nome: "PC 1", criado_em: "2026-11-01T10:00:00Z", ultimo_acesso: "2026-11-10T10:00:00Z" },
-                { id: 2, usuario: "u2", situacao: "pendente", aparelho: "Celular · iPhone · Safari", nome: "<b>Maria</b>", cidade: "Itajaí/Santa Catarina", ip: "189.4.5.6", criado_em: "2026-11-10T11:00:00Z", ultimo_acesso: "2026-11-10T11:00:00Z" }
+                { id: 2, usuario: "u2", situacao: "pendente", aparelho: "Celular · iPhone · Safari", nome: "<b>Maria</b>", chave_hash: "a3f9c2" + "0".repeat(58), cidade: "Itajaí/Santa Catarina", ip: "189.4.5.6", criado_em: "2026-11-10T11:00:00Z", ultimo_acesso: "2026-11-10T11:00:00Z" }
             ],
             trava_dispositivos: { ligada: false }
         };
@@ -488,6 +499,7 @@ const confere = (nome, ok, extra) => {
         const linhas = await pagina.$$eval("#corpoAparelhos tr", l => l.map(t => t.innerText));
         confere("admin aparelhos: abre sem erro", erros.length === 0, erros.length ? erros : undefined);
         confere("admin aparelhos: aguardando vem primeiro, com o e-mail", /filial@empresa\.com/.test(linhas[0]) && /Aguardando/.test(linhas[0]) && /Liberado/.test(linhas[1]), linhas);
+        confere("admin aparelhos: mostra o código do aparelho", linhas[0].includes("Código A3F9C2"), linhas[0]);
         confere("admin aparelhos: mostra a cidade e o IP de onde acessou", linhas[0].includes("Itajaí/Santa Catarina") && linhas[0].includes("IP 189.4.5.6"), linhas[0]);
         confere("admin aparelhos: nome entra como texto (não HTML)", (await pagina.locator("#corpoAparelhos b").count()) === 0 && linhas[0].includes("<b>Maria</b>"));
         confere("admin aparelhos: título conta quem aguarda", (await pagina.innerText("#tituloAparelhos")) === "Aparelhos (1 aguardando)");

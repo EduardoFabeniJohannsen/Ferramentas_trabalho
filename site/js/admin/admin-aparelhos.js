@@ -56,7 +56,7 @@ async function carregarAparelhos(){
         const [aparelhos, trava] = await Promise.all([
             supabaseClient
                 .from(TABELA_DISPOSITIVOS)
-                .select("id, usuario, situacao, aparelho, nome, cidade, ip, criado_em, liberado_em, ultimo_acesso")
+                .select("id, usuario, chave_hash, situacao, aparelho, nome, cidade, ip, criado_em, liberado_em, ultimo_acesso")
                 .order("ultimo_acesso", { ascending: false }),
             supabaseClient
                 .from(TABELA_TRAVA_DISPOSITIVOS)
@@ -93,6 +93,20 @@ function emailDoAparelho(aparelho){
     const perfil = perfisAdmin.find(item => item.id === aparelho.usuario);
 
     return perfil ? perfil.email : "(usuário removido)";
+}
+
+
+// "Computador · Windows · Chrome" e embaixo "Código A3F9C2": o mesmo código
+// aparece no topo da tela da pessoa (dispositivo.js), para saber qual é qual
+function celulaAparelho(aparelho){
+
+    const celula = criar("td", "", aparelho.aparelho || "—");
+
+    const codigo = String(aparelho.chave_hash || "").slice(0, 6).toUpperCase();
+
+    if(codigo) celula.appendChild(criar("span", "codigo-aparelho-admin", `Código ${codigo}`));
+
+    return celula;
 }
 
 
@@ -145,7 +159,7 @@ function linhaAparelho(aparelho){
 
     linha.appendChild(criar("td", "col-nome-aparelho", aparelho.nome || "—"));
 
-    linha.appendChild(criar("td", "", aparelho.aparelho || "—"));
+    linha.appendChild(celulaAparelho(aparelho));
 
     linha.appendChild(celulaLocalAparelho(aparelho));
 

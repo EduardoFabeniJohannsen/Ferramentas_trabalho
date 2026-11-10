@@ -95,6 +95,15 @@ TOPBAR
     user-select:none;
 }
 
+/* código do aparelho, ao lado da versão (dispositivo.js): o admin vê o mesmo */
+.codigo-aparelho{
+    margin-left:10px;
+    color:#64748b;
+    font-size:12px;
+    font-family:monospace;
+    white-space:nowrap;
+}
+
 
 /* =========================
 LAYOUT
@@ -795,6 +804,11 @@ A página fica escondida (visibility:hidden no <html>) e só este aviso aparece.
 .aviso-dispositivo-card h2{
     margin:0 0 14px;
     font-size:20px;
+}
+.aviso-dispositivo-card .aviso-dispositivo-codigo{
+    margin:0 0 14px;
+    color:#94a3b8;
+    font-family:monospace;
 }
 .aviso-dispositivo .btn-sair-dispositivo{
     background:#475569;

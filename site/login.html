@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>Login</title>
 
 <link rel="stylesheet" href="css/style.css">
@@ -30,7 +31,7 @@
             autocomplete="current-password"
         >
 
-        <button onclick="fazerLogin()">Entrar</button>
+        <button data-clique="fazerLogin">Entrar</button>
 
         <p id="loginErro" style="color:#ef4444; font-size:13px; margin-top:8px;"></p>
 
@@ -38,96 +39,11 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 
-<script>
-
-// pequeno helper local (helpers.js não é carregado aqui)
-const $ = (id) => document.getElementById(id);
-
-
-// ======================================
-// SE JÁ ESTIVER LOGADO, PULA DIRETO
-// ======================================
-
-(async function verificarSessaoExistente(){
-
-    const { data } =
-        await supabaseClient.auth.getSession();
-
-    if(data.session){
-
-        window.location.href = "propostas.html";
-    }
-
-})();
-
-
-// ======================================
-// LOGIN
-// ======================================
-
-async function fazerLogin(){
-
-    const email =
-        $("loginEmail").value.trim();
-
-    const senha =
-        $("loginSenha").value;
-
-    const erroEl =
-        $("loginErro");
-
-    erroEl.innerText = "";
-
-    if(!email || !senha){
-
-        erroEl.innerText =
-            "Preencha e-mail e senha";
-
-        return;
-    }
-
-    const { error } =
-        await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: senha
-        });
-
-    if(error){
-
-        erroEl.innerText =
-            "E-mail ou senha inválidos";
-
-        return;
-    }
-
-    window.location.href = "propostas.html";
-}
-
-
-// permite dar Enter no campo de senha pra logar
-document.addEventListener("DOMContentLoaded", () => {
-
-    const campoSenha =
-        $("loginSenha");
-
-    if(campoSenha){
-
-        campoSenha.addEventListener(
-            "keydown",
-            (evento) => {
-
-                if(evento.key === "Enter"){
-                    fazerLogin();
-                }
-            }
-        );
-    }
-});
-
-</script>
+<script src="js/login/login.js"></script>
 
 </body>
 </html>

@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Leads</title>
 
@@ -24,7 +25,7 @@ TOPBAR
 
     <!-- links das outras páginas: montados pelo js/menu.js -->
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -79,11 +80,11 @@ CONTAINER
 
             <select id="filtroStatus" title="Status"></select>
 
-            <button type="button" class="btn-secundario" onclick="recarregarLeads(true)">
+            <button type="button" class="btn-secundario" data-clique="recarregarLeads" data-arg="true">
                 ↻ Atualizar
             </button>
 
-            <button type="button" class="btn-secundario" onclick="abrirConfigBusca()">
+            <button type="button" class="btn-secundario" data-clique="abrirConfigBusca">
                 ⚙️ Configuração de busca
             </button>
 
@@ -131,7 +132,7 @@ MODAL (configuração de busca)
 
             <h3>⚙️ Configuração de busca</h3>
 
-            <button type="button" onclick="fecharConfigBusca()" title="Fechar">×</button>
+            <button type="button" data-clique="fecharConfigBusca" title="Fechar">×</button>
 
         </div>
 
@@ -165,9 +166,9 @@ MODAL (configuração de busca)
 
             <div class="botoes-config-leads">
 
-                <button type="button" onclick="salvarConfigBusca()">Salvar</button>
+                <button type="button" data-clique="salvarConfigBusca">Salvar</button>
 
-                <button type="button" class="btn-secundario" onclick="limparFormConfig()">Limpar</button>
+                <button type="button" class="btn-secundario" data-clique="limparFormConfig">Limpar</button>
 
             </div>
 
@@ -181,7 +182,8 @@ MODAL (configuração de busca)
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

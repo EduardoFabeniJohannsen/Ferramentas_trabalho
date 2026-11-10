@@ -55,7 +55,7 @@ const confere = (nome, ok, extra) => {
 
     await contexto.route("**/*", (rota) => {
         const url = new URL(rota.request().url());
-        if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
+        if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
         if(url.hostname !== "agenda.test") return rota.abort();
         if(url.pathname.endsWith("auth-guard.js")) return rota.fulfill({ contentType: "text/javascript", body: authFalso });
         const arquivo = path.join(raiz, decodeURIComponent(url.pathname));
@@ -85,7 +85,7 @@ const confere = (nome, ok, extra) => {
         await pagina.fill("#valorFrete", "500,00");
     };
 
-    const abrirConfig = async () => { if(!(await pagina.isVisible("#formaPagamento"))) await pagina.click("[onclick='abrirConfiguracoes()']"); };
+    const abrirConfig = async () => { if(!(await pagina.isVisible("#formaPagamento"))) await pagina.click("[data-clique='abrirConfiguracoes']"); };
     const fecharConfig = async () => { if(await pagina.isVisible("#formaPagamento")) await pagina.click("#modalConfig .btn-fechar"); };
     const escolher = async (forma) => { await abrirConfig(); await pagina.selectOption("#formaPagamento", forma); };
     const prazo = async (valor) => { await abrirConfig(); await pagina.fill("#prazoPagamento", valor); };

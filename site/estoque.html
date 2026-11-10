@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Estoque</title>
 
@@ -22,7 +23,7 @@ TOPBAR
 
 <div class="topbar">
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -49,7 +50,7 @@ CONTAINER
                         type="button"
                         class="btn-filial ativo"
                         data-filial="ITAJAI"
-                        onclick="trocarFilial('ITAJAI')"
+                        data-clique="trocarFilial" data-arg="ITAJAI"
                     >
                         Itajaí
                     </button>
@@ -58,7 +59,7 @@ CONTAINER
                         type="button"
                         class="btn-filial"
                         data-filial="JOINVILLE"
-                        onclick="trocarFilial('JOINVILLE')"
+                        data-clique="trocarFilial" data-arg="JOINVILLE"
                     >
                         Joinville
                     </button>
@@ -113,7 +114,7 @@ CONTAINER
                 type="button"
                 class="btn-publicar"
                 id="btnPublicar"
-                onclick="publicarResumo()"
+                data-clique="publicarResumo"
             >
                 ✅ Publicar
             </button>
@@ -121,7 +122,7 @@ CONTAINER
             <button
                 type="button"
                 class="btn-cancelar"
-                onclick="cancelarPrevia()"
+                data-clique="cancelarPrevia"
             >
                 Cancelar
             </button>
@@ -138,8 +139,9 @@ CONTAINER
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
+<script src="js/vendor/xlsx-0.18.5.full.min.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

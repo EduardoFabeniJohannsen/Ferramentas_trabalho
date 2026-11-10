@@ -118,12 +118,14 @@ const confere = (nome, ok, extra) => {
 (async () => {
 
     const navegador = await chromium.launch({ channel: "chrome", headless: true });
-    const contexto = await navegador.newContext({ viewport: { width: 1000, height: 600 } });
+    // bypassCSP: o waitForFunction do Playwright avalia texto como código, o que a CSP
+    // das páginas bloqueia (a CSP em si é conferida no teste-paginas.js)
+    const contexto = await navegador.newContext({ viewport: { width: 1000, height: 600 }, bypassCSP: true });
     const erros = [];
 
     await contexto.route("**/*", (rota) => {
         const url = new URL(rota.request().url());
-        if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
+        if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
         if(url.hostname !== "agenda.test") return rota.abort();
         if(url.pathname.endsWith("auth-guard.js")) return rota.fulfill({ contentType: "text/javascript", body: authFalso });
         const arquivo = path.join(raiz, decodeURIComponent(url.pathname));

@@ -105,7 +105,7 @@ function nomeArquivoAtual(){ return location.pathname.split("/").pop() || "index
         const ctx = await navegador.newContext({ viewport: { width: 1200, height: 750 } });
         await ctx.route("**/*", (rota) => {
             const url = new URL(rota.request().url());
-            if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: umd });
+            if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: umd });
             if(url.pathname.startsWith("/realtime/")) return rota.continue();
             if(url.pathname.startsWith("/rest/")){
                 const corpo = url.pathname.endsWith("/perfis") ? perfis : [];

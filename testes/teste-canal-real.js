@@ -82,7 +82,7 @@ function nomeArquivoAtual(){ return "agenda.html"; }`;
 
     await contexto.route("**/*", (rota) => {
         const url = new URL(rota.request().url());
-        if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: umd });
+        if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: umd });
         if(url.hostname === "127.0.0.1" && url.pathname.startsWith("/rest/")){
             if(url.pathname.endsWith("/agendamentos")) cargas.total++;
             const corpo = url.pathname.endsWith("/agendamentos")

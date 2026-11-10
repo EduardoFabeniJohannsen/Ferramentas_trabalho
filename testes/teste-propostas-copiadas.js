@@ -85,7 +85,7 @@ const confere = (nome, ok, extra) => {
         const contexto = await navegador.newContext({ viewport: tela, timezoneId: "America/Sao_Paulo" });
         await contexto.route("**/*", (rota) => {
             const url = new URL(rota.request().url());
-            if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
+            if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
             if(url.hostname !== "admin.test") return rota.abort();
             if(url.pathname.endsWith("auth-guard.js")) return rota.fulfill({ contentType: "text/javascript", body: authFalso });
             const arquivo = path.join(raiz, decodeURIComponent(url.pathname));

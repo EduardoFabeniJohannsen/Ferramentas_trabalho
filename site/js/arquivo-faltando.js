@@ -64,17 +64,17 @@ function gravarRecargaArquivo(momento){
 }
 
 
-// o que o registro-erros.js anotou, mais o supabase-js: ele vem de outro site e
+// o que o registro-erros.js anotou, mais a biblioteca do Supabase (js/vendor/): ela
 // carrega antes do registro, então só dá para saber se ficou faltando
 function listaArquivosFaltando(){
 
     const lista =
         typeof arquivosFaltando !== "undefined" ? [...arquivosFaltando] : [];
 
-    const cdnSupabase =
-        Array.from(document.scripts).find(script => script.src.includes("supabase-js"));
+    const scriptSupabase =
+        Array.from(document.scripts).find(script => script.src.includes("vendor/supabase"));
 
-    if(cdnSupabase && typeof supabase === "undefined") lista.unshift(cdnSupabase.src);
+    if(scriptSupabase && typeof supabase === "undefined") lista.unshift(scriptSupabase.src);
 
     return lista;
 }

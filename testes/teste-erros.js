@@ -70,7 +70,9 @@ const confere = (nome, ok, extra) => {
             respostaErros: "ok"
         };
 
-        const contexto = await navegador.newContext({ viewport: opcoes.tela || { width: 1300, height: 800 } });
+        // bypassCSP: o waitForFunction do Playwright avalia texto como código, o que a CSP
+        // das páginas bloqueia (a CSP em si é conferida no teste-paginas.js)
+        const contexto = await navegador.newContext({ viewport: opcoes.tela || { width: 1300, height: 800 }, bypassCSP: true });
 
         await contexto.route("**/*", async (rota) => {
 
@@ -83,8 +85,8 @@ const confere = (nome, ok, extra) => {
             // o site parou de responder depois de mandar a página
             if(opcoes.paginaSemRede && pedido.resourceType() === "fetch" && url.pathname === `/${arquivo}`) return rota.abort();
 
-            if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: umd });
-            if(url.hostname.includes("cdnjs")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
+            if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: umd });
+            if(url.pathname.endsWith("/vendor/xlsx-0.18.5.full.min.js")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
             if(url.hostname !== "site.test") return rota.abort();
 
             if(url.pathname === "/rest/v1/rpc/registrar_erro_site"){
@@ -364,9 +366,9 @@ const confere = (nome, ok, extra) => {
     }
 
     {
-        const aberta = await abrir("index.html", { falhaUmaVez: ["/npm/@supabase/supabase-js@2.45.0"], perfilSalvo: true });
+        const aberta = await abrir("index.html", { falhaUmaVez: ["/js/vendor/supabase-2.45.0.js"], perfilSalvo: true });
         await esperarCargas(aberta, 2);
-        confere("supabase-js (vem de outro site) que não carregou também recarrega", aberta.cargas() === 2 && (await aberta.pagina.evaluate(() => typeof supabaseClient)) === "object", aberta.cargas());
+        confere("biblioteca do Supabase (js/vendor) que não carregou também recarrega", aberta.cargas() === 2 && (await aberta.pagina.evaluate(() => typeof supabaseClient)) === "object", aberta.cargas());
         await aberta.contexto.close();
     }
 

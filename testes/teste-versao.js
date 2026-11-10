@@ -70,7 +70,7 @@ const servidor = http.createServer((req, res) => {
         if(!fs.existsSync(arquivo) || fs.statSync(arquivo).isDirectory()){ res.writeHead(404); return res.end(); }
         corpo = fs.readFileSync(arquivo);
         if(caminho.endsWith(".html")){
-            corpo = corpo.toString().replace(/https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@[\d.]+/, "/__supabase.js").replace(/<script[^>]+cdn[^>]+><\/script>/g, "");
+            corpo = corpo.toString().replace(/js\/vendor\/supabase-[\d.]+\.js/, "/__supabase.js").replace(/<script src="js\/vendor\/xlsx[^"]*"><\/script>/g, "");
         }
         if(caminho.endsWith("helpers.js")){
             if(estado.erroHelpers){ res.writeHead(500); return res.end("erro"); }

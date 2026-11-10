@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>Ferramentas</title>
 
 <link rel="stylesheet" href="css/style.css">
@@ -12,7 +13,7 @@
 
 <div class="topbar">
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -28,9 +29,9 @@
         <textarea id="texto" placeholder="Digite algo..."></textarea>
 
         <div class="botoes">
-            <button onclick="maiusculo()">MAIÚSCULO</button>
-            <button onclick="minusculo()">minúsculo</button>
-            <button onclick="formatarCNPJ()">formatar CNPJ</button>
+            <button data-clique="maiusculo">MAIÚSCULO</button>
+            <button data-clique="minusculo">minúsculo</button>
+            <button data-clique="formatarCNPJ">formatar CNPJ</button>
         </div>
 
     </div>
@@ -96,11 +97,11 @@
 <!-- STATUS -->
 <div class="status-bar">
 
-    <button onclick="gerarStatus('autorizado')">
+    <button data-clique="gerarStatus" data-arg="autorizado">
     Autorizado 📝
 </button>
 
-<button onclick="gerarStatus('ICMS')">
+<button data-clique="gerarStatus" data-arg="ICMS">
     ICMS
 </button>
 
@@ -108,7 +109,8 @@
 
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

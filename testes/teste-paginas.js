@@ -87,12 +87,36 @@ const confere = (nome, ok, extra) => {
     // ---------- organização dos arquivos ----------
     const paginasDoScript = {};
 
+    // ---------- segurança: política de conteúdo (CSP) ----------
+    // Todas as páginas com a mesma CSP, logo no começo do <head>; só scripts
+    // do próprio site (js/...), nenhum <script> com código dentro e nenhum CDN.
+    const cspDe = (html) => (html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)">/) || [])[1];
+    const cspPadrao = cspDe(fs.readFileSync(path.join(raiz, "login.html"), "utf8"));
+
+    confere("CSP: só scripts do próprio site", /(^|; )script-src 'self'(;|$)/.test(cspPadrao || ""), cspPadrao);
+    confere("CSP: dados só para o Supabase do projeto", /connect-src 'self' https:\/\/qhneylwmrzuesaloqetr\.supabase\.co wss:\/\/qhneylwmrzuesaloqetr\.supabase\.co https:\/\/get\.geojs\.io;/.test(cspPadrao || ""), cspPadrao);
+
     for(const arquivo of [...Object.keys(PAGINAS), "login.html"]){
         const html = fs.readFileSync(path.join(raiz, arquivo), "utf8");
         for(const achou of html.matchAll(/src="(js\/[^"]+)"/g)){
             (paginasDoScript[achou[1]] = paginasDoScript[achou[1]] || []).push(arquivo);
         }
+        const scripts = [...html.matchAll(/<script\b([^>]*)>/g)].map(achou => achou[1]);
+        confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === cspPadrao);
+        confere(`${arquivo}: a CSP vem antes de qualquer script`, html.indexOf("Content-Security-Policy") < html.indexOf("<script"));
+        confere(`${arquivo}: nenhum <script> com código dentro`, scripts.every(atributos => /\bsrc="/.test(atributos)));
+        confere(`${arquivo}: nenhum script de fora (CDN)`, scripts.every(atributos => /\bsrc="js\//.test(atributos)), scripts.filter(atributos => !/\bsrc="js\//.test(atributos)));
     }
+
+    // a biblioteca do Supabase fica no site: tem que ser a do pacote (mesma versão do package.json)
+    const pacote = path.resolve(__dirname, "..", "node_modules", "@supabase", "supabase-js");
+    const versaoPacote = require(path.join(pacote, "package.json")).version;
+    const copiaSite = path.join(raiz, "js", "vendor", `supabase-${versaoPacote}.js`);
+    confere(
+        "js/vendor: Supabase igual ao do pacote",
+        fs.existsSync(copiaSite) && fs.readFileSync(copiaSite).equals(fs.readFileSync(path.join(pacote, "dist", "umd", "supabase.js"))),
+        versaoPacote
+    );
 
     const scriptsNoDisco = fs.readdirSync(path.join(raiz, "js"), { recursive: true })
         .filter(nome => nome.endsWith(".js"))
@@ -102,8 +126,10 @@ const confere = (nome, ok, extra) => {
     confere("todo script é carregado por alguma página", semUso.length === 0, semUso.length ? semUso : undefined);
 
     // js/agenda/ só na agenda; quem é usado por mais de uma página fica direto em js/
+    // (js/vendor/: bibliotecas de terceiros, em qualquer página)
     const foraDoLugar = Object.entries(paginasDoScript).filter(([script, paginas]) => {
         const pasta = script.split("/").length > 2 ? script.split("/")[1] : null;
+        if(pasta === "vendor") return false;
         return pasta
             ? !(paginas.length === 1 && paginas[0].toLowerCase() === `${pasta}.html`)
             : paginas.length === 1;
@@ -119,8 +145,8 @@ const confere = (nome, ok, extra) => {
 
         await contexto.route("**/*", (rota) => {
             const url = new URL(rota.request().url());
-            if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso(usuario) });
-            if(url.hostname.includes("cdnjs")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
+            if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso(usuario) });
+            if(url.pathname.endsWith("/vendor/xlsx-0.18.5.full.min.js")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
             if(url.hostname !== "site.test") return rota.abort();
             const arquivo = path.join(raiz, decodeURIComponent(url.pathname));
             if(!fs.existsSync(arquivo) || fs.statSync(arquivo).isDirectory()){
@@ -165,20 +191,23 @@ const confere = (nome, ok, extra) => {
 
         const resumo = await pagina.evaluate(() => {
 
-            // onclick="abrirX()": a função precisa existir (roda no escopo global,
-            // que enxerga const e let dos scripts)
+            // data-clique="abrirX" (acoes.js): a função precisa existir em window
+            // (function dos scripts; const e let não ficam em window)
+            const ATRIBUTOS_ACAO = ["data-clique", "data-clique-fora", "data-mudanca", "data-entrada"];
             const chamadas = new Set();
+            const inline = [];
 
             document.querySelectorAll("*").forEach(elemento => {
                 for(const atributo of elemento.attributes){
-                    if(!/^on/.test(atributo.name)) continue;
-                    const achou = atributo.value.match(/^\s*(?:return\s+)?([A-Za-z_$][\w$]*)\s*\(/);
-                    if(achou && !["if", "return"].includes(achou[1])) chamadas.add(achou[1]);
+                    if(ATRIBUTOS_ACAO.includes(atributo.name)) chamadas.add(atributo.value);
+                    // onclick="..." a CSP bloqueia: o botão não faria nada
+                    if(/^on/.test(atributo.name)) inline.push(`${elemento.tagName} ${atributo.name}`);
                 }
             });
 
             return {
-                semFuncao: [...chamadas].filter(nome => new Function(`return typeof ${nome}`)() !== "function"),
+                semFuncao: [...chamadas].filter(nome => typeof window[nome] !== "function"),
+                inline,
                 versao: document.querySelector(".versao")?.innerText,
                 versaoCerta: "v" + new Function("return VERSAO_SISTEMA")(),
                 links: [...document.querySelectorAll(".topbar a[href]")].map(link => link.getAttribute("href")),
@@ -194,6 +223,19 @@ const confere = (nome, ok, extra) => {
         });
 
         confere(`${arquivo}: botões chamam funções que existem`, resumo.semFuncao.length === 0, resumo.semFuncao.length ? resumo.semFuncao : undefined);
+        confere(`${arquivo}: nenhum onclick (a CSP bloqueia)`, resumo.inline.length === 0, resumo.inline.length ? resumo.inline : undefined);
+
+        // a CSP vale de verdade: código enfiado na página não roda
+        const injetado = await pagina.evaluate(() => {
+            const script = document.createElement("script");
+            script.textContent = "window.__injetado = true";
+            document.head.appendChild(script);
+            const div = document.createElement("div");
+            div.innerHTML = '<img src="data:,x" onerror="window.__injetado = true">';
+            document.body.appendChild(div);
+            return new Promise(pronto => setTimeout(() => { div.remove(); pronto(window.__injetado === true); }, 100));
+        });
+        confere(`${arquivo}: CSP bloqueia código injetado`, !injetado);
         confere(`${arquivo}: mostra a versão`, resumo.versao === resumo.versaoCerta, resumo.versao);
 
         confere(`${arquivo}: a topbar não cobre o conteúdo`, !resumo.topbarCobre);

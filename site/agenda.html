@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Agenda</title>
 
@@ -24,7 +25,7 @@ TOPBAR
 
     <!-- links das outras páginas: montados pelo js/menu.js -->
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -46,7 +47,7 @@ CONTAINER
                 type="button"
                 id="btnModoExpedicao"
                 class="modo-btn"
-                onclick="definirModo('expedicao')"
+                data-clique="definirModo" data-arg="expedicao"
             >
                 🏭 Expedição
             </button>
@@ -55,7 +56,7 @@ CONTAINER
                 type="button"
                 id="btnModoTransportador"
                 class="modo-btn"
-                onclick="definirModo('transportador')"
+                data-clique="definirModo" data-arg="transportador"
             >
                 🚚 Transportador
             </button>
@@ -66,7 +67,7 @@ CONTAINER
 
         <div class="barra-agenda">
 
-            <button type="button" onclick="abrirModalAgenda()">
+            <button type="button" data-clique="abrirModalAgenda">
                 + Novo agendamento
             </button>
 
@@ -86,7 +87,7 @@ CONTAINER
                     class="btn-secundario"
                     id="btnLimparBusca"
                     style="display:none"
-                    onclick="limparBuscaAgenda()"
+                    data-clique="limparBuscaAgenda"
                     title="Limpar a pesquisa"
                 >
                     ×
@@ -101,7 +102,7 @@ CONTAINER
                     type="button"
                     id="btnFiltros"
                     class="btn-secundario"
-                    onclick="alternarPainelFiltros()"
+                    data-clique="alternarPainelFiltros"
                     title="Filtrar os agendamentos e escolher o que aparece na tela"
                 >
                     ⚙️ Filtros ▾
@@ -120,7 +121,7 @@ CONTAINER
                             type="button"
                             id="btnDatas"
                             class="btn-secundario"
-                            onclick="alternarPainelDatas()"
+                            data-clique="alternarPainelDatas"
                         >
                             📅 Todas as datas ▾
                         </button>
@@ -132,7 +133,7 @@ CONTAINER
                                 <button
                                     type="button"
                                     class="btn-secundario"
-                                    onclick="selecionarProximosDias(0)"
+                                    data-clique="selecionarProximosDias" data-arg="0"
                                 >
                                     Só hoje
                                 </button>
@@ -140,7 +141,7 @@ CONTAINER
                                 <button
                                     type="button"
                                     class="btn-secundario"
-                                    onclick="selecionarProximosDias(7)"
+                                    data-clique="selecionarProximosDias" data-arg="7"
                                 >
                                     Próximos 7 dias
                                 </button>
@@ -176,7 +177,7 @@ CONTAINER
                             type="button"
                             id="btnStatus"
                             class="btn-secundario"
-                            onclick="alternarPainelStatus()"
+                            data-clique="alternarPainelStatus"
                         >
                             🏷️ Todos os status ▾
                         </button>
@@ -199,7 +200,7 @@ CONTAINER
                         type="button"
                         class="btn-secundario"
                         id="btnSemPatrimonio"
-                        onclick="alternarSemPatrimonio()"
+                        data-clique="alternarSemPatrimonio"
                         title="Mostrar só as máquinas sem patrimônio definido (só o modelo, ex: WAE15)"
                     >
                         ⚠️ Só sem patrimônio
@@ -216,7 +217,7 @@ CONTAINER
                             type="button"
                             id="btnColunas"
                             class="btn-secundario"
-                            onclick="alternarPainelColunas()"
+                            data-clique="alternarPainelColunas"
                             title="Escolher quais informações aparecem na tabela"
                         >
                             👁️ Colunas ▾
@@ -237,7 +238,7 @@ CONTAINER
                             type="button"
                             id="btnBotoes"
                             class="btn-secundario"
-                            onclick="alternarPainelBotoes()"
+                            data-clique="alternarPainelBotoes"
                             title="Escolher quais botões aparecem em cada agendamento"
                         >
                             🔘 Botões ▾
@@ -256,7 +257,7 @@ CONTAINER
                         class="btn-secundario"
                         id="btnColunasPadrao"
                         style="display:none"
-                        onclick="restaurarColunasPadrao()"
+                        data-clique="restaurarColunasPadrao"
                         title="Voltar as colunas para a ordem, a largura e as informações padrão"
                     >
                         ↺ Colunas padrão
@@ -269,7 +270,7 @@ CONTAINER
             <button
                 type="button"
                 class="btn-secundario"
-                onclick="recarregarAgenda(true)"
+                data-clique="recarregarAgenda" data-arg="true"
                 title="Buscar de novo os agendamentos e motoristas"
             >
                 ↻ Atualizar
@@ -279,7 +280,7 @@ CONTAINER
                 type="button"
                 class="btn-secundario"
                 id="btnTema"
-                onclick="alternarTema()"
+                data-clique="alternarTema"
                 title="Trocar entre fundo escuro e fundo claro"
             >
                 ☀️ Fundo claro
@@ -290,7 +291,7 @@ CONTAINER
                 type="button"
                 class="btn-secundario so-admin"
                 style="display:none"
-                onclick="abrirLixeira()"
+                data-clique="abrirLixeira"
                 title="Agendamentos excluídos: restaurar ou apagar de vez"
             >
                 🗑️ Lixeira
@@ -306,7 +307,7 @@ CONTAINER
                 class="btn-secundario"
                 id="btnLimparFiltros"
                 style="display:none"
-                onclick="limparFiltros()"
+                data-clique="limparFiltros"
             >
                 × Limpar filtros
             </button>
@@ -342,7 +343,7 @@ MODAL (novo / editar)
 
             <div class="modal-acoes">
 
-                <button type="button" id="btnSalvarAgenda" onclick="salvarAgendamento()">
+                <button type="button" id="btnSalvarAgenda" data-clique="salvarAgendamento">
                     💾 Salvar
                 </button>
 
@@ -350,7 +351,7 @@ MODAL (novo / editar)
                     type="button"
                     id="btnDescartarAgenda"
                     class="btn-secundario"
-                    onclick="descartarRascunho()"
+                    data-clique="descartarRascunho"
                 >
                     🗑️ Descartar rascunho
                 </button>
@@ -360,7 +361,7 @@ MODAL (novo / editar)
                     id="btnExcluirAgenda"
                     class="btn-perigo"
                     style="display:none"
-                    onclick="excluirAgendamentoAberto()"
+                    data-clique="excluirAgendamentoAberto"
                 >
                     🗑️ Excluir agendamento
                 </button>
@@ -368,7 +369,7 @@ MODAL (novo / editar)
                 <button
                     type="button"
                     class="btn-fechar"
-                    onclick="fecharModalAgenda()"
+                    data-clique="fecharModalAgenda"
                     title="Fechar (o que foi digitado fica guardado como rascunho)"
                 >
                     ×
@@ -684,7 +685,7 @@ LIXEIRA (só admin)
             <button
                 type="button"
                 class="btn-fechar"
-                onclick="fecharLixeira()"
+                data-clique="fecharLixeira"
                 title="Fechar"
             >
                 ×
@@ -712,7 +713,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
             <button
                 type="button"
                 class="btn-fechar"
-                onclick="fecharEstoqueAgenda()"
+                data-clique="fecharEstoqueAgenda"
                 title="Fechar"
             >
                 ×
@@ -738,7 +739,8 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 
 <div id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

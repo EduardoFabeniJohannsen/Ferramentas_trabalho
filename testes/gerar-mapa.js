@@ -11,7 +11,8 @@ const contarLinhas = (texto) => texto.split(/\r?\n/).length - (texto.endsWith("\
 
 const lerScripts = (raiz) =>
     fs.readdirSync(path.join(raiz, "js"), { recursive: true })
-        .filter(nome => nome.endsWith(".js"))
+        // js/vendor/: bibliotecas de terceiros (Supabase, SheetJS), não entram no mapa
+        .filter(nome => nome.endsWith(".js") && !nome.split(/[\\/]/).includes("vendor"))
         .map(nome => {
             const texto = fs.readFileSync(path.join(raiz, "js", nome), "utf8");
             return { nome: path.basename(nome), texto };
@@ -40,8 +41,10 @@ const ordemDaPagina = (html, jsAtual) => {
 
     const js = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)]
         .map(a => a[1])
-        .filter(src => !src.includes("supabase-js"))
+        .filter(src => !src.includes("supabase-js") && !src.includes("vendor/supabase"))
         .map(src => {
+            const sheet = src.match(/vendor\/xlsx-([\d.]+\d)/);
+            if(sheet) return `[SheetJS ${sheet[1]}]`;
             if(src.startsWith("js/")) return path.basename(src, ".js");
             const xlsx = src.match(/xlsx\/([\d.]+)/);
             return xlsx ? `[SheetJS ${xlsx[1]}/CDN]` : `[${new URL(src).hostname}/CDN]`;

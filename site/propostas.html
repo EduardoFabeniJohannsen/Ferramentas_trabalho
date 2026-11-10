@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Propostas</title>
 
@@ -23,15 +24,15 @@ TOPBAR
 
 <div class="topbar">
 
-    <button onclick="gerarStatus('FreteZOHO')">
+    <button data-clique="gerarStatus" data-arg="FreteZOHO">
         Frete ZOHO
     </button>
 
-    <button onclick="gerarStatus('FreteZOHOLocComp')">
+    <button data-clique="gerarStatus" data-arg="FreteZOHOLocComp">
         Frete ZOHO - Loc Complementar
     </button>
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -57,7 +58,7 @@ CONTAINER
             <button
                 type="button"
                 class="btn-engrenagem"
-                onclick="abrirConfiguracoes()"
+                data-clique="abrirConfiguracoes"
                 title="Configurações da proposta"
             >
                 ⚙️
@@ -68,7 +69,7 @@ CONTAINER
             <button
                 type="button"
                 class="btn-limpar-tudo"
-                onclick="limparTudo()"
+                data-clique="limparTudo"
             >
                 🗑️ Limpar tudo
             </button>
@@ -84,7 +85,7 @@ CONTAINER
             <p id="textoOportunidade"></p>
 
 
-            <button onclick="copiarTexto('textoOportunidade')">
+            <button data-clique="copiarTexto" data-arg="textoOportunidade">
                 Copiar Oportunidade ZOHO
             </button>
 
@@ -118,7 +119,7 @@ CONTAINER
     <button
         type="button"
         class="btn-remover-equipamento"
-        onclick="removerEquipamento(this)"
+        data-clique="removerEquipamento" data-elemento
         title="Remover"
     >
         −
@@ -127,7 +128,7 @@ CONTAINER
     <button
         type="button"
         class="btn-add-equipamento"
-        onclick="adicionarEquipamento()"
+        data-clique="adicionarEquipamento"
     >
         +
     </button>
@@ -205,7 +206,7 @@ CONTAINER
             <p id="textoOrcamento"></p>
 
 
-            <button onclick="copiarTexto('textoOrcamento')">
+            <button data-clique="copiarTexto" data-arg="textoOrcamento">
                 Copiar Proposta ZOHO
             </button>
 
@@ -213,7 +214,7 @@ CONTAINER
             <br><br>
 
 
-            <button onclick="copiarPropostaZap()">
+            <button data-clique="copiarPropostaZap">
                 Copiar Proposta Zap
             </button>
 
@@ -233,7 +234,7 @@ CONTAINER
                 type="button"
                 id="btnFreteNoTotal"
                 class="btn-toggle"
-                onclick="alternarFreteNoTotal()"
+                data-clique="alternarFreteNoTotal"
                 title="Ativado, o Total com seguro inclui o frete de ida e volta"
             >
                 🚚 Frete no Total com seguro: Não
@@ -247,7 +248,7 @@ CONTAINER
                     type="button"
                     id="btnBitributacaoDesconto"
                     class="btn-toggle ativo"
-                    onclick="alternarBitributacao()"
+                    data-clique="alternarBitributacao"
                 >
                     Bitributação (+20%): Ativada
                 </button>
@@ -308,7 +309,7 @@ MODAL DE CONFIGURAÇÕES
 <div
     id="modalConfig"
     class="modal-overlay"
-    onclick="if(event.target === this) fecharConfiguracoes()"
+    data-clique-fora="fecharConfiguracoes"
 >
 
     <div class="modal-config">
@@ -320,7 +321,7 @@ MODAL DE CONFIGURAÇÕES
             <button
                 type="button"
                 class="btn-fechar"
-                onclick="fecharConfiguracoes()"
+                data-clique="fecharConfiguracoes"
                 title="Fechar"
             >
                 ×
@@ -333,7 +334,7 @@ MODAL DE CONFIGURAÇÕES
             type="button"
             id="btnLocacaoComplementar"
             class="btn-toggle"
-            onclick="alternarLocacaoComplementar()"
+            data-clique="alternarLocacaoComplementar"
         >
             Locação complementar: Desativada
         </button>
@@ -348,7 +349,7 @@ MODAL DE CONFIGURAÇÕES
                 type="button"
                 id="btnBitributacao"
                 class="btn-toggle ativo"
-                onclick="alternarBitributacao()"
+                data-clique="alternarBitributacao"
             >
                 Bitributação (+20%): Ativada
             </button>
@@ -362,7 +363,7 @@ MODAL DE CONFIGURAÇÕES
             type="button"
             id="btnValorDiaria"
             class="btn-toggle"
-            onclick="alternarValorDiaria()"
+            data-clique="alternarValorDiaria"
         >
             Valor da diária: Desativada
         </button>
@@ -374,7 +375,7 @@ MODAL DE CONFIGURAÇÕES
             type="button"
             id="btnEmojis"
             class="btn-toggle ativo"
-            onclick="alternarEmojis()"
+            data-clique="alternarEmojis"
         >
             Emojis: Ativado
         </button>
@@ -386,7 +387,7 @@ MODAL DE CONFIGURAÇÕES
             type="button"
             id="btnCidadeSaida"
             class="btn-toggle"
-            onclick="alternarCidadeSaida()"
+            data-clique="alternarCidadeSaida"
         >
             Cidade de saída: Itajaí
         </button>
@@ -398,7 +399,7 @@ MODAL DE CONFIGURAÇÕES
             type="button"
             id="btnSepararPagamento"
             class="btn-toggle"
-            onclick="alternarSepararPagamento()"
+            data-clique="alternarSepararPagamento"
         >
             Linha em branco antes do pagamento: Desativada
         </button>
@@ -412,7 +413,7 @@ MODAL DE CONFIGURAÇÕES
             <select
                 id="formaPagamento"
                 title="Forma de pagamento na Proposta Zap"
-                onchange="trocarFormaPagamento()"
+                data-mudanca="trocarFormaPagamento"
             >
                 <option value="">Pagamento: texto padrão</option>
                 <option value="Boleto">Pagamento: Boleto</option>
@@ -428,7 +429,7 @@ MODAL DE CONFIGURAÇÕES
                 inputmode="numeric"
                 title="Prazo em dias. Mais de um vencimento: 28/56"
                 style="display:none"
-                oninput="salvarCache()"
+                data-entrada="salvarCache"
             >
 
         </div>
@@ -446,7 +447,8 @@ MODAL DE CONFIGURAÇÕES
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

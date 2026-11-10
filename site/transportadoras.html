@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Transportadoras</title>
 
@@ -24,7 +25,7 @@ TOPBAR
 
     <!-- links das outras páginas: montados pelo js/menu.js -->
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -53,7 +54,7 @@ CONTAINER (só aparece depois de conferir se é admin ou só vê)
                 type="button"
                 class="btn-secundario"
                 id="btnNovaTransportadora"
-                onclick="abrirFormNovaTransp()"
+                data-clique="abrirFormNovaTransp"
             >
                 + Nova transportadora
             </button>
@@ -62,13 +63,13 @@ CONTAINER (só aparece depois de conferir se é admin ou só vê)
                 type="button"
                 class="btn-secundario"
                 id="btnExcluirTransportadora"
-                onclick="excluirTransportadoraAtual()"
+                data-clique="excluirTransportadoraAtual"
                 title="Excluir a transportadora selecionada (só se não tiver motorista, veículo nem agendamento)"
             >
                 🗑️ Excluir transportadora
             </button>
 
-            <button type="button" id="btnNovoItem" onclick="abrirNovoItemTransp()">
+            <button type="button" id="btnNovoItem" data-clique="abrirNovoItemTransp">
                 + Novo veículo
             </button>
 
@@ -84,11 +85,11 @@ CONTAINER (só aparece depois de conferir se é admin ou só vê)
                 autocomplete="off"
             >
 
-            <button type="button" onclick="adicionarTransportadoraTransp()">
+            <button type="button" data-clique="adicionarTransportadoraTransp">
                 Adicionar
             </button>
 
-            <button type="button" class="btn-secundario" onclick="fecharFormNovaTransp()">
+            <button type="button" class="btn-secundario" data-clique="fecharFormNovaTransp">
                 Cancelar
             </button>
 
@@ -100,7 +101,7 @@ CONTAINER (só aparece depois de conferir se é admin ou só vê)
                 type="button"
                 id="abaVeiculos"
                 class="aba-btn"
-                onclick="definirAbaTransp('veiculos')"
+                data-clique="definirAbaTransp" data-arg="veiculos"
             >
                 🚛 Veículos
             </button>
@@ -109,7 +110,7 @@ CONTAINER (só aparece depois de conferir se é admin ou só vê)
                 type="button"
                 id="abaMotoristas"
                 class="aba-btn"
-                onclick="definirAbaTransp('motoristas')"
+                data-clique="definirAbaTransp" data-arg="motoristas"
             >
                 🧑 Motoristas
             </button>
@@ -132,7 +133,7 @@ MODAL (veículo / motorista)
 <div
     id="modalTransp"
     class="modal-overlay"
-    onclick="if(event.target === this) fecharModalTransp()"
+    data-clique-fora="fecharModalTransp"
 >
 
     <div class="modal-transp">
@@ -143,14 +144,14 @@ MODAL (veículo / motorista)
 
             <div class="modal-acoes">
 
-                <button type="button" id="btnSalvarTransp" onclick="salvarModalTransp()">
+                <button type="button" id="btnSalvarTransp" data-clique="salvarModalTransp">
                     💾 Salvar
                 </button>
 
                 <button
                     type="button"
                     class="btn-fechar"
-                    onclick="fecharModalTransp()"
+                    data-clique="fecharModalTransp"
                     title="Fechar"
                 >
                     ×
@@ -170,7 +171,8 @@ MODAL (veículo / motorista)
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Admin</title>
 
@@ -24,7 +25,7 @@ TOPBAR
 
     <!-- links das outras páginas: montados pelo js/menu.js -->
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -71,7 +72,7 @@ CONTAINER
                 autocomplete="off"
             >
 
-            <button type="button" id="btnCriarUsuario" onclick="criarUsuario()">
+            <button type="button" id="btnCriarUsuario" data-clique="criarUsuario">
                 + Criar usuário
             </button>
 
@@ -92,7 +93,7 @@ CONTAINER
                 autocomplete="off"
             >
 
-            <button type="button" onclick="carregarPerfisAdmin()">
+            <button type="button" data-clique="carregarPerfisAdmin">
                 ↻ Atualizar
             </button>
 
@@ -126,7 +127,7 @@ CONTAINER
 
                 <select id="filtroErrosPagina" title="Página"></select>
 
-                <button type="button" onclick="carregarErrosSite()">
+                <button type="button" data-clique="carregarErrosSite">
                     ↻ Atualizar
                 </button>
 
@@ -134,7 +135,7 @@ CONTAINER
                     type="button"
                     id="btnTestarErros"
                     title="Grava um erro de teste, para conferir se o registro está funcionando"
-                    onclick="testarRegistroErros()"
+                    data-clique="testarRegistroErros"
                 >
                     🧪 Testar registro
                 </button>
@@ -143,12 +144,12 @@ CONTAINER
                     type="button"
                     id="btnCopiarErros"
                     title="Copiar todos os erros da lista, com os detalhes"
-                    onclick="copiarErrosVisiveis()"
+                    data-clique="copiarErrosVisiveis"
                 >
                     📋 Copiar todos
                 </button>
 
-                <button type="button" id="btnLimparErros" onclick="limparErrosSite()">
+                <button type="button" id="btnLimparErros" data-clique="limparErrosSite">
                     🗑️ Limpar lista
                 </button>
 
@@ -189,7 +190,8 @@ CONTAINER
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

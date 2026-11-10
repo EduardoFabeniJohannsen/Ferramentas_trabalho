@@ -62,8 +62,8 @@ const confere = (nome, ok, extra) => {
 
         await contexto.route("**/*", (rota) => {
             const url = new URL(rota.request().url());
-            if(url.hostname.includes("jsdelivr")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
-            if(url.hostname.includes("cdnjs")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
+            if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
+            if(url.pathname.endsWith("/vendor/xlsx-0.18.5.full.min.js")) return rota.fulfill({ contentType: "text/javascript", body: "window.XLSX = {};" });
             if(url.hostname !== "site.test") return rota.abort();
             const arquivo = path.join(raiz, decodeURIComponent(url.pathname));
             if(!fs.existsSync(arquivo)) return rota.fulfill({ status: 404, body: "" });

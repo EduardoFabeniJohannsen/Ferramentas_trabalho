@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>WEG - Contrato</title>
 
@@ -20,7 +21,7 @@ TOPBAR
 
 <div class="topbar">
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -102,7 +103,7 @@ CONTAINER
         <!-- fora da área de print: texto pra mandar junto no e-mail -->
         <button
             class="btn-copiar-email"
-            onclick="copiarParaEmail()"
+            data-clique="copiarParaEmail"
             title="Copia a saudação e os dados para confirmação"
         >📋 Copiar texto do e-mail</button>
 
@@ -119,7 +120,8 @@ CONTAINER
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

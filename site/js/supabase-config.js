@@ -1,7 +1,7 @@
 // ======================================
 // CONFIGURAÇÃO DO SUPABASE
 // ======================================
-// Precisa vir DEPOIS do <script> do supabase-js (CDN) e
+// Precisa vir DEPOIS do <script> do supabase-js (js/vendor/) e
 // ANTES de auth-guard.js / propostas-dados.js / weg.js.
 
 const SUPABASE_URL = "https://qhneylwmrzuesaloqetr.supabase.co";

@@ -116,7 +116,7 @@ function adicionarEquipamento(){
         <button
             type="button"
             class="btn-remover-equipamento"
-            onclick="removerEquipamento(this)"
+            data-clique="removerEquipamento" data-elemento
             title="Remover"
         >
             −
@@ -125,7 +125,7 @@ function adicionarEquipamento(){
         <button
             type="button"
             class="btn-add-equipamento"
-            onclick="adicionarEquipamento()"
+            data-clique="adicionarEquipamento"
         >
             +
         </button>

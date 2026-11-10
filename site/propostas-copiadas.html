@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
 
 <title>Propostas Zap copiadas</title>
 
@@ -27,7 +28,7 @@ TOPBAR
 
     <!-- links das outras páginas: montados pelo js/menu.js -->
 
-    <button onclick="fazerLogout()">Sair</button>
+    <button data-clique="fazerLogout">Sair</button>
 
     <div class="versao" id="versaoSistema"></div>
 
@@ -112,7 +113,7 @@ CONTAINER (admin ou acesso "propostas-copiadas" marcado no Admin)
 
             <div class="barra-admin">
 
-                <button type="button" onclick="carregarPropostasAdmin()">
+                <button type="button" data-clique="carregarPropostasAdmin">
                     ↻ Atualizar
                 </button>
 
@@ -120,7 +121,7 @@ CONTAINER (admin ou acesso "propostas-copiadas" marcado no Admin)
                     type="button"
                     id="btnLimparFiltrosPropostas"
                     style="display:none"
-                    onclick="limparFiltrosPropostas()"
+                    data-clique="limparFiltrosPropostas"
                 >
                     ✖ Limpar filtros
                 </button>
@@ -196,7 +197,8 @@ CONTAINER (admin ou acesso "propostas-copiadas" marcado no Admin)
 <div id="toast"></div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0"></script>
+<script src="js/vendor/supabase-2.45.0.js"></script>
+<script src="js/acoes.js"></script>
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>

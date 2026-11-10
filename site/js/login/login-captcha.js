@@ -9,7 +9,7 @@
 // Ligar no Supabase antes faz o login parar de funcionar.
 
 // chave do site (pública: pode ficar no repositório; a secreta fica só no Supabase)
-const TURNSTILE_SITE_KEY = "";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAF7o1C052yDOJo06";
 
 const URL_TURNSTILE =
     "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";

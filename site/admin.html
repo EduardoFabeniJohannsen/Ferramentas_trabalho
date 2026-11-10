@@ -113,6 +113,58 @@ CONTAINER
 
         </div>
 
+        <!-- aparelhos de cada login: liberar, desconectar (admin-aparelhos.js) -->
+        <div class="secao-aparelhos">
+
+            <h2 id="tituloAparelhos">Aparelhos</h2>
+
+            <p class="dica-admin">
+                Com a trava ligada, cada login só entra por aparelho liberado aqui (o admin
+                fica de fora). Aparelho novo aparece como "Aguardando", com o nome que a pessoa
+                escreveu. "Desconectar" tira o aparelho do sistema na hora. Quem já estava
+                logado quando a trava foi criada entra liberado.
+            </p>
+
+            <div class="barra-admin">
+
+                <button type="button" id="btnTrava" data-clique="alternarTravaAparelhos">
+                    🔒 Trava: carregando...
+                </button>
+
+                <button type="button" data-clique="carregarAparelhos">
+                    ↻ Atualizar
+                </button>
+
+                <span class="contagem" id="contagemAparelhos"></span>
+
+            </div>
+
+            <div class="area-admin">
+
+                <table class="tabela-admin tabela-aparelhos">
+
+                    <thead>
+
+                        <tr>
+                            <th class="col-usuario">Login</th>
+                            <th>Quem é / onde</th>
+                            <th>Aparelho</th>
+                            <th>Situação</th>
+                            <th>Pedido em</th>
+                            <th>Último acesso</th>
+                            <th>Ações</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="corpoAparelhos"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
         <!-- o que deu errado no navegador de cada pessoa (admin-erros.js) -->
         <div class="secao-erros">
 
@@ -195,6 +247,7 @@ CONTAINER
 <script src="js/supabase-config.js"></script>
 <script src="js/registro-erros.js"></script>
 <script src="js/arquivo-faltando.js"></script>
+<script src="js/dispositivo.js"></script>
 <script src="js/auth-guard.js"></script>
 
 <script src="js/helpers.js"></script>
@@ -205,6 +258,7 @@ CONTAINER
 <script src="js/admin/admin-dados.js"></script>
 <script src="js/admin/admin-tela.js"></script>
 <script src="js/admin/admin-online.js"></script>
+<script src="js/admin/admin-aparelhos.js"></script>
 <script src="js/admin/admin-erros.js"></script>
 <script src="js/admin/admin-erros-copiar.js"></script>
 <script src="js/admin/admin-init.js"></script>

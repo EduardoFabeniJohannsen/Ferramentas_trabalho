@@ -25,20 +25,23 @@ const tipos = { ".html": "text/html", ".js": "text/javascript", ".css": "text/cs
 
 // usuario: null = sem login; acessos e ativo vêm da tabela "perfis" simulada
 const clienteFalso = (usuario) => `
-window.supabase = { createClient(){
+window.supabase = { createClient(url, chave, opcoes){
     const usuario = ${JSON.stringify(usuario)};
+    window.__opcoesCliente = opcoes;
+    // usuario.tabelas: dados por tabela (lista, ou objeto no maybeSingle)
+    const tabelas = (usuario && usuario.tabelas) || {};
     const consulta = (tabela) => {
         let umaLinha = false;
         const perfil = usuario && { acessos: usuario.acessos || [], filiais: [], ativo: usuario.ativo !== false };
         const q = new Proxy(function(){}, {
             get(_, nome){
                 if(nome === "then") return (ok) => ok({
-                    data: tabela === "perfis" && umaLinha ? perfil : (umaLinha ? null : []),
+                    data: tabela === "perfis" && umaLinha ? perfil : (tabela in tabelas ? tabelas[tabela] : (umaLinha ? null : [])),
                     error: null,
                     count: 0
                 });
                 if(nome === "maybeSingle" || nome === "single") return () => { umaLinha = true; return q; };
-                return () => q;
+                return (...args) => { (window.__chamadas = window.__chamadas || []).push([tabela, nome, args]); return q; };
             }
         });
         return q;
@@ -62,7 +65,12 @@ window.supabase = { createClient(){
     });
     return {
         from: consulta,
-        rpc: async () => ({ data: [], error: null }),
+        // registrar_dispositivo: a situação do aparelho (usuario.dispositivo; sem nada = liberado)
+        rpc: async (nome, args) => {
+            (window.__rpcs = window.__rpcs || []).push([nome, args]);
+            if(nome === "registrar_dispositivo") return { data: (usuario && usuario.dispositivo) || "liberado", error: null };
+            return { data: [], error: null };
+        },
         channel: canal,
         removeChannel: async () => "ok",
         auth: {
@@ -281,11 +289,11 @@ const confere = (nome, ok, extra) => {
         };
     };
 
-    // sem chave (como está no repositório): login normal, sem captcha
-    const semChave = await tentarLogin(login.pagina);
-    confere("captcha: sem chave o login vai sem token", semChave.logins.length === 1 && JSON.stringify(semChave.logins[0].options) === "{}", semChave.logins);
-    confere("captcha: senha errada avisa", semChave.erro === "E-mail ou senha inválidos", semChave.erro);
     await login.pagina.close();
+
+    // a chave do site (pública) está no repositório
+    const textoCaptcha = fs.readFileSync(path.join(raiz, "js", "login", "login-captcha.js"), "utf8");
+    confere("captcha: a chave do site está preenchida", /TURNSTILE_SITE_KEY = "0x[0-9A-Za-z_-]+"/.test(textoCaptcha));
 
     // com chave: Turnstile falso que entrega um token; reset não entrega outro na hora
     const comCaptcha = await novoContexto(null);
@@ -294,6 +302,7 @@ const confere = (nome, ok, extra) => {
         reset(){ window.__resets = (window.__resets || 0) + 1; }
     };`;
     let cloudflareFora = false;
+    let chaveTeste = "";
     await comCaptcha.contexto.route("**/*", (rota) => {
         const url = new URL(rota.request().url());
         if(url.hostname === "challenges.cloudflare.com"){
@@ -301,11 +310,19 @@ const confere = (nome, ok, extra) => {
         }
         if(url.pathname.endsWith("/login-captcha.js")){
             const texto = fs.readFileSync(path.join(raiz, "js", "login", "login-captcha.js"), "utf8");
-            return rota.fulfill({ contentType: "text/javascript", body: texto.replace('TURNSTILE_SITE_KEY = ""', 'TURNSTILE_SITE_KEY = "chave-teste"') });
+            return rota.fulfill({ contentType: "text/javascript", body: texto.replace(/TURNSTILE_SITE_KEY = "[^"]*"/, `TURNSTILE_SITE_KEY = "${chaveTeste}"`) });
         }
         return rota.fallback();
     });
 
+    // sem chave: login normal, sem captcha
+    const paginaSemChave = await abrir(comCaptcha.contexto, "login.html");
+    const semChave = await tentarLogin(paginaSemChave.pagina);
+    confere("captcha: sem chave o login vai sem token", semChave.logins.length === 1 && JSON.stringify(semChave.logins[0].options) === "{}", semChave.logins);
+    confere("captcha: senha errada avisa", semChave.erro === "E-mail ou senha inválidos", semChave.erro);
+    await paginaSemChave.pagina.close();
+
+    chaveTeste = "chave-teste";
     const comChave = await abrir(comCaptcha.contexto, "login.html");
     const captcha = await comChave.pagina.evaluate(() => window.__captcha);
     confere("captcha: com chave desenha o Turnstile no login", captcha?.alvo === "#captchaLogin" && captcha?.chave === "chave-teste", captcha);
@@ -411,6 +428,85 @@ const confere = (nome, ok, extra) => {
     await bloqueada.waitForURL("**/login.html", { timeout: 5000 }).catch(() => {});
 
     confere("usuário desativado sai do sistema", bloqueada.url().endsWith("/login.html") && avisoBloqueio.includes("desativado"), avisoBloqueio);
+
+    // ---------- trava de aparelhos (dispositivo.js) ----------
+    {
+        // liberado: a chave do aparelho vai em toda chamada e continua a mesma depois de recarregar
+        const liberado = await novoContexto({ acessos: ["propostas"] });
+        const { pagina, erros } = await abrir(liberado.contexto, "propostas.html");
+        const chave = () => pagina.evaluate(() => window.__opcoesCliente?.global?.headers?.["x-dispositivo"]);
+        const primeira = await chave();
+        await pagina.reload();
+        await pagina.waitForLoadState("networkidle");
+        const registro = await pagina.evaluate(() => (window.__rpcs || []).find(([nome]) => nome === "registrar_dispositivo"));
+        confere("aparelho: a chave vai no cabeçalho x-dispositivo", /^[0-9a-f]{64}$/.test(primeira || ""), primeira);
+        confere("aparelho: a chave é a mesma depois de recarregar", primeira === (await chave()));
+        confere("aparelho: confere no banco com a chave e o aparelho", registro?.[1]?.p_chave === primeira && /Computador/.test(registro?.[1]?.p_aparelho || ""), registro);
+        confere("aparelho liberado: página normal", erros.length === 0 && (await pagina.evaluate(() => document.documentElement.style.visibility)) === "" && (await pagina.locator("#avisoDispositivo").count()) === 0);
+        await liberado.contexto.close();
+    }
+
+    {
+        // pendente: só o aviso aparece; dá para dizer quem é
+        const pendente = await novoContexto({ acessos: ["propostas"], dispositivo: "pendente" });
+        const { pagina, erros } = await abrir(pendente.contexto, "propostas.html");
+        confere("aparelho pendente: mostra o aviso", await pagina.locator("#avisoDispositivo").isVisible(), erros.length ? erros : undefined);
+        confere("aparelho pendente: a página fica escondida", (await pagina.evaluate(() => document.documentElement.style.visibility)) === "hidden" && !(await pagina.locator(".topbar").isVisible()));
+        await pagina.fill("#nomeDispositivo", "Maria - recepção");
+        await pagina.click("#avisoDispositivo button:has-text('Enviar')");
+        await pagina.waitForTimeout(100);
+        const nomeou = await pagina.evaluate(() => (window.__rpcs || []).find(([nome]) => nome === "nomear_dispositivo"));
+        confere("aparelho pendente: envia quem é", nomeou?.[1]?.p_nome === "Maria - recepção" && /^[0-9a-f]{64}$/.test(nomeou?.[1]?.p_chave || ""), nomeou);
+        confere("aparelho pendente: confirma o envio", /Enviado/.test(await pagina.innerText("#statusDispositivo")));
+        await pendente.contexto.close();
+    }
+
+    {
+        // bloqueado pelo admin: sai do login com o aviso
+        const desconectado = await novoContexto({ acessos: ["propostas"], dispositivo: "bloqueado" });
+        const pagina = await desconectado.contexto.newPage();
+        let aviso = "";
+        pagina.on("dialog", d => { aviso = d.message(); d.accept(); });
+        await pagina.goto("http://site.test/propostas.html");
+        await pagina.waitForURL("**/login.html", { timeout: 5000 }).catch(() => {});
+        confere("aparelho desconectado: sai do sistema", pagina.url().endsWith("/login.html") && /desconectado/.test(aviso) && (await pagina.evaluate(() => localStorage.getItem("__saiu"))) === "1", aviso);
+        await desconectado.contexto.close();
+    }
+
+    {
+        // admin: lista com o aguardando primeiro, liberar e ligar a trava
+        const tabelas = {
+            perfis: [{ id: "u2", email: "filial@empresa.com", acessos: ["propostas"], filiais: [], ativo: true }],
+            dispositivos: [
+                { id: 1, usuario: "u2", situacao: "liberado", aparelho: "Computador · Windows · Chrome", nome: "PC 1", criado_em: "2026-11-01T10:00:00Z", ultimo_acesso: "2026-11-10T10:00:00Z" },
+                { id: 2, usuario: "u2", situacao: "pendente", aparelho: "Celular · iPhone · Safari", nome: "<b>Maria</b>", criado_em: "2026-11-10T11:00:00Z", ultimo_acesso: "2026-11-10T11:00:00Z" }
+            ],
+            trava_dispositivos: { ligada: false }
+        };
+        const admin2 = await novoContexto({ admin: true, tabelas });
+        const { pagina, erros } = await abrir(admin2.contexto, "admin.html");
+        await pagina.waitForSelector("#corpoAparelhos tr");
+        const linhas = await pagina.$$eval("#corpoAparelhos tr", l => l.map(t => t.innerText));
+        confere("admin aparelhos: abre sem erro", erros.length === 0, erros.length ? erros : undefined);
+        confere("admin aparelhos: aguardando vem primeiro, com o e-mail", /filial@empresa\.com/.test(linhas[0]) && /Aguardando/.test(linhas[0]) && /Liberado/.test(linhas[1]), linhas);
+        confere("admin aparelhos: nome entra como texto (não HTML)", (await pagina.locator("#corpoAparelhos b").count()) === 0 && linhas[0].includes("<b>Maria</b>"));
+        confere("admin aparelhos: título conta quem aguarda", (await pagina.innerText("#tituloAparelhos")) === "Aparelhos (1 aguardando)");
+        confere("admin aparelhos: botão da trava desligada", /desligada/.test(await pagina.innerText("#btnTrava")));
+
+        // as perguntas (confirm) o abrir() já aceita
+        await pagina.evaluate(() => { window.__chamadas = []; });
+        await pagina.click("#corpoAparelhos tr:first-child .btn-liberar-aparelho");
+        await pagina.waitForTimeout(100);
+        const liberou = await pagina.evaluate(() => window.__chamadas.filter(([tabela, nome]) => tabela === "dispositivos" && (nome === "update" || nome === "eq")));
+        confere("admin aparelhos: liberar grava a situação do aparelho certo", liberou.some(([, nome, args]) => nome === "update" && args[0].situacao === "liberado" && args[0].liberado_em) && liberou.some(([, nome, args]) => nome === "eq" && args[0] === "id" && args[1] === 2), liberou);
+
+        await pagina.evaluate(() => { window.__chamadas = []; });
+        await pagina.click("#btnTrava");
+        await pagina.waitForTimeout(100);
+        const trava = await pagina.evaluate(() => window.__chamadas.filter(([tabela, nome]) => tabela === "trava_dispositivos" && nome === "update"));
+        confere("admin aparelhos: ligar a trava (depois de confirmar)", trava.length === 1 && trava[0][2][0].ligada === true, trava);
+        await admin2.contexto.close();
+    }
 
     await navegador.close();
 

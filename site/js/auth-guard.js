@@ -61,6 +61,9 @@
     // (a página continua escondida até a troca)
     if(!(await liberarPaginaAtual())) return;
 
+    // aparelho ainda não liberado pelo admin: fica só o aviso (dispositivo.js)
+    if(!(await conferirDispositivo())) return;
+
     document.documentElement.style.visibility = "";
 
 })();

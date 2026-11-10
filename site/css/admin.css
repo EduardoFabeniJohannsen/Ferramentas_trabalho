@@ -213,3 +213,40 @@
     white-space:pre-wrap;
     overflow-wrap:anywhere;
 }
+
+/* ===== Aparelhos (admin-aparelhos.js) ===== */
+.secao-aparelhos{
+    margin-top:24px;
+}
+.tabela-aparelhos tr.aparelho-pendente td{
+    background:rgba(234,179,8,.12);
+}
+.tabela-aparelhos tr.aparelho-bloqueado td{
+    opacity:.55;
+}
+.tabela-aparelhos td.col-nome-aparelho{
+    text-align:left;
+}
+.tabela-aparelhos .acoes-aparelho{
+    white-space:nowrap;
+}
+.tabela-aparelhos .acoes-aparelho button{
+    margin:2px;
+    padding:5px 9px;
+    font-size:12px;
+}
+.tabela-aparelhos .btn-liberar-aparelho{
+    background:#16a34a;
+}
+.tabela-aparelhos .btn-liberar-aparelho:hover{
+    background:#15803d;
+}
+.tabela-aparelhos .btn-desconectar-aparelho{
+    background:#dc2626;
+}
+.tabela-aparelhos .btn-desconectar-aparelho:hover{
+    background:#b91c1c;
+}
+#btnTrava.ativo{
+    background:#16a34a;
+}

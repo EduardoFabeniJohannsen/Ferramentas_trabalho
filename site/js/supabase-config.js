@@ -39,11 +39,50 @@ async function fetchSupabase(endereco, opcoes){
     }
 }
 
-// "supabase" aqui é o objeto global que vem do CDN
-// (@supabase/supabase-js). Criamos nosso client com outro
-// nome pra não conflitar com ele.
+// ======================================
+// CHAVE DO APARELHO (trava de aparelhos)
+// ======================================
+// Cada navegador sorteia uma chave e guarda no localStorage. Ela vai em toda
+// chamada ao Supabase (cabeçalho x-dispositivo): com a trava ligada, o banco só
+// entrega dados a aparelho liberado pelo admin (dispositivo.js, admin-aparelhos.js).
+// Sair do login não apaga a chave: o aparelho continua o mesmo.
+// Sem localStorage (janela anônima bloqueada), a chave vale só nesta aba.
+
+const CHAVE_LOCAL_DISPOSITIVO = "dispositivoChave";
+
+function chaveDoDispositivo(){
+
+    let chave = "";
+
+    try{
+
+        chave = localStorage.getItem(CHAVE_LOCAL_DISPOSITIVO) || "";
+
+    }catch(erro){}
+
+    if(/^[0-9a-f]{64}$/.test(chave)) return chave;
+
+    const bytes = new Uint8Array(32);
+
+    crypto.getRandomValues(bytes);
+
+    chave = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+
+    try{
+
+        localStorage.setItem(CHAVE_LOCAL_DISPOSITIVO, chave);
+
+    }catch(erro){}
+
+    return chave;
+}
+
+const CHAVE_DISPOSITIVO = chaveDoDispositivo();
+
+// "supabase" aqui é o objeto global da biblioteca (js/vendor/supabase-*.js).
+// Criamos nosso client com outro nome pra não conflitar com ele.
 const supabaseClient = supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
-    { global: { fetch: fetchSupabase } }
+    { global: { fetch: fetchSupabase, headers: { "x-dispositivo": CHAVE_DISPOSITIVO } } }
 );

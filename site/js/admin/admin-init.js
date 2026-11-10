@@ -37,4 +37,14 @@
 
     await carregarPerfisAdmin();
 
+    // aparelhos depois dos perfis: a lista mostra o e-mail de cada login
+    await carregarAparelhos();
+
+    // pedido novo aparece sozinho (só com a aba à vista)
+    setInterval(() => {
+
+        if(document.visibilityState === "visible") carregarAparelhos();
+
+    }, 30000);
+
 })();

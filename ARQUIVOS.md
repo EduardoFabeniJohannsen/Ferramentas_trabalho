@@ -6,7 +6,7 @@ Para editar algo, abra só o arquivo da responsabilidade certa. O `*-init.js` é
 
 **Pastas:** tudo que vai para o ar fica em `site/`: as páginas `.html`, o `icon.png`, `css/` e `js/`. A pasta `site/` é a raiz do site publicado, então os endereços continuam sem "site/" (ex: `agenda.html`, `js/helpers.js`). Na raiz do repositório fica só o que o Git, o GitHub e o npm exigem ali (`.github/`, `.githooks/`, `.gitignore`, `.gitattributes`, `.mcp.json`, `package.json`, `package-lock.json`), este mapa e `testes/`.
 
-Dentro de `site/`, `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `acoes`, `supabase-config`, `registro-erros`, `arquivo-faltando`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo. `js/vendor/` guarda as bibliotecas de terceiros (supabase-js e SheetJS), que não entram no mapa.
+Dentro de `site/`, `js/<página>/` guarda os scripts de cada página (`js/agenda/`, `js/propostas/`, `js/transportadoras/`, `js/weg/`...). Direto em `js/` ficam só os usados por mais de uma página: `acoes`, `supabase-config`, `registro-erros`, `arquivo-faltando`, `dispositivo`, `auth-guard`, `helpers`, `atualizacao-sistema`, `presenca`, `menu` e `status`. As listas abaixo mostram só o nome do arquivo. `js/vendor/` guarda as bibliotecas de terceiros (supabase-js e SheetJS), que não entram no mapa.
 
 **Não mude `site/js/helpers.js` de lugar:** as abas abertas leem a versão publicada nesse endereço (`js/helpers.js` no site; ver `atualizacao-sistema.js`). Se ele mudar, elas param de se atualizar sozinhas.
 
@@ -30,39 +30,39 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **index.html** — Página inicial: conversor de texto e calculadora de boletos
 - CSS: style
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → status → index-ferramentas → menu
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → status → index-ferramentas → menu
 
 **propostas.html** — Gerador de propostas (textos ZOHO e Zap, desconto, fretes). As contas ficam todas no card Resumo da proposta. No PC (~1180px+): textos | resumo | desconto, com os fretes embaixo do desconto; a partir de 800px, textos e resumo à esquerda, desconto e fretes à direita; no celular, um embaixo do outro (textos, desconto, resumo, fretes).
 - CSS: style → propostas
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-resumo-frete → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-resumo-frete → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → agenda
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
-- JS: acoes → [SheetJS 0.18.5] → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
+- JS: acoes → [SheetJS 0.18.5] → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → estoque-config → estoque-parser → estoque-grupos → estoque-render → estoque-busca → estoque-dados → estoque-upload → estoque-init
 
 **tabelas.html** — Consulta e edição das tabelas de preços e fretes
 - CSS: style → tabelas
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → tabelas-config → tabelas-dados → tabelas-desenho → tabelas-editor → tabelas-init
 
 **transportadoras.html** — Transportadoras: cadastro, veículos, motoristas e PDFs (ver: acesso "transportadoras"; editar: só admin)
 - CSS: style → transportadoras
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → transp-config → transp-banco → transp-cad-banco → transp-docs → transp-render → transp-form → transp-form-veiculo → transp-form-motorista → transp-cad-tela → transp-init
 
 **WEG.html** — Contrato WEG (preços fixos)
 - CSS: style
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
 
 **admin.html** — Usuários e acessos, online agora e erros do sistema (só admin). Usa a largura toda da tela. As Propostas Zap copiadas ficam na própria página (propostas-copiadas.html).
 - CSS: style → admin
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-erros → admin-erros-copiar → admin-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → admin-config → admin-dados → admin-tela → admin-online → admin-aparelhos → admin-erros → admin-erros-copiar → admin-init
 
 **leads.html** — Lista de empresas para a equipe chamar (acesso "leads" no Admin)
 - CSS: style → leads
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads-config → leads-contato → leads-utils → leads-dados → leads-filtros → leads-lista → leads-cards → leads-acoes → leads-busca-config → leads-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → leads-config → leads-contato → leads-utils → leads-dados → leads-filtros → leads-lista → leads-cards → leads-acoes → leads-busca-config → leads-init
 
 **login.html** — Login
 - CSS: style
@@ -70,12 +70,14 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **propostas-copiadas.html** — Propostas Zap copiadas (link 📊 Propostas Zap): cada "Copiar Proposta Zap" com quem fez, aparelho, cliente, equipamentos com desconto, total e a mensagem; filtros em cima (inclusive prazo de pagamento), filtro estilo Excel nos títulos da tabela (clicar no título abre as caixinhas) e desconto médio por usuário. Acesso "propostas-copiadas" no Admin (os dados vêm pela policy de SELECT com `tem_acesso('propostas-copiadas')`). Usa o admin.css (card largo e tabelas) mais o propostas-copiadas.css, e a largura toda da tela.
 - CSS: style → admin → propostas-copiadas
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → auth-guard → helpers → atualizacao-sistema → presenca → menu → copiadas-dados → copiadas-filtros → copiadas-linhas → copiadas-descontos → copiadas-filtro-colunas → copiadas-filtro-painel → copiadas-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → copiadas-dados → copiadas-filtros → copiadas-linhas → copiadas-descontos → copiadas-filtro-colunas → copiadas-filtro-painel → copiadas-init
 
 ## Arquivos (responsabilidade e funções)
 
 - `acoes.js` (82 linhas): Em toda página, logo depois do supabase-js: no lugar de onclick/onchange/oninput (que a CSP bloqueia), os elementos dizem o nome da função: `data-clique` (com `data-arg` para um argumento, número/true/false viram valor; `data-elemento` passa o próprio botão), `data-clique-fora` (só o clique no fundo do modal), `data-mudanca` (change) e `data-entrada` (input). A função precisa ser uma `function` (fica em window); o teste-paginas confere.
   - argumentoDaAcao, rodarAcao
+- `admin-aparelhos.js` (315 linhas): Seção "Aparelhos" do admin (trava de aparelhos): lista os aparelhos de cada login (tabela `dispositivos`, só admin lê e altera pelo RLS) com aguardando primeiro, o nome que a pessoa escreveu e o e-mail (de `perfisAdmin`, por isso carrega depois dos perfis); Liberar, Desconectar, ✏️ nome e 🗑️ excluir; botão que liga e desliga a trava (`trava_dispositivos`). Atualiza sozinho a cada 30 s com a aba à vista.
+  - mensagemFalhaAparelhos, carregarAparelhos, emailDoAparelho, desenharBotaoTrava, botaoAparelho, linhaAparelho, desenharAparelhos, salvarAparelho, mudarSituacaoAparelho, renomearAparelho, excluirAparelho, alternarTravaAparelhos
 - `admin-config.js` (51 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
 - `admin-dados.js` (105 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
   - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
@@ -83,7 +85,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - textoErroParaCopiar, copiarErroSite, copiarErrosVisiveis
 - `admin-erros.js` (293 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista, botão que grava um erro de teste e 📋 Copiar em cada erro (admin-erros-copiar.js). Nada entra como HTML.
   - mensagemFalhaErros, carregarErrosSite, errosVisiveis, desenharFiltroErros, criarCelulaMensagemErro, criarLinhaErro, criarLinhaAvisoErros, desenharErrosSite, limparErrosSite, testarRegistroErros
-- `admin-init.js` (40 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
+- `admin-init.js` (50 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
 - `admin-online.js` (127 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada (o texto vem de textoAparelhoOnline, em presenca.js). Sem histórico.
   - nomePaginaOnline, tempoOnline, textoAbaOnline, pessoasOnline, desenharUsuariosOnline
 - `admin-tela.js` (254 linhas): Tabela de usuários com uma caixinha por acesso e por filial.
@@ -172,7 +174,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - lerRecargaArquivo, gravarRecargaArquivo, listaArquivosFaltando, doProprioSite, esperarNoMaximo, renovarArquivosFaltando, enviarRegistroAntesDeRecarregar, recarregarPorArquivo, mostrarAvisoArquivoFaltando, recarregarSozinhaPorArquivo, conferirArquivosDaPagina
 - `atualizacao-sistema.js` (293 linhas): Em toda página menos o login: a cada 2 min e ao voltar para a aba compara VERSAO_SISTEMA com a do helpers.js publicado; se mudou, renova os arquivos no navegador e recarrega. Espera se houver janela aberta, trabalho não salvo ou uso no último minuto (mostra aviso com "Atualizar agora"). Carregar depois de helpers.js.
   - lerTentativaAtualizacao, gravarTentativaAtualizacao, lerVersaoPublicada, temTrabalhoAberto, paginaOcupada, esconderAvisoNovaVersao, mostrarAvisoNovaVersao, aplicarAtualizacao, tentarAtualizar, verificarVersaoSistema
-- `auth-guard.js` (377 linhas): Incluir em toda página que precisa de login (depois de supabase-config.js). Sem sessão ativa manda pra login.html antes da página aparecer; depois confere perfil (com cache), acesso à página e filial, e mostra os itens `.so-admin` para admin.
+- `auth-guard.js` (380 linhas): Incluir em toda página que precisa de login (depois de supabase-config.js). Sem sessão ativa manda pra login.html antes da página aparecer; depois confere perfil (com cache), acesso à página e filial, e mostra os itens `.so-admin` para admin.
   - existeLoginSalvo, ehAdmin, carregarPerfil, salvarPerfilCache, lerPerfilCache, buscarPerfil, temAcesso, temFilial, recursoDaPagina, nomeArquivoAtual, sairDoSistema, liberarPaginaAtual, fazerLogout
 - `busca-fretes.js` (74 linhas): TABELAS_FRETES (uma tabela por transportadora) e buscarLinhasFretes() (busca em páginas de 1000 linhas).
   - buscarLinhasFretes
@@ -189,6 +191,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `copiadas-init.js` (27 linhas): Ligações iniciais e a primeira carga. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
 - `copiadas-linhas.js` (241 linhas): Cada linha da tabela: usuário e aparelho, cliente (cidade, período, frete), equipamentos com tabela → valor final e % de desconto, total, configurações ativadas e a mensagem (ver e 📋 copiar). Nada entra como HTML.
   - moedaAdmin, descontoEquipamentoAdmin, textoEquipamentoAdmin, configuracoesAdmin, textoComplementarAdmin, textoBonificadoAdmin, textoPagamentoAdmin, prazoPagamentoAdmin, textoAparelhoAdmin, celulaUsuarioProposta, textoPeriodoAdmin, resumoClienteProposta, celulaClienteProposta, celulaEquipamentosProposta, celulaConfigProposta, celulaMensagemProposta, criarLinhaProposta
+- `dispositivo.js` (294 linhas): Trava de aparelhos, em toda página menos o login (antes do auth-guard, que chama `conferirDispositivo()` depois de liberar a página). Pergunta ao banco (`registrar_dispositivo`, com a chave do supabase-config.js e "Computador · Windows · Chrome") se o aparelho está liberado: pendente = a página fica escondida e aparece o aviso com o campo "quem é" (`nomear_dispositivo`), conferindo de novo a cada 15 s; bloqueado = sai do login. Página aberta confere a cada 2 min e ao voltar para a aba. Sem a função no banco ou sem internet segue normal: quem bloqueia os dados é o banco.
+  - esperarScriptsDaPagina, descricaoDoDispositivo, situacaoDoDispositivo, sairPorAparelhoBloqueado, elementoAvisoDispositivo, enviarNomeDispositivo, conferirDeNovoPendente, mostrarAvisoPendente, conferirDispositivo, ligarConferenciaDispositivo
 - `estoque-busca.js` (114 linhas): Barra de pesquisa: mostra só o modelo digitado, num card. (Usa compararMaquinas, escaparHtml e STATUS_COM_PREVISAO do estoque-render.js.)
   - textoBusca, modelosDaBusca, htmlCardBusca, htmlBusca
 - `estoque-config.js` (95 linhas): Status, tipos, listas fixas, filiais e estado.
@@ -273,8 +277,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - limparTextoErro, anotarErro, anotarArquivoFaltando, cssCarregou, paginaDoErro, versaoDoErro, enviarLoteErros, enviarErrosPendentes, textoDoConsole, pilhaDoConsole
 - `status.js` (200 linhas): obterCidadeSaida(), obterFreteBonificado() (a caixa Frete bonificado, embaixo do Valor frete em propostas.html: entrega, retirada ou as duas de graça; sai "Bonificado" nas mensagens e as contas usam um frete só, ou nenhum) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
   - obterCidadeSaida, obterFreteBonificado, freteEstaBonificado, fretesCobrados, gerarStatus
-- `supabase-config.js` (49 linhas): Cria o supabaseClient. Quando o banco recusa o login recém-renovado ("JWT issued at future", PGRST303), espera e repete a consulta (até 2 vezes). Precisa vir DEPOIS do <script> do supabase-js (`js/vendor/`) e ANTES de todos os outros scripts.
-  - fetchSupabase
+- `supabase-config.js` (88 linhas): Cria o supabaseClient. Sorteia e guarda a chave do aparelho (`dispositivoChave`, 64 hex) e manda em toda chamada no cabeçalho `x-dispositivo` (trava de aparelhos). Quando o banco recusa o login recém-renovado ("JWT issued at future", PGRST303), espera e repete a consulta (até 2 vezes). Precisa vir DEPOIS do <script> do supabase-js (`js/vendor/`) e ANTES de todos os outros scripts.
+  - fetchSupabase, chaveDoDispositivo
 - `tabelas-config.js` (109 linhas): Definição das tabelas editáveis (TABELAS: colunas, matriz de consulta e permissão de cada uma) e estado.
 - `tabelas-dados.js` (115 linhas): tratarValor() e carregarLinhasTabela().
   - tratarValor, carregarLinhasTabela
@@ -326,6 +330,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 | `agendamentos` | `agenda-banco.js`, `agenda-lixeira.js` (lixeira; função `mover_agendamento_lixeira`), `transp-config.js` (`transp-cad-banco.js` conta vínculos) |
 | `bucket:pedidos-compra` | `agenda-pedido-pdf.js` |
 | `bucket:docs-transportadoras` | `transp-config.js` |
+| `dispositivos` | `admin-aparelhos.js` (só o admin lê e altera); o site registra e confere pelas funções `registrar_dispositivo` e `nomear_dispositivo` (`dispositivo.js`). O SQL não fica neste repositório. |
 | `erros_site` | `admin-erros.js` (só o admin lê e apaga; a gravação é pela função `registrar_erro_site`, em `registro-erros.js`). O SQL não fica neste repositório. |
 | `frete_dionizio` | `busca-fretes.js`, `tabelas-config.js` |
 | `frete_magnus` | `busca-fretes.js`, `tabelas-config.js` |
@@ -340,6 +345,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 | `resumo_estoque` | `estoque-dados.js`, `estoque-upload.js`, `agenda-estoque-dados.js` (função `estoque_disponiveis`) |
 | `tabela_fretes` | `propostas-tabelas-fretes.js`, `tabelas-config.js` |
 | `tabela_precos` | `propostas-tabelas-precos.js`, `tabelas-config.js` |
+| `trava_dispositivos` | `admin-aparelhos.js` (uma linha: `ligada`; só o admin altera) |
 | `transportadora_docs` | `transp-config.js` |
 | `transportadoras` | `agenda-banco.js` (leitura em `agenda-transportadoras.js`), `transp-config.js` |
 | `veiculos` | `transp-config.js` |
@@ -352,6 +358,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 | Chave | Definida em |
 |---|---|
+| `dispositivoChave` | `supabase-config.js` (chave do aparelho; sair do login não apaga) |
 | `agendaModo` | `agenda-config.js` |
 | `agendaOrdem` | `agenda-config.js` |
 | `agendaTema` | `agenda-config.js` |
@@ -374,9 +381,11 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
+- **Trava de aparelhos:** com `trava_dispositivos.ligada`, quem não é admin só acessa os dados de aparelho liberado no admin. Quem confere é o banco: `dispositivo_liberado()` (cabeçalho `x-dispositivo`, guardado só como sha256) dentro de `tem_acesso()` e `tem_acesso_filial()`, e na policy de leitura da `tabela_precos`. O admin fica de fora. Aparelho de sessão aberta antes da criação da trava entra liberado. Policy nova que não use `tem_acesso` precisa chamar `dispositivo_liberado()` também.
+
 - **Segurança (CSP):** toda página tem a mesma `<meta http-equiv="Content-Security-Policy">` logo depois do charset: scripts só do próprio site (sem `<script>` com código dentro, sem onclick: use `data-clique`, ver `acoes.js`), dados só para o Supabase do projeto (https e wss) e o get.geojs.io (cidade da presença). Só o login.html libera também a Cloudflare (https://challenges.cloudflare.com, script e frame do captcha). Serviço novo de fora (API, imagem, fonte): incluir na CSP de todas as páginas, senão o navegador bloqueia. O teste-paginas confere a CSP e que ela barra código injetado; nos testes com `waitForFunction` o contexto usa `bypassCSP`.
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (359), `agenda-banco.js` (355), `agenda-form-campos.js` (354), `agenda-larguras.js` (349), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-zap.js` (326), `leads-cards.js` (325), `propostas-config.js` (322), `agenda-salvar.js` (316), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (380), `helpers.js` (359), `agenda-banco.js` (355), `agenda-form-campos.js` (354), `agenda-larguras.js` (349), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-zap.js` (326), `leads-cards.js` (325), `propostas-config.js` (322), `agenda-salvar.js` (316), `admin-aparelhos.js` (315), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - `propostas-copiadas.html` para quem não é admin (acesso "propostas-copiadas", v16.41.0): os dados só aparecem com a policy de SELECT com `tem_acesso('propostas-copiadas')` em `propostas_copiadas`. Apagar continua só com o admin.

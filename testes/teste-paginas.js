@@ -69,6 +69,8 @@ window.supabase = { createClient(){
             getSession: async () => sessao(),
             getUser: async () => ({ data: { user: sessao().data.session?.user || null }, error: null }),
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } }),
+            // login: guarda o que foi enviado e recusa (a página fica no login)
+            signInWithPassword: async (dados) => { (window.__logins = window.__logins || []).push(dados); return { data: {}, error: { status: 400, message: "Invalid login credentials" } }; },
             signOut: async () => { localStorage.setItem("__saiu", "1"); return { error: null }; }
         },
         storage: { from: () => ({}) },
@@ -91,7 +93,13 @@ const confere = (nome, ok, extra) => {
     // Todas as páginas com a mesma CSP, logo no começo do <head>; só scripts
     // do próprio site (js/...), nenhum <script> com código dentro e nenhum CDN.
     const cspDe = (html) => (html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)">/) || [])[1];
-    const cspPadrao = cspDe(fs.readFileSync(path.join(raiz, "login.html"), "utf8"));
+    const cspPadrao = cspDe(fs.readFileSync(path.join(raiz, "index.html"), "utf8"));
+
+    // login: a padrão + a Cloudflare do captcha (login-captcha.js), só nesta página
+    const CLOUDFLARE = "https://challenges.cloudflare.com";
+    const cspLogin = (cspPadrao || "")
+        .replace("script-src 'self';", `script-src 'self' ${CLOUDFLARE};`)
+        .replace("https://get.geojs.io;", `https://get.geojs.io ${CLOUDFLARE}; frame-src ${CLOUDFLARE};`);
 
     confere("CSP: só scripts do próprio site", /(^|; )script-src 'self'(;|$)/.test(cspPadrao || ""), cspPadrao);
     confere("CSP: dados só para o Supabase do projeto", /connect-src 'self' https:\/\/qhneylwmrzuesaloqetr\.supabase\.co wss:\/\/qhneylwmrzuesaloqetr\.supabase\.co https:\/\/get\.geojs\.io;/.test(cspPadrao || ""), cspPadrao);
@@ -102,7 +110,7 @@ const confere = (nome, ok, extra) => {
             (paginasDoScript[achou[1]] = paginasDoScript[achou[1]] || []).push(arquivo);
         }
         const scripts = [...html.matchAll(/<script\b([^>]*)>/g)].map(achou => achou[1]);
-        confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === cspPadrao);
+        confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === (arquivo === "login.html" ? cspLogin : cspPadrao), cspDe(html));
         confere(`${arquivo}: a CSP vem antes de qualquer script`, html.indexOf("Content-Security-Policy") < html.indexOf("<script"));
         confere(`${arquivo}: nenhum <script> com código dentro`, scripts.every(atributos => /\bsrc="/.test(atributos)));
         confere(`${arquivo}: nenhum script de fora (CDN)`, scripts.every(atributos => /\bsrc="js\//.test(atributos)), scripts.filter(atributos => !/\bsrc="js\//.test(atributos)));
@@ -260,7 +268,60 @@ const confere = (nome, ok, extra) => {
     const login = await abrir(visitante.contexto, "login.html");
     confere("login.html: abre sem erro", login.erros.length === 0, login.erros.length ? login.erros : undefined);
     confere("login.html: formulário visível", await login.pagina.locator("input").first().isVisible());
+
+    // ---------- captcha do login (login-captcha.js) ----------
+    const tentarLogin = async (pagina) => {
+        await pagina.fill("#loginEmail", "a@b.com");
+        await pagina.fill("#loginSenha", "senha");
+        await pagina.click("[data-clique='fazerLogin']");
+        await pagina.waitForTimeout(100);
+        return {
+            logins: await pagina.evaluate(() => window.__logins || []),
+            erro: await pagina.innerText("#loginErro")
+        };
+    };
+
+    // sem chave (como está no repositório): login normal, sem captcha
+    const semChave = await tentarLogin(login.pagina);
+    confere("captcha: sem chave o login vai sem token", semChave.logins.length === 1 && JSON.stringify(semChave.logins[0].options) === "{}", semChave.logins);
+    confere("captcha: senha errada avisa", semChave.erro === "E-mail ou senha inválidos", semChave.erro);
     await login.pagina.close();
+
+    // com chave: Turnstile falso que entrega um token; reset não entrega outro na hora
+    const comCaptcha = await novoContexto(null);
+    const turnstileFalso = `window.turnstile = {
+        render(alvo, opcoes){ window.__captcha = { alvo, chave: opcoes.sitekey }; setTimeout(() => opcoes.callback("token-1"), 0); return "w1"; },
+        reset(){ window.__resets = (window.__resets || 0) + 1; }
+    };`;
+    let cloudflareFora = false;
+    await comCaptcha.contexto.route("**/*", (rota) => {
+        const url = new URL(rota.request().url());
+        if(url.hostname === "challenges.cloudflare.com"){
+            return cloudflareFora ? rota.abort() : rota.fulfill({ contentType: "text/javascript", body: turnstileFalso });
+        }
+        if(url.pathname.endsWith("/login-captcha.js")){
+            const texto = fs.readFileSync(path.join(raiz, "js", "login", "login-captcha.js"), "utf8");
+            return rota.fulfill({ contentType: "text/javascript", body: texto.replace('TURNSTILE_SITE_KEY = ""', 'TURNSTILE_SITE_KEY = "chave-teste"') });
+        }
+        return rota.fallback();
+    });
+
+    const comChave = await abrir(comCaptcha.contexto, "login.html");
+    const captcha = await comChave.pagina.evaluate(() => window.__captcha);
+    confere("captcha: com chave desenha o Turnstile no login", captcha?.alvo === "#captchaLogin" && captcha?.chave === "chave-teste", captcha);
+    confere("captcha: a CSP do login deixa a Cloudflare carregar", comChave.erros.length === 0, comChave.erros.length ? comChave.erros : undefined);
+    const primeira = await tentarLogin(comChave.pagina);
+    confere("captcha: o token vai junto no login", primeira.logins[0]?.options?.captchaToken === "token-1", primeira.logins);
+    confere("captcha: depois da tentativa pede outro token", (await comChave.pagina.evaluate(() => window.__resets)) === 1);
+    const segunda = await tentarLogin(comChave.pagina);
+    confere("captcha: sem token novo não tenta o login", segunda.logins.length === 1 && /Aguarde a verificação/.test(segunda.erro), segunda.erro);
+    await comChave.pagina.close();
+
+    cloudflareFora = true;
+    const semCloudflare = await abrir(comCaptcha.contexto, "login.html");
+    const bloqueado = await tentarLogin(semCloudflare.pagina);
+    confere("captcha: Cloudflare bloqueada avisa (não tenta o login)", bloqueado.logins.length === 0 && /não carregou/.test(bloqueado.erro), bloqueado.erro);
+    await comCaptcha.contexto.close();
 
     for(const arquivo of Object.keys(PAGINAS)){
 

@@ -66,7 +66,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **login.html** — Login
 - CSS: style
-- JS: acoes → supabase-config → login
+- JS: acoes → supabase-config → login-captcha → login
 
 **propostas-copiadas.html** — Propostas Zap copiadas (link 📊 Propostas Zap): cada "Copiar Proposta Zap" com quem fez, aparelho, cliente, equipamentos com desconto, total e a mensagem; filtros em cima (inclusive prazo de pagamento), filtro estilo Excel nos títulos da tabela (clicar no título abre as caixinhas) e desconto médio por usuário. Acesso "propostas-copiadas" no Admin (os dados vêm pela policy de SELECT com `tem_acesso('propostas-copiadas')`). Usa o admin.css (card largo e tabelas) mais o propostas-copiadas.css, e a largura toda da tela.
 - CSS: style → admin → propostas-copiadas
@@ -225,8 +225,10 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - atualizarContadoresLeads, desenharLeads
 - `leads-utils.js` (53 linhas): Rótulos de status e porte, nome a partir do e-mail e mensagem de erro.
   - rotuloStatusLead, rotuloPorteLead, nomeDoEmail, mensagemErroLeads
-- `login.js` (91 linhas): Tela de login: com sessão vai direto para as propostas; senão entra com e-mail e senha do Supabase (Enter no campo de senha também entra). Fica em arquivo, não dentro do HTML, por causa da CSP.
-  - $, fazerLogin
+- `login-captcha.js` (98 linhas): Captcha do login (Cloudflare Turnstile, quase sempre invisível): carrega o script da Cloudflare, guarda o token (vale uma tentativa; renovarCaptcha pede outro) e avisa se não carregou. `TURNSTILE_SITE_KEY` vazia = sem captcha. Para ligar: 1) publicar com a chave do site; 2) ligar no Supabase (Authentication → Attack Protection → Captcha, com a chave secreta). Ligar no Supabase antes trava o login.
+  - captchaAtivo, desenharCaptcha, carregarCaptcha, renovarCaptcha, avisoCaptcha, opcoesCaptcha
+- `login.js` (121 linhas): Tela de login: com sessão vai direto para as propostas; senão entra com e-mail e senha do Supabase (Enter no campo de senha também entra), com o token do captcha (login-captcha.js). Avisa quando o Supabase bloqueia por excesso de tentativas (429). Fica em arquivo, não dentro do HTML, por causa da CSP.
+  - $, textoErroLogin, fazerLogin
 - `menu.js` (147 linhas): Links entre as páginas, montados aqui, num lugar só (PAGINAS_MENU). Em cada página aparecem todos, menos o dela mesma; `soAdmin` esconde o link até confirmar que é admin (admin.html); `comAcesso` esconde até confirmar o acesso da página no perfil (transportadoras.html, leads.html, propostas-copiadas.html). Também mede a altura da topbar (fixa, quebra em mais linhas) e guarda em `--altura-topbar`, que o `.container` (style.css) usa para começar abaixo dela.
 - `presenca.js` (327 linhas): Em toda página menos o login: informa pelo canal de presença do Supabase em qual página a pessoa está e se está usando, parada (2 min sem mexer) ou com a aba em segundo plano. Vai o id, a página, o estado, o aparelho (pelo navegador; no Android o modelo vem do Chrome) e a cidade aproximada pelo IP (get.geojs.io, guardada 6 h no navegador); não grava nada no banco. Também tem o texto do aparelho para as telas do admin (TEXTO_TIPO_APARELHO, textoAparelhoOnline). Carregar depois de helpers.js e auth-guard.js.
   - calcularEstadoPresenca, enviarPresenca, navegadorDoTexto, aparelhoAndroid, descreverAparelho, textoAparelhoOnline, modeloDoAndroid, cidadeDoIP, reenviarComAparelho, identificarAparelho, iniciarPresenca
@@ -372,7 +374,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 ## Atenções
 
-- **Segurança (CSP):** toda página tem a mesma `<meta http-equiv="Content-Security-Policy">` logo depois do charset: scripts só do próprio site (sem `<script>` com código dentro, sem onclick: use `data-clique`, ver `acoes.js`), dados só para o Supabase do projeto (https e wss) e o get.geojs.io (cidade da presença). Serviço novo de fora (API, imagem, fonte): incluir na CSP de todas as páginas, senão o navegador bloqueia. O teste-paginas confere a CSP e que ela barra código injetado; nos testes com `waitForFunction` o contexto usa `bypassCSP`.
+- **Segurança (CSP):** toda página tem a mesma `<meta http-equiv="Content-Security-Policy">` logo depois do charset: scripts só do próprio site (sem `<script>` com código dentro, sem onclick: use `data-clique`, ver `acoes.js`), dados só para o Supabase do projeto (https e wss) e o get.geojs.io (cidade da presença). Só o login.html libera também a Cloudflare (https://challenges.cloudflare.com, script e frame do captcha). Serviço novo de fora (API, imagem, fonte): incluir na CSP de todas as páginas, senão o navegador bloqueia. O teste-paginas confere a CSP e que ela barra código injetado; nos testes com `waitForFunction` o contexto usa `bypassCSP`.
 
 - Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `estoque-parser.js` (385), `transp-render.js` (381), `auth-guard.js` (377), `helpers.js` (359), `agenda-banco.js` (355), `agenda-form-campos.js` (354), `agenda-larguras.js` (349), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-zap.js` (326), `leads-cards.js` (325), `propostas-config.js` (322), `agenda-salvar.js` (316), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.

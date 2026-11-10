@@ -30,6 +30,23 @@ const $ = (id) => document.getElementById(id);
 // LOGIN
 // ======================================
 
+// muitas tentativas: o Supabase bloqueia o IP por um tempo (Authentication -> Rate Limits)
+function textoErroLogin(error){
+
+    if(error.status === 429){
+
+        return "Muitas tentativas de login. Espere alguns minutos e tente de novo.";
+    }
+
+    if(/captcha/i.test(error.message || "")){
+
+        return "A verificação de segurança falhou. Tente de novo.";
+    }
+
+    return "E-mail ou senha inválidos";
+}
+
+
 async function fazerLogin(){
 
     const email =
@@ -51,16 +68,29 @@ async function fazerLogin(){
         return;
     }
 
+    // captcha (login-captcha.js): sem o token o Supabase recusa
+    const aviso = avisoCaptcha();
+
+    if(aviso){
+
+        erroEl.innerText = aviso;
+
+        return;
+    }
+
     const { error } =
         await supabaseClient.auth.signInWithPassword({
             email: email,
-            password: senha
+            password: senha,
+            options: opcoesCaptcha()
         });
 
     if(error){
 
-        erroEl.innerText =
-            "E-mail ou senha inválidos";
+        // o token vale uma tentativa só
+        renovarCaptcha();
+
+        erroEl.innerText = textoErroLogin(error);
 
         return;
     }

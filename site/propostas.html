@@ -417,6 +417,8 @@ MODAL DE CONFIGURAÇÕES
                 <option value="">Pagamento: texto padrão</option>
                 <option value="Boleto">Pagamento: Boleto</option>
                 <option value="Depósito">Pagamento: Depósito</option>
+                <!-- o padrão de todo mundo (o que está salvo de antes passa para ele uma vez: propostas-cache.js) -->
+                <option value="Cliente novo" selected>Pagamento: Cliente novo (prazo pela regra)</option>
             </select>
 
             <input
@@ -430,6 +432,9 @@ MODAL DE CONFIGURAÇÕES
             >
 
         </div>
+
+        <!-- cliente novo: o prazo que a regra deu (propostas-pagamento.js) -->
+        <p class="dica dica-cliente-novo" id="dicaClienteNovo" style="display:none"></p>
 
         <p class="dica">Forma de pagamento e prazo em dias na Proposta Zap. Mais de um vencimento: 28/56.</p>
 

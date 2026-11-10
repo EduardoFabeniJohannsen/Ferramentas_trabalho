@@ -299,6 +299,9 @@ function abrirConfiguracoes(){
 
     const modal = $("modalConfig");
 
+    // cliente novo: o prazo segue o período, que pode ter mudado (propostas-pagamento.js)
+    atualizarCampoPrazo();
+
     if(modal) modal.classList.add("aberto");
 }
 

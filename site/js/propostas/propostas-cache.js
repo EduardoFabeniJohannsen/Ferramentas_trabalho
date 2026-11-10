@@ -59,6 +59,8 @@ function salvarCache(){
         freteBonificado: obterFreteBonificado(),
         formaPagamento: $("formaPagamento")?.value || "",
         prazoPagamento: $("prazoPagamento")?.value || "",
+        // a forma salva já é desta versão em diante (ver restaurarCache)
+        pagamentoClienteNovoPadrao: true,
         locacaoComplementarAtiva: locacaoComplementarAtiva,
         bitributacaoAtiva: bitributacaoAtiva,
         valorDiariaAtivo: valorDiariaAtivo,
@@ -93,7 +95,13 @@ function restaurarCache(){
                 : "";
     }
 
-    $("formaPagamento").value = dados.formaPagamento || "";
+    // Cliente novo virou o padrão de todo mundo (v16.52.0): o que foi salvo
+    // antes (sem a marca) passa uma vez para ele; dali em diante vale a escolha
+    // de cada um. O prazo digitado fica guardado para quando voltar ao Boleto.
+    $("formaPagamento").value =
+        dados.pagamentoClienteNovoPadrao === true
+            ? (dados.formaPagamento || "")
+            : FORMA_CLIENTE_NOVO;
 
     $("prazoPagamento").value = dados.prazoPagamento || "";
 

@@ -34,6 +34,9 @@
 
     restaurarCache();
 
+    // sem nada salvo, a forma é a do HTML (Cliente novo): mostra a dica do prazo
+    atualizarCampoPrazo();
+
 
     // ==================================
     // VEIO DA PÁGINA DE LEADS

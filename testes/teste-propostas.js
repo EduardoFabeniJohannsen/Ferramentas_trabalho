@@ -114,6 +114,7 @@ const confere = (nome, ok, extra) => {
     await abrirConfig();
     confere("está nas Configurações", await pagina.locator("#modalConfig #formaPagamento").isVisible());
     confere("prazo escondido de início", !(await pagina.isVisible("#prazoPagamento")));
+    confere("aparelho novo começa no Cliente novo, com a dica da regra", (await pagina.inputValue("#formaPagamento")) === "Cliente novo" && await pagina.isVisible("#dicaClienteNovo"), await pagina.inputValue("#formaPagamento"));
     await pagina.screenshot({ path: path.join(saida, "21-config-padrao.png") });
     await fecharConfig();
     await preencher();
@@ -140,7 +141,8 @@ const confere = (nome, ok, extra) => {
     confere("390px: textos, desconto, resumo e fretes um embaixo do outro", layout.celular, layout);
     await pagina.setViewportSize({ width: 1400, height: 900 });
 
-    // ---------- padrão não muda ----------
+    // ---------- texto padrão (sem forma) não muda ----------
+    await escolher("");
     let l = linhaPagamento(await mensagem());
     confere("padrão com emojis igual a antes", l.endsWith("Forma de pagamento: Mediante aprovação cadastral."), l);
     await pagina.evaluate(() => { emojisAtivo = false; });
@@ -202,6 +204,52 @@ const confere = (nome, ok, extra) => {
     await preencher();
     l = linhaPagamento(await mensagem());
     confere("padrão ignora o prazo escondido", l.endsWith("Forma de pagamento: Mediante aprovação cadastral."), l);
+
+    // ---------- cliente novo (regra do financeiro: prazo pelo tamanho da locação) ----------
+    await escolher("Cliente novo");
+    confere("cliente novo: sem o campo de prazo, com o prazo da regra na dica", !(await pagina.isVisible("#prazoPagamento")) && (await pagina.innerText("#dicaClienteNovo")).startsWith("Prazo de 28 dias (locação de 28 dias). Na mensagem sai como Boleto."), await pagina.innerText("#dicaClienteNovo"));
+    await pagina.screenshot({ path: path.join(saida, "21-config-cliente-novo.png") });
+    l = linhaPagamento(await mensagem());
+    confere("cliente novo sai como boleto, com o prazo da regra", l.endsWith("Forma de pagamento: Boleto com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 28 dias."), l);
+    const prazosRegra = [];
+    for(const [dias, periodos] of [["1", ""], ["7", ""], ["8", ""], ["15", ""], ["16", ""], ["21", ""], ["22", ""], ["30", ""], ["60", ""], ["28", "3"], ["7", "2"]]){
+        await pagina.fill("#periodo", dias);
+        await pagina.fill("#periodos", periodos);
+        prazosRegra.push(await pagina.evaluate(() => prazoPagamentoTexto()));
+    }
+    confere("cliente novo: até 7 dias = 6, até 15 = 14, até 21 = 20, até 30 e acima = 28 (conta os períodos)", prazosRegra.join() === "6,6,14,14,20,20,28,28,28,28,14", prazosRegra);
+    await pagina.fill("#periodo", "15");
+    await pagina.fill("#periodos", "");
+    l = linhaPagamento(await mensagem());
+    confere("cliente novo: locação de 15 dias = prazo de 14 na mensagem", l.endsWith("prazo de 14 dias."), l);
+    await abrirConfig();
+    confere("abrir o ⚙️ atualiza a dica com o período novo", (await pagina.innerText("#dicaClienteNovo")).startsWith("Prazo de 14 dias (locação de 15 dias)."), await pagina.innerText("#dicaClienteNovo"));
+    await pagina.fill("#periodo", "");
+    confere("cliente novo sem período: sem prazo", (await pagina.evaluate(() => prazoPagamentoTexto())) === "");
+    await pagina.fill("#periodo", "28");
+    await escolher("Boleto");
+    confere("voltar ao boleto: o prazo digitado continua", (await pagina.inputValue("#prazoPagamento")) === "30" && await pagina.isVisible("#prazoPagamento") && !(await pagina.isVisible("#dicaClienteNovo")));
+    await escolher("");
+
+    // ---------- Cliente novo virou o padrão: o salvo de antes passa uma vez ----------
+    await pagina.waitForTimeout(100);
+    await pagina.evaluate(() => {
+        const salvo = JSON.parse(localStorage.getItem("propostaCache"));
+        salvo.formaPagamento = "Depósito";
+        salvo.prazoPagamento = "45";
+        delete salvo.pagamentoClienteNovoPadrao;
+        localStorage.setItem("propostaCache", JSON.stringify(salvo));
+    });
+    await abrir();
+    confere("escolha salva antes desta versão passa uma vez para Cliente novo, guardando o prazo", (await pagina.inputValue("#formaPagamento")) === "Cliente novo" && (await pagina.inputValue("#prazoPagamento")) === "45", [await pagina.inputValue("#formaPagamento"), await pagina.inputValue("#prazoPagamento")]);
+    await escolher("Depósito");
+    await pagina.waitForTimeout(100);
+    await abrir();
+    confere("depois disso vale a escolha de cada um", (await pagina.inputValue("#formaPagamento")) === "Depósito" && (await pagina.inputValue("#prazoPagamento")) === "45");
+    await escolher("");
+    await pagina.waitForTimeout(100);
+    await abrir();
+    confere("o texto padrão escolhido depois também fica", (await pagina.inputValue("#formaPagamento")) === "");
 
     // ---------- registro para o admin ----------
     await pagina.evaluate(() => {

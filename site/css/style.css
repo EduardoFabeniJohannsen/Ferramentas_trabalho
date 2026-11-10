@@ -785,42 +785,16 @@ A página fica escondida (visibility:hidden no <html>) e só este aviso aparece.
     background:#0f172a;
 }
 .aviso-dispositivo-card{
-    width:100%;
-    max-width:440px;
-    padding:20px 22px;
+    padding:24px 28px;
     background:#1e293b;
     color:#e2e8f0;
     border:1px solid #334155;
     border-radius:12px;
-    text-align:left;
+    text-align:center;
 }
 .aviso-dispositivo-card h2{
-    margin:0 0 10px;
+    margin:0 0 14px;
     font-size:20px;
-}
-.aviso-dispositivo-card p{
-    margin:0 0 10px;
-    font-size:14px;
-    line-height:1.5;
-    color:#cbd5e1;
-}
-.aviso-dispositivo-linha{
-    display:flex;
-    gap:8px;
-    align-items:center;
-}
-.aviso-dispositivo-linha input{
-    flex:1;
-    min-width:0;
-    margin:0;
-}
-.aviso-dispositivo-linha button{
-    margin:0;
-}
-.aviso-dispositivo-card .aviso-dispositivo-status{
-    min-height:20px;
-    margin:8px 0;
-    color:#93c5fd;
 }
 .aviso-dispositivo .btn-sair-dispositivo{
     background:#475569;

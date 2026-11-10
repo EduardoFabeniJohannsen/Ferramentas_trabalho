@@ -147,7 +147,7 @@ function linhaAparelho(aparelho){
         acoes.appendChild(botaoAparelho("Desconectar", "Tirar este aparelho do sistema agora", () => mudarSituacaoAparelho(aparelho, "bloqueado"), "btn-desconectar-aparelho"));
     }
 
-    acoes.appendChild(botaoAparelho("✏️", "Trocar o nome (quem é / onde)", () => renomearAparelho(aparelho)));
+    acoes.appendChild(botaoAparelho("✏️", "Dar um nome (só o admin vê)", () => renomearAparelho(aparelho)));
 
     acoes.appendChild(botaoAparelho("🗑️", "Excluir da lista (se voltar, vira um pedido novo)", () => excluirAparelho(aparelho)));
 
@@ -243,7 +243,7 @@ async function mudarSituacaoAparelho(aparelho, situacao){
 
 async function renomearAparelho(aparelho){
 
-    const nome = window.prompt("Quem é / onde está este aparelho:", aparelho.nome || "");
+    const nome = window.prompt("Nome deste aparelho (só você vê):", aparelho.nome || "");
 
     if(nome === null) return;
 

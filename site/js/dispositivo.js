@@ -6,7 +6,7 @@
 // responde se este aparelho (a chave de supabase-config.js) está liberado:
 // - liberado: segue normal (o admin sempre);
 // - pendente: aparelho novo esperando o admin. A página fica escondida, aparece
-//   o aviso com o campo "quem é" e confere de novo sozinho a cada 15 s;
+//   só "Aguardando liberação" (e o Sair) e confere de novo sozinho a cada 15 s;
 // - bloqueado: o admin desconectou este aparelho: sai do login.
 // Quem protege de verdade é o banco (tem_acesso confere o aparelho); esta tela
 // só explica o que está acontecendo. Sem a função no banco ou sem internet,
@@ -92,133 +92,44 @@ async function sairPorAparelhoBloqueado(){
 // ======================================
 // AVISO: AGUARDANDO LIBERAÇÃO
 // ======================================
+// Só o aviso e o "Sair" (para entrar com outro login). Não pede nada à pessoa:
+// o admin vê o aparelho na lista e, se quiser, dá um nome pelo ✏️.
 
-function elementoAvisoDispositivo(tag, classe, texto){
-
-    const elemento = document.createElement(tag);
-
-    if(classe) elemento.className = classe;
-
-    if(texto) elemento.textContent = texto;
-
-    return elemento;
-}
-
-
-async function enviarNomeDispositivo(campo, status){
-
-    const nome = campo.value.trim();
-
-    if(!nome){
-
-        status.textContent = "Escreva quem está usando e onde.";
-
-        return;
-    }
-
-    const { error } =
-        await supabaseClient.rpc("nomear_dispositivo", {
-            p_chave: CHAVE_DISPOSITIVO,
-            p_nome: nome
-        });
-
-    status.textContent =
-        error
-            ? "Não deu para enviar. Tente de novo."
-            : "Enviado. Avise o administrador para liberar este aparelho.";
-}
-
-
-async function conferirDeNovoPendente(status){
-
-    status.textContent = "Conferindo...";
-
-    const situacao = await situacaoDoDispositivo();
-
-    if(situacao === "liberado") return window.location.reload();
-
-    if(situacao === "bloqueado") return sairPorAparelhoBloqueado();
-
-    status.textContent = "Ainda não foi liberado.";
-}
-
-
-function mostrarAvisoPendente(email){
+function mostrarAvisoPendente(){
 
     if(document.getElementById("avisoDispositivo")) return;
 
-    const fundo = elementoAvisoDispositivo("div", "aviso-dispositivo");
+    const fundo = document.createElement("div");
 
     fundo.id = "avisoDispositivo";
 
-    const card = elementoAvisoDispositivo("div", "aviso-dispositivo-card");
+    fundo.className = "aviso-dispositivo";
 
-    card.appendChild(elementoAvisoDispositivo("h2", "", "🔒 Aparelho aguardando liberação"));
+    const card = document.createElement("div");
 
-    card.appendChild(elementoAvisoDispositivo(
-        "p", "",
-        `O login ${email || ""} só entra por aparelhos liberados pelo administrador. ` +
-        "O pedido deste aparelho já foi enviado para ele."
-    ));
+    card.className = "aviso-dispositivo-card";
 
-    card.appendChild(elementoAvisoDispositivo("p", "", "Para ele saber quem é, diga quem está usando e onde:"));
+    const titulo = document.createElement("h2");
 
-    const linha = elementoAvisoDispositivo("div", "aviso-dispositivo-linha");
+    titulo.textContent = "🔒 Aguardando liberação";
 
-    const campo = elementoAvisoDispositivo("input");
-
-    campo.id = "nomeDispositivo";
-
-    campo.type = "text";
-
-    campo.maxLength = 80;
-
-    campo.placeholder = "Ex.: Maria - PC da recepção de Itajaí";
-
-    const enviar = elementoAvisoDispositivo("button", "", "Enviar");
-
-    enviar.type = "button";
-
-    linha.append(campo, enviar);
-
-    card.appendChild(linha);
-
-    const status = elementoAvisoDispositivo("p", "aviso-dispositivo-status");
-
-    status.id = "statusDispositivo";
-
-    card.appendChild(status);
-
-    const botoes = elementoAvisoDispositivo("div", "aviso-dispositivo-linha");
-
-    const deNovo = elementoAvisoDispositivo("button", "", "Já liberaram? Conferir");
-
-    deNovo.type = "button";
-
-    const sair = elementoAvisoDispositivo("button", "btn-sair-dispositivo", "Sair");
+    const sair = document.createElement("button");
 
     sair.type = "button";
 
-    botoes.append(deNovo, sair);
+    sair.className = "btn-sair-dispositivo";
 
-    card.appendChild(botoes);
-
-    fundo.appendChild(card);
-
-    enviar.addEventListener("click", () => enviarNomeDispositivo(campo, status));
-
-    campo.addEventListener("keydown", evento => {
-
-        if(evento.key === "Enter") enviarNomeDispositivo(campo, status);
-    });
-
-    deNovo.addEventListener("click", () => conferirDeNovoPendente(status));
+    sair.textContent = "Sair";
 
     sair.addEventListener("click", fazerLogout);
 
+    card.append(titulo, sair);
+
+    fundo.appendChild(card);
+
     document.body.appendChild(fundo);
 
-    // a página continua escondida embaixo; só o aviso aparece
+    // a página continua escondida embaixo; quando o admin liberar, ela abre sozinha
     setInterval(async () => {
 
         const situacao = await situacaoDoDispositivo();
@@ -254,15 +165,7 @@ async function conferirDispositivo(){
         return false;
     }
 
-    let email = "";
-
-    try{
-
-        email = (await supabaseClient.auth.getSession()).data?.session?.user?.email || "";
-
-    }catch(erro){}
-
-    mostrarAvisoPendente(email);
+    mostrarAvisoPendente();
 
     return false;
 }

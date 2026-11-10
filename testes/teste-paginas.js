@@ -447,17 +447,16 @@ const confere = (nome, ok, extra) => {
     }
 
     {
-        // pendente: só o aviso aparece; dá para dizer quem é
+        // pendente: só "Aguardando liberação" e o Sair (não pede nada à pessoa)
         const pendente = await novoContexto({ acessos: ["propostas"], dispositivo: "pendente" });
         const { pagina, erros } = await abrir(pendente.contexto, "propostas.html");
         confere("aparelho pendente: mostra o aviso", await pagina.locator("#avisoDispositivo").isVisible(), erros.length ? erros : undefined);
         confere("aparelho pendente: a página fica escondida", (await pagina.evaluate(() => document.documentElement.style.visibility)) === "hidden" && !(await pagina.locator(".topbar").isVisible()));
-        await pagina.fill("#nomeDispositivo", "Maria - recepção");
-        await pagina.click("#avisoDispositivo button:has-text('Enviar')");
-        await pagina.waitForTimeout(100);
-        const nomeou = await pagina.evaluate(() => (window.__rpcs || []).find(([nome]) => nome === "nomear_dispositivo"));
-        confere("aparelho pendente: envia quem é", nomeou?.[1]?.p_nome === "Maria - recepção" && /^[0-9a-f]{64}$/.test(nomeou?.[1]?.p_chave || ""), nomeou);
-        confere("aparelho pendente: confirma o envio", /Enviado/.test(await pagina.innerText("#statusDispositivo")));
+        const aviso = (await pagina.innerText("#avisoDispositivo")).replace(/\s+/g, " ").trim();
+        confere("aparelho pendente: só 'Aguardando liberação' e Sair", aviso === "🔒 Aguardando liberação Sair" && (await pagina.locator("#avisoDispositivo input").count()) === 0, aviso);
+        await pagina.click("#avisoDispositivo button:has-text('Sair')");
+        await pagina.waitForURL("**/login.html", { timeout: 5000 }).catch(() => {});
+        confere("aparelho pendente: Sair vai para o login", pagina.url().endsWith("/login.html"), pagina.url());
         await pendente.contexto.close();
     }
 

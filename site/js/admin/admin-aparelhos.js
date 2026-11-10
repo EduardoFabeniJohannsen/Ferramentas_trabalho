@@ -35,6 +35,12 @@ function mensagemFalhaAparelhos(erro){
         return "A trava de aparelhos ainda não existe no banco: rode o SQL no Supabase.";
     }
 
+    // coluna que falta (cidade, ip): SQL antigo da trava
+    if(codigo === "42703"){
+
+        return "Rode de novo o SQL mais recente da trava de aparelhos no Supabase.";
+    }
+
     return "Não foi possível carregar os aparelhos (verifique a conexão).";
 }
 
@@ -50,7 +56,7 @@ async function carregarAparelhos(){
         const [aparelhos, trava] = await Promise.all([
             supabaseClient
                 .from(TABELA_DISPOSITIVOS)
-                .select("id, usuario, situacao, aparelho, nome, criado_em, liberado_em, ultimo_acesso")
+                .select("id, usuario, situacao, aparelho, nome, cidade, ip, criado_em, liberado_em, ultimo_acesso")
                 .order("ultimo_acesso", { ascending: false }),
             supabaseClient
                 .from(TABELA_TRAVA_DISPOSITIVOS)
@@ -87,6 +93,18 @@ function emailDoAparelho(aparelho){
     const perfil = perfisAdmin.find(item => item.id === aparelho.usuario);
 
     return perfil ? perfil.email : "(usuário removido)";
+}
+
+
+// "Itajaí/Santa Catarina" e embaixo "IP 189.4.5.6" (de onde acessou por último).
+// A cidade vem pelo IP: é aproximada (internet de celular e VPN mostram outra).
+function celulaLocalAparelho(aparelho){
+
+    const celula = criar("td", "col-local-aparelho", aparelho.cidade || "—");
+
+    if(aparelho.ip) celula.appendChild(criar("span", "ip-aparelho", `IP ${aparelho.ip}`));
+
+    return celula;
 }
 
 
@@ -128,6 +146,8 @@ function linhaAparelho(aparelho){
     linha.appendChild(criar("td", "col-nome-aparelho", aparelho.nome || "—"));
 
     linha.appendChild(criar("td", "", aparelho.aparelho || "—"));
+
+    linha.appendChild(celulaLocalAparelho(aparelho));
 
     linha.appendChild(criar("td", "", ROTULOS_SITUACAO_APARELHO[aparelho.situacao] || aparelho.situacao));
 
@@ -179,7 +199,7 @@ function desenharAparelhos(){
 
         const celula = criar("td", "", falhaAparelhos);
 
-        celula.colSpan = 7;
+        celula.colSpan = 8;
 
         linha.appendChild(celula);
 

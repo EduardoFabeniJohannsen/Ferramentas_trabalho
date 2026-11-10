@@ -441,7 +441,7 @@ const confere = (nome, ok, extra) => {
         const registro = await pagina.evaluate(() => (window.__rpcs || []).find(([nome]) => nome === "registrar_dispositivo"));
         confere("aparelho: a chave vai no cabeçalho x-dispositivo", /^[0-9a-f]{64}$/.test(primeira || ""), primeira);
         confere("aparelho: a chave é a mesma depois de recarregar", primeira === (await chave()));
-        confere("aparelho: confere no banco com a chave e o aparelho", registro?.[1]?.p_chave === primeira && /Computador/.test(registro?.[1]?.p_aparelho || ""), registro);
+        confere("aparelho: confere no banco com a chave e o aparelho", registro?.[1]?.p_chave === primeira && /Computador/.test(registro?.[1]?.p_aparelho || "") && typeof registro?.[1]?.p_cidade === "string", registro);
         confere("aparelho liberado: página normal", erros.length === 0 && (await pagina.evaluate(() => document.documentElement.style.visibility)) === "" && (await pagina.locator("#avisoDispositivo").count()) === 0);
         await liberado.contexto.close();
     }
@@ -478,7 +478,7 @@ const confere = (nome, ok, extra) => {
             perfis: [{ id: "u2", email: "filial@empresa.com", acessos: ["propostas"], filiais: [], ativo: true }],
             dispositivos: [
                 { id: 1, usuario: "u2", situacao: "liberado", aparelho: "Computador · Windows · Chrome", nome: "PC 1", criado_em: "2026-11-01T10:00:00Z", ultimo_acesso: "2026-11-10T10:00:00Z" },
-                { id: 2, usuario: "u2", situacao: "pendente", aparelho: "Celular · iPhone · Safari", nome: "<b>Maria</b>", criado_em: "2026-11-10T11:00:00Z", ultimo_acesso: "2026-11-10T11:00:00Z" }
+                { id: 2, usuario: "u2", situacao: "pendente", aparelho: "Celular · iPhone · Safari", nome: "<b>Maria</b>", cidade: "Itajaí/Santa Catarina", ip: "189.4.5.6", criado_em: "2026-11-10T11:00:00Z", ultimo_acesso: "2026-11-10T11:00:00Z" }
             ],
             trava_dispositivos: { ligada: false }
         };
@@ -488,6 +488,7 @@ const confere = (nome, ok, extra) => {
         const linhas = await pagina.$$eval("#corpoAparelhos tr", l => l.map(t => t.innerText));
         confere("admin aparelhos: abre sem erro", erros.length === 0, erros.length ? erros : undefined);
         confere("admin aparelhos: aguardando vem primeiro, com o e-mail", /filial@empresa\.com/.test(linhas[0]) && /Aguardando/.test(linhas[0]) && /Liberado/.test(linhas[1]), linhas);
+        confere("admin aparelhos: mostra a cidade e o IP de onde acessou", linhas[0].includes("Itajaí/Santa Catarina") && linhas[0].includes("IP 189.4.5.6"), linhas[0]);
         confere("admin aparelhos: nome entra como texto (não HTML)", (await pagina.locator("#corpoAparelhos b").count()) === 0 && linhas[0].includes("<b>Maria</b>"));
         confere("admin aparelhos: título conta quem aguarda", (await pagina.innerText("#tituloAparelhos")) === "Aparelhos (1 aguardando)");
         confere("admin aparelhos: botão da trava desligada", /desligada/.test(await pagina.innerText("#btnTrava")));

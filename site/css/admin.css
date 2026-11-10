@@ -250,3 +250,11 @@
 #btnTrava.ativo{
     background:#16a34a;
 }
+.tabela-aparelhos td.col-local-aparelho{
+    text-align:left;
+}
+.tabela-aparelhos .ip-aparelho{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+}

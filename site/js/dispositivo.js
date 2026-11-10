@@ -50,6 +50,33 @@ function descricaoDoDispositivo(){
 }
 
 
+// a cidade só espera um pouco: sem resposta, o aparelho vai sem ela
+const ESPERA_CIDADE_DISPOSITIVO_MS = 2000;
+
+
+// "Itajaí/Santa Catarina" pelo IP (cidadeDoIP do presenca.js, guardada por 6 h).
+// O admin vê antes de liberar; o IP o banco grava sozinho.
+async function cidadeDoDispositivo(){
+
+    if(typeof cidadeDoIP !== "function") return "";
+
+    try{
+
+        const cidade =
+            await Promise.race([
+                cidadeDoIP(),
+                new Promise(pronto => setTimeout(() => pronto(""), ESPERA_CIDADE_DISPOSITIVO_MS))
+            ]);
+
+        return String(cidade || "");
+
+    }catch(erro){
+
+        return "";
+    }
+}
+
+
 // 'liberado', 'pendente' ou 'bloqueado'; erro (função não existe, sem rede): 'liberado'
 async function situacaoDoDispositivo(){
 
@@ -60,7 +87,8 @@ async function situacaoDoDispositivo(){
         const { data, error } =
             await supabaseClient.rpc("registrar_dispositivo", {
                 p_chave: CHAVE_DISPOSITIVO,
-                p_aparelho: descricaoDoDispositivo()
+                p_aparelho: descricaoDoDispositivo(),
+                p_cidade: await cidadeDoDispositivo()
             });
 
         if(error){

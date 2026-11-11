@@ -172,10 +172,7 @@ Magnus Guinchos:
 47 9754-0321
 
 RR Guinchos:
-47 9180-5385
-
-JGR Guinchos:
-47 9720-5094`,
+47 9180-5385`,
 
 
         // o valor do frete já está no item, então vai só a rota

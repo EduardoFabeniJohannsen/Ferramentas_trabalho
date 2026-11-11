@@ -46,6 +46,10 @@
         console.error("[auth] Erro ao verificar sessão:", erro);
     }
 
+    // A situação do aparelho (dispositivo.js) já vai sendo pedida ao banco
+    // enquanto o perfil carrega: a página não espera uma consulta depois da outra
+    const situacaoAparelho = situacaoDoDispositivo();
+
     // Admin vê os itens marcados com class="so-admin"
     // (começam escondidos com display:none no HTML)
     if(await ehAdmin()){
@@ -62,7 +66,7 @@
     if(!(await liberarPaginaAtual())) return;
 
     // aparelho ainda não liberado pelo admin: fica só o aviso (dispositivo.js)
-    if(!(await conferirDispositivo())) return;
+    if(!(await conferirDispositivo(situacaoAparelho))) return;
 
     document.documentElement.style.visibility = "";
 

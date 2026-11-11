@@ -382,7 +382,7 @@ const confere = (nome, ok, extra) => {
     await pagina.waitForTimeout(100);
     await modo("transportador");
     const visivelAgora = (sel) => pagina.isVisible(sel);
-    for(const sel of ["#btnDatas", "#btnStatus", "#btnSemPatrimonio", "#ordemAgenda", "#filtroTipo", "#btnBotoes", "#chipsTransportadora"]){
+    for(const sel of ["#btnDatas", "#btnStatus", "#btnSemPatrimonio", "#btnSemCard", "#ordemAgenda", "#filtroTipo", "#btnBotoes", "#chipsTransportadora"]){
         confere(`${sel} escondido com o painel fechado`, !(await visivelAgora(sel)));
     }
     for(const sel of ["#btnFiltros", "#buscaAgenda", "#btnTema"]){
@@ -451,6 +451,23 @@ const confere = (nome, ok, extra) => {
     confere("limpar zera tudo", (await pagina.innerText("#btnFiltros")).trim() === "⚙️ Filtros ▾" && !(await visivelAgora("#btnLimparFiltros")));
     confere("limpar mostra tudo de novo", (await pagina.innerText("#contagemAgenda")).startsWith("5 "), await pagina.innerText("#contagemAgenda"));
     confere("limpar solta os selects", (await pagina.$eval("#filtroTipo", e => e.value)) === "");
+
+    // só sem card: frete por nossa conta (ou dividido) com o card vazio
+    await pagina.click("#btnFiltros");
+    await pagina.click("#btnSemCard");
+    confere("sem card mantém o painel aberto", await visivelAgora("#painelFiltros"));
+    confere("sem card filtra (o Cliente Um já tem card)", (await pagina.innerText("#contagemAgenda")).startsWith("4 ") && (await linhaDe("Cliente Um").count()) === 0 && (await linhaDe("Cliente Dois").count()) === 1, await pagina.innerText("#contagemAgenda"));
+    confere("sem card aparece no aviso", (await pagina.innerText("#resumoFiltros")).includes("só sem card") && (await pagina.innerText("#btnFiltros")).includes("1 ativo"), await pagina.innerText("#resumoFiltros"));
+    const regraCard = await pagina.evaluate(() => [
+        itemSemCard({ freteConta: "nossa", card: "" }),
+        itemSemCard({ freteConta: "dividido", card: "  " }),
+        itemSemCard({ freteConta: "cliente", card: "" }),
+        itemSemCard({ freteConta: "nossa", card: "CARD-9" })
+    ]);
+    confere("sem card: só frete por nossa conta ou dividido, com o card vazio", JSON.stringify(regraCard) === "[true,true,false,false]", regraCard);
+    await pagina.mouse.click(5, 5);
+    await pagina.click("#btnLimparFiltros");
+    confere("limpar solta o sem card", !(await pagina.$eval("#btnSemCard", e => e.classList.contains("filtrando"))) && (await pagina.innerText("#contagemAgenda")).startsWith("5 "), await pagina.innerText("#contagemAgenda"));
 
     // ---------- status fica salvo (por usuário e por modo) ----------
     const statusSalvo = () => pagina.evaluate(() => JSON.stringify((JSON.parse(localStorage.getItem("agendaStatus:u1") || "{}")).transportador || []));

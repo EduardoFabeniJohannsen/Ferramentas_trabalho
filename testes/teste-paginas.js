@@ -65,10 +65,12 @@ window.supabase = { createClient(url, chave, opcoes){
     });
     return {
         from: consulta,
-        // registrar_dispositivo: a situação do aparelho (usuario.dispositivo; sem nada = liberado)
+        // registrar_dispositivo: a situação do aparelho (usuario.dispositivo; sem nada = liberado).
+        // "erro" ou window.__falharRpc: o banco não respondeu
         rpc: async (nome, args) => {
             (window.__rpcs = window.__rpcs || []).push([nome, args]);
-            if(nome === "registrar_dispositivo") return { data: (usuario && usuario.dispositivo) || "liberado", error: null };
+            if(nome === "registrar_dispositivo" && (window.__falharRpc || (usuario && usuario.dispositivo === "erro"))) return { data: null, error: { message: "Failed to fetch" } };
+            if(nome === "registrar_dispositivo") return { data: window.__situacaoRpc || (usuario && usuario.dispositivo) || "liberado", error: null };
             return { data: [], error: null };
         },
         channel: canal,
@@ -469,6 +471,32 @@ const confere = (nome, ok, extra) => {
         await pagina.waitForURL("**/login.html", { timeout: 5000 }).catch(() => {});
         confere("aparelho pendente: Sair vai para o login", pagina.url().endsWith("/login.html"), pagina.url());
         await pendente.contexto.close();
+    }
+
+    {
+        // tela de espera e a internet cai: continua esperando (não abre a página quebrada)
+        const pendente = await novoContexto({ acessos: ["propostas"], dispositivo: "pendente" });
+        await pendente.contexto.clock.install();
+        const { pagina } = await abrir(pendente.contexto, "propostas.html", "https");
+        await pagina.evaluate(() => { window.__marca = 1; window.__falharRpc = true; });
+        await pagina.clock.fastForward(16000);
+        await pagina.waitForTimeout(300);
+        const conferiu = await pagina.evaluate(() => window.__rpcs.filter(([nome]) => nome === "registrar_dispositivo").length);
+        confere("aparelho pendente sem internet: continua no aviso, sem recarregar", (await pagina.evaluate(() => window.__marca)) === 1 && conferiu >= 2 && (await pagina.locator("#avisoDispositivo").isVisible()), conferiu);
+        // o admin liberou: abre sozinha
+        await pagina.evaluate(() => { window.__falharRpc = false; window.__situacaoRpc = "liberado"; });
+        await pagina.clock.fastForward(16000);
+        await pagina.waitForFunction(() => window.__marca === undefined, null, { timeout: 5000 }).catch(() => {});
+        confere("aparelho pendente: liberado pelo admin, a página recarrega", (await pagina.evaluate(() => window.__marca)) === undefined);
+        await pendente.contexto.close();
+    }
+
+    {
+        // banco não respondeu ao abrir: a página abre normal (quem protege é o banco)
+        const semBanco = await novoContexto({ acessos: ["propostas"], dispositivo: "erro" });
+        const { pagina, erros } = await abrir(semBanco.contexto, "propostas.html", "https");
+        confere("aparelho sem resposta do banco: página abre normal", erros.length === 0 && (await pagina.evaluate(() => document.documentElement.style.visibility)) === "" && (await pagina.locator("#avisoDispositivo").count()) === 0, erros);
+        await semBanco.contexto.close();
     }
 
     {

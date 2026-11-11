@@ -65,6 +65,34 @@ function alternarSemPatrimonio(){
 
 
 // ======================================
+// SÓ SEM CARD
+// ======================================
+// Botão do painel de filtros: mostra só os agendamentos que precisam de card e
+// ainda estão sem. Card só existe com frete por nossa conta ou dividido (no
+// formulário, "Conta do cliente" esconde o campo): esses ficam de fora.
+// O estado fica no próprio botão, como o "Só sem patrimônio".
+
+function itemSemCard(item){
+
+    return item.freteConta !== "cliente" && !String(item.card || "").trim();
+}
+
+
+function filtrandoSemCard(){
+
+    return $("btnSemCard").classList.contains("filtrando");
+}
+
+
+function alternarSemCard(){
+
+    $("btnSemCard").classList.toggle("filtrando");
+
+    renderizarAgenda();
+}
+
+
+// ======================================
 // PAINEL DE FILTROS (botão ⚙️ Filtros)
 // ======================================
 // Filtros e opções da tela ficam todos num painel só. Como ficam escondidos,
@@ -100,6 +128,8 @@ function filtrosAtivos(){
     }
 
     if(filtrandoSemPatrimonio()) ativos.push("só sem patrimônio");
+
+    if(filtrandoSemCard()) ativos.push("só sem card");
 
     return ativos;
 }
@@ -139,6 +169,8 @@ function limparFiltros(){
     $("filtroTipo").value = "";
 
     $("btnSemPatrimonio").classList.remove("filtrando");
+
+    $("btnSemCard").classList.remove("filtrando");
 
     renderizarAgenda();
 }
@@ -189,6 +221,9 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
     const soSemPatrimonio =
         filtrandoSemPatrimonio();
 
+    const soSemCard =
+        filtrandoSemCard();
+
     // pesquisa (agenda-busca.js): acha qualquer agendamento, então o modo,
     // as datas e os status não escondem nada
     const buscando = buscandoAgenda();
@@ -230,6 +265,9 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
 
         // só as máquinas sem patrimônio definido
         if(soSemPatrimonio && !itemSemPatrimonio(item)) return false;
+
+        // só os que precisam de card (frete por nossa conta) e estão sem
+        if(soSemCard && !itemSemCard(item)) return false;
 
         if(buscando) return true;
 

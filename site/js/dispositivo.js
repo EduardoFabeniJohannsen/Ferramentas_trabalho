@@ -10,7 +10,7 @@
 // - bloqueado: o admin desconectou este aparelho: sai do login.
 // Quem protege de verdade é o banco (tem_acesso confere o aparelho); esta tela
 // só explica o que está acontecendo. Sem a função no banco ou sem internet,
-// segue normal.
+// a página abre normal; já na tela de espera, sem internet continua esperando.
 
 const ESPERA_CONFERIR_PENDENTE_MS = 15000;
 
@@ -77,7 +77,9 @@ async function cidadeDoDispositivo(){
 }
 
 
-// 'liberado', 'pendente' ou 'bloqueado'; erro (função não existe, sem rede): 'liberado'
+// 'liberado', 'pendente', 'bloqueado' ou 'erro' (função não existe, sem rede).
+// Quem chama decide o que fazer com 'erro': ao abrir a página, segue normal;
+// na tela de espera, continua esperando.
 async function situacaoDoDispositivo(){
 
     try{
@@ -95,7 +97,7 @@ async function situacaoDoDispositivo(){
 
             console.warn("[aparelho] Não deu para conferir o aparelho:", error.message || error);
 
-            return "liberado";
+            return "erro";
         }
 
         return ["pendente", "bloqueado"].includes(data) ? data : "liberado";
@@ -104,7 +106,7 @@ async function situacaoDoDispositivo(){
 
         console.warn("[aparelho] Não deu para conferir o aparelho:", erro);
 
-        return "liberado";
+        return "erro";
     }
 }
 
@@ -225,7 +227,8 @@ async function mostrarAvisoPendente(){
 
     document.body.appendChild(fundo);
 
-    // a página continua escondida embaixo; quando o admin liberar, ela abre sozinha
+    // a página continua escondida embaixo; quando o admin liberar, ela abre sozinha.
+    // 'erro' (internet caiu) não abre: continua esperando a próxima conferência
     setInterval(async () => {
 
         const situacao = await situacaoDoDispositivo();
@@ -242,12 +245,14 @@ async function mostrarAvisoPendente(){
 // CONFERIR (chamado pelo auth-guard)
 // ======================================
 
-// true = pode mostrar a página
-async function conferirDispositivo(){
+// true = pode mostrar a página. situacaoJaPedida: o auth-guard já pediu a
+// situação ao banco junto com o perfil (a página abre mais rápido).
+// 'erro' segue normal: quem protege os dados é o banco.
+async function conferirDispositivo(situacaoJaPedida){
 
-    const situacao = await situacaoDoDispositivo();
+    const situacao = await (situacaoJaPedida || situacaoDoDispositivo());
 
-    if(situacao === "liberado"){
+    if(situacao === "liberado" || situacao === "erro"){
 
         ligarConferenciaDispositivo();
 

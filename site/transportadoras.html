@@ -5,6 +5,8 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 
 <title>Transportadoras</title>
 
@@ -171,28 +173,28 @@ MODAL (veículo / motorista)
 <div id="toast"></div>
 
 
-<script src="js/vendor/supabase-2.45.0.js"></script>
-<script src="js/acoes.js"></script>
-<script src="js/supabase-config.js"></script>
-<script src="js/registro-erros.js"></script>
-<script src="js/arquivo-faltando.js"></script>
-<script src="js/dispositivo.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
 
-<script src="js/helpers.js"></script>
-<script src="js/atualizacao-sistema.js"></script>
-<script src="js/presenca.js"></script>
-<script src="js/menu.js"></script>
-<script src="js/transportadoras/transp-config.js"></script>
-<script src="js/transportadoras/transp-banco.js"></script>
-<script src="js/transportadoras/transp-cad-banco.js"></script>
-<script src="js/transportadoras/transp-docs.js"></script>
-<script src="js/transportadoras/transp-render.js"></script>
-<script src="js/transportadoras/transp-form.js"></script>
-<script src="js/transportadoras/transp-form-veiculo.js"></script>
-<script src="js/transportadoras/transp-form-motorista.js"></script>
-<script src="js/transportadoras/transp-cad-tela.js"></script>
-<script src="js/transportadoras/transp-init.js"></script>
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<script src="js/transportadoras/transp-config.js" defer></script>
+<script src="js/transportadoras/transp-banco.js" defer></script>
+<script src="js/transportadoras/transp-cad-banco.js" defer></script>
+<script src="js/transportadoras/transp-docs.js" defer></script>
+<script src="js/transportadoras/transp-render.js" defer></script>
+<script src="js/transportadoras/transp-form.js" defer></script>
+<script src="js/transportadoras/transp-form-veiculo.js" defer></script>
+<script src="js/transportadoras/transp-form-motorista.js" defer></script>
+<script src="js/transportadoras/transp-cad-tela.js" defer></script>
+<script src="js/transportadoras/transp-init.js" defer></script>
 
 </body>
 

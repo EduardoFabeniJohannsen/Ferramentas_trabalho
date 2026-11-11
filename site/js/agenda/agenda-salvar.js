@@ -93,6 +93,15 @@ async function salvarAgendamento(){
         );
     }
 
+    // carrega em outro dia (agenda-carregamento.js)
+    const erroCarregamento =
+        conferirCarregamento(
+            dados,
+            idEmEdicao ? agendamentos.find(ag => ag.id === idEmEdicao) : null
+        );
+
+    if(erroCarregamento) return avisoFormulario(erroCarregamento, "demanda");
+
     // período: 16 dias, 3 períodos ou Anual (valor antigo, sem mexer, passa)
     const periodo = normalizarPeriodo(dados.periodo);
 

@@ -135,6 +135,9 @@
     // horário: números viram HH:MM sozinhos
     $("agHorario").addEventListener("input", mascararCampoHorario);
 
+    // carrega em outro dia (agenda-carregamento.js)
+    ligarCamposCarregamento();
+
     // cliente: sugere os anteriores e puxa endereço, contato e e-mails
     ligarSugestoesClientes();
 

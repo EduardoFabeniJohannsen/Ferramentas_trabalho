@@ -26,9 +26,10 @@ function ordemEfetiva(){
 // horário vazio vai pro fim
 function compararHorario(a, b){
 
-    const horarioA = String(a.horario || "");
+    // expedição: o horário do carregamento, se carrega antes (agenda-carregamento.js)
+    const horarioA = String(horarioDaTela(a));
 
-    const horarioB = String(b.horario || "");
+    const horarioB = String(horarioDaTela(b));
 
     if(horarioA === horarioB) return 0;
 
@@ -51,14 +52,18 @@ function ordenarAgendamentos(lista){
 
     return lista.sort((a, b) => {
 
-        // 1) data
-        if(a.data !== b.data){
+        // 1) data (expedição: a do carregamento, se carrega antes)
+        const dataA = dataDaTela(a);
 
-            if(!a.data) return -1;
+        const dataB = dataDaTela(b);
 
-            if(!b.data) return 1;
+        if(dataA !== dataB){
 
-            return a.data < b.data ? -1 : 1;
+            if(!dataA) return -1;
+
+            if(!dataB) return 1;
+
+            return dataA < dataB ? -1 : 1;
         }
 
         // 2) critério escolhido (dentro da mesma data)

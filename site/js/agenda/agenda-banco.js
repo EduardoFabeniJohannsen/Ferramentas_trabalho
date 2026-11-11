@@ -25,6 +25,9 @@ const INTERVALO_RECARGA_MS = 30000;
 const CAMPOS_BANCO = {
     data: "data",
     horario: "horario",
+    // carrega em outro dia (agenda-carregamento.js)
+    dataCarregamento: "data_carregamento",
+    horarioCarregamento: "horario_carregamento",
     tipo: "tipo",
     status: "status",
     plataforma: "plataforma",
@@ -118,7 +121,7 @@ function paraBanco(dados){
 
         if(!coluna) return;
 
-        if(campo === "data"){
+        if(campo === "data" || campo === "dataCarregamento"){
 
             // data vazia vira null (agendamento ainda sem data)
             linha[coluna] = valor || null;

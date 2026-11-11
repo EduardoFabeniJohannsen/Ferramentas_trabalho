@@ -5,6 +5,8 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 
 <title>Agenda</title>
 
@@ -400,12 +402,12 @@ MODAL (novo / editar)
                 <div class="etapa-grade">
 
                     <div>
-                        <label for="agData">Data</label>
+                        <label for="agData" id="rotuloData">Data</label>
                         <input type="date" id="agData">
                     </div>
 
                     <div>
-                        <label for="agHorario">Horário</label>
+                        <label for="agHorario" id="rotuloHorario">Horário</label>
                         <input
                             type="text"
                             id="agHorario"
@@ -424,6 +426,32 @@ MODAL (novo / editar)
                     <div>
                         <label for="agStatus">Status</label>
                         <select id="agStatus"></select>
+                    </div>
+
+                    <!-- carrega num dia e entrega em outro (agenda-carregamento.js):
+                         a expedição vê o dia e o horário do carregamento -->
+                    <div class="largo" id="blocoCarregarAntes">
+                        <label class="opcao-carregar">
+                            <input type="checkbox" id="agCarregarAntes">
+                            📦 Carregar em outro dia (antes da entrega)
+                        </label>
+                    </div>
+
+                    <div id="blocoDataCarregamento" style="display:none">
+                        <label for="agDataCarregamento">Data do carregamento</label>
+                        <input type="date" id="agDataCarregamento">
+                    </div>
+
+                    <div id="blocoHorarioCarregamento" style="display:none">
+                        <label for="agHorarioCarregamento">Horário do carregamento</label>
+                        <input
+                            type="text"
+                            id="agHorarioCarregamento"
+                            list="listaHorarios"
+                            maxlength="9"
+                            autocomplete="off"
+                            placeholder="17:00"
+                        >
                     </div>
 
                     <!-- uma linha por equipamento (quantidade, − e +); o que é
@@ -750,59 +778,60 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 
 <div id="toast"></div>
 
-<script src="js/vendor/supabase-2.45.0.js"></script>
-<script src="js/acoes.js"></script>
-<script src="js/supabase-config.js"></script>
-<script src="js/registro-erros.js"></script>
-<script src="js/arquivo-faltando.js"></script>
-<script src="js/dispositivo.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
 
-<script src="js/helpers.js"></script>
-<script src="js/atualizacao-sistema.js"></script>
-<script src="js/presenca.js"></script>
-<script src="js/menu.js"></script>
-<script src="js/agenda/agenda-config.js"></script>
-<script src="js/agenda/agenda-utils.js"></script>
-<script src="js/agenda/agenda-patrimonio.js"></script>
-<script src="js/agenda/agenda-banco.js"></script>
-<script src="js/agenda/agenda-filtros.js"></script>
-<script src="js/agenda/agenda-busca.js"></script>
-<script src="js/agenda/agenda-filtro-datas.js"></script>
-<script src="js/agenda/agenda-filtro-status.js"></script>
-<script src="js/agenda/agenda-ordem.js"></script>
-<script src="js/agenda/agenda-render.js"></script>
-<script src="js/agenda/agenda-celula-partes.js"></script>
-<script src="js/agenda/agenda-celulas.js"></script>
-<script src="js/agenda/agenda-linhas.js"></script>
-<script src="js/agenda/agenda-colunas.js"></script>
-<script src="js/agenda/agenda-colunas-visiveis.js"></script>
-<script src="js/agenda/agenda-botoes-linha.js"></script>
-<script src="js/agenda/agenda-larguras.js"></script>
-<script src="js/agenda/agenda-tema.js"></script>
-<script src="js/agenda/agenda-zap.js"></script>
-<script src="js/agenda/agenda-transportadoras.js"></script>
-<script src="js/agenda/agenda-motoristas.js"></script>
-<script src="js/agenda/agenda-form-campos.js"></script>
-<script src="js/agenda/agenda-unidades.js"></script>
-<script src="js/agenda/agenda-plataformas.js"></script>
-<script src="js/agenda/agenda-rascunho.js"></script>
-<script src="js/agenda/agenda-etapas.js"></script>
-<script src="js/agenda/agenda-modal.js"></script>
-<script src="js/agenda/agenda-salvar.js"></script>
-<script src="js/agenda/agenda-coleta.js"></script>
-<script src="js/agenda/agenda-pagamento.js"></script>
-<script src="js/agenda/agenda-clientes.js"></script>
-<script src="js/agenda/agenda-pedido.js"></script>
-<script src="js/agenda/agenda-pedido-pdf.js"></script>
-<script src="js/agenda/agenda-lixeira.js"></script>
-<script src="js/agenda/agenda-estoque-dados.js"></script>
-<script src="js/agenda/agenda-estoque-tabela.js"></script>
-<script src="js/agenda/agenda-estoque.js"></script>
-<script src="js/agenda/agenda-conflitos.js"></script>
-<script src="js/agenda/agenda-usar-patrimonio.js"></script>
-<script src="js/agenda/agenda-tempo-real.js"></script>
-<script src="js/agenda/agenda-init.js"></script>
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<script src="js/agenda/agenda-config.js" defer></script>
+<script src="js/agenda/agenda-utils.js" defer></script>
+<script src="js/agenda/agenda-carregamento.js" defer></script>
+<script src="js/agenda/agenda-patrimonio.js" defer></script>
+<script src="js/agenda/agenda-banco.js" defer></script>
+<script src="js/agenda/agenda-filtros.js" defer></script>
+<script src="js/agenda/agenda-busca.js" defer></script>
+<script src="js/agenda/agenda-filtro-datas.js" defer></script>
+<script src="js/agenda/agenda-filtro-status.js" defer></script>
+<script src="js/agenda/agenda-ordem.js" defer></script>
+<script src="js/agenda/agenda-render.js" defer></script>
+<script src="js/agenda/agenda-celula-partes.js" defer></script>
+<script src="js/agenda/agenda-celulas.js" defer></script>
+<script src="js/agenda/agenda-linhas.js" defer></script>
+<script src="js/agenda/agenda-colunas.js" defer></script>
+<script src="js/agenda/agenda-colunas-visiveis.js" defer></script>
+<script src="js/agenda/agenda-botoes-linha.js" defer></script>
+<script src="js/agenda/agenda-larguras.js" defer></script>
+<script src="js/agenda/agenda-tema.js" defer></script>
+<script src="js/agenda/agenda-zap.js" defer></script>
+<script src="js/agenda/agenda-transportadoras.js" defer></script>
+<script src="js/agenda/agenda-motoristas.js" defer></script>
+<script src="js/agenda/agenda-form-campos.js" defer></script>
+<script src="js/agenda/agenda-unidades.js" defer></script>
+<script src="js/agenda/agenda-plataformas.js" defer></script>
+<script src="js/agenda/agenda-rascunho.js" defer></script>
+<script src="js/agenda/agenda-etapas.js" defer></script>
+<script src="js/agenda/agenda-modal.js" defer></script>
+<script src="js/agenda/agenda-salvar.js" defer></script>
+<script src="js/agenda/agenda-coleta.js" defer></script>
+<script src="js/agenda/agenda-pagamento.js" defer></script>
+<script src="js/agenda/agenda-clientes.js" defer></script>
+<script src="js/agenda/agenda-pedido.js" defer></script>
+<script src="js/agenda/agenda-pedido-pdf.js" defer></script>
+<script src="js/agenda/agenda-lixeira.js" defer></script>
+<script src="js/agenda/agenda-estoque-dados.js" defer></script>
+<script src="js/agenda/agenda-estoque-tabela.js" defer></script>
+<script src="js/agenda/agenda-estoque.js" defer></script>
+<script src="js/agenda/agenda-conflitos.js" defer></script>
+<script src="js/agenda/agenda-usar-patrimonio.js" defer></script>
+<script src="js/agenda/agenda-tempo-real.js" defer></script>
+<script src="js/agenda/agenda-init.js" defer></script>
 
 </body>
 

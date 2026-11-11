@@ -20,7 +20,8 @@ function criarCelulasAgenda(item){
 
     // ---------- horário ----------
 
-    const textoHorario = item.horario || "—";
+    // expedição: o horário do carregamento, se carrega antes (agenda-carregamento.js)
+    const textoHorario = horarioDaTela(item) || "—";
 
     // horário em texto (ex: CONFIRMAR) usa letra menor pra caber
     celulas.horario =
@@ -33,6 +34,14 @@ function criarCelulasAgenda(item){
             ),
             textoHorario
         );
+
+    // carrega num dia e entrega em outro: o outro dia embaixo do horário
+    const outroDia = textoOutroDiaDaLinha(item);
+
+    if(outroDia){
+
+        celulas.horario.appendChild(criar("span", "ag-outro-dia", outroDia));
+    }
 
     // ---------- tipo ----------
 

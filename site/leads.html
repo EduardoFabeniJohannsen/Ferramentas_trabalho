@@ -5,6 +5,8 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 
 <title>Leads</title>
 
@@ -182,28 +184,28 @@ MODAL (configuração de busca)
 <div id="toast"></div>
 
 
-<script src="js/vendor/supabase-2.45.0.js"></script>
-<script src="js/acoes.js"></script>
-<script src="js/supabase-config.js"></script>
-<script src="js/registro-erros.js"></script>
-<script src="js/arquivo-faltando.js"></script>
-<script src="js/dispositivo.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
 
-<script src="js/helpers.js"></script>
-<script src="js/atualizacao-sistema.js"></script>
-<script src="js/presenca.js"></script>
-<script src="js/menu.js"></script>
-<script src="js/leads/leads-config.js"></script>
-<script src="js/leads/leads-contato.js"></script>
-<script src="js/leads/leads-utils.js"></script>
-<script src="js/leads/leads-dados.js"></script>
-<script src="js/leads/leads-filtros.js"></script>
-<script src="js/leads/leads-lista.js"></script>
-<script src="js/leads/leads-cards.js"></script>
-<script src="js/leads/leads-acoes.js"></script>
-<script src="js/leads/leads-busca-config.js"></script>
-<script src="js/leads/leads-init.js"></script>
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<script src="js/leads/leads-config.js" defer></script>
+<script src="js/leads/leads-contato.js" defer></script>
+<script src="js/leads/leads-utils.js" defer></script>
+<script src="js/leads/leads-dados.js" defer></script>
+<script src="js/leads/leads-filtros.js" defer></script>
+<script src="js/leads/leads-lista.js" defer></script>
+<script src="js/leads/leads-cards.js" defer></script>
+<script src="js/leads/leads-acoes.js" defer></script>
+<script src="js/leads/leads-busca-config.js" defer></script>
+<script src="js/leads/leads-init.js" defer></script>
 
 </body>
 

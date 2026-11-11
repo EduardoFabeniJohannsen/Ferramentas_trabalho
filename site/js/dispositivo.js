@@ -22,10 +22,16 @@ const TIPOS_DISPOSITIVO = { celular: "Celular", tablet: "Tablet", computador: "C
 let conferenciaDispositivoLigada = false;
 
 
-// os scripts da página terminaram de carregar (o presenca.js vem depois deste)
+// os scripts da página terminaram de carregar (o presenca.js vem depois deste).
+// Os scripts são defer: enquanto rodam, o readyState já é "interactive"; quem
+// diz que todos rodaram é o DOMContentLoaded (dispara depois do último).
+let scriptsDaPaginaProntos = document.readyState === "complete";
+
+document.addEventListener("DOMContentLoaded", () => { scriptsDaPaginaProntos = true; }, { once: true });
+
 function esperarScriptsDaPagina(){
 
-    if(document.readyState !== "loading") return Promise.resolve();
+    if(scriptsDaPaginaProntos || document.readyState === "complete") return Promise.resolve();
 
     return new Promise(pronto =>
         document.addEventListener("DOMContentLoaded", pronto, { once: true })

@@ -5,6 +5,8 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 
 <title>Propostas</title>
 
@@ -447,39 +449,39 @@ MODAL DE CONFIGURAÇÕES
 <div id="toast"></div>
 
 
-<script src="js/vendor/supabase-2.45.0.js"></script>
-<script src="js/acoes.js"></script>
-<script src="js/supabase-config.js"></script>
-<script src="js/registro-erros.js"></script>
-<script src="js/arquivo-faltando.js"></script>
-<script src="js/dispositivo.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
 
-<script src="js/helpers.js"></script>
-<script src="js/atualizacao-sistema.js"></script>
-<script src="js/presenca.js"></script>
-<script src="js/propostas/busca-fretes.js"></script>
-<script src="js/status.js"></script>
-<script src="js/menu.js"></script>
-<script src="js/propostas/propostas-estado.js"></script>
-<script src="js/propostas/propostas-tabelas-precos.js"></script>
-<script src="js/propostas/propostas-tabelas-fretes.js"></script>
-<script src="js/propostas/propostas-avisos.js"></script>
-<script src="js/propostas/propostas-equipamentos.js"></script>
-<script src="js/propostas/propostas-valor-tabela.js"></script>
-<script src="js/propostas/propostas-fretes-painel.js"></script>
-<script src="js/propostas/propostas-desconto.js"></script>
-<script src="js/propostas/propostas-desconto-calculo.js"></script>
-<script src="js/propostas/propostas-desconto-total-seguro.js"></script>
-<script src="js/propostas/propostas-resumo.js"></script>
-<script src="js/propostas/propostas-resumo-frete.js"></script>
-<script src="js/propostas/propostas-cache.js"></script>
-<script src="js/propostas/propostas-config.js"></script>
-<script src="js/propostas/propostas-pagamento.js"></script>
-<script src="js/propostas/proposta-zap.js"></script>
-<script src="js/propostas/propostas-registro.js"></script>
-<script src="js/propostas/propostas-textos.js"></script>
-<script src="js/propostas/propostas-init.js"></script>
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/propostas/busca-fretes.js" defer></script>
+<script src="js/status.js" defer></script>
+<script src="js/menu.js" defer></script>
+<script src="js/propostas/propostas-estado.js" defer></script>
+<script src="js/propostas/propostas-tabelas-precos.js" defer></script>
+<script src="js/propostas/propostas-tabelas-fretes.js" defer></script>
+<script src="js/propostas/propostas-avisos.js" defer></script>
+<script src="js/propostas/propostas-equipamentos.js" defer></script>
+<script src="js/propostas/propostas-valor-tabela.js" defer></script>
+<script src="js/propostas/propostas-fretes-painel.js" defer></script>
+<script src="js/propostas/propostas-desconto.js" defer></script>
+<script src="js/propostas/propostas-desconto-calculo.js" defer></script>
+<script src="js/propostas/propostas-desconto-total-seguro.js" defer></script>
+<script src="js/propostas/propostas-resumo.js" defer></script>
+<script src="js/propostas/propostas-resumo-frete.js" defer></script>
+<script src="js/propostas/propostas-cache.js" defer></script>
+<script src="js/propostas/propostas-config.js" defer></script>
+<script src="js/propostas/propostas-pagamento.js" defer></script>
+<script src="js/propostas/proposta-zap.js" defer></script>
+<script src="js/propostas/propostas-registro.js" defer></script>
+<script src="js/propostas/propostas-textos.js" defer></script>
+<script src="js/propostas/propostas-init.js" defer></script>
 
 </body>
 

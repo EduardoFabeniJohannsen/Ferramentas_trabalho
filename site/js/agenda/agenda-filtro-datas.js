@@ -25,7 +25,7 @@ function datasDoFiltro(){
 
     filtrarAgendamentos(false, true).forEach(item => {
 
-        datas.add(item.data || "");
+        datas.add(dataDaTela(item));
     });
 
     datasOcultas.forEach(data => datas.add(data));

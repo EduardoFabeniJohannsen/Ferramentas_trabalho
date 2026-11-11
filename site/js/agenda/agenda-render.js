@@ -179,11 +179,14 @@ function renderizarAgenda(){
 
     filtrados.forEach(item => {
 
-        const corDoItem = corDoDia(item.data);
+        // expedição: o dia do carregamento, se carrega antes (agenda-carregamento.js)
+        const dia = dataDaTela(item);
 
-        if(item.data !== dataAtual){
+        const corDoItem = corDoDia(dia);
 
-            dataAtual = item.data;
+        if(dia !== dataAtual){
+
+            dataAtual = dia;
 
             const linhaDia = criar("tr", "ag-dia");
 
@@ -194,8 +197,8 @@ function renderizarAgenda(){
                 criar(
                     "th",
                     "",
-                    item.data
-                        ? tituloDoDia(item.data)
+                    dia
+                        ? tituloDoDia(dia)
                         : "📌 Sem data definida — iniciar preparativos"
                 );
 

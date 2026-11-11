@@ -171,6 +171,27 @@ function linhasLocalZap(rotulo, nome, endereco, link, usarWRSeVazio, linkComRotu
 }
 
 
+// carrega num dia e entrega em outro (agenda-carregamento.js): as duas datas
+function linhasDataZap(item, linhaHorario){
+
+    if(!carregaEmOutroDia(item)){
+
+        return [`*Data:* ${textoDataZap(item.data)}`, linhaHorario];
+    }
+
+    const horarioCarga =
+        String(item.horarioCarregamento || "").trim();
+
+    return [
+        `*Data coleta:* ${textoDataZap(item.dataCarregamento)}`,
+        `*Horário:* ${horarioCarga.toUpperCase() === "IMEDIATO" ? "imediato" : horarioCarga}`.trimEnd(),
+        "==",
+        `*Data entrega:* ${textoDataZap(item.data)}`,
+        linhaHorario
+    ];
+}
+
+
 function montarTextoZap(item){
 
     if(!item.data){
@@ -232,9 +253,7 @@ function montarTextoZap(item){
 
         "",
 
-        `*Data:* ${textoDataZap(item.data)}`,
-
-        linhaHorario,
+        ...linhasDataZap(item, linhaHorario),
 
         `*Equipamento:* ${item.plataforma}`,
 

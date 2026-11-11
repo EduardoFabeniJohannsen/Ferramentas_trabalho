@@ -11,6 +11,9 @@
 const CAMPOS_AGENDA = [
     ["data", "agData"],
     ["horario", "agHorario"],
+    // carrega em outro dia (agenda-carregamento.js)
+    ["dataCarregamento", "agDataCarregamento"],
+    ["horarioCarregamento", "agHorarioCarregamento"],
     ["tipo", "agTipo"],
     ["status", "agStatus"],
     ["plataforma", "agPlataforma"],

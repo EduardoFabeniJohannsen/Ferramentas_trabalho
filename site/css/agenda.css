@@ -385,6 +385,33 @@ tr.ag-item[data-status="Concluído"] td{
 .ag-hora.ag-hora-texto{
     font-size:11px;
 }
+/* carrega num dia e entrega em outro (agenda-carregamento.js) */
+.ag-outro-dia{
+    display:block;
+    margin-top:2px;
+    font-size:11px;
+    font-weight:normal;
+    color:#fbbf24;
+}
+body.tema-claro .ag-outro-dia{
+    color:#b45309;
+}
+.form-grade label.opcao-carregar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:6px 0 8px;
+    font-size:13px;
+    color:#e2e8f0;
+    cursor:pointer;
+}
+.opcao-carregar input{
+    width:auto;
+    margin:0;
+}
+body.tema-claro .form-grade label.opcao-carregar{
+    color:#1e293b;
+}
 /* horário em destaque: branco no fundo vermelho */
 .ag-hora-pilula{
     display:inline-block;

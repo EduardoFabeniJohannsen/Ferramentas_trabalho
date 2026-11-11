@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 <title>Login</title>
 
 <link rel="stylesheet" href="css/style.css">
@@ -42,12 +44,12 @@
 
 </div>
 
-<script src="js/vendor/supabase-2.45.0.js"></script>
-<script src="js/acoes.js"></script>
-<script src="js/supabase-config.js"></script>
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
 
-<script src="js/login/login-captcha.js"></script>
-<script src="js/login/login.js"></script>
+<script src="js/login/login-captcha.js" defer></script>
+<script src="js/login/login.js" defer></script>
 
 </body>
 </html>

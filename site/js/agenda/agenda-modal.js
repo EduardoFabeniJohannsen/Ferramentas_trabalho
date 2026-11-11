@@ -98,6 +98,9 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 
     atualizarCamposTipo();
 
+    // carrega em outro dia: marcado se já tem carregamento (agenda-carregamento.js)
+    prepararCamposCarregamento();
+
     atualizarSugestoesPeriodo();
 
     // clientes e locais dos agendamentos anteriores (agenda-clientes.js)

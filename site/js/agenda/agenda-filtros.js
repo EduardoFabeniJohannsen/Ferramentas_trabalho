@@ -275,7 +275,7 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
         if(!ignorarStatus && statusOcultos.has(item.status)) return false;
 
         // filtro de datas: as desmarcadas não aparecem
-        if(!ignorarData && datasOcultas.has(item.data || "")) return false;
+        if(!ignorarData && datasOcultas.has(dataDaTela(item))) return false;
 
         return true;
     });

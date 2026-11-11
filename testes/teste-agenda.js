@@ -829,6 +829,81 @@ const confere = (nome, ok, extra) => {
     });
     confere("dividido: duplicar e criar coleta levam a parte por nossa conta", copiasDividido.join() === "200,00,200,00", copiasDividido);
 
+    // ---------- carregar num dia e entregar em outro ----------
+    const amanha = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    const novoCarregamento = async () => {
+        await pagina.evaluate(() => {
+            window.__inseridos = [];
+            inserirAgendamento = async (dados) => { window.__inseridos.push(dados); return { ...dados, id: 93 }; };
+            encerrarModalAgenda();
+            removerRascunho("novo");
+            abrirModalAgenda();
+        });
+        await pagina.waitForSelector(".modal-overlay.aberto");
+        await pagina.locator(".ag-plataforma-item").first().fill("WAE18R093");
+        await pagina.fill("#agCliente", "Cliente Carrega");
+    };
+    await novoCarregamento();
+    confere("carregamento: a opção aparece na entrega, com os campos escondidos", await pagina.isVisible("#agCarregarAntes") && !(await pagina.isVisible("#agDataCarregamento")));
+    await pagina.check("#agCarregarAntes");
+    confere("carregamento: marcar mostra a data e o horário e a data vira 'da entrega'", await pagina.isVisible("#agDataCarregamento") && await pagina.isVisible("#agHorarioCarregamento") && (await pagina.innerText("#rotuloData")) === "Data da entrega");
+    await pagina.fill("#agData", hoje);
+    await pagina.fill("#agDataCarregamento", amanha);
+    await pagina.locator("#agHorarioCarregamento").pressSequentially("1700");
+    confere("carregamento: horário vira 17:00 sozinho", (await pagina.inputValue("#agHorarioCarregamento")) === "17:00");
+    await pagina.evaluate(() => salvarAgendamento());
+    confere("carregamento depois da entrega: não salva e avisa", (await pagina.evaluate(() => window.__inseridos.length)) === 0 && (await pagina.innerText("#toast")).includes("O carregamento precisa ser antes da entrega"), await pagina.innerText("#toast"));
+    await pagina.fill("#agData", amanha);
+    await pagina.fill("#agDataCarregamento", hoje);
+    await pagina.locator("#etapa-demanda, .etapa-demanda").first().scrollIntoViewIfNeeded();
+    await pagina.screenshot({ path: path.join(saida, "17-agenda-carregar-antes.png") });
+    await pagina.evaluate(() => salvarAgendamento());
+    await pagina.waitForTimeout(150);
+    const salvoCarga = await pagina.evaluate(() => window.__inseridos[0] || {});
+    confere("carregamento: salva a data e o horário do carregamento", salvoCarga.dataCarregamento === hoje && salvoCarga.horarioCarregamento === "17:00" && salvoCarga.data === amanha, salvoCarga);
+
+    await novoCarregamento();
+    await pagina.selectOption("#agTipo", "Coleta");
+    confere("carregamento: coleta não tem a opção", !(await pagina.isVisible("#agCarregarAntes")));
+    await pagina.evaluate(() => salvarAgendamento());
+    await pagina.waitForTimeout(150);
+    const semCarga = await pagina.evaluate(() => window.__inseridos[0] || {});
+    confere("sem carregamento: as colunas novas nem vão (salva mesmo sem o SQL)", semCarga.cliente === "Cliente Carrega" && !("dataCarregamento" in semCarga) && !("horarioCarregamento" in semCarga), semCarga);
+    await pagina.evaluate(() => { encerrarModalAgenda(); removerRascunho("novo"); });
+    confere("carregamento: coluna data_carregamento vazia vira null", (await pagina.evaluate(() => paraBanco({ dataCarregamento: "" }).data_carregamento)) === null);
+
+    await pagina.evaluate(([hoje, amanha]) => {
+        agendamentos.push({ ...agendamentos.find(ag => ag.id === 1), id: 94, plataforma: "WAE18R094", cliente: "Cliente Carga Antes",
+            data: amanha, horario: "08:00", dataCarregamento: hoje, horarioCarregamento: "17:00", status: "Confirmado" });
+    }, [hoje, amanha]);
+    // o dia (cabeçalho) em que a linha aparece e o que tem na célula do horário
+    const ondeAparece = () => pagina.evaluate(() => {
+        const linhas = [...document.querySelectorAll("#listaAgenda tr")];
+        const i = linhas.findIndex(l => l.classList.contains("ag-item") && l.textContent.includes("Cliente Carga Antes"));
+        const dia = linhas.slice(0, i).reverse().find(l => l.classList.contains("ag-dia"));
+        return { dia: dia ? dia.textContent : "", hora: i >= 0 ? linhas[i].querySelector(".ag-hora").textContent : "" };
+    });
+    const tituloHoje = await pagina.evaluate((d) => tituloDoDia(d), hoje);
+    const tituloAmanha = await pagina.evaluate((d) => tituloDoDia(d), amanha);
+    const diaMes = (iso) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+    await modo("expedicao");
+    const naExpedicao = await ondeAparece();
+    confere("expedição: aparece no dia e no horário do carregamento, com a entrega embaixo", naExpedicao.dia === tituloHoje && naExpedicao.hora === `17:00entrega ${diaMes(amanha)} 08:00`, naExpedicao);
+    await pagina.screenshot({ path: path.join(saida, "18-expedicao-carregar-antes.png") });
+    await modo("transportador");
+    const noTransportador = await ondeAparece();
+    confere("transportador: fica no dia da entrega, com o carregamento embaixo", noTransportador.dia === tituloAmanha && noTransportador.hora === `08:00📦 carrega ${diaMes(hoje)} 17:00`, noTransportador);
+
+    const zapCarga = await pagina.evaluate(() => {
+        const item = agendamentos.find(ag => ag.id === 94);
+        return { texto: montarTextoZap(item).texto || "", coleta: textoDataZap(item.dataCarregamento), entrega: textoDataZap(item.data) };
+    });
+    confere("Zap: data da coleta (carregamento) e da entrega",
+        zapCarga.texto.startsWith(`🚚 AGENDAMENTO DE ENTREGA\n\n*Data coleta:* ${zapCarga.coleta}\n*Horário:* 17:00\n==\n*Data entrega:* ${zapCarga.entrega}\n*Horário:* 08:00\n*Equipamento:* WAE18R094`), zapCarga.texto);
+    const duplicadoCarga = await pagina.evaluate(() => valoresDuplicados(agendamentos.find(ag => ag.id === 94)));
+    confere("duplicar: a data do carregamento fica em branco (o horário vai)", duplicadoCarga.dataCarregamento === "" && duplicadoCarga.horarioCarregamento === "17:00" && duplicadoCarga.data === "", duplicadoCarga);
+    await pagina.evaluate(() => { agendamentos = agendamentos.filter(ag => ag.id !== 94); renderizarAgenda(); localStorage.clear(); });
+
     await pagina.evaluate(() => {
         agendamentos.push({ ...agendamentos.find(ag => ag.id === 1), id: 95, plataforma: "WAE18R095", freteConta: "dividido", frete: "500,00", freteNossa: "200,00" });
     });

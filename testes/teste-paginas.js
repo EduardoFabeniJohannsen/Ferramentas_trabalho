@@ -123,6 +123,10 @@ const confere = (nome, ok, extra) => {
         confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === (arquivo === "login.html" ? cspLogin : cspPadrao), cspDe(html));
         confere(`${arquivo}: a CSP vem antes de qualquer script`, html.indexOf("Content-Security-Policy") < html.indexOf("<script"));
         confere(`${arquivo}: nenhum <script> com código dentro`, scripts.every(atributos => /\bsrc="/.test(atributos)));
+        // a <meta> da CSP desliga a busca antecipada do Chrome: sem defer, cada script só começa
+        // a baixar quando o anterior termina (uns 3 s pra abrir a agenda com o cache vencido)
+        confere(`${arquivo}: todo script com defer (baixam juntos)`, scripts.every(atributos => /\bdefer\b/.test(atributos)), scripts.filter(atributos => !/\bdefer\b/.test(atributos)));
+        confere(`${arquivo}: já abre a conexão com o Supabase`, html.includes("<link rel=\"preconnect\" href=\"https://qhneylwmrzuesaloqetr.supabase.co\" crossorigin>"));
         confere(`${arquivo}: nenhum script de fora (CDN)`, scripts.every(atributos => /\bsrc="js\//.test(atributos)), scripts.filter(atributos => !/\bsrc="js\//.test(atributos)));
     }
 

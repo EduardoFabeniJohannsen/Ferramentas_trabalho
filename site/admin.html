@@ -5,6 +5,8 @@
 
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 
 <title>Admin</title>
 
@@ -243,26 +245,26 @@ CONTAINER
 <div id="toast"></div>
 
 
-<script src="js/vendor/supabase-2.45.0.js"></script>
-<script src="js/acoes.js"></script>
-<script src="js/supabase-config.js"></script>
-<script src="js/registro-erros.js"></script>
-<script src="js/arquivo-faltando.js"></script>
-<script src="js/dispositivo.js"></script>
-<script src="js/auth-guard.js"></script>
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
 
-<script src="js/helpers.js"></script>
-<script src="js/atualizacao-sistema.js"></script>
-<script src="js/presenca.js"></script>
-<script src="js/menu.js"></script>
-<script src="js/admin/admin-config.js"></script>
-<script src="js/admin/admin-dados.js"></script>
-<script src="js/admin/admin-tela.js"></script>
-<script src="js/admin/admin-online.js"></script>
-<script src="js/admin/admin-aparelhos.js"></script>
-<script src="js/admin/admin-erros.js"></script>
-<script src="js/admin/admin-erros-copiar.js"></script>
-<script src="js/admin/admin-init.js"></script>
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<script src="js/admin/admin-config.js" defer></script>
+<script src="js/admin/admin-dados.js" defer></script>
+<script src="js/admin/admin-tela.js" defer></script>
+<script src="js/admin/admin-online.js" defer></script>
+<script src="js/admin/admin-aparelhos.js" defer></script>
+<script src="js/admin/admin-erros.js" defer></script>
+<script src="js/admin/admin-erros-copiar.js" defer></script>
+<script src="js/admin/admin-init.js" defer></script>
 
 </body>
 

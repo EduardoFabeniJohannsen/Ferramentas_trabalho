@@ -89,6 +89,8 @@ function valoresDuplicados(item){
     return {
         ...valores,
         data: "",
+        // o carregamento é do dia novo também (o horário fica)
+        dataCarregamento: "",
         status: STATUS_PADRAO,
         card: "",
         formaPagamento: item.formaPagamento || "",

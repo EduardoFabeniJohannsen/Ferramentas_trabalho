@@ -381,7 +381,7 @@ const confere = (nome, ok, extra) => {
             window.__copiado = null;
             botao.click();
             await new Promise(r => setTimeout(r, 30));
-            copiados.push([botao.closest(".resumo-linha").querySelector(".resumo-rotulo").innerText.trim(), window.__copiado]);
+            copiados.push([(botao.closest(".resumo-linha")?.querySelector(".resumo-rotulo").innerText || botao.closest(".resumo-nota").innerText).trim(), window.__copiado]);
         }
         return { copiados, toast: document.getElementById("toast").innerText };
     });
@@ -533,6 +533,31 @@ const confere = (nome, ok, extra) => {
     confere("quantidade: diária da linha e por máquina", rs.eq[1]?.titulo === "2x WTE12" && rs.eq[1].linhas["📅 Diária"] === "R$ 214,29" && rs.eq[1].notas.includes("R$ 107,14 por máquina"), rs.eq[1]);
     confere("com 2 equipamentos mostra a diária da proposta", rs.total.linhas["📅 Diária da proposta"] === "R$ 391,07" && rs.total.notas.includes("com seguro R$ 418,45"), rs.total);
     await pagina.screenshot({ path: path.join(saida, "25-propostas-resumo.png"), fullPage: true });
+    // acréscimo: no Zoho entra como desconto negativo; o por máquina já sai no formato de lá
+    const numeroTela = (texto) => Number(String(texto).replace(/^R\$ /, "").replace(/ \(.*$/, "").replace(/\./g, "").replace(",", "."));
+    await pagina.locator(".quantidadeEquipamento").nth(0).fill("2");
+    rs = await resumo();
+    await pagina.locator(".descValorDesejado").nth(0).fill(String(Math.round(numeroTela(rs.eq[0].linhas["Tabela"]) * 1.3)));
+    rs = await resumo();
+    const acrescimo = numeroTela(rs.eq[0].linhas["Acréscimo"] || "0");
+    const porMaquina = "-" + (acrescimo / 2).toFixed(2);
+    const zohoAcrescimo = await pagina.evaluate(async () => {
+        const secao = document.querySelectorAll("#conteudoResumo .resumo-secao")[0];
+        const copiados = [];
+        for(const botao of secao.querySelectorAll(".resumo-zoho")){
+            window.__copiado = null;
+            botao.click();
+            await new Promise(r => setTimeout(r, 30));
+            copiados.push(window.__copiado);
+        }
+        return copiados;
+    });
+    confere("acréscimo por máquina no formato do Zoho, com menos", acrescimo > 0 && rs.eq[0].notas.includes(`${porMaquina} por máquina`), [porMaquina, rs.eq[0]]);
+    confere("📋 do acréscimo copia negativo (total e por máquina)", zohoAcrescimo.join() === [(-acrescimo).toFixed(2), porMaquina].join(), zohoAcrescimo);
+    await pagina.locator("#conteudoResumo .resumo-secao").nth(0).screenshot({ path: path.join(saida, "25b-propostas-acrescimo-por-maquina.png") });
+    // volta como estava: os testes seguintes usam o primeiro com 1 máquina e 10%
+    await pagina.locator(".quantidadeEquipamento").nth(0).fill("1");
+    await pagina.locator(".descPercentual").nth(0).fill("10");
 
     await pagina.fill("#periodo", "60");
     rs = await resumo();

@@ -15,7 +15,7 @@ function moedaResumo(valor){
 
 
 // 📋 depois do valor: copia no formato do Zoho ("2160.00": sem o ponto do
-// milhar e com ponto nos centavos), pra colar direto lá
+// milhar e com ponto nos centavos; acréscimo com menos), pra colar direto lá
 function botaoZohoResumo(valor){
 
     const texto = formatarNumeroPonto(valor);
@@ -140,7 +140,8 @@ function secaoEquipamentoResumo(item, infoPeriodo){
                 diferenca > 0 ? "Desconto" : "Acréscimo",
                 `${moedaResumo(Math.abs(diferenca))} (${formatarMoedaBR(percentual)}%)`,
                 descontoAlto ? "resumo-desconto-alto" : "",
-                Math.abs(diferenca)
+                // no Zoho o acréscimo entra como desconto negativo
+                diferenca
             )
         );
 
@@ -152,9 +153,17 @@ function secaoEquipamentoResumo(item, infoPeriodo){
             ));
         }
 
+        // o desconto é lançado por máquina no Zoho: já no formato de lá
+        // ("408.40"; acréscimo com menos: "-408.40"), com o 📋 ao lado
         if(item.quantidade > 1){
 
-            secao.append(notaResumo(`${moedaResumo(Math.abs(diferenca) / item.quantidade)} por máquina`));
+            const porMaquina = diferenca / item.quantidade;
+
+            const nota = notaResumo(`${formatarNumeroPonto(porMaquina)} por máquina `, "resumo-por-maquina");
+
+            nota.append(botaoZohoResumo(porMaquina));
+
+            secao.append(nota);
         }
     }
 

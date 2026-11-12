@@ -209,8 +209,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - escaparHtml, chaveDataPrevisao, compararMaquinas, htmlItemModelo, desenharResumo, formatarDataHora, mostrarAvisosEstoque, mostrarPublicado
 - `estoque-upload.js` (127 linhas): Ler o Excel, prévia e publicar.
   - lerArquivo, cancelarPrevia, publicarResumo
-- `helpers.js` (359 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
-  - $, criar, semAcento, canalAgenda, avisarAgendaMudou, formatarData, dataBR, dataHoraBR, dataISO, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, mostrarToast, lerLocal, lerLocalJSON, gravarLocal, gravarLocalJSON, removerLocal
+- `helpers.js` (389 linhas): Versão do sistema (VERSAO_SISTEMA), $, criar() (cria elemento com classe e texto), semAcento() (tira só o acento), dataBR(), dataHoraBR(), dataISO(), lerLocal() e gravarLocal() (preferências salvas no navegador), canal de avisos da agenda (canalAgenda, avisarAgendaMudou), formatadores, copiar() e mostrarToast().
+  - $, criar, semAcento, canalAgenda, avisarAgendaMudou, formatarData, dataBR, dataHoraBR, dataISO, brToNumber, formatarMoedaBR, formatarNumeroPonto, copiar, copiarFormatado, mostrarToast, lerLocal, lerLocalJSON, gravarLocal, gravarLocalJSON, removerLocal
 - `index-ferramentas.js` (259 linhas): Ferramentas da página inicial: conversor de texto (maiúsculo/minúsculo/CNPJ) e calculadora de boletos (valor dividido em N parcelas, com a sobra dos centavos ajustada, e vencimentos por dias personalizados).
   - maiusculo, minusculo, formatarCNPJ, calcularBoletos, calcularDiasPersonalizados
 - `leads-acoes.js` (109 linhas): "Vou chamar" com condição no banco (só um pega) e resultado do contato (só quem marcou ou admin).
@@ -315,8 +315,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - montarListaEquipamentos, montarSelectUnidade, textoRotaFrete, obterQuantidade, obterPeriodos, obterDatas, grupoDoModelo, ordemDoGrupo
 - `weg-documento.js` (188 linhas): gerarDocumento(): área para print. Só lista os equipamentos com quantidade maior que 0; a locação complementar mostra a rota do frete (W Rental Itajaí x WEG unidade).
   - gerarDocumento
-- `weg-email.js` (95 linhas): Texto para mandar junto com o print por e-mail (botão "Copiar texto do e-mail" ao lado do documento): saudação pelo horário, nome das máquinas escolhidas e dados para confirmação.
-  - saudacaoEmail, nomeEquipamentoEmail, equipamentosEmail, textoConfirmacaoEmail, copiarParaEmail
+- `weg-email.js` (159 linhas): Texto para mandar junto com o print por e-mail (botão "Copiar texto do e-mail" ao lado do documento): saudação pelo horário, nome das máquinas escolhidas e dados para confirmação.
+  - exemploDataEntregaEmail, escaparHtmlEmail, saudacaoEmail, nomeEquipamentoEmail, equipamentosEmail, cicloEmail, textoConfirmacaoEmail, htmlConfirmacaoEmail, copiarParaEmail
 - `weg-init.js` (70 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
 
 ## CSS
@@ -387,7 +387,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 - **Segurança (CSP):** toda página tem a mesma `<meta http-equiv="Content-Security-Policy">` logo depois do charset: scripts só do próprio site (sem `<script>` com código dentro, sem onclick: use `data-clique`, ver `acoes.js`), dados só para o Supabase do projeto (https e wss) e o get.geojs.io (cidade da presença). Só o login.html libera também a Cloudflare (https://challenges.cloudflare.com, script e frame do captcha). Serviço novo de fora (API, imagem, fonte): incluir na CSP de todas as páginas, senão o navegador bloqueia. O teste-paginas confere a CSP e que ela barra código injetado; nos testes com `waitForFunction` o contexto usa `bypassCSP`.
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `estoque-parser.js` (385), `auth-guard.js` (384), `transp-render.js` (381), `helpers.js` (359), `agenda-banco.js` (358), `agenda-form-campos.js` (357), `admin-aparelhos.js` (349), `agenda-larguras.js` (349), `agenda-zap.js` (345), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-salvar.js` (325), `leads-cards.js` (325), `propostas-config.js` (322), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310), `dispositivo.js` (306).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `helpers.js` (389), `estoque-parser.js` (385), `auth-guard.js` (384), `transp-render.js` (381), `agenda-banco.js` (358), `agenda-form-campos.js` (357), `admin-aparelhos.js` (349), `agenda-larguras.js` (349), `agenda-zap.js` (345), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-salvar.js` (325), `leads-cards.js` (325), `propostas-config.js` (322), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310), `dispositivo.js` (306).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - `propostas-copiadas.html` para quem não é admin (acesso "propostas-copiadas", v16.41.0): os dados só aparecem com a policy de SELECT com `tem_acesso('propostas-copiadas')` em `propostas_copiadas`. Apagar continua só com o admin.

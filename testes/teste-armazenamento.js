@@ -221,6 +221,28 @@ const confere = (nome, ok, extra) => {
         await pagina.waitForLoadState("networkidle");
         confere("WEG: volta", (await pagina.inputValue("#dataInicio")) === "2026-10-31");
 
+        // texto do e-mail: copia formatado (negrito no Outlook) e o texto simples junto
+        await pagina.fill("#qtd-WME10", "1");
+        await pagina.fill("#periodos", "4");
+        const copiado = await pagina.evaluate(async () => {
+            let itens = null;
+            // o site de teste é http: o navegador não dá o clipboard nem o ClipboardItem
+            window.ClipboardItem = window.ClipboardItem || class { constructor(dados){ this.dados = dados; } async getType(tipo){ return this.dados[tipo]; } };
+            Object.defineProperty(navigator, "clipboard", { configurable: true, value: { write: async (lista) => { itens = lista; } } });
+            copiarParaEmail();
+            await new Promise(pronto => setTimeout(pronto, 50));
+            const ler = async (tipo) => (await itens[0].getType(tipo)).text();
+            return { html: await ler("text/html"), texto: await ler("text/plain") };
+        });
+        confere("WEG e-mail: campos em negrito", copiado.html.includes("<b>Data da entrega:</b>") && copiado.html.includes("<b>CNPJ de faturamento:</b>"), copiado.html);
+        confere("WEG e-mail: exemplo da data é o início da tela", copiado.html.includes("Exemplo: 31/10/2026") && copiado.texto.includes("Exemplo: 31/10/2026"), copiado.texto);
+        confere("WEG e-mail: ciclo e máquina no texto", copiado.texto.includes("de 4 ciclos de 30 dias do Mastro Elétrico de 10 metros"), copiado.texto);
+        confere("WEG e-mail: texto simples sem HTML", !/[<>]/.test(copiado.texto), copiado.texto);
+
+        // como fica colado no e-mail
+        await pagina.setContent(`<body style="background:#fff;padding:20px">${copiado.html}</body>`);
+        await pagina.screenshot({ path: path.join(__dirname, "capturas", "weg-email.png") });
+
         await pagina.close();
     }
 

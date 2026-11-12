@@ -9,7 +9,7 @@
 // ======================================
 // Só precisa trocar aqui — aparece sozinho nas duas páginas.
 
-const VERSAO_SISTEMA = "16.57.1";
+const VERSAO_SISTEMA = "16.58.0";
 
 document.querySelectorAll(".versao").forEach(elemento => {
     elemento.innerText = "v" + VERSAO_SISTEMA;
@@ -256,6 +256,36 @@ const copiar = async (texto, mensagem) => {
     }
 
     return copiou;
+};
+
+
+// Copia com formatação (negrito, cores): colando no Outlook/Gmail sai
+// formatado; num bloco de notas ou no Zap sai o texto simples. Navegador
+// sem suporte a HTML no clipboard: copia só o texto.
+const copiarFormatado = async (html, texto, mensagem) => {
+
+    try {
+
+        if (typeof ClipboardItem === "undefined" || !navigator.clipboard?.write) {
+
+            throw new Error("sem suporte a HTML no clipboard");
+        }
+
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                "text/html": new Blob([html], { type: "text/html" }),
+                "text/plain": new Blob([texto], { type: "text/plain" })
+            })
+        ]);
+
+        if (mensagem) mostrarToast(mensagem);
+
+        return true;
+
+    } catch (erro) {
+
+        return copiar(texto, mensagem);
+    }
 };
 
 

@@ -16,7 +16,9 @@ Dentro de `site/`, `js/<página>/` guarda os scripts de cada página (`js/agenda
 
 O site continua sem build: `package.json` e `node_modules` servem só para os testes (precisa do Node 20 ou mais novo e do Chrome instalados). O banco é sempre simulado; nenhum teste acessa o Supabase de verdade.
 
-- Primeira vez: `npm install`. Rodar tudo: `npm test` (cerca de 9 minutos). Só um assunto: `npm test -- leads`. Só os que não abrem o navegador (menos de 1 s): `npm test -- --rapidos`.
+- Primeira vez: `npm install`. Rodar tudo: `npm test` (cerca de 3 minutos; o mais lento, teste-versao, sozinho leva uns 2 e meio). Só um assunto: `npm test -- leads`. Só os que não abrem o navegador (menos de 1 s): `npm test -- --rapidos`.
+- `npm test -- --mudados`: os rápidos e os ligados aos arquivos que mudaram desde o último commit (`testes/mudados.js` explica como liga arquivo e teste; arquivo usado em 5 páginas ou mais, como helpers.js e style.css, roda tudo). Bom durante o trabalho; antes de entregar, `npm test` completo.
+- O `testes/rodar.js` roda vários testes ao mesmo tempo (até 4; no GitHub, 3), cada um com o próprio Chrome e servidor simulado. Os mais demorados começam primeiro, pelo tempo da última rodada (`testes/capturas/tempos.json`). Um de cada vez: `npm test -- --juntos=1` (útil se um teste só falhar junto com os outros).
 - Antes de cada commit (`.githooks/pre-commit`, ligado pelo `npm install` via `testes/ligar-pre-commit.js`): atualiza este mapa, põe ele no mesmo commit e roda os testes rápidos; se um falhar, o commit não acontece. Sem Node no computador, só avisa e deixa commitar. Pular uma vez: `git commit --no-verify`.
 - `testes/teste-paginas.js`: abre todas as páginas com o `auth-guard.js` real (erros, arquivos faltando, funções dos botões, menu, login e acessos). Página nova entra na lista `PAGINAS`.
 - `testes/teste-erros.js`: registro de erros, recarga por arquivo que não carregou e a seção do Admin, com o supabase-js de verdade e o servidor simulado.
@@ -37,7 +39,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-resumo-frete → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
-- CSS: style → agenda
+- CSS: style → agenda → agenda-tabela → agenda-modal → agenda-estoque → agenda-formulario → agenda-tema-claro
 - JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-carregamento → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
@@ -81,10 +83,10 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - `admin-config.js` (51 linhas): Páginas (ACESSOS_ADMIN, chave = nome do arquivo sem .html; "fretes" libera os dados de frete; "transportadoras" é só ver), filiais e estado da tela de usuários e acessos.
 - `admin-dados.js` (105 linhas): Ler e salvar os acessos de cada usuário (tabela "perfis") e criar usuário pela função `criar-usuario`. Só admin enxerga todos e altera (policies de RLS).
   - carregarPerfisAdmin, salvarPerfilAdmin, criarUsuarioAdmin
-- `admin-erros-copiar.js` (43 linhas): Botões 📋 da seção "Erros do sistema": copia um erro (ou todos os da lista) com página, versão, usuário, horários, mensagem e detalhes, pronto para colar numa conversa. Carregar depois de admin-erros.js.
+- `admin-erros-copiar.js` (51 linhas): Botões 📋 da seção "Erros do sistema": copia um erro (ou todos os da lista) com página, versão, usuário, horários, mensagem e detalhes, pronto para colar numa conversa. Carregar depois de admin-erros.js.
   - textoErroParaCopiar, copiarErroSite, copiarErrosVisiveis
-- `admin-erros.js` (293 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista, botão que grava um erro de teste e 📋 Copiar em cada erro (admin-erros-copiar.js). Nada entra como HTML.
-  - mensagemFalhaErros, carregarErrosSite, errosVisiveis, desenharFiltroErros, criarCelulaMensagemErro, criarLinhaErro, criarLinhaAvisoErros, desenharErrosSite, limparErrosSite, testarRegistroErros
+- `admin-erros.js` (387 linhas): Seção "Erros do sistema": lista os erros da tabela erros_site dos últimos 30 dias, filtro por página, limpar a lista, botão que grava um erro de teste e 📋 Copiar em cada erro (admin-erros-copiar.js). Nada entra como HTML.
+  - mensagemFalhaErros, carregarErrosSite, errosVisiveis, agruparErros, gruposVisiveis, valoresDoGrupo, criarCelulaVarios, criarRegistrosDoGrupo, desenharFiltroErros, criarCelulaMensagemErro, criarLinhaErro, criarLinhaAvisoErros, desenharErrosSite, limparErrosSite, testarRegistroErros
 - `admin-init.js` (50 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página. Quem não é admin já foi mandado embora pelo auth-guard.js.
 - `admin-online.js` (127 linhas): Painel "Online agora": quem está com o sistema aberto, em qual página e se está usando, parado ou em segundo plano, e embaixo o aparelho (celular/tablet/computador, marca, navegador) e a cidade aproximada (o texto vem de textoAparelhoOnline, em presenca.js). Sem histórico.
   - nomePaginaOnline, tempoOnline, textoAbaOnline, pessoasOnline, desenharUsuariosOnline
@@ -322,7 +324,14 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 ## CSS
 
 - `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou)
-- `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `agenda.css`, `leads.css`, `propostas-copiadas.css`: estilos de cada página (a propostas-copiadas.html carrega também o admin.css)
+- `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `leads.css`, `propostas-copiadas.css`: estilos de cada página (a propostas-copiadas.html carrega também o admin.css)
+- Agenda, em seis arquivos carregados nesta ordem (a ordem conta: uma regra posterior vence a anterior):
+  - `agenda.css`: card, barra, ⚙️ Filtros, pesquisa e filtro de datas.
+  - `agenda-tabela.css`: a lista (tabela, dias, linhas, status, botões da linha), a largura das colunas e o patrimônio ainda não definido.
+  - `agenda-modal.css`: o modal (cabeçalho fixo com o Salvar) e a lixeira.
+  - `agenda-estoque.css`: consulta ao estoque (botão 🔍 da linha).
+  - `agenda-formulario.css`: formulário do agendamento (locais do cliente, faturamento, plataformas, etapas e retirada).
+  - `agenda-tema-claro.css`: fundo claro. Sempre o último.
 - `transportadoras.css`: lista, modal, documentos e formulário de nova transportadora
 
 ## Supabase (tabelas, bucket e função)
@@ -387,7 +396,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 
 - **Segurança (CSP):** toda página tem a mesma `<meta http-equiv="Content-Security-Policy">` logo depois do charset: scripts só do próprio site (sem `<script>` com código dentro, sem onclick: use `data-clique`, ver `acoes.js`), dados só para o Supabase do projeto (https e wss) e o get.geojs.io (cidade da presença). Só o login.html libera também a Cloudflare (https://challenges.cloudflare.com, script e frame do captcha). Serviço novo de fora (API, imagem, fonte): incluir na CSP de todas as páginas, senão o navegador bloqueia. O teste-paginas confere a CSP e que ela barra código injetado; nos testes com `waitForFunction` o contexto usa `bypassCSP`.
 
-- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `helpers.js` (389), `estoque-parser.js` (385), `auth-guard.js` (384), `transp-render.js` (381), `agenda-banco.js` (358), `agenda-form-campos.js` (357), `admin-aparelhos.js` (349), `agenda-larguras.js` (349), `agenda-zap.js` (345), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-salvar.js` (325), `leads-cards.js` (325), `propostas-config.js` (322), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310), `dispositivo.js` (306).
+- Arquivos acima de ~300 linhas (sugerir divisão antes de crescerem): `agenda-clientes.js` (533), `proposta-zap.js` (478), `helpers.js` (389), `admin-erros.js` (387), `estoque-parser.js` (385), `auth-guard.js` (384), `transp-render.js` (381), `agenda-banco.js` (358), `agenda-form-campos.js` (357), `admin-aparelhos.js` (349), `agenda-larguras.js` (349), `agenda-zap.js` (345), `presenca.js` (327), `agenda-pagamento.js` (326), `agenda-salvar.js` (325), `leads-cards.js` (325), `propostas-config.js` (322), `propostas-cache.js` (312), `transp-docs.js` (312), `registro-erros.js` (310), `dispositivo.js` (306).
 - Cadastro de transportadoras e motoristas saiu da agenda (v16.6.0): agora é só em `transportadoras.html` (admin). A agenda só lê.
 - `transportadoras.html` para quem não é admin (acesso "transportadoras", v16.8.0): só ver. A tela esconde os botões, mas os dados só aparecem com policies de SELECT com `tem_acesso('transportadoras')` em `transportadoras`, `veiculos`, `motoristas`, `motoristas_dados`, `transportadora_docs` e no bucket `docs-transportadoras`. Gravar continua só com as policies de admin.
 - `propostas-copiadas.html` para quem não é admin (acesso "propostas-copiadas", v16.41.0): os dados só aparecem com a policy de SELECT com `tem_acesso('propostas-copiadas')` em `propostas_copiadas`. Apagar continua só com o admin.

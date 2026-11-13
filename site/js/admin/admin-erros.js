@@ -3,7 +3,8 @@
 // ======================================
 // Lista o que o registro-erros.js guardou na tabela erros_site. Só o admin lê e
 // apaga (quem protege é o RLS). As mensagens vêm do navegador de cada pessoa:
-// nada entra na tela como HTML.
+// nada entra na tela como HTML. O mesmo erro (página, tipo e mensagem) gravado por
+// várias pessoas ou versões aparece numa linha só (agruparErros).
 
 const TABELA_ERROS_SITE = "erros_site";
 
@@ -93,6 +94,91 @@ function errosVisiveis(){
 }
 
 
+// O banco grava um registro por pessoa e por versão. Na tela, mesma página, tipo e
+// mensagem viram uma linha só: soma as vezes, mostra a versão e a pessoa mais
+// recentes e guarda os registros (Ver os N registros). A lista já vem do mais
+// recente para o mais antigo, então o primeiro de cada grupo é o mais recente.
+function agruparErros(lista){
+
+    const grupos = new Map();
+
+    lista.forEach(erro => {
+
+        const chave = `${erro.pagina}|${erro.tipo}|${erro.mensagem}`;
+
+        const grupo = grupos.get(chave);
+
+        if(!grupo){
+
+            grupos.set(chave, { ...erro, vezes: Number(erro.vezes || 0), registros: [erro] });
+
+            return;
+        }
+
+        grupo.registros.push(erro);
+
+        grupo.vezes += Number(erro.vezes || 0);
+
+        if(erro.criado_em < grupo.criado_em) grupo.criado_em = erro.criado_em;
+    });
+
+    return [...grupos.values()];
+}
+
+
+function gruposVisiveis(){
+
+    return agruparErros(errosVisiveis());
+}
+
+
+// versões ou pessoas diferentes do grupo, a mais recente primeiro
+function valoresDoGrupo(grupo, campo, vazio){
+
+    return [...new Set(grupo.registros.map(erro => erro[campo] || vazio))];
+}
+
+
+// "16.30.0" ou "16.30.0 (+2)", com todas no title
+function criarCelulaVarios(grupo, campo, vazio, classe){
+
+    const valores = valoresDoGrupo(grupo, campo, vazio);
+
+    const celula =
+        criar("td", classe, valores.length > 1 ? `${valores[0]} (+${valores.length - 1})` : valores[0]);
+
+    if(valores.length > 1) celula.title = valores.join("\n");
+
+    return celula;
+}
+
+
+// a lista dos registros juntados: quando, versão, quem e quantas vezes
+function criarRegistrosDoGrupo(grupo){
+
+    const detalhes = criar("details", "erro-registros");
+
+    detalhes.appendChild(criar("summary", "", `Ver os ${grupo.registros.length} registros`));
+
+    const lista = criar("ul");
+
+    grupo.registros.forEach(erro => {
+
+        lista.appendChild(
+            criar(
+                "li",
+                "",
+                `${dataHoraBR(erro.atualizado_em)} · ${erro.versao} · ${erro.usuario_email || "—"} · ${erro.vezes} vez(es)`
+            )
+        );
+    });
+
+    detalhes.appendChild(lista);
+
+    return detalhes;
+}
+
+
 function desenharFiltroErros(){
 
     const select = $("filtroErrosPagina");
@@ -142,6 +228,7 @@ function criarCelulaMensagemErro(erro){
 
     celula.appendChild(criar("div", "erro-mensagem", erro.mensagem));
 
+    // o detalhe (onde aconteceu) é o do registro mais recente
     if(erro.detalhe){
 
         const detalhes = criar("details");
@@ -153,10 +240,13 @@ function criarCelulaMensagemErro(erro){
         celula.appendChild(detalhes);
     }
 
+    if(erro.registros?.length > 1) celula.appendChild(criarRegistrosDoGrupo(erro));
+
     return celula;
 }
 
 
+// recebe um grupo (agruparErros): com um registro só, fica igual ao registro
 function criarLinhaErro(erro){
 
     const linha = criar("tr");
@@ -168,8 +258,8 @@ function criarLinhaErro(erro){
     linha.append(
         quando,
         criar("td", "", nomePaginaOnline(erro.pagina)),
-        criar("td", "", erro.versao),
-        criar("td", "col-erro-usuario", erro.usuario_email || "—"),
+        criarCelulaVarios(erro, "versao", "—", ""),
+        criarCelulaVarios(erro, "usuario_email", "—", "col-erro-usuario"),
         criarCelulaMensagemErro(erro),
         criar("td", "", erro.vezes)
     );
@@ -196,7 +286,7 @@ function desenharErrosSite(){
 
     desenharFiltroErros();
 
-    const visiveis = errosVisiveis();
+    const visiveis = gruposVisiveis();
 
     const corpo = $("corpoErros");
 
@@ -240,7 +330,11 @@ async function limparErrosSite(){
 
     if(!ids.length) return;
 
-    if(!confirm(`Apagar ${ids.length} erro(s) da lista?`)) return;
+    const grupos = gruposVisiveis().length;
+
+    const registros = grupos === ids.length ? "" : ` (${ids.length} registros)`;
+
+    if(!confirm(`Apagar ${grupos} erro(s) da lista${registros}?`)) return;
 
     try{
 

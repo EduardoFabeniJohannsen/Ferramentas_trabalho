@@ -5,13 +5,21 @@
 // página, versão, usuário, horários, mensagem e detalhes, pronto para colar numa
 // conversa. Carregar depois de admin-erros.js.
 
-// texto pronto para colar numa conversa (com tudo o que ajuda a achar a causa)
+// texto pronto para colar numa conversa (com tudo o que ajuda a achar a causa).
+// Recebe um grupo (agruparErros): com vários registros, lista todas as versões e
+// pessoas; o detalhe é o do mais recente.
 function textoErroParaCopiar(erro){
 
+    const registros = erro.registros || [erro];
+
+    const versoes = [...new Set(registros.map(r => r.versao))];
+
+    const usuarios = [...new Set(registros.map(r => r.usuario_email || "não identificado"))];
+
     const linhas = [
-        `Erro do sistema: ${nomePaginaOnline(erro.pagina)} (${erro.pagina}.html), versão ${erro.versao}`,
+        `Erro do sistema: ${nomePaginaOnline(erro.pagina)} (${erro.pagina}.html), ${versoes.length > 1 ? "versões" : "versão"} ${versoes.join(", ")}`,
         `Tipo: ${ROTULOS_TIPO_ERRO[erro.tipo] || erro.tipo}`,
-        `Usuário: ${erro.usuario_email || "não identificado"}`,
+        `${usuarios.length > 1 ? "Usuários" : "Usuário"}: ${usuarios.join(", ")}`,
         `Vezes: ${erro.vezes} · primeira: ${dataHoraBR(erro.criado_em)} · última: ${dataHoraBR(erro.atualizado_em)}`,
         "Mensagem:",
         erro.mensagem
@@ -32,7 +40,7 @@ function copiarErroSite(erro){
 // todos os da lista (com o filtro, só os daquela página)
 function copiarErrosVisiveis(){
 
-    const visiveis = errosVisiveis();
+    const visiveis = gruposVisiveis();
 
     if(!visiveis.length) return;
 

@@ -570,7 +570,7 @@ const confere = (nome, ok, extra) => {
 
     // ---------- SQL ainda não rodado e outras falhas ----------
     {
-        const { contexto, pagina, servidor, errosPagina } = await abrir("admin.html");
+        const { contexto, pagina, servidor, errosPagina, dialogos } = await abrir("admin.html");
 
         confere("sem erros: avisa", (await pagina.innerText("#corpoErros")).includes("Nenhum erro"));
 
@@ -594,6 +594,35 @@ const confere = (nome, ok, extra) => {
         await pagina.click(".secao-erros button:has-text('Atualizar')");
         await pagina.waitForFunction(() => document.querySelectorAll("#corpoErros tr").length === 3);
         confere("Atualizar traz de novo", true);
+
+        // o mesmo erro (página, tipo e mensagem) de várias pessoas e versões: uma linha só
+        const base = LINHAS_ERROS()[0];
+        servidor.linhas = [
+            { ...base, id: 11, atualizado_em: "2026-10-05T12:00:00Z", criado_em: "2026-10-03T12:00:00Z", versao: "16.31.0", usuario_email: "bia@exemplo.com", vezes: 2, detalhe: "o mais recente" },
+            { ...base, id: 12, atualizado_em: "2026-10-04T12:00:00Z", criado_em: "2026-10-01T09:00:00Z", versao: "16.30.0", usuario_email: "ana@exemplo.com", vezes: 3, detalhe: "o mais antigo" },
+            { ...base, id: 13, atualizado_em: "2026-10-02T12:00:00Z", criado_em: "2026-10-02T12:00:00Z", versao: "16.30.0", usuario_email: null, vezes: 1, detalhe: "" },
+            { ...base, id: 14, atualizado_em: "2026-10-02T12:00:00Z", pagina: "leads" }
+        ];
+        await pagina.click(".secao-erros button:has-text('Atualizar')");
+        await pagina.waitForFunction(() => document.querySelectorAll("#corpoErros tr").length === 2);
+        const juntas = await pagina.locator("#corpoErros tr").allInnerTexts();
+        confere("junta o mesmo erro da mesma página (outra página fica separada)", juntas.length === 2 && juntas[1].includes("Leads"), juntas);
+        confere("soma as vezes", juntas[0].trim().endsWith("6"), juntas[0]);
+        confere("versão e pessoa mais recentes, com quantas mais", juntas[0].includes("16.31.0 (+1)") && juntas[0].includes("bia@exemplo.com (+2)"), juntas[0]);
+        confere("primeira vez é a mais antiga de todas", (await pagina.locator("#corpoErros tr").first().locator("td").first().getAttribute("title")) === "Primeira vez: 01/10/2026 06:00", await pagina.locator("#corpoErros tr").first().locator("td").first().getAttribute("title"));
+        confere("todas as versões e pessoas no title", (await pagina.locator("#corpoErros tr").first().locator("td").nth(3).getAttribute("title")) === "bia@exemplo.com\nana@exemplo.com\n—");
+        confere("contagem conta os erros juntados", (await pagina.innerText("#contagemErros")) === "2 erro(s), 9 ocorrência(s)", await pagina.innerText("#contagemErros"));
+        await pagina.locator("#corpoErros .erro-registros summary").click();
+        const registros = await pagina.locator("#corpoErros .erro-registros li").allInnerTexts();
+        confere("Ver os 3 registros", registros.length === 3 && registros[1].includes("16.30.0 · ana@exemplo.com · 3 vez(es)") && registros[2].includes("· — ·"), registros);
+        confere("só o erro com vários registros tem a lista", (await pagina.locator("#corpoErros tr").nth(1).locator(".erro-registros").count()) === 0);
+        const copiado = await pagina.evaluate(() => textoErroParaCopiar(gruposVisiveis()[0]));
+        confere("Copiar traz todas as versões e pessoas", copiado.includes("versões 16.31.0, 16.30.0") && copiado.includes("Usuários: bia@exemplo.com, ana@exemplo.com, não identificado") && copiado.includes("Vezes: 6") && copiado.includes("o mais recente") && !copiado.includes("o mais antigo"), copiado);
+        dialogos.aceitar = false;
+        await pagina.click("#btnLimparErros");
+        await pagina.waitForTimeout(50);
+        confere("Limpar conta os erros e os registros", dialogos.vistos.at(-1) === "Apagar 2 erro(s) da lista (4 registros)?", dialogos.vistos);
+        await pagina.screenshot({ path: path.join(saida, "91-erros-juntados.png"), fullPage: true });
 
         await contexto.close();
     }

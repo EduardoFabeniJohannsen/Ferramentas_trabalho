@@ -213,6 +213,12 @@
     white-space:pre-wrap;
     overflow-wrap:anywhere;
 }
+/* o mesmo erro de várias pessoas ou versões (agruparErros) */
+.erro-registros ul{
+    margin:4px 0 0;
+    padding-left:18px;
+    overflow-wrap:anywhere;
+}
 
 /* ===== Aparelhos (admin-aparelhos.js) ===== */
 .secao-aparelhos{

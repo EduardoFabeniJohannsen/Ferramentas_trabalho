@@ -1,0 +1,218 @@
+/* Agenda: formulário do agendamento (locais do cliente, faturamento, plataformas, etapas e retirada). */
+
+/* locais que o cliente já usou (agenda-clientes.js): nome do local e cidade */
+.locais-cliente .chips{
+    margin-bottom:4px;
+}
+.chip-local{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1px;
+    text-align:left;
+    max-width:100%;
+}
+.chip-local small{
+    font-size:12px;
+    opacity:.8;
+}
+
+/* ===== Faturamento (pagamento e pedido de compra) ===== */
+#blocoFaturamento label{
+    margin-top:6px;
+}
+.prazo-linha{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
+}
+.prazo-linha input{
+    width:90px;
+    margin:0;
+    text-align:center;
+}
+.prazo-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+/* plataformas: uma linha por equipamento */
+.ag-plataforma-linha{
+    margin-bottom:6px;
+}
+.ag-plataforma-linha input{
+    margin:0;
+}
+.ag-plataforma-linha button{
+    flex:none;
+    width:38px;
+    margin:0;
+    padding:8px 0;
+    font-size:18px;
+    line-height:1;
+}
+.prazo-rotulo{
+    min-width:56px;
+    font-size:13px;
+    color:#cbd5e1;
+}
+.prazo-unidade{
+    font-size:13px;
+    color:#94a3b8;
+}
+.btn-add-prazo{
+    margin:0 10px 8px 0;
+    padding:6px 12px;
+    font-size:13px;
+}
+.resumo-prazos{
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}
+#agPedidoCompra:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+.doc-linha{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:6px 0;
+    padding:6px 10px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:8px;
+    font-size:13px;
+}
+.doc-linha .doc-nome{
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.doc-linha button{
+    margin:0;
+    padding:4px 10px;
+}
+.aviso-pedido{
+    margin:4px 0 0;
+    font-size:12px;
+    color:#fbbf24;
+}
+
+/* frete dividido: quanto o cliente paga (embaixo da parte por nossa conta) */
+.aviso-frete-cliente{
+    margin:4px 0 0;
+    font-size:12px;
+    color:#94a3b8;
+}
+
+/* ===== Etapas do formulário (demanda → local → faturamento) ===== */
+.etapa{
+    grid-column:1 / -1;
+    margin-top:14px;
+    border:1px solid #334155;
+    border-left-width:5px;
+    border-radius:10px;
+    overflow:hidden;
+}
+.etapa:first-child{
+    margin-top:0;
+}
+.etapa-demanda{
+    border-left-color:#3b82f6;
+}
+.etapa-local{
+    border-left-color:#f59e0b;
+}
+.etapa-faturamento{
+    border-left-color:#22c55e;
+}
+.etapa-titulo{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    padding:8px 14px;
+    font-size:14px;
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.etapa-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    font-size:12px;
+    color:#0f172a;
+    background:#94a3b8;
+}
+.etapa-demanda .etapa-num{
+    background:#3b82f6;
+}
+.etapa-local .etapa-num{
+    background:#f59e0b;
+}
+.etapa-faturamento .etapa-num{
+    background:#22c55e;
+}
+.etapa-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+    padding:6px 14px 14px;
+}
+
+/* etapa recolhível: clicar no título esconde o conteúdo */
+.etapa-titulo{
+    cursor:pointer;
+    user-select:none;
+}
+.etapa-titulo:hover{
+    filter:brightness(1.2);
+}
+.etapa-seta{
+    margin-left:auto;
+    font-size:14px;
+    transition:transform .15s;
+}
+.etapa.recolhida .etapa-seta{
+    transform:rotate(-90deg);
+}
+.etapa.recolhida .etapa-grade{
+    display:none;
+}
+
+/* retirada recolhida (entrega): só o título com "W Rental" */
+.titulo-retirada{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    user-select:none;
+}
+.titulo-retirada:hover{
+    filter:brightness(1.2);
+}
+.retirada-resumo{
+    font-weight:normal;
+    color:#94a3b8;
+}
+.retirada-seta{
+    margin-left:auto;
+    transition:transform .15s;
+}
+.titulo-retirada.recolhida .retirada-seta{
+    transform:rotate(-90deg);
+}
+
+@media(max-width:600px){
+    .form-grade,
+    .etapa-grade{
+        grid-template-columns:1fr;
+    }
+}

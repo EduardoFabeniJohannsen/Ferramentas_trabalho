@@ -120,7 +120,7 @@ function aplicarUnidades(){
 
 // Tipo trocado ou formulário aberto: com "entre unidades" mostra as duas
 // caixas e esconde retirada, entrega, cliente e e-mails (classe no modal,
-// regras em agenda.css). As caixas partem do que está nos campos.
+// regras em agenda-tabela.css). As caixas partem do que está nos campos.
 function atualizarBlocoUnidades(){
 
     const entreUnidades = $("agTipo").value === TIPO_TRANSFERENCIA_UNIDADES;

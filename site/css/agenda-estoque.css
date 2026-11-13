@@ -1,0 +1,168 @@
+/* Agenda: consulta ao estoque (botão 🔍 da linha). */
+
+/* consulta ao estoque (botão 🔍 da linha) */
+.estoque-topo{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:center;
+    justify-content:space-between;
+}
+.estoque-topo button{
+    margin:0;
+    padding:6px 12px;
+}
+.estoque-filial{
+    margin-top:16px;
+    overflow-x:auto;
+}
+.estoque-filial h4{
+    margin:0;
+}
+.estoque-filial small{
+    opacity:.7;
+}
+/* mais de 12 horas sem publicar o estoque */
+.estoque-filial small.estoque-desatualizado{
+    display:inline-block;
+    margin-top:2px;
+    padding:3px 8px;
+    border-radius:6px;
+    background:#b91c1c;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:bold;
+    opacity:1;
+}
+.estoque-nada{
+    margin:8px 0 0;
+    font-size:13px;
+    opacity:.8;
+}
+.estoque-tabela{
+    width:100%;
+    min-width:560px;
+    margin-top:6px;
+    border-collapse:collapse;
+    table-layout:fixed;
+    font-size:13px;
+}
+/* mesmas colunas nas duas filiais; o aviso de reserva fica com o espaço maior */
+.estoque-tabela th:nth-child(4){
+    width:52px;
+}
+.estoque-tabela th:nth-child(6){
+    width:30%;
+}
+.estoque-tabela th:nth-child(7){
+    width:64px;
+}
+/* "Qual equipamento trocar?" (vários equipamentos no agendamento) */
+.estoque-escolha{
+    margin-bottom:12px;
+    padding:10px 12px;
+    border:1px solid #3b82f6;
+    border-radius:8px;
+    background:rgba(59,130,246,.14);
+}
+.estoque-escolha p{
+    margin:0 0 8px;
+    font-weight:bold;
+}
+.estoque-escolha-botoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+.estoque-escolha-botoes button{
+    margin:0;
+    padding:6px 12px;
+}
+.estoque-usar{
+    text-align:right;
+}
+.estoque-usar button{
+    margin:0;
+    padding:3px 10px;
+    font-size:12px;
+}
+.estoque-em-manutencao{
+    font-weight:bold;
+    color:#f87171;
+}
+/* máquina que já está em alguma demanda: a linha inteira em destaque */
+.estoque-tabela tr.estoque-em-demanda td{
+    background:rgba(251,191,36,.18);
+}
+.estoque-tabela tr.estoque-em-demanda td:first-child{
+    box-shadow:inset 4px 0 0 #fbbf24;
+}
+.estoque-tabela tr.estoque-neste-agendamento td{
+    background:rgba(96,165,250,.16);
+}
+.estoque-tabela tr.estoque-neste-agendamento td:first-child{
+    box-shadow:inset 4px 0 0 #60a5fa;
+}
+.estoque-tabela tr.estoque-em-demanda .estoque-reserva,
+.estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    font-weight:bold;
+}
+.estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    color:#93c5fd;
+}
+.estoque-tabela th,
+.estoque-tabela td{
+    padding:5px 8px;
+    text-align:left;
+    border-bottom:1px solid #334155;
+}
+.estoque-tabela th{
+    font-size:11px;
+    text-transform:uppercase;
+    opacity:.75;
+}
+.estoque-patrimonio{
+    font-weight:bold;
+    white-space:nowrap;
+}
+.estoque-reserva{
+    font-size:12px;
+    color:#fbbf24;
+}
+body.tema-claro .estoque-tabela th,
+body.tema-claro .estoque-tabela td{
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .estoque-reserva{
+    color:#a14a09;
+}
+body.tema-claro .estoque-em-manutencao{
+    color:#b91c1c;
+}
+body.tema-claro .estoque-tabela tr.estoque-neste-agendamento .estoque-reserva{
+    color:#1d4ed8;
+}
+.modal-corpo{
+    padding:14px 20px 20px;
+}
+.form-grade{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 10px;
+    padding:14px 20px 20px;
+}
+.form-grade label{
+    display:block;
+    font-size:12px;
+    color:#94a3b8;
+    margin-bottom:2px;
+}
+.form-grade .largo{
+    grid-column:1 / -1;
+}
+.subtitulo-form{
+    margin:10px 0 4px;
+    font-size:13px;
+    font-weight:bold;
+    color:#cbd5e1;
+}

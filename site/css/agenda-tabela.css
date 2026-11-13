@@ -1,0 +1,416 @@
+/* Agenda: a lista (tabela, dias, linhas, status, botões da linha), a largura das colunas e o patrimônio ainda não definido. */
+
+/* ===== Lista (tabela: as colunas se ajustam ao texto e ficam alinhadas) ===== */
+#listaAgenda{
+    overflow-x:auto;
+}
+.ag-tabela{
+    border-collapse:separate;
+    border-spacing:0 3px;
+    width:auto;
+    max-width:100%;
+}
+.ag-tabela p{
+    margin:0;
+}
+.ag-tabela thead th{
+    padding:4px 10px;
+    font-size:11px;
+    font-weight:bold;
+    text-align:left;
+    text-transform:uppercase;
+    color:#94a3b8;
+    border-bottom:1px solid #334155;
+    white-space:nowrap;
+}
+.ag-tabela thead th + th{
+    border-left:1px dashed #475569;
+}
+.ag-tabela thead th.ag-cab-horario{
+    text-align:center;
+}
+/* título arrastável (muda a ordem das colunas) */
+.ag-tabela thead th.ag-cab-coluna{
+    cursor:grab;
+    user-select:none;
+}
+.ag-tabela thead th.ag-cab-coluna:hover{
+    color:#e5e7eb;
+}
+.ag-tabela thead th.arrastando{
+    opacity:.4;
+}
+.ag-tabela thead th.solta-antes{
+    box-shadow:inset 3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.solta-depois{
+    box-shadow:inset -3px 0 0 #3b82f6;
+}
+.ag-tabela thead th.ag-cab-proposta{
+    text-align:center;
+}
+.ag-tabela thead th.ag-cab-lado{
+    border:none;
+}
+/* traço de corte do print: a proposta fica fora enquanto for a última coluna;
+   se o usuário mudar ela de lugar, só os botões ficam fora */
+.ag-tabela thead th.ag-cab-proposta:nth-last-child(2),
+.ag-tabela thead th:not(.ag-cab-proposta) + th.ag-cab-lado{
+    border-left:2px dashed #334155;
+}
+
+/* cabeçalho de cada dia (a cor do dia vem da variável --cor-dia) */
+tr.ag-dia{
+    --cor-dia:#94a3b8;
+}
+tr.ag-dia th{
+    padding:3px 12px;
+    font-size:14px;
+    text-align:left;
+    text-transform:capitalize;
+    background:var(--cor-dia);
+    color:#0f172a;
+    border-radius:6px;
+    background-clip:padding-box;
+}
+tr.ag-dia:not(:first-child) th{
+    border-top:8px solid transparent;
+}
+
+/* linha de cada agendamento */
+tr.ag-item{
+    --cor-dia:#94a3b8;
+}
+tr.ag-item td{
+    padding:2px 10px;
+    font-size:13px;
+    line-height:1.25;
+    vertical-align:middle;
+    background:#0f172a;
+    background:color-mix(in srgb, var(--cor-dia) 16%, #0f172a);
+    border-top:1px solid var(--cor-dia);
+    border-bottom:1px solid var(--cor-dia);
+}
+tr.ag-item td + td{
+    border-left:1px dashed #475569;
+}
+tr.ag-item td:first-child{
+    border-left:6px solid var(--cor-dia);
+    border-radius:8px 0 0 8px;
+}
+tr.ag-item td:last-child{
+    border-right:1px solid var(--cor-dia);
+    border-radius:0 8px 8px 0;
+}
+tr.ag-item[data-status="Cancelado"] td,
+tr.ag-item[data-status="Concluído"] td{
+    opacity:.55;
+}
+.ag-conteudo{
+    overflow-wrap:anywhere;
+}
+/* colunas curtas (período, status, motorista...): nunca quebram de linha */
+.ag-sem-quebra{
+    white-space:nowrap;
+}
+.ag-hora{
+    font-weight:bold;
+    font-size:14px;
+    text-align:center;
+    white-space:nowrap;
+}
+.ag-hora.ag-hora-texto{
+    font-size:11px;
+}
+/* carrega num dia e entrega em outro (agenda-carregamento.js) */
+.ag-outro-dia{
+    display:block;
+    margin-top:2px;
+    font-size:11px;
+    font-weight:normal;
+    color:#fbbf24;
+}
+body.tema-claro .ag-outro-dia{
+    color:#b45309;
+}
+.form-grade label.opcao-carregar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:6px 0 8px;
+    font-size:13px;
+    color:#e2e8f0;
+    cursor:pointer;
+}
+.opcao-carregar input{
+    width:auto;
+    margin:0;
+}
+body.tema-claro .form-grade label.opcao-carregar{
+    color:#1e293b;
+}
+/* horário em destaque: branco no fundo vermelho */
+.ag-hora-pilula{
+    display:inline-block;
+    padding:1px 10px;
+    border-radius:999px;
+    background:#991b1b;
+    color:#ffffff;
+}
+/* sem horário: discreto */
+.ag-hora-vazio{
+    color:#94a3b8;
+    font-weight:normal;
+}
+.ag-patrimonio{
+    font-weight:bold;
+    font-size:15px;
+}
+
+/* status: a própria etiqueta troca o status ao clicar */
+tr.ag-item select.tag-select{
+    -webkit-appearance:none;
+    appearance:none;
+    width:auto;
+    margin:0;
+    padding:1px 9px;
+    border:none;
+    border-radius:999px;
+    font-family:inherit;
+    font-size:11px;
+    font-weight:bold;
+    color:#e5e7eb;
+    text-align:center;
+    cursor:pointer;
+}
+tr.ag-item select.tag-select option{
+    background:#0f172a;
+    color:#e5e7eb;
+}
+.tag{
+    display:inline-block;
+    padding:1px 8px;
+    border-radius:999px;
+    background:#334155;
+    color:#e5e7eb;
+    font-size:11px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+.tag[data-tipo="Entrega"]{
+    background:#1d4ed8;
+}
+.tag[data-tipo="Coleta"]{
+    background:#b45309;
+}
+.tag[data-tipo="Transferência"]{
+    background:#7e22ce;
+}
+.tag[data-tipo="Transferência entre unidades"]{
+    background:#a21caf;
+}
+.tag[data-tipo="Troca técnica"]{
+    background:#0f766e;
+}
+
+/* ===== Transferência entre unidades (agenda-unidades.js) =====
+   O modal ganha a classe form-entre-unidades: aparecem as caixas de saída e
+   destino; somem retirada, entrega, cliente e e-mails (preenchidos sozinhos) */
+.so-entre-unidades{
+    display:none;
+}
+.form-entre-unidades .so-entre-unidades{
+    display:block;
+}
+.form-entre-unidades .esconde-entre-unidades{
+    display:none;
+}
+.enderecos-unidades{
+    margin:0;
+    font-size:12px;
+    color:#94a3b8;
+    white-space:pre-line;
+}
+/* transportadora "A definir": discreto, só o texto (sem etiqueta colorida) */
+.tag.sem-transp{
+    padding:0;
+    background:transparent;
+    color:#94a3b8;
+    font-weight:normal;
+}
+.tag[data-status="A confirmar"]{
+    background:#a16207;
+}
+.tag[data-status="Confirmado"]{
+    background:#1d4ed8;
+}
+.tag[data-status="Em rota"]{
+    background:#c2410c;
+}
+.tag[data-status="Concluído"]{
+    background:#15803d;
+}
+.tag[data-status="Cancelado"]{
+    background:#475569;
+}
+
+.ag-local{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+}
+.ag-local-texto{
+    font-weight:bold;
+    color:#e5e7eb;
+}
+.ag-local-endereco{
+    color:#cbd5e1;
+}
+.ag-link{
+    display:block;
+    font-size:11px;
+    color:#60a5fa;
+    word-break:break-all;
+}
+.ag-extra{
+    color:#cbd5e1;
+}
+
+/* proposta e botões da linha: o traço de corte separa o que fica fora
+   da área do print (ver o cabeçalho) */
+tr.ag-item td.ag-proposta{
+    padding-left:14px;
+    padding-right:14px;
+    font-size:12px;
+    color:#cbd5e1;
+    text-align:center;
+    white-space:nowrap;
+}
+tr.ag-item td.ag-lado{
+    padding-left:14px;
+    border-left:1px dashed #475569;
+}
+tr.ag-item td.ag-proposta:nth-last-child(2),
+tr.ag-item td:not(.ag-proposta) + td.ag-lado{
+    border-left:2px dashed #334155;
+}
+tr.ag-item td.ag-proposta:first-child{
+    border-left:6px solid var(--cor-dia);
+}
+.ag-botoes{
+    display:flex;
+    gap:16px;
+    align-items:center;
+}
+.ag-botoes button{
+    margin:0;
+    padding:5px 10px;
+}
+.ag-botoes .btn-concluir{
+    background:#065f46;
+}
+.ag-botoes .btn-concluir:hover{
+    background:#064e3b;
+}
+.ag-botoes .btn-zap{
+    background:#16a34a;
+}
+.ag-botoes .btn-zap:hover{
+    background:#15803d;
+}
+.ag-botoes .btn-faturamento{
+    background:#0e7490;
+}
+.ag-botoes .btn-faturamento:hover{
+    background:#155e75;
+}
+.ag-botoes .btn-coleta{
+    background:#b45309;
+}
+.ag-botoes .btn-coleta:hover{
+    background:#92400e;
+}
+.ag-botoes .btn-duplicar{
+    background:#be185d;
+}
+.ag-botoes .btn-duplicar:hover{
+    background:#9d174d;
+}
+.ag-botoes .btn-estoque{
+    background:#6d28d9;
+}
+.ag-botoes .btn-estoque:hover{
+    background:#5b21b6;
+}
+.ag-botoes .btn-excluir-ag{
+    margin-left:12px;
+}
+.ag-botoes .btn-excluir-ag:first-child{
+    margin-left:0;
+}
+
+/* ===== Largura das colunas (arrastar a borda do título) ===== */
+.ag-tabela thead th{
+    position:relative;
+}
+.ag-redimensiona{
+    position:absolute;
+    top:0;
+    right:-3px;
+    width:7px;
+    height:100%;
+    z-index:2;
+    cursor:col-resize;
+    user-select:none;
+    touch-action:none;
+}
+.ag-redimensiona:hover,
+.ag-redimensiona.ativo{
+    background:#3b82f6;
+}
+/* com largura escolhida, o texto quebra de linha dentro da coluna */
+.ag-tabela.largura-fixa{
+    table-layout:fixed;
+}
+.ag-tabela.largura-fixa .ag-conteudo{
+    max-width:none !important;
+    overflow-wrap:anywhere;
+}
+.ag-tabela.largura-fixa .ag-sem-quebra{
+    white-space:normal;
+}
+.ag-tabela.largura-fixa thead th{
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.ag-tabela.largura-fixa thead th .ag-redimensiona{
+    right:0;
+}
+
+/* ===== Patrimônio ainda não definido (só o modelo, ex: WAE15) ===== */
+.ag-patr-incompleto{
+    padding:0 6px;
+    border-radius:6px;
+    background:#facc15;
+    color:#422006;
+}
+.ag-patr-aviso{
+    margin-left:4px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#b45309;
+    color:#ffffff;
+    font-size:10px;
+    font-weight:bold;
+    white-space:nowrap;
+    text-transform:uppercase;
+}
+.aviso-patrimonio{
+    margin:3px 0 0;
+    font-size:12px;
+    color:#fbbf24;
+}
+#btnSemPatrimonio.filtrando,
+#btnSemCard.filtrando{
+    background:#b45309;
+}

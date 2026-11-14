@@ -18,10 +18,14 @@
 
     gerarDocumento();
 
-    // qualquer mudança regera o documento e salva no cache
+    desenharTituloWEG();
+
+    // qualquer mudança regera o documento e o título e salva no cache
     const atualizar = () => {
 
         gerarDocumento();
+
+        desenharTituloWEG();
 
         salvarCacheWEG();
     };

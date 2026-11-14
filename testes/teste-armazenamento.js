@@ -239,6 +239,34 @@ const confere = (nome, ok, extra) => {
         confere("WEG e-mail: ciclo e máquina no texto", copiado.texto.includes("de 4 ciclos de 30 dias do Mastro Elétrico de 10 metros"), copiado.texto);
         confere("WEG e-mail: texto simples sem HTML", !/[<>]/.test(copiado.texto), copiado.texto);
 
+        // título do orçamento: o padrão da Proposta ZOHO (CLIENTE_MODELOS_PERÍODO)
+        const tituloNaTela = () => pagina.innerText("#tituloWEG");
+        confere("WEG título: unidade, máquina e períodos", (await tituloNaTela()) === "WEG JARAGUÁ DO SUL_WME10_4 PERIODOS", await tituloNaTela());
+        await pagina.fill("#qtd-WAE12", "2");
+        await pagina.selectOption("#unidadeWEG", "Blumenau");
+        await pagina.fill("#periodos", "1");
+        confere("WEG título: acompanha a tela, na ordem do documento, quantidade só acima de 1, 1 período = 30 DIAS", (await tituloNaTela()) === "WEG BLUMENAU_WME10 + 2 WAE12_30 DIAS", await tituloNaTela());
+        const tituloCopiado = await pagina.evaluate(async () => {
+            let texto = null;
+            Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (t) => { texto = t; } } });
+            copiarTituloWEG();
+            await new Promise(pronto => setTimeout(pronto, 50));
+            return { texto, toast: document.querySelector("#toast").innerText };
+        });
+        confere("WEG título: copia o que está na tela", tituloCopiado.texto === "WEG BLUMENAU_WME10 + 2 WAE12_30 DIAS" && tituloCopiado.toast === "Título copiado", tituloCopiado);
+        await pagina.screenshot({ path: path.join(__dirname, "capturas", "weg-titulo.png") });
+        await pagina.fill("#qtd-WME10", "0");
+        await pagina.fill("#qtd-WAE12", "0");
+        confere("WEG título: sem equipamento, avisa na tela", (await tituloNaTela()).includes("Escolha um equipamento") && await pagina.locator("#tituloWEG.vazio").count() === 1, await tituloNaTela());
+        const semTitulo = await pagina.evaluate(async () => {
+            let texto = null;
+            Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (t) => { texto = t; } } });
+            copiarTituloWEG();
+            await new Promise(pronto => setTimeout(pronto, 50));
+            return { texto, toast: document.querySelector("#toast").innerText, erro: document.querySelector("#toast").classList.contains("erro") };
+        });
+        confere("WEG título: sem equipamento não copia e avisa", semTitulo.texto === null && semTitulo.toast === "Escolha pelo menos um equipamento" && semTitulo.erro, semTitulo);
+
         // como fica colado no e-mail
         await pagina.setContent(`<body style="background:#fff;padding:20px">${copiado.html}</body>`);
         await pagina.screenshot({ path: path.join(__dirname, "capturas", "weg-email.png") });

@@ -102,12 +102,24 @@ CONTAINER
 
     <div class="coluna-documento">
 
-        <!-- fora da área de print: texto pra mandar junto no e-mail -->
-        <button
-            class="btn-copiar-email"
-            data-clique="copiarParaEmail"
-            title="Copia a saudação e os dados para confirmação"
-        >📋 Copiar texto do e-mail</button>
+        <!-- fora da área de print: título do orçamento e texto pra mandar junto no e-mail -->
+        <div class="acoes-documento">
+
+            <span class="titulo-orcamento-weg" id="tituloWEG" title="Título do orçamento (mesmo padrão da Proposta ZOHO)"></span>
+
+            <button
+                class="btn-copiar-email"
+                data-clique="copiarTituloWEG"
+                title="Copia o título do orçamento: WEG UNIDADE_MODELOS_PERÍODO"
+            >📋 Copiar título</button>
+
+            <button
+                class="btn-copiar-email"
+                data-clique="copiarParaEmail"
+                title="Copia a saudação e os dados para confirmação"
+            >📋 Copiar texto do e-mail</button>
+
+        </div>
 
         <div
             id="documentoProposta"
@@ -138,6 +150,7 @@ CONTAINER
 <script src="js/weg/weg-documento.js" defer></script>
 <script src="js/weg/weg-cache.js" defer></script>
 <script src="js/weg/weg-email.js" defer></script>
+<script src="js/weg/weg-titulo.js" defer></script>
 <script src="js/weg/weg-init.js" defer></script>
 
 </body>

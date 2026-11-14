@@ -671,6 +671,40 @@ DOCUMENTO PROPOSTA (impressão/print)
     background:#334155;
 }
 
+/* WEG: título do orçamento e os botões de copiar, em cima do documento */
+.acoes-documento{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    align-items:center;
+
+    justify-content:flex-end;
+
+    gap:6px;
+
+    max-width:100%;
+}
+
+.titulo-orcamento-weg{
+
+    font-size:12px;
+
+    font-weight:bold;
+
+    color:#e2e8f0;
+
+    overflow-wrap:anywhere;
+}
+
+.titulo-orcamento-weg.vazio{
+
+    font-weight:normal;
+
+    color:#94a3b8;
+}
+
 .documento-proposta .resumo-linha.bonificado{
 
     background:#16a34a;

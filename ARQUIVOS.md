@@ -56,7 +56,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **WEG.html** — Contrato WEG (preços fixos)
 - CSS: style
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → weg-dados → weg-documento → weg-cache → weg-email → weg-titulo → weg-init
 
 **admin.html** — Usuários e acessos, online agora e erros do sistema (só admin). Usa a largura toda da tela. As Propostas Zap copiadas ficam na própria página (propostas-copiadas.html).
 - CSS: style → admin
@@ -319,7 +319,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - gerarDocumento
 - `weg-email.js` (159 linhas): Texto para mandar junto com o print por e-mail (botão "Copiar texto do e-mail" ao lado do documento): saudação pelo horário, nome das máquinas escolhidas e dados para confirmação.
   - exemploDataEntregaEmail, escaparHtmlEmail, saudacaoEmail, nomeEquipamentoEmail, equipamentosEmail, cicloEmail, textoConfirmacaoEmail, htmlConfirmacaoEmail, copiarParaEmail
-- `weg-init.js` (70 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `weg-init.js` (74 linhas): Ligações iniciais. Sempre o ÚLTIMO script da página.
+- `weg-titulo.js` (82 linhas): Botão "📋 Copiar título" ao lado do documento (fora da área de print): o nome do orçamento no padrão da Proposta ZOHO, CLIENTE_MODELOS_PERÍODO, com a unidade da WEG como cliente (ex: "WEG JARAGUÁ DO SUL_WTE10 + 2 WAE12_3 PERIODOS"). O título aparece em cima dos botões e muda junto com a tela.
+  - clienteTituloWEG, modelosTituloWEG, periodoTituloWEG, tituloOrcamentoWEG, desenharTituloWEG, copiarTituloWEG
 
 ## CSS
 

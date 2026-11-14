@@ -121,7 +121,29 @@ const confere = (nome, ok, extra) => {
     await modo("transportador");
     let t = await titulos();
     confere("transportador: Proposta é a última coluna", t[t.length - 2] === "Proposta", t);
-    confere("transportador: sem botão Colunas", !(await pagina.isVisible("#btnColunas")));
+    confere("transportador: colunas padrão de sempre", t.join() === "Horário,Tipo,Plataforma / Cliente,Transportadora,Motorista,Status,Retirada,Entrega,Observação,Frete,Proposta,", t);
+
+    // os dois modos têm as mesmas colunas (muda só quais começam à mostra)
+    const idsDosModos = await pagina.evaluate(() => [COLUNAS_EXPEDICAO, COLUNAS_TRANSPORTADOR].map(l => l.map(c => c.id).sort().join()));
+    confere("transportador: as mesmas colunas da expedição", idsDosModos[0] === idsDosModos[1], idsDosModos);
+
+    // transportador também escolhe qualquer coluna no 👁️ Colunas
+    await abreOpcao("#btnColunas");
+    confere("transportador: botão Colunas com a contagem", (await pagina.innerText("#btnColunas")).includes("11 de 22"), await pagina.innerText("#btnColunas"));
+    const marcarColuna = (nome, ligar) => pagina.locator("#listaColunasVisiveis label").filter({ hasText: new RegExp("^" + nome + "$") }).locator("input").setChecked(ligar);
+    for(const nome of ["Cidade de entrega", "Vendedor", "Período"]) await marcarColuna(nome, true);
+    await marcarColuna("Tipo", false);
+    t = await titulos();
+    confere("transportador: liga e desliga colunas", ["Cidade de entrega", "Vendedor", "Período"].every(n => t.includes(n)) && !t.includes("Tipo"), t);
+    confere("transportador: linha tem uma célula por coluna", (await pagina.$eval("tr.ag-item", l => l.children.length)) === t.length);
+    const salvoTransp = await pagina.evaluate(() => JSON.parse(localStorage.getItem("agendaColunasVisiveis:u1")));
+    confere("transportador: escolha salva só no modo dele", JSON.stringify(salvoTransp.transportador) === JSON.stringify({ cidade: true, vendedor: true, periodo: true, tipo: false }) && Object.keys(salvoTransp.expedicao).length === 0, salvoTransp);
+    await pagina.screenshot({ path: path.join(saida, "0-transportador-colunas.png") });
+    for(const nome of ["Cidade de entrega", "Vendedor", "Período"]) await marcarColuna(nome, false);
+    await marcarColuna("Tipo", true);
+    await pagina.mouse.click(5, 5);
+    t = await titulos();
+    confere("transportador: desmarcar volta ao padrão", t.join() === "Horário,Tipo,Plataforma / Cliente,Transportadora,Motorista,Status,Retirada,Entrega,Observação,Frete,Proposta,", t);
 
     // ---------- expedição: padrão ----------
     await modo("expedicao");

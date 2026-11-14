@@ -8,6 +8,34 @@
 // PROPOSTA ZAP
 // ======================================
 
+// O texto sai do código do modelo: W + tipo + motor + altura de trabalho.
+// Tipo: A articulada, T tesoura, TL telescópica, M mastro (o mesmo padrão do
+// estoque-config.js; quick up não tem texto aqui). Motor: E elétrica, D diesel.
+// Ex: WAE18, WTD12, WTLD41. Fora do padrão devolve null.
+const TIPOS_MODELO_ZAP = {
+    TL: "Telescópica",
+    A: "Articulada",
+    T: "Tesoura",
+    M: "Mastro"
+};
+
+function partesDoModeloZap(modelo){
+
+    // TL vem antes de T na busca: WTLD41 é telescópica, não tesoura
+    const partes = String(modelo || "").match(/^.(TL|A|T|M)([ED])/);
+
+    const altura = parseInt(String(modelo || "").replace(/[^\d]/g, ""), 10);
+
+    if(!partes || !Number.isFinite(altura)) return null;
+
+    return {
+        tipo: TIPOS_MODELO_ZAP[partes[1]],
+        energia: partes[2] === "E" ? "elétrica" : "diesel",
+        altura
+    };
+}
+
+
 function copiarPropostaZap(){
 
     const equipamentos =
@@ -100,26 +128,9 @@ function copiarPropostaZap(){
     }
 
 
-    // O texto depende do padrão do modelo: 2ª letra A/T/M,
-    // 3ª letra E/D e número = altura de trabalho.
+    // O texto depende do padrão do modelo (partesDoModeloZap)
     const modeloForaPadrao =
-        equipamentos.find(equipamento => {
-
-            const modelo =
-                equipamento.modelo;
-
-            const altura =
-                parseInt(
-                    modelo.replace(/[^\d]/g, ""),
-                    10
-                );
-
-            return (
-                !["A", "T", "M"].includes(modelo.charAt(1)) ||
-                !["E", "D"].includes(modelo.charAt(2)) ||
-                !Number.isFinite(altura)
-            );
-        });
+        equipamentos.find(equipamento => !partesDoModeloZap(equipamento.modelo));
 
 
     if(modeloForaPadrao){
@@ -260,47 +271,8 @@ function copiarPropostaZap(){
                 equipamento.quantidade;
 
 
-            const letra2 =
-                modelo.charAt(1);
-
-
-            const letra3 =
-                modelo.charAt(2);
-
-
-            const altura =
-                parseInt(
-                    modelo.replace(
-                        /[^\d]/g,
-                        ""
-                    )
-                );
-
-
-            let tipo = "";
-
-
-            if(letra2 === "A")
-                tipo = "Articulada";
-
-
-            if(letra2 === "T")
-                tipo = "Tesoura";
-
-
-            if(letra2 === "M")
-                tipo = "Mastro";
-
-
-            let energia = "";
-
-
-            if(letra3 === "E")
-                energia = "elétrica";
-
-
-            if(letra3 === "D")
-                energia = "diesel";
+            const { tipo, energia, altura } =
+                partesDoModeloZap(modelo);
 
 
             const alturaPlataforma =

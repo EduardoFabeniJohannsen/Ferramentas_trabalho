@@ -1,8 +1,9 @@
 // ======================================
 // AGENDA - MOSTRAR E OCULTAR COLUNAS
 // ======================================
-// Botão 👁️ Colunas (só na expedição): lista com caixinhas de todas as
-// informações do modo. Fica salvo neste navegador, separado por usuário e
+// Botão 👁️ Colunas (nos dois modos): lista com caixinhas de todas as
+// informações do modo (expedição e transportador têm as mesmas colunas; o que
+// muda é quais começam à mostra). Fica salvo neste navegador, separado por usuário e
 // por modo. Guarda só o que difere do padrão de COLUNAS_* (campo "oculta").
 
 function colunaLigada(coluna){
@@ -85,9 +86,6 @@ function atualizarBotaoColunas(){
     const todas = colunasDoModo();
 
     const ligadas = todas.filter(colunaLigada);
-
-    $("filtroColunas").style.display =
-        modoVisualizacao === "expedicao" ? "" : "none";
 
     $("btnColunas").innerText =
         `👁️ Colunas: ${ligadas.length} de ${todas.length} ▾`;

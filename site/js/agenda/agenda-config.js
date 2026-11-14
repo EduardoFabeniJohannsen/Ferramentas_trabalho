@@ -104,7 +104,8 @@ const COLUNAS_EXPEDICAO = [
     { id: "proposta", titulo: "Proposta", semQuebra: true }
 ];
 
-// sem período, e com o frete por último
+// as mesmas colunas da expedição (o teste-agenda confere), com outras à mostra:
+// tipo, retirada, entrega e frete aparecem; período e o resto começam ocultos
 const COLUNAS_TRANSPORTADOR = [
     { id: "horario", titulo: "Horário" },
     { id: "tipo", titulo: "Tipo", semQuebra: true },
@@ -112,10 +113,21 @@ const COLUNAS_TRANSPORTADOR = [
     { id: "transportadora", titulo: "Transportadora", semQuebra: true },
     { id: "motorista", titulo: "Motorista", semQuebra: true },
     { id: "status", titulo: "Status", semQuebra: true },
+    { id: "periodo", titulo: "Período", semQuebra: true, oculta: true },
     { id: "retirada", titulo: "Retirada", maxLargura: "520px" },
     { id: "entrega", titulo: "Entrega", maxLargura: "560px" },
+    { id: "cidade", titulo: "Cidade de entrega", semQuebra: true, oculta: true },
     { id: "obs", titulo: "Observação", maxLargura: "420px" },
+    { id: "contato", titulo: "Contato", maxLargura: "320px", oculta: true },
+    { id: "obsEntrega", titulo: "Obs. de entrega", maxLargura: "420px", oculta: true },
+    { id: "referencia", titulo: "Referência", maxLargura: "420px", oculta: true },
     { id: "frete", titulo: "Frete", semQuebra: true },
+    { id: "freteConta", titulo: "Frete por conta de", semQuebra: true, oculta: true },
+    { id: "card", titulo: "Card", maxLargura: "320px", oculta: true },
+    { id: "emails", titulo: "E-mails do cliente", maxLargura: "420px", oculta: true },
+    { id: "pagamento", titulo: "Pagamento", semQuebra: true, oculta: true },
+    { id: "pedido", titulo: "Pedido de compra", semQuebra: true, oculta: true },
+    { id: "vendedor", titulo: "Vendedor", semQuebra: true, oculta: true },
     { id: "proposta", titulo: "Proposta", semQuebra: true }
 ];
 

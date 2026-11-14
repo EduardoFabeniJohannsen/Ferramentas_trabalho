@@ -304,6 +304,21 @@ const confere = (nome, ok, extra) => {
     };
     const linhaZap = (texto, trecho) => (texto.split("\n").find(l => l.includes(trecho)) || "").trim();
 
+    // o tipo do Zap sai do código do modelo; TL é telescópica (WTLD41 era barrado como "fora do padrão")
+    const modelos = await pagina.evaluate(() =>
+        ["WTLD41", "WTLE20", "WTE12", "WTD15", "WAE18", "WAD26", "WME10", "WQ12", "WXE10", "WAE"]
+            .map(modelo => [modelo, partesDoModeloZap(modelo)]));
+    const textoModelo = (p) => p ? `${p.tipo} ${p.energia} ${p.altura}` : null;
+    confere(
+        "Zap: tipo pelo código do modelo (telescópica, tesoura, articulada, mastro)",
+        JSON.stringify(modelos.map(([m, p]) => [m, textoModelo(p)])) === JSON.stringify([
+            ["WTLD41", "Telescópica diesel 41"], ["WTLE20", "Telescópica elétrica 20"], ["WTE12", "Tesoura elétrica 12"],
+            ["WTD15", "Tesoura diesel 15"], ["WAE18", "Articulada elétrica 18"], ["WAD26", "Articulada diesel 26"],
+            ["WME10", "Mastro elétrica 10"], ["WQ12", null], ["WXE10", null], ["WAE", null]
+        ]),
+        modelos.map(([m, p]) => [m, textoModelo(p)])
+    );
+
     // Resumo da proposta lido por seção: { periodo, vazio, eq: [...], frete, total },
     // cada seção com o título, as linhas { rótulo: valor } e as notas juntas
     const resumo = () => pagina.evaluate(() => {

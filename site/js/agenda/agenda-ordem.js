@@ -6,7 +6,8 @@
 
 // Sempre por data (sem data vem primeiro). Dentro de cada data vale a
 // ordem escolhida; o horário é sempre o desempate, então com
-// "motorista" a rota de cada motorista fica por horário.
+// "motorista" a rota de cada motorista fica por horário. No transportador,
+// clicar no título da coluna muda isso (agenda-ordem-colunas.js).
 function ordemEfetiva(){
 
     const ordem =
@@ -50,6 +51,9 @@ function ordenarAgendamentos(lista){
             ? ["Coleta", "Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES, "Transferência"]
             : ["Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES, "Coleta", "Transferência"];
 
+    // Horário ▼ no transportador: dias mais recentes primeiro (agenda-ordem-colunas.js)
+    const sentido = sentidoDasDatas();
+
     return lista.sort((a, b) => {
 
         // 1) data (expedição: a do carregamento, se carrega antes)
@@ -63,7 +67,7 @@ function ordenarAgendamentos(lista){
 
             if(!dataB) return 1;
 
-            return dataA < dataB ? -1 : 1;
+            return (dataA < dataB ? -1 : 1) * sentido;
         }
 
         // 2) critério escolhido (dentro da mesma data)

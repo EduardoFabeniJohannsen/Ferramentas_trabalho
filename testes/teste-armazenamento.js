@@ -10,7 +10,7 @@ const PAGINAS = ["index.html", "propostas.html", "agenda.html", "estoque.html", 
 
 const CHAVES = [
     "agendaModo", "agendaOrdem", "agendaTema",
-    "agendaColunas:u1", "agendaColunasVisiveis:u1", "agendaBotoes:u1", "agendaLarguras:u1", "agendaEtapas:u1", "agendaRascunhos",
+    "agendaColunas:u1", "agendaColunasVisiveis:u1", "agendaOrdemColuna:u1", "agendaBotoes:u1", "agendaLarguras:u1", "agendaEtapas:u1", "agendaRascunhos",
     "leadsVendedor:u1", "estoqueFilial", "propostaCache", "cacheTabelaPrecos", "cacheTabelaFretes", "transportadorasUltima", "wegCache"
 ];
 

@@ -149,6 +149,15 @@ CONTAINER
                                 <button
                                     type="button"
                                     class="btn-secundario"
+                                    data-clique="selecionarAteHoje"
+                                    title="Hoje e os dias que já passaram"
+                                >
+                                    Hoje e anteriores
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-secundario"
                                     data-clique="selecionarProximosDias" data-arg="7"
                                 >
                                     Próximos 7 dias
@@ -329,6 +338,18 @@ CONTAINER
                 data-clique="limparFiltros"
             >
                 × Limpar filtros
+            </button>
+            <!-- transportador: ordenado pela coluna clicada (agenda-ordem-colunas.js) -->
+            <span id="resumoOrdem"></span>
+            <button
+                type="button"
+                class="btn-secundario"
+                id="btnOrdemNormal"
+                style="display:none"
+                data-clique="voltarOrdemNormal"
+                title="Volta para a ordem por data e horário, separada por dia"
+            >
+                ↺ Ordem normal
             </button>
         </p>
 
@@ -806,6 +827,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 <script src="js/agenda/agenda-filtro-datas.js" defer></script>
 <script src="js/agenda/agenda-filtro-status.js" defer></script>
 <script src="js/agenda/agenda-ordem.js" defer></script>
+<script src="js/agenda/agenda-ordem-colunas.js" defer></script>
 <script src="js/agenda/agenda-render.js" defer></script>
 <script src="js/agenda/agenda-celula-partes.js" defer></script>
 <script src="js/agenda/agenda-celulas.js" defer></script>

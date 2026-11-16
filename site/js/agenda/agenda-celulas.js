@@ -3,6 +3,36 @@
 // ======================================
 // Monta o conteúdo de cada coluna de um agendamento.
 
+// entrega e troca saem da W Rental e coleta volta pra ela, quando o local fica
+// vazio (também usado para ordenar pela coluna, agenda-ordem-colunas.js)
+function origemNomeDaTela(item){
+
+    if(
+        !item.origemNome &&
+        !item.origemEndereco &&
+        (item.tipo === "Entrega" || item.tipo === "Troca técnica")
+    ){
+        return LOCAL_PADRAO;
+    }
+
+    return item.origemNome;
+}
+
+
+function destinoNomeDaTela(item){
+
+    if(
+        !item.destinoNome &&
+        !item.destinoEndereco &&
+        item.tipo === "Coleta"
+    ){
+        return LOCAL_PADRAO;
+    }
+
+    return item.destinoNome;
+}
+
+
 function criarCelulasAgenda(item){
 
     const expedicao =
@@ -41,6 +71,12 @@ function criarCelulasAgenda(item){
     if(outroDia){
 
         celulas.horario.appendChild(criar("span", "ag-outro-dia", outroDia));
+    }
+
+    // ordenado por outra coluna (sem a separação por dia): a data em cima do horário
+    if(!agrupaPorDia() && dataDaTela(item)){
+
+        celulas.horario.prepend(criar("span", "ag-data-linha", textoDataNaLinha(dataDaTela(item))));
     }
 
     // ---------- tipo ----------
@@ -118,27 +154,9 @@ function criarCelulasAgenda(item){
     // ---------- local e frete ----------
     // (na expedição só aparecem se o usuário ligar a coluna)
 
-    // entrega e troca saem da W Rental e coleta volta pra ela,
-    // quando o local fica vazio
-    let origemNome = item.origemNome;
+    const origemNome = origemNomeDaTela(item);
 
-    if(
-        !origemNome &&
-        !item.origemEndereco &&
-        (item.tipo === "Entrega" || item.tipo === "Troca técnica")
-    ){
-        origemNome = LOCAL_PADRAO;
-    }
-
-    let destinoNome = item.destinoNome;
-
-    if(
-        !destinoNome &&
-        !item.destinoEndereco &&
-        item.tipo === "Coleta"
-    ){
-        destinoNome = LOCAL_PADRAO;
-    }
+    const destinoNome = destinoNomeDaTela(item);
 
     celulas.retirada =
         celula(

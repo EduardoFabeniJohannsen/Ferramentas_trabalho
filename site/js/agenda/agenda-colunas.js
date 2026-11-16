@@ -189,6 +189,31 @@ function criarTituloColuna(coluna){
 
     titulo.title = "Arraste para mudar a ordem da coluna";
 
+    // transportador: clicar ordena por esta coluna (agenda-ordem-colunas.js).
+    // Arrastar não dispara o clique; a borda (largura) já para o clique dela.
+    if(modoVisualizacao === "transportador"){
+
+        titulo.classList.add("ordenavel");
+
+        titulo.title = "Clique para ordenar por esta coluna (de novo inverte) · arraste para mudar a ordem";
+
+        const seta = setaOrdemColuna(coluna.id);
+
+        if(seta){
+
+            titulo.classList.add("ordenada");
+
+            titulo.appendChild(criar("span", "ag-seta-ordem", ` ${seta}`));
+        }
+
+        titulo.addEventListener("click", (evento) => {
+
+            if(evento.target.closest(".ag-redimensiona")) return;
+
+            alternarOrdemColuna(coluna.id);
+        });
+    }
+
     titulo.addEventListener(
         "dragstart",
         (evento) => {

@@ -194,6 +194,9 @@
 
         carregarColunasVisiveis();
 
+        // a coluna clicada para ordenar, no transportador (agenda-ordem-colunas.js)
+        carregarOrdemColuna();
+
         carregarBotoesLinha();
 
         // os status desmarcados no filtro (salvos por usuário e por modo)

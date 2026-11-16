@@ -133,6 +133,32 @@ tr.ag-item[data-status="Concluído"] td{
 body.tema-claro .ag-outro-dia{
     color:#b45309;
 }
+
+/* ordenado pela coluna (agenda-ordem-colunas.js): a data em cima do horário,
+   o título clicável e a seta na coluna ordenada */
+.ag-data-linha{
+    display:block;
+    margin-bottom:2px;
+    font-size:11px;
+    font-weight:normal;
+    color:#94a3b8;
+    white-space:nowrap;
+}
+body.tema-claro .ag-data-linha{
+    color:#52617a;
+}
+.ag-tabela thead th.ag-cab-coluna.ordenavel{
+    cursor:pointer;
+}
+.ag-tabela thead th.ag-cab-coluna.ordenada{
+    color:#93c5fd;
+}
+body.tema-claro .ag-tabela thead th.ag-cab-coluna.ordenada{
+    color:#1d4ed8;
+}
+.ag-seta-ordem{
+    font-size:10px;
+}
 .form-grade label.opcao-carregar{
     display:flex;
     align-items:center;

@@ -192,6 +192,22 @@ function alternarTodasDatas(){
 }
 
 
+// atalho: hoje e os dias que já passaram (com Horário ▼ no transportador,
+// fica "de hoje para trás")
+function selecionarAteHoje(){
+
+    const hoje = dataISO(0);
+
+    datasOcultas = new Set(
+        datasDoFiltro().filter(data => !data || data > hoje)
+    );
+
+    renderizarAgenda();
+
+    desenharPainelDatas();
+}
+
+
 // atalhos: marca só as datas de hoje até daqui a N dias (0 = só hoje)
 function selecionarProximosDias(dias){
 

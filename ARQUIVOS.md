@@ -40,7 +40,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
 - CSS: style → agenda → agenda-tabela → agenda-modal → agenda-estoque → agenda-formulario → agenda-tema-claro
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-carregamento → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → agenda-config → agenda-utils → agenda-carregamento → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-datas → agenda-filtro-status → agenda-ordem → agenda-ordem-colunas → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
@@ -102,15 +102,15 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - carregaEmOutroDia, usaCarregamentoNaTela, dataDaTela, horarioDaTela, textoDiaHora, textoOutroDiaDaLinha, mostrarCamposCarregamento, prepararCamposCarregamento, alternarCarregarAntes, conferirCarregamento, ligarCamposCarregamento
 - `agenda-celula-partes.js` (153 linhas): Peças das células: bloco de local, seletor de status, célula com a coluna e nome da máquina.
   - criarBlocoLocal, criarSeletorStatus, criarCelula, criarMaquina
-- `agenda-celulas.js` (237 linhas): Conteúdo de cada coluna de um agendamento.
-  - criarCelulasAgenda
+- `agenda-celulas.js` (255 linhas): Conteúdo de cada coluna de um agendamento.
+  - origemNomeDaTela, destinoNomeDaTela, criarCelulasAgenda
 - `agenda-clientes.js` (533 linhas): Ao digitar o cliente, sugere o nome completo dos clientes de agendamentos
   - chaveCliente, carregarHistoricoClientes, compararRecentes, agendamentosComCliente, clientesConhecidos, localDoCliente, locaisDoCliente, camposLocalCliente, clienteDoFormulario, preencherOpcoes, rotuloLocal, desenharSugestoesClientes, desenharLocaisCliente, marcarLocalAtivo, preencherAuto, textoPagamentoFormulario, preencherPagamentoCliente, aplicarCliente, usarLocalCliente, aplicarLocalDaLista, escolheuDaLista, prepararSugestoesClientes, ligarSugestoesClientes
 - `agenda-coleta.js` (122 linhas): Cria uma coleta já preenchida a partir de uma entrega.
   - valoresColetaDaEntrega, copiarEntregaParaColeta, valoresDuplicados, duplicarAgendamento
 - `agenda-colunas-visiveis.js` (167 linhas): Botão 👁️ Colunas (nos dois modos, que têm as mesmas 22 colunas): mostrar e ocultar qualquer informação da tabela; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
-- `agenda-colunas.js` (261 linhas): Colunas por modo e ordem das colunas (arrastar o título).
+- `agenda-colunas.js` (286 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
 - `agenda-config.js` (270 linhas): Constantes (tipos, status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Tipos: "Transferência" é a entre obras (o valor salvo de sempre, que aparece como "Transferência entre obras" em ROTULOS_TIPO) e TIPO_TRANSFERENCIA_UNIDADES vai pra expedição (TIPOS_EXPEDICAO) sem faturamento.
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
@@ -123,15 +123,15 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - desenharEstoqueAgenda, abrirEstoqueAgenda, fecharEstoqueAgenda
 - `agenda-etapas.js` (139 linhas): Etapas do formulário (Demanda, Local e entrega, Faturamento) que recolhem ao clicar no título; salva por usuário; avisoFormulario() abre a etapa com erro. Carregar antes de agenda-modal.js.
   - chaveEtapas, lerEtapas, salvarEtapas, mostrarEtapa, aplicarEtapasSalvas, avisoFormulario
-- `agenda-filtro-datas.js` (211 linhas): Painel de datas estilo Excel e atalhos (hoje / próximos dias).
-  - semAcentoMinusculo, datasDoFiltro, rotuloDataFiltro, atualizarBotaoDatas, desenharPainelDatas, alternarPainelDatas, fecharPainelDatas, alternarTodasDatas, selecionarProximosDias
+- `agenda-filtro-datas.js` (227 linhas): Painel de datas estilo Excel e atalhos (só hoje, hoje e anteriores, próximos 7 dias).
+  - semAcentoMinusculo, datasDoFiltro, rotuloDataFiltro, atualizarBotaoDatas, desenharPainelDatas, alternarPainelDatas, fecharPainelDatas, alternarTodasDatas, selecionarAteHoje, selecionarProximosDias
 - `agenda-filtro-status.js` (220 linhas): Painel de status estilo Excel. Os status desmarcados ficam salvos por usuário e por modo (agendaStatus); as datas não.
   - chaveStatusFiltro, carregarStatusFiltro, salvarStatusFiltro, statusDoFiltro, contagemPorStatus, atualizarBotaoStatus, desenharPainelStatus, alternarPainelStatus, fecharPainelStatus, alternarTodosStatus
 - `agenda-filtros.js` (282 linhas): Modo expedição/transportador, botões "Só sem patrimônio" e "Só sem card" (frete por nossa conta ou dividido com o Card vazio; por conta do cliente não tem card), botão ⚙️ Filtros (painel único com filtros e opções; o botão e a linha da contagem avisam o que está filtrando) e filtrarAgendamentos() (pesquisando, o modo, as datas e os status não escondem nada; os antigos só aparecem na pesquisa).
   - definirModo, visivelNoModo, filtrandoSemPatrimonio, alternarSemPatrimonio, itemSemCard, filtrandoSemCard, alternarSemCard, filtrosAtivos, atualizarBotaoFiltros, limparFiltros, alternarPainelFiltros, fecharPainelFiltros, filtrarAgendamentos
 - `agenda-form-campos.js` (357 linhas): CAMPOS_AGENDA, máscaras de horário/período e regras dos campos. Em entrega, a retirada vem recolhida ("— W Rental"); abre sozinha se tiver algo preenchido ou em outro tipo.
   - preencherSelect, forcarMaiusculo, mascararHorario, mascararCampoHorario, horarioValido, textoDias, textoPeriodos, normalizarPeriodo, atualizarSugestoesPeriodo, atualizarCamposTipo, retiradaPreenchida, mostrarRetirada, atualizarRetirada, alternarRetirada, preencherSelectComAtual, garantirOpcaoTransportadora, garantirOpcaoVendedor
-- `agenda-init.js` (221 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
+- `agenda-init.js` (224 linhas): Ligações de eventos e carga inicial (modo, tema e ordem salvos). Sempre o ÚLTIMO script da página.
 - `agenda-larguras.js` (349 linhas): Largura das colunas: arrastar a borda do título (como no Excel), duplo clique ajusta ao conteúdo; salva por usuário e por modo. Carregar depois de agenda-colunas.js.
   - chaveLarguras, lerLarguras, salvarLarguras, temLarguraPersonalizada, restaurarColunasPadrao, idsDaTabela, titulosDaTabela, aplicarLarguras, congelarLarguras, ajustarLarguraAoConteudo, atualizarBotaoColunasPadrao, criarAlcaLargura
 - `agenda-linhas.js` (194 linhas): Cabeçalho da tabela e a linha de cada agendamento, com os botões (✅ concluir, só na expedição; 📋 Zap, 🧾 faturamento, ↩️ coleta, 📆 duplicar, 🔍 estoque, editar, excluir).
@@ -142,7 +142,9 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - abrirModalAgenda, atualizarCamposConta, atualizarTextoFreteCliente, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista
-- `agenda-ordem.js` (111 linhas): Ordem dentro de cada data (horário, motorista, entregas/coletas).
+- `agenda-ordem-colunas.js` (267 linhas): Só no transportador: clicar no título de uma coluna ordena por ela (▲), de novo inverte (▼) e na terceira volta à ordem normal (data e horário). Horário ▼ = dias mais recentes primeiro, ainda separados por dia; outra coluna ordena a lista inteira, sem a separação por dia, com a data em cima do horário. Vazio fica no fim; o empate segue a ordem normal. A linha da contagem avisa ("Ordenado por...") e tem o ↺ Ordem normal. Salva por usuário (`agendaOrdemColuna`). Carregar depois de agenda-ordem.js.
+  - chaveOrdemColuna, carregarOrdemColuna, salvarOrdemColuna, ordemColunaAtiva, agrupaPorDia, sentidoDasDatas, vazioNaOrdem, compararValoresOrdem, ordenarPorColuna, alternarOrdemColuna, voltarOrdemNormal, setaOrdemColuna, textoOrdemColuna, atualizarAvisoOrdemColuna, textoDataNaLinha
+- `agenda-ordem.js` (115 linhas): Ordem dentro de cada data (horário, motorista, entregas/coletas).
   - ordemEfetiva, compararHorario, ordenarAgendamentos
 - `agenda-pagamento.js` (326 linhas): Faturamento no formulário (só entregas): forma de pagamento (Depósito/Boleto) e prazos em linhas (28 e 56 = 28/56). Botão 🧾 da linha copia "Boleto – 28/56 DD - Enviar para:" com um e-mail por linha (pega só os e-mails do campo; nomes, telefones e separadores ficam de fora). Carrega depois de agenda-coleta.js e antes de agenda-init.js.
   - prazosDigitados, atualizarResumoPrazos, desenharPrazos, adicionarPrazo, validarPrazos, atualizarBlocoFaturamento, preencherFaturamento, faturamentoParaRascunho, faturamentoPreenchido, coletarFaturamento, textoFaturamento, copiarFaturamento
@@ -156,7 +158,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - criarLinhaPlataforma, sincronizarPlataformas, desenharPlataformas, adicionarLinhaPlataforma, removerLinhaPlataforma, digitarPlataforma
 - `agenda-rascunho.js` (99 linhas): Guarda no navegador o que foi digitado e não salvo.
   - chaveRascunho, lerRascunhos, gravarRascunhos, removerRascunho, salvarRascunho, agendarRascunho, atualizarBotoesModal
-- `agenda-render.js` (226 linhas): Chips de transportadora, select de ordem, controles do modo e renderizarAgenda().
+- `agenda-render.js` (233 linhas): Chips de transportadora, select de ordem, controles do modo e renderizarAgenda().
   - desenharChips, atualizarSelectOrdem, definirOrdem, atualizarControlesModo, renderizarAgenda
 - `agenda-salvar.js` (325 linhas): salvarAgendamento() (os filtros de status e datas ficam como estavam; se o salvo ficou escondido, o aviso diz por quê), concluirAgendamento() (botão ✅: marca Concluído e sai da expedição, sem excluir) e excluirAgendamento() (manda para a lixeira; o PDF do pedido fica até apagar de vez).
   - salvarAgendamento, avisoSalvoEscondido, concluirAgendamento, excluirAgendamento

@@ -113,6 +113,9 @@ function atualizarControlesModo(){
 
     atualizarSelectOrdem();
 
+    // "· Ordenado por ..." e o ↺ Ordem normal (agenda-ordem-colunas.js)
+    atualizarAvisoOrdemColuna();
+
     atualizarBotaoColunas();
 
     atualizarBotaoBotoesLinha();
@@ -123,7 +126,7 @@ function atualizarControlesModo(){
     $("dicaModo").innerText =
         expedicao
             ? "Só entregas, trocas e transferências entre unidades que ainda não saíram. Inclui as sem data (preparar). Escolha as informações em ⚙️ Filtros. Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura."
-            : "Informação completa. Só o que já tem data definida. Arraste os títulos das colunas para mudar a ordem e a borda deles para mudar a largura.";
+            : "Informação completa. Só o que já tem data definida. Clique no título de uma coluna para ordenar por ela (de novo inverte). Arraste os títulos para mudar a ordem das colunas e a borda deles para mudar a largura.";
 }
 
 
@@ -145,8 +148,12 @@ function renderizarAgenda(){
 
     lista.className = "lista-" + modoVisualizacao;
 
+    // ordem normal e, por cima, a coluna clicada (agenda-ordem-colunas.js)
     const filtrados =
-        ordenarAgendamentos(filtrarAgendamentos(false));
+        ordenarPorColuna(ordenarAgendamentos(filtrarAgendamentos(false)));
+
+    // ordenado por outra coluna, os dias se misturam: sem o cabeçalho de cada dia
+    const porDia = agrupaPorDia();
 
     $("contagemAgenda").innerText =
         `${filtrados.length} agendamento(s)`;
@@ -184,7 +191,7 @@ function renderizarAgenda(){
 
         const corDoItem = corDoDia(dia);
 
-        if(dia !== dataAtual){
+        if(porDia && dia !== dataAtual){
 
             dataAtual = dia;
 

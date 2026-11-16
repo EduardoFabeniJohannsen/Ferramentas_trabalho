@@ -11,7 +11,8 @@ window.supabase = { createClient(){
     const consulta = () => {
         const q = new Proxy(function(){}, {
             get(_, nome){
-                if(nome === "then") return (ok) => ok({ data: [], error: null, count: 0 });
+                // window.__segurarBanco: o banco só responde quando o teste soltar
+                if(nome === "then") return (ok) => Promise.resolve(window.__segurarBanco).then(() => ok({ data: [], error: null, count: 0 }));
                 return () => q;
             }
         });
@@ -591,6 +592,23 @@ const confere = (nome, ok, extra) => {
     await pagina.click(".btn-limpar-tudo");
     await pagina.waitForTimeout(100);
     confere("limpar tudo esvazia o resumo", (await resumo()).vazio);
+
+    // ---------- digitar enquanto as tabelas carregam não apaga a proposta salva ----------
+    // o init só repõe o que estava salvo depois de carregar as tabelas (internet lenta)
+    await pagina.fill("#nomeCliente", "Cliente Guardado");
+    await pagina.waitForTimeout(100);
+    const nomeSalvo = () => pagina.evaluate(() => JSON.parse(localStorage.getItem("propostaCache") || "{}").nomeCliente);
+    await pagina.addInitScript(() => { window.__segurarBanco = new Promise(pronto => { window.__liberarBanco = pronto; }); });
+    await pagina.goto("http://agenda.test/propostas.html");
+    await pagina.fill("#nomeCliente", "Digitado antes de carregar");
+    await pagina.waitForTimeout(100);
+    confere("digitar antes de repor o que estava salvo não grava por cima", (await nomeSalvo()) === "Cliente Guardado", await nomeSalvo());
+    await pagina.evaluate(() => window.__liberarBanco());
+    await pagina.waitForTimeout(150);
+    confere("carregou: repõe a proposta salva", (await pagina.inputValue("#nomeCliente")) === "Cliente Guardado", await pagina.inputValue("#nomeCliente"));
+    await pagina.fill("#nomeCliente", "Cliente Depois");
+    await pagina.waitForTimeout(100);
+    confere("depois de repor, volta a salvar", (await nomeSalvo()) === "Cliente Depois", await nomeSalvo());
 
     confere("sem erros no console", erros.length === 0, erros);
 

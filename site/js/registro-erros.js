@@ -27,6 +27,13 @@ const ERROS_IGNORADOS = [
     /ResizeObserver loop/i
 ];
 
+// a biblioteca do Supabase anota sozinha (console.error só com o erro, sem texto
+// nosso) a falha de rede ao renovar o login, e tenta de novo: o computador
+// acordando, o Wi-Fi trocando. Se a página ficar sem o que precisava, o código
+// dela registra a falha, com o motivo. Chrome, Firefox e Safari
+const FALHA_DE_REDE_DA_BIBLIOTECA =
+    /^(Failed to fetch|NetworkError when attempting to fetch resource\.?|Load failed)$/i;
+
 const errosPendentes = new Map();
 
 const errosConhecidos = new Set();
@@ -219,6 +226,15 @@ function textoDoConsole(valor){
 }
 
 
+// o código do site sempre escreve o que estava fazendo antes do erro
+function falhaDeRedeDaBiblioteca(argumentos){
+
+    return argumentos.length === 1 &&
+        argumentos[0] instanceof Error &&
+        FALHA_DE_REDE_DA_BIBLIOTECA.test(argumentos[0].message);
+}
+
+
 // onde o erro aconteceu, sem as linhas deste arquivo
 function pilhaDoConsole(argumentos){
 
@@ -294,6 +310,8 @@ function pilhaDoConsole(argumentos){
         consoleErrorOriginal.apply(console, argumentos);
 
         try{
+
+            if(falhaDeRedeDaBiblioteca(argumentos)) return;
 
             anotarErro(
                 "tratado",

@@ -67,8 +67,16 @@ const confere = (nome, ok, extra) => {
             falhaUmaVez: new Set(opcoes.falhaUmaVez || []),
             extras: opcoes.extras || {},
             respostaRpc: "ok",
-            respostaErros: "ok"
+            respostaErros: "ok",
+            // arquivo que só chega quando o teste soltar (internet lenta)
+            segurando: new Map((opcoes.segurar || []).map(caminho => {
+                let soltar;
+                const promessa = new Promise(pronto => { soltar = pronto; });
+                return [caminho, { promessa, soltar }];
+            }))
         };
+
+        servidor.soltar = (caminho) => servidor.segurando.get(caminho)?.soltar();
 
         // bypassCSP: o waitForFunction do Playwright avalia texto como código, o que a CSP
         // das páginas bloqueia (a CSP em si é conferida no teste-paginas.js)
@@ -120,6 +128,8 @@ const confere = (nome, ok, extra) => {
             if(servidor.faltando.has(url.pathname)) return rota.fulfill({ status: 404, body: "" });
             if(servidor.semRede.has(url.pathname)) return rota.abort();
 
+            if(servidor.segurando.has(url.pathname)) await servidor.segurando.get(url.pathname).promessa;
+
             const local = path.join(raiz, decodeURIComponent(url.pathname));
             if(!fs.existsSync(local)) return rota.fulfill({ status: 404, body: "" });
             return rota.fulfill({ contentType: tipos[path.extname(local)] || "text/plain", body: fs.readFileSync(local) });
@@ -165,8 +175,13 @@ const confere = (nome, ok, extra) => {
         pagina.on("load", () => { vezesCarregou++; });
         const cargas = () => vezesCarregou;
 
-        await pagina.goto(`http://site.test/${arquivo}`);
-        await pagina.waitForLoadState("networkidle");
+        // segurando um arquivo, a página ainda não terminou de carregar: o teste segue
+        if(opcoes.segurar){
+            await pagina.goto(`http://site.test/${arquivo}`, { waitUntil: "commit" });
+        }else{
+            await pagina.goto(`http://site.test/${arquivo}`);
+            await pagina.waitForLoadState("networkidle");
+        }
 
         return { contexto, pagina, servidor, errosPagina, consoleErros, dialogos, cargas };
     };
@@ -384,6 +399,23 @@ const confere = (nome, ok, extra) => {
         await enviar(pagina);
         confere("ignora o que não é erro do site", servidor.rpc.length === 0, servidor.rpc);
 
+        // a biblioteca do Supabase (a de verdade) anota sozinha a falha de rede e
+        // tenta de novo: o computador acordando, o Wi-Fi trocando
+        const consoleRede = [];
+        pagina.on("console", mensagem => { if(mensagem.type() === "error") consoleRede.push(mensagem.text()); });
+        servidor.semRede.add("/auth/v1/user");
+        const semRedeUsuario = await pagina.evaluate(async () => (await supabaseClient.auth.getUser()).error?.name);
+        await pagina.evaluate(() => {
+            console.error(new TypeError("Load failed"));
+            console.error(new TypeError("NetworkError when attempting to fetch resource."));
+            console.error("[agenda] Falha ao carregar:", new TypeError("Failed to fetch"));
+        });
+        await enviar(pagina);
+        confere("a biblioteca anotou a falha de rede no console", semRedeUsuario === "AuthRetryableFetchError" && consoleRede.some(texto => texto.startsWith("TypeError: Failed to fetch")), [semRedeUsuario, consoleRede]);
+        confere("falha de rede que a biblioteca anota sozinha não é registrada (Chrome, Safari, Firefox)", comTexto(servidor, "Failed to fetch").length === 1 && comTexto(servidor, "Load failed").length === 0 && comTexto(servidor, "NetworkError").length === 0, servidor.rpc.map(c => c.p_mensagem));
+        confere("falha de rede com o texto do site é registrada", comTexto(servidor, "[agenda] Falha ao carregar: Failed to fetch").length === 1, servidor.rpc.map(c => c.p_mensagem));
+        servidor.semRede.delete("/auth/v1/user");
+
         await pagina.evaluate(() => { console.error("com token eyJhbGci.eyJzdWIi.assinaturaXYZ no meio"); });
         await enviar(pagina);
         confere("token de login nunca é enviado", comTexto(servidor, "com token")[0]?.p_mensagem === "com token [token] no meio", servidor.rpc);
@@ -412,6 +444,32 @@ const confere = (nome, ok, extra) => {
             console.error("sem login");
         });
         confere("sem login não envia", (await enviar(pagina)) === false && comTexto(servidor, "sem login").length === 0, servidor.rpc.map(c => c.p_mensagem));
+
+        await contexto.close();
+    }
+
+    // ---------- clique antes de a função chegar (internet lenta) ----------
+    // o navegador mostra a página enquanto baixa os primeiros scripts; o acoes.js
+    // já escuta os cliques, mas a função vem num script que ainda não chegou
+    {
+        const segurado = "/js/agenda/agenda-filtros.js";
+        const { contexto, pagina, servidor, errosPagina } = await abrir("agenda.html", { segurar: [segurado] });
+
+        await pagina.waitForFunction(() => typeof enviarErrosPendentes === "function" && !!document.querySelector('[data-clique="definirModo"][data-arg="expedicao"]'));
+        const antes = await pagina.evaluate(() => {
+            document.querySelector('[data-clique="definirModo"][data-arg="expedicao"]').click();
+            return typeof definirModo;
+        });
+        servidor.soltar(segurado);
+        await pagina.waitForLoadState("networkidle");
+        await enviar(pagina);
+
+        confere("clique antes de a função chegar: roda quando ela chega", antes === "undefined" && (await pagina.evaluate(() => modoVisualizacao)) === "expedicao", [antes, await pagina.evaluate(() => modoVisualizacao)]);
+        confere("clique antes de a função chegar: não vira 'função não encontrada'", comTexto(servidor, "função não encontrada").length === 0 && errosPagina.length === 0, [servidor.rpc.map(c => c.p_mensagem), errosPagina]);
+
+        await pagina.evaluate(() => { document.body.insertAdjacentHTML("beforeend", '<button id="semFuncao" data-clique="funcaoQueNaoExiste">x</button>'); document.getElementById("semFuncao").click(); });
+        await enviar(pagina);
+        confere("página carregada: função que não existe continua registrada", comTexto(servidor, "função não encontrada: funcaoQueNaoExiste").length === 1, servidor.rpc.map(c => c.p_mensagem));
 
         await contexto.close();
     }

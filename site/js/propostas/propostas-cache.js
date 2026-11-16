@@ -13,8 +13,15 @@
 
 const CHAVE_CACHE_PROPOSTA = "propostaCache";
 
+// o init repõe o que estava salvo só depois de carregar as tabelas: salvar
+// antes disso (alguém digitando enquanto carrega) gravaria a tela ainda vazia
+// por cima da proposta guardada
+let cacheRestaurado = false;
+
 
 function salvarCache(){
+
+    if(!cacheRestaurado) return;
 
     const equipamentos = [];
 
@@ -78,6 +85,8 @@ function salvarCache(){
 function restaurarCache(){
 
     const dados = lerLocalJSON(CHAVE_CACHE_PROPOSTA);
+
+    cacheRestaurado = true;
 
     if(!dados) return;
 

@@ -15,6 +15,15 @@
 //   data-entrada="salvarCache"                     -> no input (enquanto digita)
 // A função precisa ser uma "function" dos scripts da página (fica em window).
 
+// O navegador já mostra a página enquanto baixa os primeiros scripts (o
+// auth-guard.js, que esconde, vem depois deste). Um clique nessa hora chega
+// antes da função: ele roda quando todos os scripts tiverem rodado (o
+// DOMContentLoaded vem depois do último "defer"), em vez de se perder.
+let scriptsDasAcoesProntos = document.readyState === "complete";
+
+document.addEventListener("DOMContentLoaded", () => { scriptsDasAcoesProntos = true; }, { once: true });
+
+
 function argumentoDaAcao(elemento){
 
     if(elemento.hasAttribute("data-elemento")) return [elemento];
@@ -37,6 +46,13 @@ function rodarAcao(elemento, atributo){
     const funcao = window[nome];
 
     if(typeof funcao !== "function"){
+
+        if(!scriptsDasAcoesProntos){
+
+            document.addEventListener("DOMContentLoaded", () => rodarAcao(elemento, atributo), { once: true });
+
+            return;
+        }
 
         console.error(`[acoes] função não encontrada: ${nome}`);
 

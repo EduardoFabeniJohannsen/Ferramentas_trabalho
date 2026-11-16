@@ -33,10 +33,11 @@
             autocomplete="current-password"
         >
 
-        <!-- captcha da Cloudflare (login-captcha.js): só aparece quando ela desconfia -->
-        <div id="captchaLogin"></div>
+        <!-- captcha da Cloudflare (login-captcha.js): só aparece quando ela desconfia
+             ou quando a verificação não termina -->
+        <div id="captchaLogin" style="display:flex; justify-content:center; margin:6px 0;"></div>
 
-        <button data-clique="fazerLogin">Entrar</button>
+        <button id="btnEntrar" data-clique="fazerLogin">Entrar</button>
 
         <p id="loginErro" style="color:#ef4444; font-size:13px; margin-top:8px;"></p>
 

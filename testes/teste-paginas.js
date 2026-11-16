@@ -291,14 +291,15 @@ const confere = (nome, ok, extra) => {
     confere("login.html: formulário visível", await login.pagina.locator("input").first().isVisible());
 
     // ---------- captcha do login (login-captcha.js) ----------
-    const tentarLogin = async (pagina) => {
+    const tentarLogin = async (pagina, espera = 100) => {
         await pagina.fill("#loginEmail", "a@b.com");
         await pagina.fill("#loginSenha", "senha");
         await pagina.click("[data-clique='fazerLogin']");
-        await pagina.waitForTimeout(100);
+        await pagina.waitForTimeout(espera);
         return {
             logins: await pagina.evaluate(() => window.__logins || []),
-            erro: await pagina.innerText("#loginErro")
+            erro: await pagina.innerText("#loginErro"),
+            botao: await pagina.innerText("#btnEntrar")
         };
     };
 
@@ -308,22 +309,39 @@ const confere = (nome, ok, extra) => {
     const textoCaptcha = fs.readFileSync(path.join(raiz, "js", "login", "login-captcha.js"), "utf8");
     confere("captcha: a chave do site está preenchida", /TURNSTILE_SITE_KEY = "0x[0-9A-Za-z_-]+"/.test(textoCaptcha));
 
-    // com chave: Turnstile falso que entrega um token; reset não entrega outro na hora
+    // com chave: Turnstile falso. modoCaptcha diz o que ele faz a cada desenho:
+    // "na-hora" entrega o token, "manual" só quando o teste chamar
+    // window.__entregarToken(), "erro" avisa o código 600010, "nao-suportado"
+    // avisa o navegador. O reset (depois de uma tentativa) não entrega outro token.
     const comCaptcha = await novoContexto(null);
-    const turnstileFalso = `window.turnstile = {
-        render(alvo, opcoes){ window.__captcha = { alvo, chave: opcoes.sitekey }; setTimeout(() => opcoes.callback("token-1"), 0); return "w1"; },
-        reset(){ window.__resets = (window.__resets || 0) + 1; }
+    let modoCaptcha = "na-hora";
+    const turnstileFalso = () => `window.turnstile = {
+        render(alvo, opcoes){
+            const n = window.__renders = (window.__renders || 0) + 1;
+            window.__captcha = { alvo, chave: opcoes.sitekey, aparencia: opcoes.appearance };
+            const modo = ${JSON.stringify(modoCaptcha)};
+            if(modo === "na-hora") setTimeout(() => opcoes.callback("token-" + n), 0);
+            if(modo === "manual") window.__entregarToken = () => opcoes.callback("token-" + n);
+            if(modo === "erro") setTimeout(() => opcoes["error-callback"]("600010"), 0);
+            if(modo === "nao-suportado") setTimeout(() => opcoes["unsupported-callback"](), 0);
+            return "w" + n;
+        },
+        reset(){ window.__resets = (window.__resets || 0) + 1; },
+        remove(){ window.__removidos = (window.__removidos || 0) + 1; }
     };`;
     let cloudflareFora = false;
     let chaveTeste = "";
     await comCaptcha.contexto.route("**/*", (rota) => {
         const url = new URL(rota.request().url());
         if(url.hostname === "challenges.cloudflare.com"){
-            return cloudflareFora ? rota.abort() : rota.fulfill({ contentType: "text/javascript", body: turnstileFalso });
+            return cloudflareFora ? rota.abort() : rota.fulfill({ contentType: "text/javascript", body: turnstileFalso() });
         }
         if(url.pathname.endsWith("/login-captcha.js")){
-            const texto = fs.readFileSync(path.join(raiz, "js", "login", "login-captcha.js"), "utf8");
-            return rota.fulfill({ contentType: "text/javascript", body: texto.replace(/TURNSTILE_SITE_KEY = "[^"]*"/, `TURNSTILE_SITE_KEY = "${chaveTeste}"`) });
+            const texto = fs.readFileSync(path.join(raiz, "js", "login", "login-captcha.js"), "utf8")
+                .replace(/TURNSTILE_SITE_KEY = "[^"]*"/, `TURNSTILE_SITE_KEY = "${chaveTeste}"`)
+                // no teste a espera pelo token é curta
+                .replace(/ESPERA_TOKEN_CAPTCHA_MS = \d+/, "ESPERA_TOKEN_CAPTCHA_MS = 1500");
+            return rota.fulfill({ contentType: "text/javascript", body: texto });
         }
         return rota.fallback();
     });
@@ -343,10 +361,45 @@ const confere = (nome, ok, extra) => {
     const primeira = await tentarLogin(comChave.pagina);
     confere("captcha: o token vai junto no login", primeira.logins[0]?.options?.captchaToken === "token-1", primeira.logins);
     confere("captcha: depois da tentativa pede outro token", (await comChave.pagina.evaluate(() => window.__resets)) === 1);
-    const segunda = await tentarLogin(comChave.pagina);
-    confere("captcha: sem token novo não tenta o login", segunda.logins.length === 1 && /Aguarde a verificação/.test(segunda.erro), segunda.erro);
+    const segunda = await tentarLogin(comChave.pagina, 2000);
+    confere("captcha: o token não chega: espera, não tenta o login e avisa", segunda.logins.length === 1 && /está demorando/.test(segunda.erro), segunda.erro);
+    confere("captcha: o token não chega: mostra a caixinha da Cloudflare", (await comChave.pagina.evaluate(() => [window.__removidos, window.__captcha.aparencia, window.__captcha.alvo].join())) === "1,always,#captchaLogin", await comChave.pagina.evaluate(() => window.__captcha));
+    confere("captcha: o botão volta ao normal", segunda.botao === "Entrar" && !(await comChave.pagina.isDisabled("#btnEntrar")), segunda.botao);
+    const terceira = await tentarLogin(comChave.pagina);
+    confere("captcha: com a caixinha à mostra, o token novo entra", terceira.logins.length === 2 && terceira.logins[1]?.options?.captchaToken === "token-2", terceira.logins);
     await comChave.pagina.close();
 
+    // verificação demorando (celular): o Entrar espera e segue sozinho
+    modoCaptcha = "manual";
+    const lenta = await abrir(comCaptcha.contexto, "login.html");
+    await lenta.pagina.fill("#loginEmail", "a@b.com");
+    await lenta.pagina.fill("#loginSenha", "senha");
+    await lenta.pagina.evaluate(() => { fazerLogin(); fazerLogin(); });
+    const botaoEsperando = await lenta.pagina.innerText("#btnEntrar");
+    const desligado = await lenta.pagina.isDisabled("#btnEntrar");
+    await lenta.pagina.evaluate(() => window.__entregarToken());
+    await lenta.pagina.waitForTimeout(150);
+    const logouLenta = await lenta.pagina.evaluate(() => window.__logins || []);
+    confere("captcha demorando: o botão mostra Verificando... e fica desligado", botaoEsperando === "Verificando..." && desligado, botaoEsperando);
+    confere("captcha demorando: espera o token e entra sozinho, uma vez só", logouLenta.length === 1 && logouLenta[0].options?.captchaToken === "token-1", logouLenta);
+    confere("captcha demorando: sem aviso de verificação", !/verificação/.test(await lenta.pagina.innerText("#loginErro")), await lenta.pagina.innerText("#loginErro"));
+    await lenta.pagina.close();
+
+    // erro da Cloudflare: mostra o código e a caixinha
+    modoCaptcha = "erro";
+    const comErro = await abrir(comCaptcha.contexto, "login.html");
+    const erroCf = await tentarLogin(comErro.pagina);
+    confere("captcha com erro: não tenta o login e mostra o código", erroCf.logins.length === 0 && /código 600010/.test(erroCf.erro), erroCf.erro);
+    confere("captcha com erro: mostra a caixinha da Cloudflare", (await comErro.pagina.evaluate(() => window.__captcha.aparencia)) === "always");
+    await comErro.pagina.close();
+
+    modoCaptcha = "nao-suportado";
+    const antigo = await abrir(comCaptcha.contexto, "login.html");
+    const naoSuportado = await tentarLogin(antigo.pagina);
+    confere("captcha: navegador sem suporte avisa", naoSuportado.logins.length === 0 && /navegador/.test(naoSuportado.erro), naoSuportado.erro);
+    await antigo.pagina.close();
+
+    modoCaptcha = "na-hora";
     cloudflareFora = true;
     const semCloudflare = await abrir(comCaptcha.contexto, "login.html");
     const bloqueado = await tentarLogin(semCloudflare.pagina);

@@ -47,7 +47,24 @@ function textoErroLogin(error){
 }
 
 
+// clique duplo ou Enter enquanto já está entrando
+let entrandoLogin = false;
+
+
+// "Verificando..." / "Entrando..." no botão enquanto espera
+function marcarBotaoEntrar(texto){
+
+    const botao = $("btnEntrar");
+
+    botao.disabled = !!texto;
+
+    botao.innerText = texto || "Entrar";
+}
+
+
 async function fazerLogin(){
+
+    if(entrandoLogin) return;
 
     const email =
         $("loginEmail").value.trim();
@@ -68,34 +85,61 @@ async function fazerLogin(){
         return;
     }
 
-    // captcha (login-captcha.js): sem o token o Supabase recusa
+    entrandoLogin = true;
+
+    try{
+
+        // captcha (login-captcha.js): sem o token o Supabase recusa. No celular
+        // a verificação pode levar uns segundos: espera em vez de recusar
+        if(!(await esperarTokenCaptchaComAviso())) return;
+
+        marcarBotaoEntrar("Entrando...");
+
+        const { error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: senha,
+                options: opcoesCaptcha()
+            });
+
+        if(error){
+
+            // o token vale uma tentativa só
+            renovarCaptcha();
+
+            erroEl.innerText = textoErroLogin(error);
+
+            return;
+        }
+
+        window.location.href = "propostas.html";
+
+    }finally{
+
+        entrandoLogin = false;
+
+        marcarBotaoEntrar("");
+    }
+}
+
+
+// true = tem o token (ou não precisa). Senão já mostrou o aviso e a caixinha.
+async function esperarTokenCaptchaComAviso(){
+
+    if(captchaAtivo() && !tokenCaptcha) marcarBotaoEntrar("Verificando...");
+
+    await esperarTokenCaptcha();
+
     const aviso = avisoCaptcha();
 
-    if(aviso){
+    if(!aviso) return true;
 
-        erroEl.innerText = aviso;
+    $("loginErro").innerText = aviso;
 
-        return;
-    }
+    // a caixinha da Cloudflare aparece, com o que ela está fazendo
+    mostrarCaptcha();
 
-    const { error } =
-        await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: senha,
-            options: opcoesCaptcha()
-        });
-
-    if(error){
-
-        // o token vale uma tentativa só
-        renovarCaptcha();
-
-        erroEl.innerText = textoErroLogin(error);
-
-        return;
-    }
-
-    window.location.href = "propostas.html";
+    return false;
 }
 
 

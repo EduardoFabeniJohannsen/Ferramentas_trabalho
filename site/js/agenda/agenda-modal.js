@@ -258,6 +258,8 @@ document.addEventListener("keydown", (evento) => {
 
         fecharPainelStatus();
 
+        fecharPainelTipos();
+
         fecharPainelColunas();
 
         fecharPainelBotoes();

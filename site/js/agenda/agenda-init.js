@@ -10,8 +10,6 @@
 
 (function init(){
 
-    preencherSelect("filtroTipo", TIPOS, "Todos os tipos", rotuloTipo);
-
     preencherSelect("agTipo", TIPOS, undefined, rotuloTipo);
 
     // transferência entre unidades: as caixas de saída e destino (agenda-unidades.js)
@@ -25,14 +23,6 @@
     preencherSelect("agStatus", STATUS_AGENDA);
 
     preencherSelect("agTransportadora", TRANSPORTADORAS, "Sem transportadora");
-
-    [ "filtroTipo" ].forEach(id => {
-
-        $(id).addEventListener(
-            "change",
-            renderizarAgenda
-        );
-    });
 
     // trocou a transportadora: o motorista antigo não vale mais
     $("agTransportadora").addEventListener(
@@ -57,6 +47,8 @@
 
     $("marcarTodosStatus").addEventListener("change", alternarTodosStatus);
 
+    $("marcarTodosTipos").addEventListener("change", alternarTodosTipos);
+
     document.addEventListener("click", (evento) => {
 
         // o clique redesenhou o que foi clicado (ex: chip da transportadora):
@@ -76,6 +68,11 @@
         if(!evento.target.closest(".filtro-status")){
 
             fecharPainelStatus();
+        }
+
+        if(!evento.target.closest(".filtro-tipos")){
+
+            fecharPainelTipos();
         }
 
         if(!evento.target.closest(".filtro-colunas")){
@@ -201,6 +198,9 @@
 
         // os status desmarcados no filtro (salvos por usuário e por modo)
         carregarStatusFiltro();
+
+        // os tipos desmarcados no filtro (salvos por usuário; só no transportador)
+        carregarTiposFiltro();
 
         recarregarAgenda(false);
 

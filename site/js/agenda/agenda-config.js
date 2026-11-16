@@ -171,6 +171,10 @@ const CHAVE_AGENDA_LARGURAS = "agendaLarguras";
 // navegador: { expedicao: [], transportador: [] } (agenda-filtro-status.js)
 const CHAVE_AGENDA_STATUS = "agendaStatus";
 
+// tipos desmarcados no filtro por cada usuário (só valem no transportador),
+// neste navegador: ["Coleta", ...] (agenda-filtro-tipos.js)
+const CHAVE_AGENDA_TIPOS = "agendaTipos";
+
 // etapas do formulário que cada usuário deixou recolhidas, neste navegador
 const CHAVE_AGENDA_ETAPAS = "agendaEtapas";
 
@@ -264,6 +268,11 @@ let datasOcultas = new Set();
 // ficam aqui. Vazio = todos os status aparecem. Fica salvo por usuário e por
 // modo (carregarStatusFiltro); as datas não ficam salvas.
 let statusOcultos = new Set();
+
+// filtro de tipo (igual ao de status, só no transportador): os tipos
+// DESMARCADOS ficam aqui. Vazio = todos os tipos aparecem. Fica salvo por
+// usuário (carregarTiposFiltro).
+let tiposOcultos = new Set();
 
 // valores que o agendamento tinha ao abrir (valores antigos fora do
 // padrão continuam podendo ser salvos sem mexer neles)

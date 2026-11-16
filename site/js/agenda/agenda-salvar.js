@@ -236,6 +236,11 @@ function avisoSalvoEscondido(item){
         return " (escondido: a data dele está desmarcada no filtro)";
     }
 
+    if(aparece(filtrarAgendamentos(false, false, false, true))){
+
+        return ` (escondido: tipo "${rotuloTipo(item.tipo)}" desmarcado no filtro)`;
+    }
+
     if(!buscandoAgenda() && !visivelNoModo(item)){
 
         return modoVisualizacao === "expedicao"

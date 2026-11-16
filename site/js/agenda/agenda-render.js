@@ -108,8 +108,10 @@ function atualizarControlesModo(){
     $("btnModoTransportador").classList.toggle("ativo", !expedicao);
 
     // na expedição só tem entrega, então o filtro de tipo some
-    $("filtroTipo").style.display =
+    $("filtroTipos").style.display =
         expedicao ? "none" : "";
+
+    if(expedicao) fecharPainelTipos();
 
     atualizarSelectOrdem();
 
@@ -139,6 +141,8 @@ function renderizarAgenda(){
     atualizarBotaoDatas();
 
     atualizarBotaoStatus();
+
+    atualizarBotaoTipos();
 
     atualizarBotaoFiltros();
 

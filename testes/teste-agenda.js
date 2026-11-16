@@ -404,7 +404,7 @@ const confere = (nome, ok, extra) => {
     await pagina.waitForTimeout(100);
     await modo("transportador");
     const visivelAgora = (sel) => pagina.isVisible(sel);
-    for(const sel of ["#btnDatas", "#btnStatus", "#btnSemPatrimonio", "#btnSemCard", "#ordemAgenda", "#filtroTipo", "#btnBotoes", "#chipsTransportadora"]){
+    for(const sel of ["#btnDatas", "#btnStatus", "#btnSemPatrimonio", "#btnSemCard", "#ordemAgenda", "#btnTipos", "#btnBotoes", "#chipsTransportadora"]){
         confere(`${sel} escondido com o painel fechado`, !(await visivelAgora(sel)));
     }
     for(const sel of ["#btnFiltros", "#buscaAgenda", "#btnTema"]){
@@ -445,7 +445,11 @@ const confere = (nome, ok, extra) => {
     confere("painel não passa do fim da tela", fp.y + fp.height <= 700, fp);
     confere("o resto rola dentro do painel", await pagina.$eval("#painelFiltros", e => e.scrollHeight > e.clientHeight));
 
-    await pagina.selectOption("#filtroTipo", "Entrega");
+    await pagina.click("#btnTipos");
+    confere("tipos: abrir fecha a lista de datas", await visivelAgora("#painelTipos") && !(await visivelAgora("#painelDatas")));
+    await pagina.uncheck("#marcarTodosTipos");
+    await pagina.locator("#listaTiposFiltro label", { hasText: "Entrega" }).locator("input").check();
+    confere("tipos: lista segue aberta", await visivelAgora("#painelTipos") && await visivelAgora("#painelFiltros"));
     await pagina.click("#btnSemPatrimonio");
     confere("sem patrimônio mantém aberto", await visivelAgora("#painelFiltros"));
 
@@ -472,7 +476,7 @@ const confere = (nome, ok, extra) => {
     await pagina.click("#btnLimparFiltros");
     confere("limpar zera tudo", (await pagina.innerText("#btnFiltros")).trim() === "⚙️ Filtros ▾" && !(await visivelAgora("#btnLimparFiltros")));
     confere("limpar mostra tudo de novo", (await pagina.innerText("#contagemAgenda")).startsWith("5 "), await pagina.innerText("#contagemAgenda"));
-    confere("limpar solta os selects", (await pagina.$eval("#filtroTipo", e => e.value)) === "");
+    confere("limpar solta os tipos", (await pagina.innerText("#btnTipos")).trim() === "📦 Todos os tipos ▾" && (await pagina.evaluate(() => localStorage.getItem("agendaTipos:u1"))) === "[]", await pagina.innerText("#btnTipos"));
 
     // só sem card: frete por nossa conta (ou dividido) com o card vazio
     await pagina.click("#btnFiltros");
@@ -673,7 +677,7 @@ const confere = (nome, ok, extra) => {
         "Entrega=Entrega", "Coleta=Coleta", "Transferência=Transferência entre obras",
         "Transferência entre unidades=Transferência entre unidades", "Troca técnica=Troca técnica"
     ]), tiposForm);
-    const tiposFiltro = await pagina.$$eval("#filtroTipo option", l => l.map(o => o.textContent));
+    const tiposFiltro = await pagina.evaluate(() => { desenharPainelTipos(); return [...document.querySelectorAll("#listaTiposFiltro .tag")].map(e => e.textContent); });
     confere("o filtro de tipo usa os mesmos nomes", tiposFiltro.includes("Transferência entre obras") && tiposFiltro.includes("Transferência entre unidades"), tiposFiltro);
 
     await pagina.evaluate(() => { removerRascunho("novo"); abrirModalAgenda(); });

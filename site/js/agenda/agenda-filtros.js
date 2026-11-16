@@ -48,7 +48,7 @@ function visivelNoModo(item){
 // ======================================
 // Botão do painel de filtros: mostra só as máquinas cujo patrimônio ainda não foi
 // definido (a manutenção só passou o modelo). O estado fica no próprio
-// botão (classe "filtrando"), como o filtro de tipo fica no select.
+// botão (classe "filtrando").
 
 function filtrandoSemPatrimonio(){
 
@@ -122,10 +122,8 @@ function filtrosAtivos(){
         if($("btnStatus").classList.contains("filtrando")) ativos.push("status");
     }
 
-    if(modoVisualizacao !== "expedicao" && $("filtroTipo").value){
-
-        ativos.push(`tipo ${$("filtroTipo").value}`);
-    }
+    // "tipo Entrega + Coleta" (agenda-filtro-tipos.js); na expedição não vale
+    if(filtrandoTipos()) ativos.push(textoTiposFiltro());
 
     if(filtrandoSemPatrimonio()) ativos.push("só sem patrimônio");
 
@@ -166,7 +164,13 @@ function limparFiltros(){
     // o status fica salvo (agenda-filtro-status.js): limpo também fica
     salvarStatusFiltro();
 
-    $("filtroTipo").value = "";
+    // o tipo só vale no transportador: limpando na expedição, a escolha de lá fica
+    if(modoVisualizacao !== "expedicao"){
+
+        tiposOcultos.clear();
+
+        salvarTiposFiltro();
+    }
 
     $("btnSemPatrimonio").classList.remove("filtrando");
 
@@ -209,11 +213,10 @@ function fecharPainelFiltros(){
 // FILTROS
 // ======================================
 // ignorarTransportadora = usado pra contar os botões das
-// transportadoras respeitando os outros filtros.
+// transportadoras respeitando os outros filtros (idem data, status e tipo
+// nas listas de caixinhas).
 
-function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
-
-    const tipo = $("filtroTipo").value;
+function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus, ignorarTipo){
 
     const expedicao =
         modoVisualizacao === "expedicao";
@@ -260,8 +263,9 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus){
             }
         }
 
-        // na expedição os tipos já são os de TIPOS_EXPEDICAO: o filtro de tipo não vale
-        if(!expedicao && tipo && item.tipo !== tipo) return false;
+        // filtro de tipo: os desmarcados não aparecem. Na expedição os tipos
+        // já são os de TIPOS_EXPEDICAO: o filtro de tipo não vale
+        if(!expedicao && !ignorarTipo && tiposOcultos.has(item.tipo)) return false;
 
         // só as máquinas sem patrimônio definido
         if(soSemPatrimonio && !itemSemPatrimonio(item)) return false;

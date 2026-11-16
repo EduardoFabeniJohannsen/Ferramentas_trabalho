@@ -188,6 +188,8 @@ function alternarPainelStatus(){
     // um painel de cada vez
     fecharPainelDatas();
 
+    fecharPainelTipos();
+
     desenharPainelStatus();
 
     painel.classList.add("aberto");

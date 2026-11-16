@@ -112,6 +112,7 @@ body.tema-claro .painel-filtros-titulo:not(:first-child){
 body.tema-claro .painel-filtros,
 body.tema-claro .painel-datas,
 body.tema-claro .painel-status,
+body.tema-claro .painel-tipos,
 body.tema-claro .painel-colunas,
 body.tema-claro .painel-botoes{
     background:var(--claro-card);

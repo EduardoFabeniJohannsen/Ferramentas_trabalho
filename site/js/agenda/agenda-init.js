@@ -49,6 +49,11 @@
 
     $("marcarTodosTipos").addEventListener("change", alternarTodosTipos);
 
+    // filtro de motorista: busca e "selecionar tudo"
+    $("buscaMotoristas").addEventListener("input", desenharPainelMotoristas);
+
+    $("marcarTodosMotoristas").addEventListener("change", alternarTodosMotoristas);
+
     document.addEventListener("click", (evento) => {
 
         // o clique redesenhou o que foi clicado (ex: chip da transportadora):
@@ -73,6 +78,11 @@
         if(!evento.target.closest(".filtro-tipos")){
 
             fecharPainelTipos();
+        }
+
+        if(!evento.target.closest(".filtro-motoristas")){
+
+            fecharPainelMotoristas();
         }
 
         if(!evento.target.closest(".filtro-colunas")){
@@ -201,6 +211,9 @@
 
         // os tipos desmarcados no filtro (salvos por usuário; só no transportador)
         carregarTiposFiltro();
+
+        // os motoristas marcados no filtro (salvos por usuário e por modo)
+        carregarMotoristasFiltro();
 
         recarregarAgenda(false);
 

@@ -56,7 +56,7 @@ function statusDoFiltro(){
 
     const existentes = new Set();
 
-    filtrarAgendamentos(false, false, true).forEach(item => {
+    filtrarAgendamentos("status").forEach(item => {
 
         existentes.add(item.status);
     });
@@ -72,7 +72,7 @@ function contagemPorStatus(){
 
     const contagem = {};
 
-    filtrarAgendamentos(false, false, true).forEach(item => {
+    filtrarAgendamentos("status").forEach(item => {
 
         contagem[item.status] = (contagem[item.status] || 0) + 1;
     });
@@ -103,6 +103,9 @@ function atualizarBotaoStatus(){
     botao.innerText = texto;
 
     botao.classList.toggle("filtrando", marcados.length < todos.length);
+
+    // lista aberta: a contagem acompanha os outros filtros (ex: trocou a transportadora)
+    if($("painelStatus").classList.contains("aberto")) desenharPainelStatus();
 }
 
 
@@ -116,31 +119,22 @@ function desenharPainelStatus(){
 
     const contagem = contagemPorStatus();
 
-    // "(Selecionar tudo)": marcado, desmarcado ou meio-termo
-    const marcados =
-        todos.filter(nome => !statusOcultos.has(nome)).length;
-
-    const caixaTodos = $("marcarTodosStatus");
-
-    caixaTodos.checked = todos.length > 0 && marcados === todos.length;
-
-    caixaTodos.indeterminate = marcados > 0 && marcados < todos.length;
+    marcarCaixaTodos(
+        "marcarTodosStatus",
+        todos.filter(nome => !statusOcultos.has(nome)).length,
+        todos.length
+    );
 
     todos.forEach(nome => {
 
-        const rotulo = criar("label", "data-opcao");
+        const tag = criar("span", "tag", nome);
 
-        const caixa = criar("input");
+        tag.dataset.status = nome;
 
-        caixa.type = "checkbox";
+        lista.appendChild(
+            criarOpcaoFiltro(tag, !statusOcultos.has(nome), contagem[nome], (marcado) => {
 
-        caixa.checked = !statusOcultos.has(nome);
-
-        caixa.addEventListener(
-            "change",
-            () => {
-
-                if(caixa.checked){
+                if(marcado){
 
                     statusOcultos.delete(nome);
 
@@ -151,25 +145,10 @@ function desenharPainelStatus(){
 
                 salvarStatusFiltro();
 
+                // redesenha a lista junto (atualizarBotaoStatus)
                 renderizarAgenda();
-
-                desenharPainelStatus();
-            }
+            })
         );
-
-        rotulo.appendChild(caixa);
-
-        const tag = criar("span", "tag", nome);
-
-        tag.dataset.status = nome;
-
-        rotulo.appendChild(tag);
-
-        rotulo.appendChild(
-            criar("span", "contagem-status", `(${contagem[nome] || 0})`)
-        );
-
-        lista.appendChild(rotulo);
     });
 }
 
@@ -186,9 +165,7 @@ function alternarPainelStatus(){
     }
 
     // um painel de cada vez
-    fecharPainelDatas();
-
-    fecharPainelTipos();
+    fecharListasFiltro();
 
     desenharPainelStatus();
 
@@ -216,7 +193,6 @@ function alternarTodosStatus(){
 
     salvarStatusFiltro();
 
+    // redesenha a lista junto (atualizarBotaoStatus)
     renderizarAgenda();
-
-    desenharPainelStatus();
 }

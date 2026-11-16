@@ -70,7 +70,7 @@ function contagemPorTipo(){
 
     const contagem = {};
 
-    filtrarAgendamentos(false, false, false, true).forEach(item => {
+    filtrarAgendamentos("tipo").forEach(item => {
 
         contagem[item.tipo] = (contagem[item.tipo] || 0) + 1;
     });
@@ -108,30 +108,19 @@ function desenharPainelTipos(){
 
     const contagem = contagemPorTipo();
 
-    // "(Selecionar tudo)": marcado, desmarcado ou meio-termo
-    const marcados = tiposMarcados().length;
-
-    const caixaTodos = $("marcarTodosTipos");
-
-    caixaTodos.checked = marcados === TIPOS.length;
-
-    caixaTodos.indeterminate = marcados > 0 && marcados < TIPOS.length;
+    marcarCaixaTodos("marcarTodosTipos", tiposMarcados().length, TIPOS.length);
 
     TIPOS.forEach(tipo => {
 
-        const rotulo = criar("label", "data-opcao");
+        // a mesma etiqueta colorida da coluna Tipo
+        const tag = criar("span", "tag", rotuloTipo(tipo));
 
-        const caixa = criar("input");
+        tag.dataset.tipo = tipo;
 
-        caixa.type = "checkbox";
+        lista.appendChild(
+            criarOpcaoFiltro(tag, !tiposOcultos.has(tipo), contagem[tipo], (marcado) => {
 
-        caixa.checked = !tiposOcultos.has(tipo);
-
-        caixa.addEventListener(
-            "change",
-            () => {
-
-                if(caixa.checked){
+                if(marcado){
 
                     tiposOcultos.delete(tipo);
 
@@ -144,23 +133,8 @@ function desenharPainelTipos(){
 
                 // redesenha a lista junto (atualizarBotaoTipos)
                 renderizarAgenda();
-            }
+            })
         );
-
-        rotulo.appendChild(caixa);
-
-        // a mesma etiqueta colorida da coluna Tipo
-        const tag = criar("span", "tag", rotuloTipo(tipo));
-
-        tag.dataset.tipo = tipo;
-
-        rotulo.appendChild(tag);
-
-        rotulo.appendChild(
-            criar("span", "contagem-status", `(${contagem[tipo] || 0})`)
-        );
-
-        lista.appendChild(rotulo);
     });
 }
 
@@ -177,9 +151,7 @@ function alternarPainelTipos(){
     }
 
     // um painel de cada vez
-    fecharPainelDatas();
-
-    fecharPainelStatus();
+    fecharListasFiltro();
 
     desenharPainelTipos();
 

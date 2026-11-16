@@ -226,19 +226,24 @@ function avisoSalvoEscondido(item){
 
     if(aparece(filtrarAgendamentos())) return "";
 
-    if(aparece(filtrarAgendamentos(false, false, true))){
+    if(aparece(filtrarAgendamentos("status"))){
 
         return ` (escondido: status "${item.status}" desmarcado no filtro)`;
     }
 
-    if(aparece(filtrarAgendamentos(false, true, false))){
+    if(aparece(filtrarAgendamentos("data"))){
 
         return " (escondido: a data dele está desmarcada no filtro)";
     }
 
-    if(aparece(filtrarAgendamentos(false, false, false, true))){
+    if(aparece(filtrarAgendamentos("tipo"))){
 
         return ` (escondido: tipo "${rotuloTipo(item.tipo)}" desmarcado no filtro)`;
+    }
+
+    if(aparece(filtrarAgendamentos("motorista"))){
+
+        return ` (escondido: motorista "${rotuloMotoristaFiltro(nomeMotoristaFiltro(item))}" desmarcado no filtro)`;
     }
 
     if(!buscandoAgenda() && !visivelNoModo(item)){

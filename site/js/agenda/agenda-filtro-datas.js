@@ -23,7 +23,7 @@ function datasDoFiltro(){
 
     const datas = new Set();
 
-    filtrarAgendamentos(false, true).forEach(item => {
+    filtrarAgendamentos("data").forEach(item => {
 
         datas.add(dataDaTela(item));
     });
@@ -160,9 +160,7 @@ function alternarPainelDatas(){
     $("buscaDatas").value = "";
 
     // um painel de cada vez
-    fecharPainelStatus();
-
-    fecharPainelTipos();
+    fecharListasFiltro();
 
     desenharPainelDatas();
 

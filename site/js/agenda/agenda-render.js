@@ -15,7 +15,7 @@ function desenharChips(){
     area.innerHTML = "";
 
     const base =
-        filtrarAgendamentos(true);
+        filtrarAgendamentos("transportadora");
 
     const opcoes = [
         { valor: "", rotulo: "Todas" },
@@ -144,6 +144,8 @@ function renderizarAgenda(){
 
     atualizarBotaoTipos();
 
+    atualizarBotaoMotoristas();
+
     atualizarBotaoFiltros();
 
     const lista = $("listaAgenda");
@@ -154,7 +156,7 @@ function renderizarAgenda(){
 
     // ordem normal e, por cima, a coluna clicada (agenda-ordem-colunas.js)
     const filtrados =
-        ordenarPorColuna(ordenarAgendamentos(filtrarAgendamentos(false)));
+        ordenarPorColuna(ordenarAgendamentos(filtrarAgendamentos()));
 
     // ordenado por outra coluna, os dias se misturam: sem o cabeçalho de cada dia
     const porDia = agrupaPorDia();

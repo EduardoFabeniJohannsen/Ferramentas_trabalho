@@ -100,7 +100,9 @@ body.tema-claro .tag.sem-transp,
 body.tema-claro .ag-hora-vazio{
     color:#64748b;
 }
-body.tema-claro .contagem-status{
+body.tema-claro .contagem-status,
+body.tema-claro .sem-motorista,
+body.tema-claro .lista-vazia{
     color:#52617a;
 }
 body.tema-claro .painel-filtros-titulo{
@@ -113,6 +115,7 @@ body.tema-claro .painel-filtros,
 body.tema-claro .painel-datas,
 body.tema-claro .painel-status,
 body.tema-claro .painel-tipos,
+body.tema-claro .painel-motoristas,
 body.tema-claro .painel-colunas,
 body.tema-claro .painel-botoes{
     background:var(--claro-card);

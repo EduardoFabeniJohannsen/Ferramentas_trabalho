@@ -21,8 +21,11 @@ function definirModo(modo){
 
     gravarLocal(CHAVE_AGENDA_MODO, modoVisualizacao);
 
-    // cada modo tem o seu filtro de status salvo (agenda-filtro-status.js)
+    // cada modo tem o seu filtro de status e de motorista salvo
+    // (agenda-filtro-status.js e agenda-filtro-motoristas.js)
     carregarStatusFiltro();
+
+    carregarMotoristasFiltro();
 
     renderizarAgenda();
 }
@@ -125,6 +128,9 @@ function filtrosAtivos(){
     // "tipo Entrega + Coleta" (agenda-filtro-tipos.js); na expedição não vale
     if(filtrandoTipos()) ativos.push(textoTiposFiltro());
 
+    // "motorista João + Pedro" (agenda-filtro-motoristas.js)
+    if(filtrandoMotoristas()) ativos.push(textoMotoristasFiltro());
+
     if(filtrandoSemPatrimonio()) ativos.push("só sem patrimônio");
 
     if(filtrandoSemCard()) ativos.push("só sem card");
@@ -172,6 +178,11 @@ function limparFiltros(){
         salvarTiposFiltro();
     }
 
+    // o motorista fica salvo por modo, como o status
+    motoristasMarcados = null;
+
+    salvarMotoristasFiltro();
+
     $("btnSemPatrimonio").classList.remove("filtrando");
 
     $("btnSemCard").classList.remove("filtrando");
@@ -212,11 +223,11 @@ function fecharPainelFiltros(){
 // ======================================
 // FILTROS
 // ======================================
-// ignorarTransportadora = usado pra contar os botões das
-// transportadoras respeitando os outros filtros (idem data, status e tipo
-// nas listas de caixinhas).
+// ignorar = o filtro que fica de lado ("transportadora", "data", "status",
+// "tipo" ou "motorista"): é como cada filtro conta as próprias opções
+// respeitando os outros.
 
-function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus, ignorarTipo){
+function filtrarAgendamentos(ignorar){
 
     const expedicao =
         modoVisualizacao === "expedicao";
@@ -245,7 +256,7 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus, 
             if(!visivelNoModo(item)) return false;
         }
 
-        if(!ignorarTransportadora){
+        if(ignorar !== "transportadora"){
 
             if(
                 filtroTransportadora === SEM_TRANSPORTADORA &&
@@ -265,7 +276,10 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus, 
 
         // filtro de tipo: os desmarcados não aparecem. Na expedição os tipos
         // já são os de TIPOS_EXPEDICAO: o filtro de tipo não vale
-        if(!expedicao && !ignorarTipo && tiposOcultos.has(item.tipo)) return false;
+        if(!expedicao && ignorar !== "tipo" && tiposOcultos.has(item.tipo)) return false;
+
+        // filtro de motorista: só os marcados (agenda-filtro-motoristas.js)
+        if(ignorar !== "motorista" && !motoristaAparece(item)) return false;
 
         // só as máquinas sem patrimônio definido
         if(soSemPatrimonio && !itemSemPatrimonio(item)) return false;
@@ -276,10 +290,10 @@ function filtrarAgendamentos(ignorarTransportadora, ignorarData, ignorarStatus, 
         if(buscando) return true;
 
         // filtro de status: os desmarcados não aparecem
-        if(!ignorarStatus && statusOcultos.has(item.status)) return false;
+        if(ignorar !== "status" && statusOcultos.has(item.status)) return false;
 
         // filtro de datas: as desmarcadas não aparecem
-        if(!ignorarData && datasOcultas.has(dataDaTela(item))) return false;
+        if(ignorar !== "data" && datasOcultas.has(dataDaTela(item))) return false;
 
         return true;
     });

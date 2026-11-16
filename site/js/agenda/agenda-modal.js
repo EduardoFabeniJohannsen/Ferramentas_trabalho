@@ -254,11 +254,8 @@ document.addEventListener("keydown", (evento) => {
 
         fecharModalAgenda();
 
-        fecharPainelDatas();
-
-        fecharPainelStatus();
-
-        fecharPainelTipos();
+        // datas, status, tipos e motoristas
+        fecharListasFiltro();
 
         fecharPainelColunas();
 

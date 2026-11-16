@@ -175,6 +175,11 @@ const CHAVE_AGENDA_STATUS = "agendaStatus";
 // neste navegador: ["Coleta", ...] (agenda-filtro-tipos.js)
 const CHAVE_AGENDA_TIPOS = "agendaTipos";
 
+// motoristas MARCADOS no filtro por cada usuário (uma lista por modo; null =
+// todos), neste navegador: { expedicao: null, transportador: ["João"] }
+// (agenda-filtro-motoristas.js)
+const CHAVE_AGENDA_MOTORISTAS = "agendaMotoristas";
+
 // etapas do formulário que cada usuário deixou recolhidas, neste navegador
 const CHAVE_AGENDA_ETAPAS = "agendaEtapas";
 
@@ -273,6 +278,10 @@ let statusOcultos = new Set();
 // DESMARCADOS ficam aqui. Vazio = todos os tipos aparecem. Fica salvo por
 // usuário (carregarTiposFiltro).
 let tiposOcultos = new Set();
+
+// filtro de motorista: null = todos aparecem; senão os nomes MARCADOS do modo
+// atual ("" = sem motorista). Salvo por usuário e por modo (carregarMotoristasFiltro).
+let motoristasMarcados = null;
 
 // valores que o agendamento tinha ao abrir (valores antigos fora do
 // padrão continuam podendo ser salvos sem mexer neles)

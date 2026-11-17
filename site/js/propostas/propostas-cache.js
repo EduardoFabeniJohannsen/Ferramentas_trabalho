@@ -75,6 +75,7 @@ function salvarCache(){
         cidadeSaida: cidadeSaidaAtual,
         separarPagamentoAtivo: separarPagamentoAtivo,
         freteNoTotalAtivo: freteNoTotalAtivo,
+        aprovacaoCadastralAtiva: aprovacaoCadastralAtiva,
         equipamentos: equipamentos
     };
 
@@ -146,6 +147,11 @@ function restaurarCache(){
     freteNoTotalAtivo = dados.freteNoTotalAtivo === true;
 
     atualizarBotaoFreteNoTotal();
+
+    // ativada por padrão (cache antigo, sem o campo, fica ativada)
+    aprovacaoCadastralAtiva = dados.aprovacaoCadastralAtiva !== false;
+
+    atualizarBotaoAprovacaoCadastral();
 
     const equipamentos =
         Array.isArray(dados.equipamentos)
@@ -314,6 +320,12 @@ function limparTudo(){
 
     // reseta o card de desconto pro estado inicial
     renderizarDescontosPorEquipamento([]);
+
+    // a configuração fica, menos a aprovação cadastral: ela vale por cliente,
+    // e o próximo pode ser novo (sem ela, sairia sem pedir a aprovação)
+    aprovacaoCadastralAtiva = true;
+
+    atualizarBotaoAprovacaoCadastral();
 
     removerLocal(CHAVE_CACHE_PROPOSTA);
 

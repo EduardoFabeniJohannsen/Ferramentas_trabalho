@@ -111,7 +111,8 @@ function montarRegistroProposta({ texto, itens, infoPeriodo, frete, valorComplem
                 bitributacao: bitributacaoAtiva,
                 diaria: valorDiariaAtivo,
                 emojis: emojisAtivo,
-                separarPagamento: separarPagamentoAtivo
+                separarPagamento: separarPagamentoAtivo,
+                aprovacaoCadastral: aprovacaoCadastralAtiva
             },
             equipamentos,
             valorComplementar: arredondarRegistro(valorComplementar)

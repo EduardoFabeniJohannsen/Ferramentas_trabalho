@@ -63,6 +63,9 @@ function configuracoesAdmin(dados){
 
     if(config.separarPagamento) lista.push("Linha em branco no pagamento");
 
+    // registro antigo não tem o campo: saiu com a aprovação
+    if(config.aprovacaoCadastral === false) lista.push("Sem aprovação cadastral");
+
     lista.push(textoPagamentoAdmin(dados));
 
     return lista;
@@ -108,7 +111,7 @@ function textoPagamentoAdmin(dados){
 // Prazo que saiu na mensagem: "28", "28/56"... ("" = a mensagem não citou prazo).
 // Com Boleto ou Depósito é o prazo digitado. Sem escolher a forma sai o texto
 // padrão (propostas-pagamento.js): com emojis não cita prazo; sem emojis diz
-// "28 dias, mediante aprovação cadastral".
+// "28 dias, mediante aprovação cadastral"; sem a aprovação, só "28 dias".
 const PRAZO_TEXTO_PADRAO_SEM_EMOJIS = "28";
 
 function prazoPagamentoAdmin(dados){
@@ -117,7 +120,11 @@ function prazoPagamentoAdmin(dados){
 
     if(pagamento.forma) return pagamento.prazo || "";
 
-    return dados?.configuracoes?.emojis === false ? PRAZO_TEXTO_PADRAO_SEM_EMOJIS : "";
+    const config = dados?.configuracoes || {};
+
+    return config.emojis === false || config.aprovacaoCadastral === false
+        ? PRAZO_TEXTO_PADRAO_SEM_EMOJIS
+        : "";
 }
 
 

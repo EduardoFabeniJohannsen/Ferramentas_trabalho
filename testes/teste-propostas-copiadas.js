@@ -190,9 +190,16 @@ const confere = (nome, ok, extra) => {
         prazoPagamentoAdmin({ configuracoes: { emojis: true } }),
         prazoPagamentoAdmin({ pagamento: { forma: "Boleto", prazo: "" } }),
         prazoPagamentoAdmin({ pagamento: { forma: "", prazo: "45" }, configuracoes: { emojis: true } }),
-        prazoPagamentoAdmin(null)
+        prazoPagamentoAdmin(null),
+        prazoPagamentoAdmin({ configuracoes: { emojis: true, aprovacaoCadastral: false } })
     ]);
-    confere("prazo do texto padrão: 28 só sem emojis; prazo escondido sem forma não conta", JSON.stringify(prazos) === JSON.stringify(["28", "", "", "", ""]), prazos);
+    confere("prazo do texto padrão: 28 sem emojis ou sem a aprovação cadastral; prazo escondido sem forma não conta", JSON.stringify(prazos) === JSON.stringify(["28", "", "", "", "", "28"]), prazos);
+    const tagsAprovacao = await pagina.evaluate(() => [
+        configuracoesAdmin({ configuracoes: { aprovacaoCadastral: false } }).includes("Sem aprovação cadastral"),
+        configuracoesAdmin({ configuracoes: { aprovacaoCadastral: true } }).includes("Sem aprovação cadastral"),
+        configuracoesAdmin({ configuracoes: {} }).includes("Sem aprovação cadastral")
+    ]);
+    confere("tag Sem aprovação cadastral só quando foi desativada (registro antigo saiu com ela)", JSON.stringify(tagsAprovacao) === JSON.stringify([true, false, false]), tagsAprovacao);
     await pagina.selectOption("#filtroPropostasModelo", "WAE16");
 
     // ---------- desconto ----------
@@ -239,7 +246,7 @@ const confere = (nome, ok, extra) => {
 
     await abrirColuna("config");
     const grupos = await pagina.$$eval("#painelFiltroColuna .filtro-coluna-titulo-grupo", l => l.map(g => g.textContent));
-    confere("Configurações: um grupo por tipo", JSON.stringify(grupos) === JSON.stringify(["Cidade de saída", "Locação complementar", "Pagamento", "Diária", "Emojis", "Linha em branco no pagamento", "Frete bonificado"]), grupos);
+    confere("Configurações: um grupo por tipo", JSON.stringify(grupos) === JSON.stringify(["Cidade de saída", "Locação complementar", "Pagamento", "Diária", "Emojis", "Linha em branco no pagamento", "Aprovação cadastral", "Frete bonificado"]), grupos);
     confere("lista só o que existe com os outros filtros (como no Excel)", JSON.stringify(await opcoesPainel(3)) === JSON.stringify(["Boleto 28 dias (1)", "Depósito 28/56 dias (1)"]), await opcoesPainel(3));
     await opcaoPainel("Depósito 28/56 dias").uncheck();
     confere("desmarcar Depósito tira a Beta (junto com o filtro de Equipamentos)", JSON.stringify(await clientes()) === '["Construtora Alfa"]', await clientes());

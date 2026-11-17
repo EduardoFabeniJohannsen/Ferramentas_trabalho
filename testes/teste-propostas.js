@@ -184,6 +184,40 @@ const confere = (nome, ok, extra) => {
     confere("sem emojis usa a escolha", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 30 dias."), l);
     await pagina.evaluate(() => { emojisAtivo = true; });
 
+    // ---------- sem "mediante aprovação cadastral" (cliente já cadastrado) ----------
+    // textContent: com o modal fechado o innerText não é confiável
+    const botaoAprovacao = () => pagina.$eval("#btnAprovacaoCadastral", b => [b.textContent.trim(), b.classList.contains("ativo")]);
+    await abrirConfig();
+    confere("aprovação cadastral começa ativada", JSON.stringify(await botaoAprovacao()) === JSON.stringify(["Mediante aprovação cadastral: Ativado", true]), await botaoAprovacao());
+    await pagina.click("#btnAprovacaoCadastral");
+    confere("clicar desativa", JSON.stringify(await botaoAprovacao()) === JSON.stringify(["Mediante aprovação cadastral: Desativado", false]), await botaoAprovacao());
+    l = linhaPagamento(await mensagem());
+    confere("desativada: a forma de pagamento sai sem o trecho", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, prazo de 30 dias."), l);
+    await prazo("");
+    l = linhaPagamento(await mensagem());
+    confere("desativada e sem prazo", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento."), l);
+    await prazo("30");
+    await escolher("Cliente novo");
+    l = linhaPagamento(await mensagem());
+    confere("desativada: cliente novo também", l.endsWith("Forma de pagamento: Boleto com emissão no dia seguinte à entrega do equipamento, prazo de 28 dias."), l);
+    await escolher("");
+    l = linhaPagamento(await mensagem());
+    confere("desativada: o texto padrão (com emojis ficaria vazio) diz o prazo", l.endsWith("Forma de pagamento: 28 dias."), l);
+    await pagina.evaluate(() => { emojisAtivo = false; });
+    l = linhaPagamento(await mensagem());
+    confere("desativada: o texto padrão sem emojis também", l.endsWith("Forma de pagamento: 28 dias."), l);
+    await pagina.evaluate(() => { emojisAtivo = true; });
+    await escolher("Depósito");
+    await pagina.waitForTimeout(100);
+    await abrir();
+    await abrirConfig();
+    confere("recarregar mantém desativada (fica salva com a proposta)", JSON.stringify(await botaoAprovacao()) === JSON.stringify(["Mediante aprovação cadastral: Desativado", false]), await botaoAprovacao());
+    await pagina.click("#btnAprovacaoCadastral");
+    l = linhaPagamento(await mensagem());
+    confere("ativar de novo volta o trecho", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 30 dias."), l);
+    await pagina.waitForTimeout(100);
+    confere("ativada também fica salva", (await pagina.evaluate(() => JSON.parse(localStorage.getItem("propostaCache")).aprovacaoCadastralAtiva)) === true);
+
     // ---------- recarregar mantém ----------
     await pagina.waitForTimeout(100);
     await abrir();
@@ -265,7 +299,7 @@ const confere = (nome, ok, extra) => {
     confere("copiar registra uma vez", registros.length === 1 && registros[0].tabela === "propostas_copiadas", registros.length);
     confere("registro tem cliente, cidade e o texto copiado", r.cliente === "Cliente Teste" && r.cidade === "Brusque" && r.texto === copiado, { cliente: r.cliente, cidade: r.cidade });
     confere("registro tem o equipamento e os valores", equip.modelo === "WAE18" && equip.quantidade === 1 && equip.valorFinal === 1000 && equip.seguro === 70 && r.valor_total === 1070, equip);
-    confere("registro tem período, frete e configurações", r.dados.diasTotal === 28 && r.dados.frete === 500 && r.dados.configuracoes.emojis === true && r.dados.configuracoes.locacaoComplementar === false && r.dados.cidadeSaida === "Itajaí", r.dados);
+    confere("registro tem período, frete e configurações", r.dados.diasTotal === 28 && r.dados.frete === 500 && r.dados.configuracoes.emojis === true && r.dados.configuracoes.locacaoComplementar === false && r.dados.configuracoes.aprovacaoCadastral === true && r.dados.cidadeSaida === "Itajaí", r.dados);
     confere("registro tem o aparelho", r.aparelho?.tipo === "computador" && !!r.aparelho.navegador, r.aparelho);
     confere("quem fez o banco preenche (não vai do navegador)", !("usuario_email" in r) && !("usuario_id" in r), Object.keys(r));
     await mensagem();
@@ -283,11 +317,13 @@ const confere = (nome, ok, extra) => {
 
     // ---------- limpar tudo ----------
     await escolher("Boleto");
+    await pagina.click("#btnAprovacaoCadastral");
     await fecharConfig();
     await pagina.selectOption("#freteBonificado", "entrega");
     await pagina.click(".btn-limpar-tudo");
     await pagina.waitForTimeout(100);
     confere("limpar tudo não mexe na configuração", (await pagina.inputValue("#formaPagamento")) === "Boleto");
+    confere("limpar tudo ativa de novo a aprovação cadastral (o próximo cliente pode ser novo)", (await pagina.evaluate(() => aprovacaoCadastralAtiva)) === true && JSON.stringify(await botaoAprovacao()) === JSON.stringify(["Mediante aprovação cadastral: Ativado", true]), await botaoAprovacao());
     confere("limpar tudo limpa o formulário", (await pagina.inputValue("#cidade")) === "" && (await pagina.inputValue("#freteBonificado")) === "");
 
     // ---------- total com seguro ----------

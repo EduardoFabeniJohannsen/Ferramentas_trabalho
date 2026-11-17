@@ -1,7 +1,7 @@
 // ======================================
 // PROPOSTAS - FORMA DE PAGAMENTO
 // ======================================
-// Boleto, depósito ou cliente novo e o prazo em dias (⚙️ Configurações), na mensagem da Proposta Zap. Cliente novo sai como Boleto, com o prazo pela regra do financeiro. Sem escolher a forma, sai com o texto padrão de sempre.
+// Boleto, depósito ou cliente novo e o prazo em dias (⚙️ Configurações), na mensagem da Proposta Zap. Cliente novo sai como Boleto, com o prazo pela regra do financeiro. Sem escolher a forma, sai com o texto padrão de sempre. O "mediante aprovação cadastral" pode ser desativado (cliente já cadastrado).
 
 const PRAZO_PAGAMENTO_PADRAO = "28";
 
@@ -119,6 +119,9 @@ function textoFormaPagamento(){
 
     if(!forma){
 
+        // sem a aprovação, o texto padrão com emojis ficaria vazio: diz o prazo
+        if(!aprovacaoCadastralAtiva) return "28 dias.";
+
         return emojisAtivo
             ? "Mediante aprovação cadastral."
             : "28 dias, mediante aprovação cadastral.";
@@ -131,7 +134,43 @@ function textoFormaPagamento(){
     const prazo = prazoPagamentoTexto();
 
     return (
-        `${nome} com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral` +
+        `${nome} com emissão no dia seguinte à entrega do equipamento` +
+        (aprovacaoCadastralAtiva ? ", mediante aprovação cadastral" : "") +
         (prazo ? `, prazo de ${prazo} dias.` : ".")
     );
+}
+
+
+// ======================================
+// APROVAÇÃO CADASTRAL (toggle)
+// ======================================
+// Ativada por padrão. Cliente que já tem cadastro aprovado não precisa de
+// nova aprovação: desativada, a forma de pagamento sai sem o "mediante
+// aprovação cadastral". Vale por cliente: fica salva com a proposta e o
+// Limpar tudo ativa de novo (o próximo cliente pode ser novo).
+
+let aprovacaoCadastralAtiva = true;
+
+
+function alternarAprovacaoCadastral(){
+
+    aprovacaoCadastralAtiva = !aprovacaoCadastralAtiva;
+
+    atualizarBotaoAprovacaoCadastral();
+
+    // o modal fica fora dos cards que salvam sozinhos ao digitar
+    salvarCache();
+}
+
+
+function atualizarBotaoAprovacaoCadastral(){
+
+    const botao = $("btnAprovacaoCadastral");
+
+    if(!botao) return;
+
+    botao.classList.toggle("ativo", aprovacaoCadastralAtiva);
+
+    botao.innerText =
+        `Mediante aprovação cadastral: ${aprovacaoCadastralAtiva ? "Ativado" : "Desativado"}`;
 }

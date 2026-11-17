@@ -33,6 +33,8 @@
 
         // soAdmin: o link só aparece para admin
 
+        { arquivo: "analise-fretes.html", rotulo: "📈 Análise de fretes", soAdmin: true },
+
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
     ];
 

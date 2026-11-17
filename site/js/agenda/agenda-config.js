@@ -21,16 +21,6 @@
 // nomes das transportadoras (vêm da tabela "transportadoras" do Supabase)
 let TRANSPORTADORAS = [];
 
-// de uma unidade da W Rental para outra (agenda-unidades.js): vai pra
-// expedição como uma entrega, mas sem faturamento
-const TIPO_TRANSFERENCIA_UNIDADES = "Transferência entre unidades";
-
-const TIPOS = ["Entrega", "Coleta", "Transferência", TIPO_TRANSFERENCIA_UNIDADES, "Troca técnica"];
-
-// como o tipo aparece na tela ("Transferência" é a entre obras: o valor salvo
-// continua o de sempre, então os agendamentos antigos não mudam)
-const ROTULOS_TIPO = { "Transferência": "Transferência entre obras" };
-
 // o que a expedição mostra: o que sai da W Rental
 const TIPOS_EXPEDICAO = ["Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES];
 
@@ -41,9 +31,6 @@ const VENDEDORES = ["Eduardo", "Maria Luiza", "Fernanda", "Abdan", "Julie"];
 const HORARIO_PADRAO = "08:00";
 
 const STATUS_PADRAO = "Confirmado";
-
-// o botão ✅ da linha marca este (agenda-salvar.js)
-const STATUS_CONCLUIDO = "Concluído";
 
 const STATUS_AGENDA = [
     "A confirmar",

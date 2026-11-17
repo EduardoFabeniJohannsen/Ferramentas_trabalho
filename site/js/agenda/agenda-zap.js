@@ -41,28 +41,6 @@ function ehLocalWR(nome){
 }
 
 
-// Modelo a partir do patrimônio: 3 letras + altura (WAE18R001 -> WAE18,
-// WTE14L076 -> WTE14, WAD16060 -> WAD16). Mesma regra do estoque.
-function modeloDaPlataforma(plataforma){
-
-    const texto =
-        String(plataforma || "").trim().toUpperCase();
-
-    const partes =
-        texto.match(/^([A-Z]+?)(\d+)/);
-
-    if(!partes) return texto;
-
-    const digitos = partes[2];
-
-    return partes[1] + (
-        digitos.length > 2
-            ? digitos.slice(0, 2)
-            : digitos
-    );
-}
-
-
 // vários equipamentos: modelo de cada um, com a quantidade
 // (2x WAD16010 + WTE12046 -> 2x WAD16 + WTE12)
 function modelosDaPlataforma(plataforma){

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
+
+<title>Análise de fretes</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<!-- admin.css: card largo, tabelas e barra de filtros; analise-fretes.css: resumo,
+     barrinhas e gráfico desta página -->
+<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/analise-fretes.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <!-- links das outras páginas: montados pelo js/menu.js -->
+
+    <button data-clique="fazerLogout">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER (só admin: quanto se gasta e com quem)
+========================= -->
+
+<div class="container">
+
+    <div class="card card-admin card-analise">
+
+        <h2>📈 Análise de fretes</h2>
+
+        <p class="dica-admin">
+            Agendamentos com data no período, sem os cancelados (nem os da lixeira). Cada
+            agendamento é um frete e uma viagem. <strong>Valor</strong> é o que as transportadoras
+            cobraram; <strong>nosso custo</strong> é a parte por nossa conta (Nossa conta, ou a
+            nossa parte quando o frete é dividido com o cliente).
+        </p>
+
+        <!-- filtros (analise-filtros.js) -->
+        <div class="barra-admin barra-analise">
+
+            <label class="campo-periodo">De
+                <input type="date" id="analiseDe" data-mudanca="trocarPeriodoAnalise">
+            </label>
+
+            <label class="campo-periodo">Até
+                <input type="date" id="analiseAte" data-mudanca="trocarPeriodoAnalise">
+            </label>
+
+            <div class="atalhos-periodo">
+                <button type="button" data-clique="escolherPeriodoAnalise" data-arg="mes">Este mês</button>
+                <button type="button" data-clique="escolherPeriodoAnalise" data-arg="mes-passado">Mês passado</button>
+                <button type="button" data-clique="escolherPeriodoAnalise" data-arg="30">30 dias</button>
+                <button type="button" data-clique="escolherPeriodoAnalise" data-arg="90">90 dias</button>
+                <button type="button" data-clique="escolherPeriodoAnalise" data-arg="ano">Este ano</button>
+            </div>
+
+            <select id="analiseTipo" data-mudanca="desenharAnaliseFretes" title="Tipo de agendamento">
+                <option value="">Todos os tipos</option>
+            </select>
+
+            <label class="so-concluidos">
+                <input type="checkbox" id="analiseConcluidos" data-mudanca="desenharAnaliseFretes">
+                Só concluídos
+            </label>
+
+            <span class="contagem" id="contagemAnalise"></span>
+
+        </div>
+
+        <!-- os números grandes (analise-tela.js) -->
+        <div class="resumo-fretes" id="resumoFretes"></div>
+
+
+        <section class="secao-analise">
+
+            <h3>Por transportadora</h3>
+
+            <p class="dica-admin">
+                A parte mostra quantos dos fretes ficaram com cada uma. Frete por máquina é o
+                valor dividido pelas máquinas levadas (o frete de 2 máquinas custa mais que o de 1).
+            </p>
+
+            <div class="area-admin">
+                <table class="tabela-admin tabela-analise">
+                    <thead>
+                        <tr>
+                            <th class="col-nome">Transportadora</th>
+                            <th>Fretes</th>
+                            <th>Parte dos fretes</th>
+                            <th>Valor</th>
+                            <th>Parte do valor</th>
+                            <th>Nosso custo</th>
+                            <th>Frete médio</th>
+                            <th>Por máquina</th>
+                            <th title="Fretes sem valor informado: ficam fora do valor e das médias">Sem valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTransportadorasAnalise"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+
+        <section class="secao-analise">
+
+            <h3 id="tituloViagens">Viagens por dia</h3>
+
+            <p class="dica-admin">
+                Passe o mouse (ou toque) numa coluna para ver o dia: viagens, valor e quem fez.
+                Períodos de mais de 2 meses mostram uma coluna por semana.
+            </p>
+
+            <!-- analise-grafico.js -->
+            <div class="grafico-viagens" id="graficoViagens">
+                <div class="dica-grafico" id="dicaViagens" hidden></div>
+            </div>
+
+            <details class="numeros-viagens">
+
+                <summary>Ver os números</summary>
+
+                <div class="area-admin">
+                    <table class="tabela-admin tabela-analise">
+                        <thead>
+                            <tr>
+                                <th>Dia</th>
+                                <th>Viagens</th>
+                                <th>Valor</th>
+                                <th class="col-nome">Transportadoras</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoViagensAnalise"></tbody>
+                    </table>
+                </div>
+
+            </details>
+
+        </section>
+
+
+        <section class="secao-analise">
+
+            <h3>Mesma cidade, transportadoras diferentes</h3>
+
+            <p class="dica-admin">
+                Cidades (do endereço do cliente) atendidas por mais de uma transportadora no
+                período: compara o preço de quem fez o mesmo destino. O ⚠️ aparece quando a mais
+                usada cobra mais que outra.
+            </p>
+
+            <div class="area-admin">
+                <table class="tabela-admin tabela-analise">
+                    <thead>
+                        <tr>
+                            <th class="col-nome">Cidade / transportadora</th>
+                            <th>Fretes</th>
+                            <th>Frete médio</th>
+                            <th>Por máquina</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoCidadesAnalise"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+
+        <section class="secao-analise">
+
+            <h3>Por modelo de máquina</h3>
+
+            <p class="dica-admin">
+                O frete de um agendamento com várias máquinas se divide igual entre elas.
+            </p>
+
+            <div class="area-admin">
+                <table class="tabela-admin tabela-analise">
+                    <thead>
+                        <tr>
+                            <th class="col-nome">Modelo</th>
+                            <th>Máquinas</th>
+                            <th>Frete por máquina</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoModelosAnalise"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
+
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<!-- o mesmo da agenda: tipos e status, cidade do endereço, máquinas e modelo -->
+<script src="js/agendamento-comum.js" defer></script>
+<script src="js/analise-fretes/analise-dados.js" defer></script>
+<script src="js/analise-fretes/analise-calculo.js" defer></script>
+<script src="js/analise-fretes/analise-viagens.js" defer></script>
+<script src="js/analise-fretes/analise-filtros.js" defer></script>
+<script src="js/analise-fretes/analise-grafico.js" defer></script>
+<script src="js/analise-fretes/analise-resumo.js" defer></script>
+<script src="js/analise-fretes/analise-tela.js" defer></script>
+<script src="js/analise-fretes/analise-init.js" defer></script>
+
+</body>
+
+</html>

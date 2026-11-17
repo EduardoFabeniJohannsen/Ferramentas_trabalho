@@ -35,30 +35,10 @@ function patrimonioFormatado(texto){
 // Ficam juntos na coluna plataforma, separados por "+", com a quantidade
 // na frente quando passa de 1: "2x WAD16 + WTE12". Um só fica como era.
 // Digitado à mão também pode vir com / , ; ou "e" ("WAE18R001 / WAE18R002").
+// separarPlataformas() e modeloDaPlataforma() ficam em js/agendamento-comum.js.
 
-// "2x WAD16 + WTE12" -> [{ quantidade: 2, patrimonio: "WAD16" }, { quantidade: 1, patrimonio: "WTE12" }]
-function separarPlataformas(texto){
-
-    return String(texto || "")
-        .split(/\s*[+,;\/]\s*|\s+e\s+/i)
-        .map(parte => parte.trim())
-        .filter(Boolean)
-        .map(parte => {
-
-            const partes =
-                parte.match(/^(\d+)\s*x\s+(.+)$/i);
-
-            if(!partes) return { quantidade: 1, patrimonio: parte };
-
-            return {
-                quantidade: Math.max(1, Number(partes[1])),
-                patrimonio: partes[2].trim()
-            };
-        });
-}
-
-
-// o contrário: lista -> "2x WAD16 + WTE12" (linha sem patrimônio não entra)
+// o contrário de separarPlataformas: lista -> "2x WAD16 + WTE12" (linha sem
+// patrimônio não entra)
 function juntarPlataformas(lista){
 
     return lista

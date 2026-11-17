@@ -302,13 +302,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - processarLinhasFretes, carregarFretes
 - `propostas-tabelas-precos.js` (161 linhas): Cópia offline (localStorage, de preços e de fretes) e carregamento de tabela_precos.
   - salvarCopiaTabela, lerCopiaTabela, processarLinhasPrecos, carregarTabela
-- `propostas-textos.js` (172 linhas): Oportunidade e proposta ZOHO, copiarTexto().
-  - gerarTextos, copiarTexto
+- `propostas-textos.js` (191 linhas): Oportunidade e proposta ZOHO, copiarTexto(), e os botões embaixo do Copiar Proposta Zap: Copiar frete (normal ou locação complementar, pela escolha do ⚙️; no lugar dos botões de frete da barra de cima) e Copiar faturamento (a forma de pagamento, igual à da Proposta Zap).
+  - gerarTextos, copiarTexto, copiarFrete, copiarFaturamento
 - `propostas-valor-tabela.js` (197 linhas): Período da proposta (campos Período e Períodos) e busca do valor de tabela de cada equipamento.
   - obterPeriodoProposta, preencherValorTabela
 - `registro-erros.js` (328 linhas): Em toda página menos o login, logo depois de supabase-config: guarda erro de código, arquivo que não carregou e o que passa por console.error, e envia pela função `registrar_erro_site`. O mesmo erro soma em "vezes". Sem login ou sem internet não registra, e falhar aqui nunca atrapalha a página. A falha de rede que a biblioteca do Supabase anota sozinha (só o erro, sem texto nosso; ela tenta de novo) fica de fora.
   - limparTextoErro, anotarErro, anotarArquivoFaltando, cssCarregou, paginaDoErro, versaoDoErro, enviarLoteErros, enviarErrosPendentes, textoDoConsole, falhaDeRedeDaBiblioteca, pilhaDoConsole
-- `status.js` (197 linhas): obterCidadeSaida(), obterFreteBonificado() (a caixa Frete bonificado, embaixo do Valor frete em propostas.html: entrega, retirada ou as duas de graça; sai "Bonificado" nas mensagens e as contas usam um frete só, ou nenhum) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
+- `status.js` (211 linhas): obterCidadeSaida(), obterFreteBonificado() (a caixa Frete bonificado, embaixo do Valor frete em propostas.html: entrega, retirada ou as duas de graça; sai "Bonificado" nas mensagens e as contas usam um frete só, ou nenhum) e gerarStatus() (Autorizado e ICMS na página inicial; FreteZOHO ou FreteZOHOLocComp pelo botão Copiar frete da proposta, conforme a locação complementar do ⚙️. Na locação complementar, entrega e retirada saem uma em cada linha, recuadas embaixo do "FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR").
   - obterCidadeSaida, obterFreteBonificado, freteEstaBonificado, fretesCobrados, gerarStatus
 - `supabase-config.js` (88 linhas): Cria o supabaseClient. Sorteia e guarda a chave do aparelho (`dispositivoChave`, 64 hex) e manda em toda chamada no cabeçalho `x-dispositivo` (trava de aparelhos). Quando o banco recusa o login recém-renovado ("JWT issued at future", PGRST303), espera e repete a consulta (até 2 vezes). Precisa vir DEPOIS do <script> do supabase-js (`js/vendor/`) e ANTES de todos os outros scripts.
   - fetchSupabase, chaveDoDispositivo

@@ -1,7 +1,7 @@
 // ======================================
 // CIDADE DE SAÍDA E MENSAGENS DE STATUS
 // ======================================
-// obterCidadeSaida(), obterFreteBonificado() (entrega, retirada ou as duas de graça) e gerarStatus() (botões Autorizado, ICMS, Frete ZOHO).
+// obterCidadeSaida(), obterFreteBonificado() (entrega, retirada ou as duas de graça) e gerarStatus() (Autorizado e ICMS na página inicial; o frete, pelo Copiar frete da proposta).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -11,7 +11,7 @@
 // O toggle fica em ⚙️ Configurações (propostas.html) e o estado
 // (cidadeSaidaAtual) vive em propostas-dados.js. Em outra página,
 // que não tem o toggle, fica sempre Itajaí.
-// zap = como aparece na Proposta Zap; zoho = na mensagem Frete ZOHO.
+// zap = como aparece na Proposta Zap; zoho = na mensagem do Copiar frete.
 
 const CIDADES_SAIDA = {
 
@@ -77,6 +77,17 @@ function fretesCobrados(){
 // ======================================
 // STATUS
 // ======================================
+// Autorizado e ICMS: botões da página inicial. FreteZOHO e FreteZOHOLocComp:
+// o "Copiar frete" da proposta escolhe um pelo ⚙️ (propostas-textos.js).
+
+// o nome no aviso de copiado
+const NOMES_STATUS = {
+    autorizado: "Autorizado",
+    ICMS: "ICMS",
+    FreteZOHO: "Frete",
+    FreteZOHOLocComp: "Frete (locação complementar)"
+};
+
 
 function gerarStatus(tipo){
 
@@ -141,8 +152,8 @@ function gerarStatus(tipo){
 - Frete retirada: ${valorZoho("retirada")} - ${cidade} x ${saida}`;
 
 
-    // os dois bonificados: os dois botões copiam só essas duas linhas
-    // (sem boleto, valores, transportadores nem locação complementar)
+    // os dois bonificados: o Copiar frete copia só essas duas linhas, com ou
+    // sem locação complementar (sem boleto, valores nem transportadores)
     if(semFrete && (tipo === "FreteZOHO" || tipo === "FreteZOHOLocComp")){
 
         return copiar(linhasFreteZoho, "Frete bonificado copiado");
@@ -175,9 +186,12 @@ RR Guinchos:
 47 9180-5385`,
 
 
-        // o valor do frete já está no item, então vai só a rota
+        // o valor do frete já está no item, então vai só a rota: entrega e
+        // retirada uma em cada linha, recuadas embaixo do título
         FreteZOHOLocComp:
-`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ${nomeZoho("entrega", "ENTREGA")} ( ${saida} x ${cidade} ) - ${nomeZoho("retirada", "RETIRADA")} ( ${cidade} x ${saida} )`,
+`- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR
+  - ${nomeZoho("entrega", "ENTREGA")} ( ${saida} x ${cidade} )
+  - ${nomeZoho("retirada", "RETIRADA")} ( ${cidade} x ${saida} )`,
 
 
         ICMS:
@@ -193,5 +207,5 @@ RR Guinchos:
     if(!texto) return;
 
 
-    copiar(texto, tipo + " copiado");
+    copiar(texto, `${NOMES_STATUS[tipo] || tipo} copiado`);
 }

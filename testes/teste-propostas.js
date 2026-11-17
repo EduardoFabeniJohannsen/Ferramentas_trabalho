@@ -184,6 +184,15 @@ const confere = (nome, ok, extra) => {
     confere("sem emojis usa a escolha", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 30 dias."), l);
     await pagina.evaluate(() => { emojisAtivo = true; });
 
+    // botão "Copiar faturamento" (embaixo do Copiar Proposta Zap): a forma de pagamento
+    const copiarFaturamento = async () => {
+        await pagina.evaluate(() => { window.__copiado = null; });
+        await fecharConfig();
+        await pagina.click("#btnCopiarFaturamento");
+        await pagina.waitForTimeout(60);
+        return pagina.evaluate(() => window.__copiado);
+    };
+
     // ---------- sem "mediante aprovação cadastral" (cliente já cadastrado) ----------
     // textContent: com o modal fechado o innerText não é confiável
     const botaoAprovacao = () => pagina.$eval("#btnAprovacaoCadastral", b => [b.textContent.trim(), b.classList.contains("ativo")]);
@@ -193,6 +202,7 @@ const confere = (nome, ok, extra) => {
     confere("clicar desativa", JSON.stringify(await botaoAprovacao()) === JSON.stringify(["Mediante aprovação cadastral: Desativado", false]), await botaoAprovacao());
     l = linhaPagamento(await mensagem());
     confere("desativada: a forma de pagamento sai sem o trecho", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento, prazo de 30 dias."), l);
+    confere("desativada: o Copiar faturamento também", (await copiarFaturamento()) === "Depósito com emissão no dia seguinte à entrega do equipamento, prazo de 30 dias.", await copiarFaturamento());
     await prazo("");
     l = linhaPagamento(await mensagem());
     confere("desativada e sem prazo", l.endsWith("Forma de pagamento: Depósito com emissão no dia seguinte à entrega do equipamento."), l);
@@ -246,6 +256,9 @@ const confere = (nome, ok, extra) => {
     await pagina.screenshot({ path: path.join(saida, "21-config-cliente-novo.png") });
     l = linhaPagamento(await mensagem());
     confere("cliente novo sai como boleto, com o prazo da regra", l.endsWith("Forma de pagamento: Boleto com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 28 dias."), l);
+    const faturamento = await copiarFaturamento();
+    confere("Copiar faturamento: a mesma forma de pagamento da Proposta Zap", faturamento === "Boleto com emissão no dia seguinte à entrega do equipamento, mediante aprovação cadastral, prazo de 28 dias." && l.endsWith(faturamento), faturamento);
+    confere("Copiar faturamento avisa", (await pagina.innerText("#toast")).includes("Faturamento copiado"), await pagina.innerText("#toast"));
     const prazosRegra = [];
     for(const [dias, periodos] of [["1", ""], ["7", ""], ["8", ""], ["15", ""], ["16", ""], ["21", ""], ["22", ""], ["30", ""], ["60", ""], ["28", "3"], ["7", "2"]]){
         await pagina.fill("#periodo", dias);
@@ -443,31 +456,36 @@ const confere = (nome, ok, extra) => {
     confere("📋 Zoho: sem o ponto do milhar e com ponto nos centavos", /^\d+\.\d\d$/.test(descontoZoho) && zoho.copiados[0][1] === descontoZoho && zoho.copiados[1][1] === "1200.00" && zoho.toast.includes("1200.00 copiado"), [zoho, descontoTela]);
     confere("formato Zoho: milhões e centavos", (await pagina.evaluate(() => [formatarNumeroPonto(1234567.891), formatarNumeroPonto(0.5), formatarNumeroPonto(2160)].join())) === "1234567.89,0.50,2160.00");
 
-    // botão "Frete ZOHO - Loc Complementar": a rota da entrega e da retirada
-    const freteLocComp = async () => {
-        await pagina.evaluate(() => { window.__copiado = null; });
-        await pagina.click("button:has-text('Frete ZOHO - Loc Complementar')");
+    // botão "Copiar frete": segue a locação complementar do ⚙️ (ligada: o frete vai
+    // no item, só a rota da entrega e da retirada; desligada: o frete à parte)
+    const copiarFreteCom = async (locacaoComplementar) => {
+        await pagina.evaluate((ligada) => {
+            window.__copiado = null;
+            window.__locacaoAntes = locacaoComplementarAtiva;
+            locacaoComplementarAtiva = ligada;
+        }, locacaoComplementar);
+        await fecharConfig();
+        await pagina.click("#btnCopiarFrete");
         await pagina.waitForTimeout(60);
-        return pagina.evaluate(() => window.__copiado);
+        return pagina.evaluate(() => { locacaoComplementarAtiva = window.__locacaoAntes; return window.__copiado; });
     };
+    const freteLocComp = () => copiarFreteCom(true);
+    confere("a barra de cima não tem mais os botões de frete", (await pagina.locator(".topbar button", { hasText: "Frete" }).count()) === 0);
     await pagina.fill("#cidade", " Brusque ");
     let locComp = await freteLocComp();
-    confere("Frete ZOHO - Loc Complementar: entrega e retirada com as cidades", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( ITAJAÍ x BRUSQUE ) - RETIRADA ( BRUSQUE x ITAJAÍ )", locComp);
+    confere("Copiar frete avisa qual copiou", (await pagina.innerText("#toast")).includes("Frete (locação complementar) copiado"), await pagina.innerText("#toast"));
+    confere("Copiar frete (locação complementar): entrega e retirada com as cidades", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR\n  - ENTREGA ( ITAJAÍ x BRUSQUE )\n  - RETIRADA ( BRUSQUE x ITAJAÍ )", locComp);
     await pagina.evaluate(() => { cidadeSaidaAtual = "JOINVILLE"; });
     locComp = await freteLocComp();
-    confere("Frete ZOHO - Loc Complementar: sai da cidade de saída escolhida", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( JOINVILLE x BRUSQUE ) - RETIRADA ( BRUSQUE x JOINVILLE )", locComp);
+    confere("Copiar frete (locação complementar): sai da cidade de saída escolhida", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR\n  - ENTREGA ( JOINVILLE x BRUSQUE )\n  - RETIRADA ( BRUSQUE x JOINVILLE )", locComp);
     await pagina.evaluate(() => { cidadeSaidaAtual = "ITAJAI"; });
     await pagina.fill("#cidade", "");
     locComp = await freteLocComp();
-    confere("Frete ZOHO - Loc Complementar: sem cidade não copia e avisa", locComp === null && (await pagina.innerText("#toast")).includes("Informe a cidade"), [locComp, await pagina.innerText("#toast")]);
+    confere("Copiar frete (locação complementar): sem cidade não copia e avisa", locComp === null && (await pagina.innerText("#toast")).includes("Informe a cidade"), [locComp, await pagina.innerText("#toast")]);
     await pagina.fill("#cidade", "Brusque");
 
     // ---------- frete bonificado (a entrega ou a retirada de graça) ----------
-    const freteZoho = async () => {
-        await pagina.evaluate(() => { window.__copiado = null; gerarStatus("FreteZOHO"); });
-        await pagina.waitForTimeout(60);
-        return (await pagina.evaluate(() => window.__copiado)) || "";
-    };
+    const freteZoho = async () => (await copiarFreteCom(false)) || "";
     const bordaBonificado = () => pagina.evaluate(() => getComputedStyle(document.getElementById("freteBonificado")).borderColor);
     const VERDE = "rgb(22, 163, 74)";
     confere("frete bonificado: nenhum por padrão, sem destaque", (await pagina.inputValue("#freteBonificado")) === "" && (await bordaBonificado()) !== VERDE, await bordaBonificado());
@@ -479,17 +497,17 @@ const confere = (nome, ok, extra) => {
     zap = await zapAtual();
     confere("Zap: entrega bonificada e a retirada com o valor", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: Bonificado de Itajai x Brusque" && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: R$ 500,00 de Brusque x Itajai" && linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), [linhaZap(zap, "Frete entrega"), linhaZap(zap, "Frete retirada"), linhaZap(zap, "Total máquina + seguro")]);
     locComp = await freteLocComp();
-    confere("Frete ZOHO - Loc Complementar: entrega bonificada", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA BONIFICADA ( ITAJAÍ x BRUSQUE ) - RETIRADA ( BRUSQUE x ITAJAÍ )", locComp);
+    confere("Copiar frete (locação complementar): entrega bonificada", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR\n  - ENTREGA BONIFICADA ( ITAJAÍ x BRUSQUE )\n  - RETIRADA ( BRUSQUE x ITAJAÍ )", locComp);
     let zohoFrete = await freteZoho();
-    confere("Frete ZOHO: BONIFICADO no lugar do valor da entrega", zohoFrete.includes("- Frete entrega: BONIFICADO - ITAJAÍ x BRUSQUE\n- Frete retirada: R$ 500,00 - BRUSQUE x ITAJAÍ"), zohoFrete);
+    confere("Copiar frete (normal): BONIFICADO no lugar do valor da entrega", zohoFrete.includes("- Frete entrega: BONIFICADO - ITAJAÍ x BRUSQUE\n- Frete retirada: R$ 500,00 - BRUSQUE x ITAJAÍ"), zohoFrete);
 
     await pagina.selectOption("#freteBonificado", "retirada");
     zap = await zapAtual();
     confere("Zap: retirada bonificada", linhaZap(zap, "Frete entrega") === "🚚 Frete entrega: R$ 500,00 de Itajai x Brusque" && linhaZap(zap, "Frete retirada") === "🚚 Frete retirada: Bonificado de Brusque x Itajai", [linhaZap(zap, "Frete entrega"), linhaZap(zap, "Frete retirada")]);
     locComp = await freteLocComp();
-    confere("Frete ZOHO - Loc Complementar: retirada bonificada", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR - ENTREGA ( ITAJAÍ x BRUSQUE ) - RETIRADA BONIFICADA ( BRUSQUE x ITAJAÍ )", locComp);
+    confere("Copiar frete (locação complementar): retirada bonificada", locComp === "- FRETE INCLUSO NO ITEM LOCAÇÃO COMPLEMENTAR\n  - ENTREGA ( ITAJAÍ x BRUSQUE )\n  - RETIRADA BONIFICADA ( BRUSQUE x ITAJAÍ )", locComp);
     zohoFrete = await freteZoho();
-    confere("Frete ZOHO: retirada bonificada", zohoFrete.includes("- Frete entrega: R$ 500,00 - ITAJAÍ x BRUSQUE\n- Frete retirada: BONIFICADO - BRUSQUE x ITAJAÍ"), zohoFrete);
+    confere("Copiar frete (normal): retirada bonificada", zohoFrete.includes("- Frete entrega: R$ 500,00 - ITAJAÍ x BRUSQUE\n- Frete retirada: BONIFICADO - BRUSQUE x ITAJAÍ"), zohoFrete);
 
     // terceirizado: um boleto só
     await pagina.evaluate(() => alternarLocacaoComplementar());
@@ -517,10 +535,10 @@ const confere = (nome, ok, extra) => {
     const soBonificados = "- Frete entrega: BONIFICADO - ITAJAÍ x BRUSQUE\n- Frete retirada: BONIFICADO - BRUSQUE x ITAJAÍ";
     zohoFrete = await freteZoho();
     locComp = await freteLocComp();
-    confere("Frete ZOHO e Loc Complementar: as duas bonificadas copiam só as duas linhas", zohoFrete === soBonificados && locComp === soBonificados, [zohoFrete, locComp]);
+    confere("Copiar frete, com ou sem locação complementar: as duas bonificadas copiam só as duas linhas", zohoFrete === soBonificados && locComp === soBonificados, [zohoFrete, locComp]);
     await pagina.fill("#cidade", "");
     zohoFrete = await freteZoho();
-    confere("Frete ZOHO com as duas bonificadas ainda pede a cidade", zohoFrete === "" && (await pagina.innerText("#toast")).includes("Informe a cidade"), [zohoFrete, await pagina.innerText("#toast")]);
+    confere("Copiar frete com as duas bonificadas ainda pede a cidade", zohoFrete === "" && (await pagina.innerText("#toast")).includes("Informe a cidade"), [zohoFrete, await pagina.innerText("#toast")]);
     await pagina.fill("#cidade", "Brusque");
     await pagina.fill("#valorFrete", "500,00");
 

@@ -26,13 +26,8 @@ TOPBAR
 
 <div class="topbar">
 
-    <button data-clique="gerarStatus" data-arg="FreteZOHO">
-        Frete ZOHO
-    </button>
-
-    <button data-clique="gerarStatus" data-arg="FreteZOHOLocComp">
-        Frete ZOHO - Loc Complementar
-    </button>
+    <!-- links das outras páginas: montados pelo js/menu.js. O frete e o
+         faturamento se copiam pelos botões embaixo do Copiar Proposta Zap -->
 
     <button data-clique="fazerLogout">Sair</button>
 
@@ -220,6 +215,24 @@ CONTAINER
                 Copiar Proposta Zap
             </button>
 
+
+            <br><br>
+
+
+            <!-- propostas-textos.js: o frete pela locação complementar do ⚙️
+                 (normal ou incluso no item) e a forma de pagamento -->
+            <button id="btnCopiarFrete" data-clique="copiarFrete">
+                Copiar frete
+            </button>
+
+
+            <br><br>
+
+
+            <button id="btnCopiarFaturamento" data-clique="copiarFaturamento">
+                Copiar faturamento
+            </button>
+
         </div>
 
 
@@ -341,7 +354,7 @@ MODAL DE CONFIGURAÇÕES
             Locação complementar: Desativada
         </button>
 
-        <p class="dica">Frete entra como "Locação Complementar" (+20%).</p>
+        <p class="dica">Frete entra como "Locação Complementar" (+20%). O Copiar frete segue esta escolha.</p>
 
 
         <!-- só aparece com a locação complementar ativada -->
@@ -394,7 +407,7 @@ MODAL DE CONFIGURAÇÕES
             Cidade de saída: Itajaí
         </button>
 
-        <p class="dica">Joinville troca a cidade de saída do frete nas mensagens (Proposta Zap e Frete ZOHO).</p>
+        <p class="dica">Joinville troca a cidade de saída do frete nas mensagens (Proposta Zap e Copiar frete).</p>
 
 
         <button

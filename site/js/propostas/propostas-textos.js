@@ -1,7 +1,7 @@
 // ======================================
 // PROPOSTAS - TEXTOS
 // ======================================
-// Oportunidade e proposta ZOHO, copiarTexto().
+// Oportunidade e proposta ZOHO, copiarTexto(), e os botões de baixo Copiar frete (normal ou locação complementar, pelo ⚙️) e Copiar faturamento (a forma de pagamento).
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -169,4 +169,23 @@ function copiarTexto(id){
 
 
     copiar(texto, "Copiado");
+}
+
+
+// ======================================
+// COPIAR FRETE E FATURAMENTO (botões de baixo)
+// ======================================
+
+// a mensagem do frete pelo ⚙️: com a locação complementar o frete vai no item
+// (só a rota); sem ela, o frete pago à parte com os transportadores (status.js)
+function copiarFrete(){
+
+    gerarStatus(locacaoComplementarAtiva ? "FreteZOHOLocComp" : "FreteZOHO");
+}
+
+
+// a forma de pagamento, igual à da Proposta Zap (propostas-pagamento.js)
+function copiarFaturamento(){
+
+    copiar(textoFormaPagamento(), "Faturamento copiado");
 }

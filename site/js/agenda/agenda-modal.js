@@ -64,7 +64,10 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 
     CAMPOS_AGENDA.forEach(([campo, idCampo]) => {
 
-        $(idCampo).value = origem ? (origem[campo] || "") : "";
+        const valor = origem ? origem[campo] : "";
+
+        // lista (outros contratos) vai para o campo escondido em JSON
+        $(idCampo).value = Array.isArray(valor) ? (valor.length ? JSON.stringify(valor) : "") : (valor || "");
     });
 
     if(!origem){
@@ -83,6 +86,9 @@ function abrirModalAgenda(id, valoresIniciais, aviso){
 
     // uma linha por equipamento (vem do campo escondido agPlataforma)
     desenharPlataformas();
+
+    // outros contratos da coleta (vem do campo escondido agOutrosContratos)
+    desenharOutrosContratos();
 
     // agendamentos antigos (ou novos) sem valor ficam por nossa conta
     if(!$("agFreteConta").value){

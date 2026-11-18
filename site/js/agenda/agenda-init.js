@@ -137,6 +137,9 @@
     // equipamento vão juntas para o campo escondido agPlataforma)
     $("listaPlataformas").addEventListener("input", digitarPlataforma);
 
+    // outros contratos da coleta: as linhas vão para o campo escondido
+    $("listaOutrosContratos").addEventListener("input", sincronizarOutrosContratos);
+
     $("agPlataformaRecolha").addEventListener("input", forcarMaiusculo);
 
     // horário: números viram HH:MM sozinhos

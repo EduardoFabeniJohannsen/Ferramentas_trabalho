@@ -117,6 +117,21 @@ async function salvarAgendamento(){
         dados.periodo = periodo.valor;
     }
 
+    // outros contratos: só na coleta (agenda-contratos.js)
+    const contratos = conferirOutrosContratos(dados);
+
+    if(contratos.erro) return avisoFormulario(contratos.erro, "demanda");
+
+    dados.outrosContratos = contratos.lista;
+
+    // sem nenhum (e sem ter tido antes) não vai para o banco: salvar continua
+    // funcionando mesmo antes do SQL da coluna outros_contratos
+    const tinhaContratos =
+        idEmEdicao &&
+        listaOutrosContratos(agendamentos.find(ag => ag.id === idEmEdicao)?.outrosContratos).length > 0;
+
+    if(!dados.outrosContratos.length && !tinhaContratos) delete dados.outrosContratos;
+
     // faturamento: pagamento e pedido de compra (só entregas)
     const faturamento = coletarFaturamento(dados.tipo);
 

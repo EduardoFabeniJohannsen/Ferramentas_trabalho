@@ -101,9 +101,16 @@ function criarCelulasAgenda(item){
         titulo.appendChild(criarMaquina(item.plataformaRecolha));
     }
 
-    if(item.cliente){
+    // coleta com mais de um contrato: "Alfa + Beta (2 contratos)" (agenda-contratos.js)
+    const clientes = textoClientesAgendamento(item);
 
-        titulo.appendChild(criar("span", "", ` — ${item.cliente}`));
+    const contratos = contratosDoAgendamento(item).length;
+
+    if(clientes){
+
+        titulo.appendChild(
+            criar("span", "", ` — ${clientes}${contratos > 1 ? ` (${contratos} contratos)` : ""}`)
+        );
     }
 
     celulas.titulo = celula("titulo", titulo);
@@ -247,7 +254,7 @@ function criarCelulasAgenda(item){
 
     // ---------- proposta ----------
 
-    celulas.proposta = celulaTexto("proposta", item.proposta);
+    celulas.proposta = celulaTexto("proposta", textoPropostasAgendamento(item));
 
     celulas.proposta.classList.add("ag-proposta");
 

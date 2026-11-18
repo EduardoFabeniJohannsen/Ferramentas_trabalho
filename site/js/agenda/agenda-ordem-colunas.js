@@ -23,7 +23,7 @@ const ROTULOS_FRETE_CONTA = {
 // valor de cada coluna para ordenar: texto, número ou vazio ("" / null)
 const CHAVES_ORDEM_COLUNA = {
     tipo: (item) => rotuloTipo(item.tipo),
-    titulo: (item) => [item.plataforma, item.cliente].filter(Boolean).join(" — "),
+    titulo: (item) => [item.plataforma, textoClientesAgendamento(item)].filter(Boolean).join(" — "),
     transportadora: (item) => item.transportadora,
     motorista: (item) => item.motorista,
     periodo: (item) => item.periodo,
@@ -50,7 +50,7 @@ const CHAVES_ORDEM_COLUNA = {
     pagamento: (item) => item.formaPagamento,
     pedido: (item) => item.pedidoCompra ? (item.pedidoNumero || "Sim") : "",
     vendedor: (item) => item.vendedor,
-    proposta: (item) => item.proposta
+    proposta: (item) => textoPropostasAgendamento(item)
 };
 
 

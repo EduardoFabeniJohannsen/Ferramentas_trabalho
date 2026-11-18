@@ -587,6 +587,15 @@ MODAL (novo / editar)
                         <select id="agVendedor"></select>
                     </div>
 
+                    <!-- coleta de mais de uma proposta no mesmo lugar (agenda-contratos.js):
+                         o 1º contrato são os campos de cima; os outros ficam no campo escondido -->
+                    <div class="largo bloco-outros-contratos" id="blocoOutrosContratos" style="display:none">
+                        <label id="rotuloOutrosContratos">Mais de um contrato nesta coleta?</label>
+                        <div id="listaOutrosContratos"></div>
+                        <button type="button" class="btn-secundario btn-outro-contrato" data-clique="adicionarOutroContrato">+ Outro contrato</button>
+                        <input type="hidden" id="agOutrosContratos">
+                    </div>
+
                     <div class="largo">
                         <label for="agReferencia">Referência da mensagem do Zap (ficha / proposta — digitada à mão)</label>
                         <input type="text" id="agReferencia" placeholder="Ficha / referência">
@@ -903,6 +912,7 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 <script src="js/agenda/agenda-form-campos.js" defer></script>
 <script src="js/agenda/agenda-unidades.js" defer></script>
 <script src="js/agenda/agenda-plataformas.js" defer></script>
+<script src="js/agenda/agenda-contratos.js" defer></script>
 <script src="js/agenda/agenda-rascunho.js" defer></script>
 <script src="js/agenda/agenda-etapas.js" defer></script>
 <script src="js/agenda/agenda-modal.js" defer></script>

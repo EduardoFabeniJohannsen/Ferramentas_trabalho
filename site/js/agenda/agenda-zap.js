@@ -289,8 +289,9 @@ function montarTextoZap(item){
         );
     }
 
-    // ficha digitada à mão, ou o nome da proposta montado sozinho
-    linhas.push(`* ${referenciaZap(item)}`.trimEnd());
+    // ficha digitada à mão, ou o nome da proposta montado sozinho; coleta
+    // com mais de um contrato: uma linha por contrato (agenda-contratos.js)
+    referenciasZap(item).forEach(referencia => linhas.push(`* ${referencia}`.trimEnd()));
 
     if(porNossa){
 

@@ -37,7 +37,8 @@ function itemCombinaBusca(item){
     const texto =
         semAcentoMinusculo(
             [
-                item.cliente,
+                // com os clientes dos outros contratos da coleta (agenda-contratos.js)
+                textoClientesAgendamento(item),
                 item.origemNome,
                 item.origemEndereco,
                 item.destinoNome,

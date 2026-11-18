@@ -23,6 +23,8 @@ const CAMPOS_AGENDA = [
     ["cliente", "agCliente"],
     ["proposta", "agProposta"],
     ["periodo", "agPeriodo"],
+    // coleta com mais de um contrato (agenda-contratos.js): JSON no campo escondido
+    ["outrosContratos", "agOutrosContratos"],
     ["vendedor", "agVendedor"],
     ["origemNome", "agOrigemNome"],
     ["origemEndereco", "agOrigemEndereco"],
@@ -274,6 +276,9 @@ function atualizarCamposTipo(){
         troca ? "Máquina de entrega" : "Plataforma";
 
     atualizarRetirada();
+
+    // outros contratos: só na coleta (agenda-contratos.js)
+    atualizarBlocoOutrosContratos();
 
     // entre unidades: saída e destino viram as caixas das unidades
     atualizarBlocoUnidades();

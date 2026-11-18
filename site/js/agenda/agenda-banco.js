@@ -37,6 +37,8 @@ const CAMPOS_BANCO = {
     transportadora: "transportadora",
     motorista: "motorista",
     periodo: "periodo",
+    // coleta com mais de um contrato: [{ cliente, proposta, periodo }] (agenda-contratos.js)
+    outrosContratos: "outros_contratos",
     vendedor: "vendedor",
     origemNome: "origem_nome",
     origemEndereco: "origem_endereco",
@@ -106,6 +108,9 @@ function doBanco(linha){
 
     item.pedidoCompra = linha.pedido_compra === true;
 
+    // sem a coluna (SQL ainda não aplicado) ou vazia: nenhum
+    item.outrosContratos = listaOutrosContratos(linha.outros_contratos);
+
     return item;
 }
 
@@ -138,6 +143,10 @@ function paraBanco(dados){
         }else if(campo === "prazosPagamento"){
 
             linha[coluna] = Array.isArray(valor) ? valor : [];
+
+        }else if(campo === "outrosContratos"){
+
+            linha[coluna] = listaOutrosContratos(valor);
 
         }else if(campo === "pedidoCompra"){
 

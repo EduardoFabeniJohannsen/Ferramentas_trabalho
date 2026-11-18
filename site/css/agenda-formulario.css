@@ -51,6 +51,46 @@
     font-size:18px;
     line-height:1;
 }
+/* outros contratos da coleta: número, cliente, proposta, período e − */
+.ag-contrato-linha{
+    display:grid;
+    grid-template-columns:22px minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 38px;
+    gap:6px;
+    align-items:center;
+    margin-bottom:6px;
+}
+.ag-contrato-linha input{
+    margin:0;
+}
+.ag-contrato-linha button{
+    margin:0;
+    padding:8px 0;
+    font-size:18px;
+    line-height:1;
+}
+.ag-contrato-numero{
+    font-size:13px;
+    font-weight:bold;
+    color:#94a3b8;
+    text-align:center;
+}
+.btn-outro-contrato{
+    margin:0 0 6px;
+    padding:6px 12px;
+    font-size:13px;
+}
+/* celular: o cliente numa linha, proposta e período embaixo */
+@media (max-width:600px){
+    .ag-contrato-linha{
+        grid-template-columns:22px minmax(0, 1fr) minmax(0, 1fr) 38px;
+    }
+    .ag-contrato-cliente{
+        grid-column:2 / -1;
+    }
+    .ag-contrato-proposta{
+        grid-column:2;
+    }
+}
 .prazo-rotulo{
     min-width:56px;
     font-size:13px;

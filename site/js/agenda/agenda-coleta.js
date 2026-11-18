@@ -76,6 +76,8 @@ function copiarEntregaParaColeta(item){
 // Copia tudo, menos a data (fica em branco pra escolher), o status (volta ao
 // padrão), o card e o pedido de compra (são de cada agendamento; o PDF do
 // pedido não pode ser de dois). Forma de pagamento e prazos vão junto.
+// Frete frustrado: a cópia é a entrega remarcada (tipo Entrega) e o frete fica
+// em branco (o do frustrado é ida + volta).
 
 function valoresDuplicados(item){
 
@@ -94,7 +96,8 @@ function valoresDuplicados(item){
         status: STATUS_PADRAO,
         card: "",
         formaPagamento: item.formaPagamento || "",
-        prazosPagamento: [...(item.prazosPagamento || [])]
+        prazosPagamento: [...(item.prazosPagamento || [])],
+        ...(item.tipo === TIPO_FRETE_FRUSTRADO ? { tipo: "Entrega", frete: "", freteNossa: "" } : {})
     };
 }
 
@@ -112,11 +115,12 @@ function duplicarAgendamento(item){
 
     removerRascunho("novo");
 
-    abrirModalAgenda(
-        null,
-        valoresDuplicados(item),
-        `📆 Cópia do agendamento de ${item.cliente || item.plataforma}. Escolha a nova data.`
-    );
+    const aviso =
+        item.tipo === TIPO_FRETE_FRUSTRADO
+            ? `📆 Entrega remarcada (do frete frustrado de ${item.cliente || item.plataforma}). Escolha a nova data e informe o frete.`
+            : `📆 Cópia do agendamento de ${item.cliente || item.plataforma}. Escolha a nova data.`;
+
+    abrirModalAgenda(null, valoresDuplicados(item), aviso);
 
     $("agData").focus();
 }

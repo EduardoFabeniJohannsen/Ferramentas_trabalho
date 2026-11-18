@@ -226,6 +226,17 @@ function coletarFaturamento(tipo){
         pedidoPdfNome: ""
     };
 
+    // frete frustrado: a entrega que voltou. O faturamento dela fica como está
+    // no banco (nada vai no salvar), sem perguntar e sem apagar o PDF do
+    // pedido: a entrega nova (Duplicar) ainda precisa dele. Mudança no PDF
+    // ainda não salva é deixada de lado
+    if(tipo === TIPO_FRETE_FRUSTRADO){
+
+        pendenciaPdf = { apagar: "", enviar: null };
+
+        return { dados: {} };
+    }
+
     if(tipo !== "Entrega"){
 
         if(

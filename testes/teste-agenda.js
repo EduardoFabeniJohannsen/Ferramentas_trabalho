@@ -673,9 +673,10 @@ const confere = (nome, ok, extra) => {
         inserirAgendamento = async (dados) => { window.__inseridos.push(dados); return { ...dados, id: 99 }; };
     });
     const tiposForm = await pagina.$$eval("#agTipo option", l => l.map(o => `${o.value}=${o.textContent}`));
-    confere("tipos: entre obras (o valor de sempre) e entre unidades", JSON.stringify(tiposForm) === JSON.stringify([
+    confere("tipos: entre obras (o valor de sempre), entre unidades e frete frustrado", JSON.stringify(tiposForm) === JSON.stringify([
         "Entrega=Entrega", "Coleta=Coleta", "Transferência=Transferência entre obras",
-        "Transferência entre unidades=Transferência entre unidades", "Troca técnica=Troca técnica"
+        "Transferência entre unidades=Transferência entre unidades", "Troca técnica=Troca técnica",
+        "Frete frustrado=Frete frustrado"
     ]), tiposForm);
     const tiposFiltro = await pagina.evaluate(() => { desenharPainelTipos(); return [...document.querySelectorAll("#listaTiposFiltro .tag")].map(e => e.textContent); });
     confere("o filtro de tipo usa os mesmos nomes", tiposFiltro.includes("Transferência entre obras") && tiposFiltro.includes("Transferência entre unidades"), tiposFiltro);

@@ -238,6 +238,9 @@ tr.ag-item select.tag-select option{
 .tag[data-tipo="Troca técnica"]{
     background:#0f766e;
 }
+.tag[data-tipo="Frete frustrado"]{
+    background:#b91c1c;
+}
 
 /* ===== Transferência entre unidades (agenda-unidades.js) =====
    O modal ganha a classe form-entre-unidades: aparecem as caixas de saída e

@@ -11,7 +11,13 @@
 // expedição como uma entrega, mas sem faturamento
 const TIPO_TRANSFERENCIA_UNIDADES = "Transferência entre unidades";
 
-const TIPOS = ["Entrega", "Coleta", "Transferência", TIPO_TRANSFERENCIA_UNIDADES, "Troca técnica"];
+// a máquina carregou, chegou no local e precisou voltar: a própria entrega vira
+// este tipo (o frete digitado é o da ida + volta) e a entrega nova é criada à
+// parte. Não reserva a máquina (voltou para o pátio) e não vai para a
+// expedição; o faturamento da entrega fica guardado (agenda-pagamento.js)
+const TIPO_FRETE_FRUSTRADO = "Frete frustrado";
+
+const TIPOS = ["Entrega", "Coleta", "Transferência", TIPO_TRANSFERENCIA_UNIDADES, "Troca técnica", TIPO_FRETE_FRUSTRADO];
 
 // como o tipo aparece na tela ("Transferência" é a entre obras: o valor salvo
 // continua o de sempre, então os agendamentos antigos não mudam)

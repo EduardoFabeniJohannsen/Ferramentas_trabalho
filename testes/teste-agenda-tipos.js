@@ -124,8 +124,8 @@ const confere = (nome, ok, extra) => {
     await pagina.click("#btnTipos");
     confere("a lista de tipos abre dentro do painel de filtros", await visivel("#painelTipos") && await visivel("#painelFiltros"));
     const nomes = await pagina.$$eval("#listaTiposFiltro .tag", l => l.map(e => `${e.textContent}|${e.dataset.tipo}`));
-    confere("os cinco tipos, com o nome da tela e a cor da coluna Tipo", JSON.stringify(nomes) === JSON.stringify([
-        "Entrega|Entrega", "Coleta|Coleta", "Transferência entre obras|Transferência", "Transferência entre unidades|Transferência entre unidades", "Troca técnica|Troca técnica"
+    confere("os seis tipos, com o nome da tela e a cor da coluna Tipo", JSON.stringify(nomes) === JSON.stringify([
+        "Entrega|Entrega", "Coleta|Coleta", "Transferência entre obras|Transferência", "Transferência entre unidades|Transferência entre unidades", "Troca técnica|Troca técnica", "Frete frustrado|Frete frustrado"
     ]), nomes);
     confere("contagem de cada tipo", (await linhaTipo("Entrega")).includes("(2)") && (await linhaTipo("Coleta")).includes("(1)"), [await linhaTipo("Entrega"), await linhaTipo("Coleta")]);
     confere("tudo marcado", await pagina.isChecked("#marcarTodosTipos") && await caixa("Coleta").isChecked());
@@ -145,9 +145,9 @@ const confere = (nome, ok, extra) => {
     await pagina.screenshot({ path: path.join(saida, "tipos-1-entrega-e-coleta.png") });
 
     await caixa("Troca técnica").check();
-    confere("três tipos: N de 5 no botão", (await ordem()) === "R001,R002,R005,R006" && (await botao()) === "📦 Tipos: 3 de 5 ▾", [await ordem(), await botao()]);
+    confere("três tipos: N de 6 no botão", (await ordem()) === "R001,R002,R005,R006" && (await botao()) === "📦 Tipos: 3 de 6 ▾", [await ordem(), await botao()]);
     await caixa("Troca técnica").uncheck();
-    confere("fica salvo os desmarcados", (await salvo()) === JSON.stringify(["Transferência", "Transferência entre unidades", "Troca técnica"]), await salvo());
+    confere("fica salvo os desmarcados", (await salvo()) === JSON.stringify(["Frete frustrado", "Transferência", "Transferência entre unidades", "Troca técnica"]), await salvo());
 
     // a contagem respeita os outros filtros e acompanha com a lista aberta
     await pagina.locator("#chipsTransportadora .chip", { hasText: "Trans A" }).click();
@@ -189,7 +189,7 @@ const confere = (nome, ok, extra) => {
     await pagina.click("#btnLimparFiltros");
     await pagina.click("#btnModoTransportador");
     await pagina.waitForTimeout(50);
-    confere("limpar na expedição mantém os tipos do transportador", (await ordem()) === "R001,R002,R006" && (await salvo()) === JSON.stringify(["Transferência", "Transferência entre unidades", "Troca técnica"]), [await ordem(), await salvo()]);
+    confere("limpar na expedição mantém os tipos do transportador", (await ordem()) === "R001,R002,R006" && (await salvo()) === JSON.stringify(["Frete frustrado", "Transferência", "Transferência entre unidades", "Troca técnica"]), [await ordem(), await salvo()]);
 
     // ---------- (Selecionar tudo) e limpar ----------
     await pagina.click("#btnFiltros");

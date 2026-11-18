@@ -371,7 +371,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 | Nome | Usado em |
 |---|---|
-| `agendamentos` | `agenda-banco.js`, `agenda-lixeira.js` (lixeira; função `mover_agendamento_lixeira`), `transp-config.js` (`transp-cad-banco.js` conta vínculos), `analise-dados.js` (só lê, para a Análise de fretes). Coluna `outros_contratos` (jsonb, lista; coleta com mais de um contrato): só vai no salvar quando tem contrato (ou tinha), então a agenda funciona antes do SQL dela |
+| `agendamentos` | `agenda-banco.js`, `agenda-lixeira.js` (lixeira; função `mover_agendamento_lixeira`), `transp-config.js` (`transp-cad-banco.js` conta vínculos), `analise-dados.js` (só lê, para a Análise de fretes). Coluna `outros_contratos` (jsonb, lista; coleta com mais de um contrato): só vai no salvar quando tem contrato (ou tinha), então a agenda funciona antes do SQL dela. A coluna `tipo` só aceita os tipos da regra `agendamentos_tipo_check`: tipo novo em TIPOS (`agendamento-comum.js`) precisa de SQL trocando a regra, senão salvar dá "O banco ainda não aceita este tipo" |
 | `bucket:pedidos-compra` | `agenda-pedido-pdf.js` |
 | `bucket:docs-transportadoras` | `transp-config.js` |
 | `dispositivos` | `admin-aparelhos.js` (só o admin lê e altera); o site registra e confere pela função `registrar_dispositivo` (`dispositivo.js`). O SQL não fica neste repositório. |

@@ -208,7 +208,7 @@ function mensagemErroSalvar(erro){
         (codigo === "23514" && /tipo/i.test(texto)) ||
         (codigo === "22P02" && /enum/i.test(texto))
     ){
-        return "O banco ainda não aceita este tipo de agendamento. Aplique o SQL da transferência entre unidades no Supabase.";
+        return "O banco ainda não aceita este tipo de agendamento (falta liberar o tipo novo na coluna tipo). Aplique no Supabase o SQL mais recente dos tipos da agenda.";
     }
 
     if(codigo === "23514"){

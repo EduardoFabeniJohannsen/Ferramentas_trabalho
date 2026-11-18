@@ -155,6 +155,13 @@ let navegador = null;
     confere("a forma de pagamento da entrega vai junto", copia.forma === "Boleto", copia.forma);
     confere("o aviso explica", copia.aviso.includes("Entrega remarcada") && copia.aviso.includes("informe o frete"), copia.aviso);
 
+    // banco sem o SQL do tipo novo: o aviso diz o que fazer (sem citar outro tipo)
+    const aviso = await pagina.evaluate(() => [
+        mensagemErroSalvar({ code: "23514", message: 'new row for relation "agendamentos" violates check constraint "agendamentos_tipo_check"' }),
+        mensagemErroSalvar({ code: "22P02", message: 'invalid input value for enum tipo_agendamento: "Frete frustrado"' })
+    ]);
+    confere("banco sem o tipo novo (regra ou enum): avisa para aplicar o SQL dos tipos", aviso.every(texto => texto.includes("ainda não aceita este tipo") && texto.includes("SQL mais recente dos tipos") && !texto.includes("transferência entre unidades")), aviso);
+
     confere("sem erros no console", erros.length === 0, erros);
     await navegador.close();
     console.log(falhas ? `${falhas} falha(s)` : "todos ok");

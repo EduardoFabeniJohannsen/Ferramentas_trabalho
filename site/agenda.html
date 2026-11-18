@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://maps.googleapis.com https://maps.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src 'self' https://*.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <!-- já abre a conexão com o banco enquanto os arquivos baixam -->
 <link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
 
@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/agenda-modal.css">
 <link rel="stylesheet" href="css/agenda-estoque.css">
 <link rel="stylesheet" href="css/agenda-formulario.css">
+<link rel="stylesheet" href="css/agenda-mapa.css">
 <!-- sempre o último: o fundo claro troca as cores dos outros -->
 <link rel="stylesheet" href="css/agenda-tema-claro.css">
 
@@ -357,6 +358,16 @@ CONTAINER
                 title="Buscar de novo os agendamentos e motoristas"
             >
                 ↻ Atualizar
+            </button>
+
+            <!-- os agendamentos da lista num mapa do Google Maps (agenda-mapa.js) -->
+            <button
+                type="button"
+                class="btn-secundario"
+                data-clique="abrirMapaAgenda"
+                title="Os agendamentos da lista (com os filtros) num mapa do Google Maps"
+            >
+                🗺️ Mapa
             </button>
 
             <button
@@ -857,6 +868,42 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 
 </div>
 
+<!-- =========================
+MAPA (botão 🗺️ Mapa)
+========================= -->
+<div id="modalMapa" class="modal-overlay">
+
+    <div class="modal-agenda modal-mapa">
+
+        <div class="modal-agenda-topo">
+
+            <div class="modal-titulo">
+                <h3>🗺️ Mapa da agenda</h3>
+                <span id="resumoMapa" class="resumo-mapa"></span>
+            </div>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                data-clique="fecharMapaAgenda"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div id="avisosMapa" class="avisos-mapa"></div>
+
+        <div class="mapa-corpo">
+            <div id="mapaAgenda" class="mapa-area"></div>
+            <div id="listaMapa" class="mapa-lista"></div>
+        </div>
+
+    </div>
+
+</div>
+
 <datalist id="listaHorarios">
     <option value="CONFIRMAR">
     <option value="IMEDIATO">
@@ -928,6 +975,12 @@ CONSULTA AO ESTOQUE (botão 🔍 da linha)
 <script src="js/agenda/agenda-estoque.js" defer></script>
 <script src="js/agenda/agenda-conflitos.js" defer></script>
 <script src="js/agenda/agenda-usar-patrimonio.js" defer></script>
+<script src="js/agenda/agenda-mapa-links.js" defer></script>
+<script src="js/agenda/agenda-mapa-locais.js" defer></script>
+<script src="js/agenda/agenda-mapa-lista.js" defer></script>
+<script src="js/agenda/agenda-mapa-rota.js" defer></script>
+<script src="js/agenda/agenda-mapa-google.js" defer></script>
+<script src="js/agenda/agenda-mapa.js" defer></script>
 <script src="js/agenda/agenda-tempo-real.js" defer></script>
 <script src="js/agenda/agenda-init.js" defer></script>
 

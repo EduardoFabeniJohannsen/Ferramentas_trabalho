@@ -112,6 +112,15 @@ const confere = (nome, ok, extra) => {
         .replace("script-src 'self';", `script-src 'self' ${CLOUDFLARE};`)
         .replace("https://get.geojs.io;", `https://get.geojs.io ${CLOUDFLARE}; frame-src ${CLOUDFLARE};`);
 
+    // agenda: a padrão + o Google Maps do 🗺️ Mapa (agenda-mapa.js), só nesta página. É a
+    // lista que o Google pede (scripts, fontes, imagens dos mapas e conexões dele)
+    const cspAgenda = (cspPadrao || "")
+        .replace("script-src 'self';", "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com;")
+        .replace("style-src 'self' 'unsafe-inline';", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;")
+        .replace("img-src 'self' data:;", "img-src 'self' data: blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https://*.googleusercontent.com;")
+        .replace("https://get.geojs.io;", "https://get.geojs.io https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; worker-src 'self' blob:; frame-src 'self' https://*.google.com;");
+    const cspDaPagina = { "login.html": cspLogin, "agenda.html": cspAgenda };
+
     confere("CSP: só scripts do próprio site", /(^|; )script-src 'self'(;|$)/.test(cspPadrao || ""), cspPadrao);
     confere("CSP: dados só para o Supabase do projeto", /connect-src 'self' https:\/\/qhneylwmrzuesaloqetr\.supabase\.co wss:\/\/qhneylwmrzuesaloqetr\.supabase\.co https:\/\/get\.geojs\.io;/.test(cspPadrao || ""), cspPadrao);
 
@@ -121,7 +130,7 @@ const confere = (nome, ok, extra) => {
             (paginasDoScript[achou[1]] = paginasDoScript[achou[1]] || []).push(arquivo);
         }
         const scripts = [...html.matchAll(/<script\b([^>]*)>/g)].map(achou => achou[1]);
-        confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === (arquivo === "login.html" ? cspLogin : cspPadrao), cspDe(html));
+        confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === (cspDaPagina[arquivo] || cspPadrao), cspDe(html));
         confere(`${arquivo}: a CSP vem antes de qualquer script`, html.indexOf("Content-Security-Policy") < html.indexOf("<script"));
         confere(`${arquivo}: nenhum <script> com código dentro`, scripts.every(atributos => /\bsrc="/.test(atributos)));
         // a <meta> da CSP desliga a busca antecipada do Chrome: sem defer, cada script só começa

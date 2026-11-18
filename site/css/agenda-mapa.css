@@ -1,0 +1,190 @@
+/* Agenda: o 🗺️ Mapa (Google Maps com os locais da lista, a lista numerada ao lado e a janela do pino). */
+
+/* ===== Modal grande: o mapa à esquerda, a lista à direita ===== */
+.modal-agenda.modal-mapa{
+    display:flex;
+    flex-direction:column;
+    max-width:1400px;
+    height:90vh;
+    overflow:hidden;
+}
+.resumo-mapa{
+    font-size:12px;
+    color:#94a3b8;
+}
+.avisos-mapa:empty{
+    display:none;
+}
+.avisos-mapa{
+    padding:8px 20px 0;
+}
+.aviso-mapa{
+    margin:0 0 6px;
+    font-size:13px;
+    color:#fbbf24;
+}
+.mapa-corpo{
+    flex:1;
+    min-height:0;
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) 340px;
+}
+.mapa-area{
+    min-height:300px;
+    background:#0f172a;
+}
+.mapa-lista{
+    overflow:auto;
+    padding:8px 12px 16px;
+    border-left:1px solid #334155;
+}
+
+/* ===== A lista: um bloco por dia ===== */
+.mapa-dia{
+    --cor-dia:#94a3b8;
+    margin-bottom:12px;
+}
+.mapa-dia-topo{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:space-between;
+    padding:4px 8px;
+    border-radius:6px;
+    background:var(--cor-dia);
+    color:#0f172a;
+    font-size:13px;
+    text-transform:capitalize;
+}
+.mapa-dia-topo .btn-rota-mapa{
+    margin:0;
+    padding:2px 8px;
+    font-size:12px;
+    text-transform:none;
+}
+.mapa-paradas{
+    list-style:none;
+    margin:4px 0 0;
+    padding:0;
+}
+.mapa-parada{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    padding:6px 4px;
+    border-bottom:1px solid #334155;
+    cursor:pointer;
+}
+.mapa-parada:hover{
+    background:rgba(148, 163, 184, .12);
+}
+.mapa-num{
+    flex:none;
+    min-width:24px;
+    height:24px;
+    border-radius:999px;
+    background:var(--cor-dia);
+    color:#0f172a;
+    font-size:12px;
+    font-weight:bold;
+    line-height:24px;
+    text-align:center;
+}
+.mapa-parada.aproximado .mapa-num{
+    opacity:.6;
+}
+.mapa-parada.sem-local .mapa-num{
+    background:transparent;
+    border:1px dashed #94a3b8;
+    color:#94a3b8;
+    line-height:22px;
+}
+.mapa-parada-texto{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+    font-size:13px;
+}
+.mapa-parada-titulo{
+    font-weight:bold;
+}
+.mapa-parada-situacao{
+    color:#94a3b8;
+    overflow-wrap:anywhere;
+}
+.mapa-parada.sem-local .mapa-parada-situacao{
+    color:#fbbf24;
+}
+
+/* ===== Janela do pino (o fundo dela é sempre branco, do Google) ===== */
+.mapa-info{
+    max-width:280px;
+    color:#0f172a;
+    font-size:13px;
+    line-height:1.35;
+}
+.mapa-info strong{
+    display:block;
+    margin-bottom:2px;
+}
+.mapa-info-cliente{
+    font-weight:bold;
+    font-size:14px;
+    margin-bottom:4px;
+}
+.mapa-info-rotulo{
+    color:#475569;
+}
+.mapa-info-precisao{
+    display:block;
+    margin-top:4px;
+    color:#475569;
+}
+.mapa-info-botoes{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-top:8px;
+}
+.mapa-info-botoes a{
+    color:#1d4ed8;
+}
+.mapa-info-botoes button{
+    margin:0;
+    padding:4px 10px;
+}
+
+/* ===== Celular: o mapa em cima, a lista embaixo ===== */
+@media (max-width:760px){
+    .modal-agenda.modal-mapa{
+        height:auto;
+        max-height:94vh;
+        overflow:auto;
+    }
+    .mapa-corpo{
+        grid-template-columns:minmax(0, 1fr);
+    }
+    .mapa-area{
+        height:55vh;
+    }
+    .mapa-lista{
+        overflow:visible;
+        border-left:none;
+        border-top:1px solid #334155;
+    }
+}
+
+/* ===== Fundo claro ===== */
+body.tema-claro .mapa-lista,
+body.tema-claro .mapa-parada{
+    border-color:var(--claro-linha);
+}
+body.tema-claro .resumo-mapa,
+body.tema-claro .mapa-parada-situacao{
+    color:#52617a;
+}
+body.tema-claro .aviso-mapa,
+body.tema-claro .mapa-parada.sem-local .mapa-parada-situacao{
+    color:#a14a09;
+}

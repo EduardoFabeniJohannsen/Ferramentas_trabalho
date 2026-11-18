@@ -272,5 +272,7 @@ document.addEventListener("keydown", (evento) => {
         fecharLixeira();
 
         fecharEstoqueAgenda();
+
+        fecharMapaAgenda();
     }
 });

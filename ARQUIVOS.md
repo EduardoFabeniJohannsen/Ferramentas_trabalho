@@ -39,8 +39,8 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 - JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → busca-fretes → status → menu → propostas-estado → propostas-tabelas-precos → propostas-tabelas-fretes → propostas-avisos → propostas-equipamentos → propostas-valor-tabela → propostas-fretes-painel → propostas-desconto → propostas-desconto-calculo → propostas-desconto-total-seguro → propostas-resumo → propostas-resumo-frete → propostas-cache → propostas-config → propostas-pagamento → proposta-zap → propostas-registro → propostas-textos → propostas-init
 
 **agenda.html** — Agenda de entregas, coletas, transferências e trocas
-- CSS: style → agenda → agenda-tabela → agenda-modal → agenda-estoque → agenda-formulario → agenda-tema-claro
-- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → agendamento-comum → agenda-config → agenda-utils → agenda-carregamento → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-listas → agenda-filtro-datas → agenda-filtro-status → agenda-filtro-tipos → agenda-filtro-motoristas → agenda-ordem → agenda-ordem-colunas → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-contratos → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-tempo-real → agenda-init
+- CSS: style → agenda → agenda-tabela → agenda-modal → agenda-estoque → agenda-formulario → agenda-mapa → agenda-tema-claro
+- JS: acoes → supabase-config → registro-erros → arquivo-faltando → dispositivo → auth-guard → helpers → atualizacao-sistema → presenca → menu → agendamento-comum → agenda-config → agenda-utils → agenda-carregamento → agenda-patrimonio → agenda-banco → agenda-filtros → agenda-busca → agenda-filtro-listas → agenda-filtro-datas → agenda-filtro-status → agenda-filtro-tipos → agenda-filtro-motoristas → agenda-ordem → agenda-ordem-colunas → agenda-render → agenda-celula-partes → agenda-celulas → agenda-linhas → agenda-colunas → agenda-colunas-visiveis → agenda-botoes-linha → agenda-larguras → agenda-tema → agenda-zap → agenda-transportadoras → agenda-motoristas → agenda-form-campos → agenda-unidades → agenda-plataformas → agenda-contratos → agenda-rascunho → agenda-etapas → agenda-modal → agenda-salvar → agenda-coleta → agenda-pagamento → agenda-clientes → agenda-pedido → agenda-pedido-pdf → agenda-lixeira → agenda-estoque-dados → agenda-estoque-tabela → agenda-estoque → agenda-conflitos → agenda-usar-patrimonio → agenda-mapa-links → agenda-mapa-locais → agenda-mapa-lista → agenda-mapa-rota → agenda-mapa-google → agenda-mapa → agenda-tempo-real → agenda-init
 
 **estoque.html** — Resumo do estoque de plataformas (por filial)
 - CSS: style → estoque
@@ -116,7 +116,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - colunaLigada, chaveColunasVisiveis, carregarColunasVisiveis, salvarColunasVisiveis, temColunasVisiveisPersonalizadas, restaurarColunasVisiveis, ligarColuna, atualizarBotaoColunas, desenharPainelColunas, alternarPainelColunas, encaixarPainelNaTela, fecharPainelColunas
 - `agenda-colunas.js` (286 linhas): Colunas por modo e ordem das colunas (arrastar o título).
   - colunasDoModo, ordenarColunas, colunasAtuais, obterUsuarioAgenda, chaveOrdemColunas, carregarOrdemColunas, salvarOrdemColunas, moverColuna, ordemColunasPersonalizada, restaurarOrdemColunas, limparIndicadoresColunas, soltaDepois, criarTituloColuna
-- `agenda-config.js` (275 linhas): Constantes (status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Os tipos (TIPOS, ROTULOS_TIPO: "Transferência" é a entre obras; TIPO_TRANSFERENCIA_UNIDADES) e STATUS_CONCLUIDO ficam em `agendamento-comum.js`; aqui, TIPOS_EXPEDICAO leva a transferência entre unidades pra expedição, sem faturamento.
+- `agenda-config.js` (280 linhas): Constantes (status, colunas, cores), chaves do localStorage e variáveis de estado da agenda. Os tipos (TIPOS, ROTULOS_TIPO: "Transferência" é a entre obras; TIPO_TRANSFERENCIA_UNIDADES) e STATUS_CONCLUIDO ficam em `agendamento-comum.js`; aqui, TIPOS_EXPEDICAO leva a transferência entre unidades pra expedição, sem faturamento.
 - `agenda-conflitos.js` (62 linhas): Ao salvar, avisa se o patrimônio já está em outra demanda (só aviso, a pessoa decide). Ao editar, só olha os patrimônios novos no agendamento. Carregar depois de agenda-estoque.js.
   - patrimoniosDoAgendamento, conflitosDoAgendamento, confirmarConflitos
 - `agenda-contratos.js` (268 linhas): Coleta de mais de uma proposta no mesmo lugar: 1 cliente com 2 contratos, ou 2 clientes. O primeiro contrato são os campos de sempre (Cliente, Nº da proposta, Período); cada outro é uma linha (cliente, proposta, período), guardada no campo escondido agOutrosContratos e na coluna outros_contratos (lista). As máquinas continuam numa lista só. Na mensagem do Zap vai uma referência por contrato; na lista, os clientes juntos ("Alfa + Beta") e as propostas ("712804 / 713000"). Só na coleta: em outro tipo o bloco some e não conta.
@@ -150,7 +150,19 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - criarCabecalhoAgenda, criarItemAgenda
 - `agenda-lixeira.js` (211 linhas): Lixeira (só admin): excluir manda o agendamento para a lixeira (`excluido_em`, pela função `mover_agendamento_lixeira` do banco; quem não é admin não vê mais). Botão 🗑️ Lixeira (`.so-admin`) lista os excluídos para restaurar ou apagar de vez (só admin pelo RLS; apaga junto o PDF do pedido). Carregar antes de agenda-init.js.
   - moverParaLixeiraBanco, carregarLixeira, dataLixeira, desenharLixeira, abrirLixeira, fecharLixeira, restaurarDaLixeira, apagarDeVez
-- `agenda-modal.js` (276 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card por nossa conta e no dividido; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente ou dividido. "Frete por conta de: Cliente e nossa conta" mostra a parte por nossa conta (coluna `frete_nossa`) e quanto fica para o cliente.
+- `agenda-mapa-google.js` (188 linhas): Carrega o Google Maps para o 🗺️ Mapa (agenda-mapa.js): a chave vem da função mapa-agenda do Supabase (segredo GOOGLE_MAPS_CHAVE; não fica no código, que é público) e o script do Google só baixa quando o mapa abre. Sem a chave, com a função fora do ar ou com a chave recusada pelo Google, o mapa avisa o que falta. Também desenha as unidades da W Rental (quadrados "W"). Carregar antes de agenda-mapa.js.
+  - erroDoMapa, buscarChaveGoogleMaps, carregarGoogleMaps, prepararMapaGoogle, desenharUnidadesMapa, mostrarAvisosMapa
+- `agenda-mapa-links.js` (142 linhas): Lê o link do Google Maps salvo no agendamento (sem internet): as coordenadas que vêm nele (!3d/!4d, ?q=, /maps/search/, coordenadas digitadas; @lat,lng é só o centro da tela de quem copiou), se é link curto (maps.app.goo.gl, que só a função do Supabase abre) e o nome do lugar (para a busca de endereços). Também diz quais lados do agendamento vão para o 🗺️ Mapa. Carregar antes de agenda-mapa-locais.js.
+  - coordenadaValida, pontoMapa, coordenadasDoTexto, urlDoLink, ehLinkCurto, textoDoLugarNoLink, enderecoParaBusca, ladosNoMapa
+- `agenda-mapa-lista.js` (273 linhas): As paradas do 🗺️ Mapa (agenda-mapa.js): os agendamentos da lista em ordem de dia e horário, numerados como os pinos. Ao lado do mapa, separadas por dia, com a situação de cada uma (procurando, aproximado, sem local e o motivo); clicar leva ao pino. A janela do pino mostra tipo, horário, cliente, máquina, transportadora, status e o local, com "Abrir no Google Maps" e "Editar". "Rota ↗" abre no Google Maps a rota do dia: sai da W Rental Itajaí e passa pelos locais na ordem do horário (o Google abre até 10 paradas). Carregar depois de agenda-mapa-locais.js.
+  - chaveHorarioMapa, agendamentosDoMapa, montarParadasMapa, tituloParadaMapa, paradasPorDia, desenharListaMapa, criarItemListaMapa, atualizarItemListaMapa, atualizarRotasMapa, linkAbrirNoMaps, conteudoJanelaMapa
+- `agenda-mapa-locais.js` (277 linhas): Acha as coordenadas do local do cliente de cada agendamento para o 🗺️ Mapa (agenda-mapa.js), nesta ordem: as que já vêm no link do Google Maps (link longo ou coordenadas digitadas); o link curto (maps.app.goo.gl), aberto pela função mapa-agenda do Supabase (o navegador não consegue abrir link de outro site); o nome do lugar que vem no link; o endereço escrito, pela busca de endereços do Google (Geocoder). O que achou fica guardado neste navegador (agendaMapaLocais) para não buscar de novo. Carregar antes de agenda-mapa.js.
+  - locaisMapaGuardados, chaveLinkMapa, chaveEnderecoMapa, localMapaGuardado, guardarLocalMapa, recomecarBuscasMapa, abrirLinkCurto, buscarEnderecoGoogle, coordenadasDoLado, coordenadasDoLink, localizarParadas
+- `agenda-mapa-rota.js` (52 linhas): "Rota ↗" de cada dia do 🗺️ Mapa: abre no Google Maps a rota que sai da W Rental Itajaí e passa pelos locais do dia na ordem do horário (o Google abre até 10 paradas pelo link; as demais ficam de fora, com aviso). Carregar depois de agenda-mapa-lista.js.
+  - linkRotaMapa, abrirRotaDoDia
+- `agenda-mapa.js` (218 linhas): Mostra no Google Maps os agendamentos que estão na lista (os filtros valem): um pino por local do cliente, na cor do dia, com o número da lista ao lado do mapa (agenda-mapa-lista.js). Pino apagado = local aproximado (achado pelo endereço). As unidades da W Rental aparecem como quadrados "W". A chave do Google Maps vem da função mapa-agenda do Supabase (não fica no código, que é público); sem ela, o mapa avisa o que falta. Carregar depois de agenda-mapa-locais.js e agenda-unidades.js.
+  - abrirMapaAgenda, fecharMapaAgenda, latLngMapa, limparMarcadoresMapa, colocarMarcadorMapa, abrirJanelaMapa, focarParadaMapa, enquadrarMapa, atualizarResumoMapa
+- `agenda-modal.js` (278 linhas): Abrir e fechar o formulário, descartar rascunho, excluir pelo modal. Card por nossa conta e no dividido; e-mails do cliente sempre aparecem (faturamento), mas só vão no agendamento por conta do cliente ou dividido. "Frete por conta de: Cliente e nossa conta" mostra a parte por nossa conta (coluna `frete_nossa`) e quanto fica para o cliente.
   - abrirModalAgenda, atualizarCamposConta, atualizarTextoFreteCliente, fecharModalAgenda, encerrarModalAgenda, descartarRascunho, excluirAgendamentoAberto
 - `agenda-motoristas.js` (90 linhas): Só leitura: carrega os motoristas e monta as opções do formulário. Cadastrar/excluir motorista: só admin, em transportadoras.html.
   - carregarMotoristas, motoristasDe, atualizarOpcoesMotorista
@@ -358,12 +370,13 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 - `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou)
 - `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `leads.css`, `propostas-copiadas.css`, `analise-fretes.css`: estilos de cada página (a propostas-copiadas.html e a analise-fretes.html carregam também o admin.css)
-- Agenda, em seis arquivos carregados nesta ordem (a ordem conta: uma regra posterior vence a anterior):
+- Agenda, em sete arquivos carregados nesta ordem (a ordem conta: uma regra posterior vence a anterior):
   - `agenda.css`: card, barra, ⚙️ Filtros, pesquisa e filtro de datas.
   - `agenda-tabela.css`: a lista (tabela, dias, linhas, status, botões da linha), a largura das colunas e o patrimônio ainda não definido.
   - `agenda-modal.css`: o modal (cabeçalho fixo com o Salvar) e a lixeira.
   - `agenda-estoque.css`: consulta ao estoque (botão 🔍 da linha).
   - `agenda-formulario.css`: formulário do agendamento (locais do cliente, faturamento, plataformas, etapas e retirada).
+  - `agenda-mapa.css`: o 🗺️ Mapa (modal grande com o Google Maps, a lista numerada por dia ao lado e a janela do pino; no celular, a lista vai para baixo do mapa).
   - `agenda-tema-claro.css`: fundo claro. Sempre o último.
 - `transportadoras.css`: lista, modal, documentos e formulário de nova transportadora
 
@@ -379,6 +392,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 | `frete_dionizio` | `busca-fretes.js`, `tabelas-config.js` |
 | `frete_magnus` | `busca-fretes.js`, `tabelas-config.js` |
 | `função:criar-usuario` | `admin-dados.js` |
+| `função:mapa-agenda` | `agenda-mapa-google.js` (`acao: "chave"`: a chave do Google Maps, do segredo `GOOGLE_MAPS_CHAVE`) e `agenda-mapa-locais.js` (`acao: "link"`: abre o link curto do Google Maps e devolve o longo; só segue links do Google). Com "Verify JWT" ligado. O código não fica neste repositório. A agenda.html é a única página com o Google Maps na CSP. |
 | `leads` | `leads-dados.js`, `leads-acoes.js`, `leads-cards.js` (grava só status, chamado e observação; quem cria é o agente externo, com service_role no servidor dele) |
 | `leads_buscas` | `leads-dados.js` (só lê: resultado de cada busca do agente) |
 | `leads_config` | `leads-busca-config.js` (o agente externo lê as ativas) |
@@ -413,6 +427,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 | `agendaStatus` | `agenda-config.js` |
 | `agendaEtapas` | `agenda-config.js` |
 | `agendaRascunhos` | `agenda-config.js` |
+| `agendaMapaLocais` | `agenda-config.js` (onde fica cada local do 🗺️ Mapa, pelo link ou endereço; até 600, os mais antigos saem) |
 | `leadsVendedor:<usuário>` | `leads-config.js` |
 | `authPerfil` | `auth-guard.js` |
 | `estoqueFilial` | `estoque-config.js` |

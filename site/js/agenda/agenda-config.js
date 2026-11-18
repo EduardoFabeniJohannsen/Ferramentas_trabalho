@@ -173,6 +173,11 @@ const CHAVE_AGENDA_ETAPAS = "agendaEtapas";
 // rascunhos do formulário (o que foi digitado e não foi salvo)
 const CHAVE_AGENDA_RASCUNHOS = "agendaRascunhos";
 
+// onde fica cada local do 🗺️ Mapa, achado pelo link ou pelo endereço (não
+// procura de novo): { "link:...": { lat, lng, exato, fonte, quando } }
+// (agenda-mapa-locais.js)
+const CHAVE_AGENDA_MAPA_LOCAIS = "agendaMapaLocais";
+
 // A agenda sempre fica separada por data. Isso é a ordem DENTRO de
 // cada data (em todas, o desempate final é o horário).
 const ORDENS = [

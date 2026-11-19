@@ -8,6 +8,8 @@
 }
 .card-estoque-topo{
     width:100%;
+    /* no celular o style.css limita os cards a 350px: este acompanha os de baixo */
+    max-width:none;
     text-align:left;
 }
 .card-estoque-topo h2{

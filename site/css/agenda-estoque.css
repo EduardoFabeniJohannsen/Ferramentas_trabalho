@@ -129,6 +129,103 @@
     font-size:12px;
     color:#fbbf24;
 }
+/* ===== Celular: cada máquina é um bloco, sem rolar para o lado =====
+   em cima o patrimônio, a situação e o Usar; embaixo marca · modelo · ano e,
+   se tiver, a demanda em que ela já está */
+@media (max-width:600px){
+    .estoque-filial{
+        overflow-x:visible;
+    }
+    .estoque-tabela{
+        display:block;
+        min-width:0;
+        table-layout:auto;
+    }
+    .estoque-tabela thead{
+        display:none;
+    }
+    .estoque-tabela tbody{
+        display:block;
+    }
+    .estoque-tabela tr{
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:2px 8px;
+        padding:8px 8px 8px 10px;
+        border-bottom:1px solid #334155;
+    }
+    .estoque-tabela td{
+        display:block;
+        padding:0;
+        border:none;
+    }
+    .estoque-tabela td:nth-child(1){
+        order:1;
+        font-size:15px;
+    }
+    .estoque-tabela td:nth-child(5){
+        order:2;
+        margin-left:auto;
+    }
+    .estoque-tabela td.estoque-usar{
+        order:3;
+    }
+    .estoque-usar button{
+        padding:6px 14px;
+        font-size:13px;
+    }
+    /* quebra a linha: marca, modelo e ano embaixo */
+    .estoque-tabela tr::after{
+        content:"";
+        order:4;
+        flex-basis:100%;
+    }
+    .estoque-tabela td:nth-child(2),
+    .estoque-tabela td:nth-child(3),
+    .estoque-tabela td:nth-child(4){
+        order:5;
+        font-size:12px;
+        opacity:.75;
+    }
+    .estoque-tabela td:nth-child(3){
+        order:6;
+    }
+    .estoque-tabela td:nth-child(4){
+        order:7;
+    }
+    .estoque-tabela td:nth-child(3)::before,
+    .estoque-tabela td:nth-child(4)::before{
+        content:"·";
+        margin-right:8px;
+    }
+    .estoque-tabela td.estoque-reserva{
+        order:8;
+        flex-basis:100%;
+    }
+    .estoque-tabela td:empty{
+        display:none;
+    }
+    /* o destaque vai para o bloco todo */
+    .estoque-tabela tr.estoque-em-demanda{
+        background:rgba(251,191,36,.18);
+        box-shadow:inset 4px 0 0 #fbbf24;
+    }
+    .estoque-tabela tr.estoque-neste-agendamento{
+        background:rgba(96,165,250,.16);
+        box-shadow:inset 4px 0 0 #60a5fa;
+    }
+    .estoque-tabela tr.estoque-em-demanda td,
+    .estoque-tabela tr.estoque-em-demanda td:first-child,
+    .estoque-tabela tr.estoque-neste-agendamento td,
+    .estoque-tabela tr.estoque-neste-agendamento td:first-child{
+        background:transparent;
+        box-shadow:none;
+    }
+    body.tema-claro .estoque-tabela tr{
+        border-bottom-color:var(--claro-linha);
+    }
+}
 body.tema-claro .estoque-tabela th,
 body.tema-claro .estoque-tabela td{
     border-bottom-color:var(--claro-linha);

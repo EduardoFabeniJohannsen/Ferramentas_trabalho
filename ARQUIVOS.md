@@ -380,7 +380,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
   - `agenda.css`: card, barra, ⚙️ Filtros, pesquisa e filtro de datas.
   - `agenda-tabela.css`: a lista (tabela, dias, linhas, status, botões da linha), a largura das colunas e o patrimônio ainda não definido.
   - `agenda-modal.css`: o modal (cabeçalho fixo com o Salvar) e a lixeira.
-  - `agenda-estoque.css`: consulta ao estoque (botão 🔍 da linha).
+  - `agenda-estoque.css`: consulta ao estoque (botão 🔍 da linha). No celular (até 600px) cada máquina vira um bloco: patrimônio, situação e Usar em cima; marca · modelo · ano embaixo e a demanda em que ela já está.
   - `agenda-formulario.css`: formulário do agendamento (locais do cliente, faturamento, plataformas, etapas e retirada).
   - `agenda-mapa.css`: o 🗺️ Mapa (modal grande com o Google Maps, a lista numerada por dia ao lado e a janela do pino; no celular, a lista vai para baixo do mapa).
   - `agenda-demanda.css`: o 📦 Demanda (período com atalhos, tabela por modelo com os agendamentos de cada um; no celular, a tabela cabe na tela).

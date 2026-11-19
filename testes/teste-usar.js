@@ -348,6 +348,27 @@ const confere = (nome, ok, extra) => {
     await pagina.locator("#listaEstoqueAgenda tbody tr", { has: pagina.locator('td.estoque-patrimonio:text-is("WAE18R010")') }).locator(".estoque-usar button").dblclick();
     await pagina.waitForTimeout(100);
     confere("clique duplo grava uma vez", (await pagina.evaluate(() => window.__gravacoes.length)) - antes === 1);
+    await fechar();
+
+    // ---------- celular: cada máquina em bloco, sem rolar para o lado ----------
+    await pagina.setViewportSize({ width: 390, height: 844 });
+    await abrir(1);
+    const celular = await pagina.evaluate(() => {
+        const janela = document.querySelector("#modalEstoque .modal-agenda").getBoundingClientRect();
+        const area = document.querySelector(".estoque-filial");
+        const dentro = (el) => { const c = el.getBoundingClientRect(); return c.left >= janela.left && c.right <= janela.right; };
+        const usar = [...document.querySelectorAll(".estoque-usar button")];
+        const reserva = [...document.querySelectorAll(".estoque-reserva")].find(td => td.textContent.includes("Outra Demanda"));
+        return {
+            rola: area.scrollWidth > area.clientWidth,
+            usarDentro: usar.length > 0 && usar.every(dentro),
+            reservaDentro: !!reserva && dentro(reserva)
+        };
+    });
+    confere("celular: a lista do estoque não rola para o lado; Usar e 'já em demanda' à vista", !celular.rola && celular.usarDentro && celular.reservaDentro, celular);
+    await pagina.screenshot({ path: path.join(saida, "32-usar-celular.png") });
+    await fechar();
+    await pagina.setViewportSize({ width: 1500, height: 900 });
 
     confere("sem erros no console", erros.length === 0, erros);
 

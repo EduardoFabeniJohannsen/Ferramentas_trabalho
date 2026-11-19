@@ -238,7 +238,8 @@ const confere = (nome, ok, extra) => {
     await chega("soltou a coluna, atualiza", bia, "Cliente Arrasto");
 
     // ---------- rolagem ----------
-    await bia.setViewportSize({ width: 700, height: 300 });
+    // 760: ainda a tabela (até 700px a agenda vira cartões e não rola para o lado)
+    await bia.setViewportSize({ width: 760, height: 300 });
     await bia.evaluate(() => { $("listaAgenda").scrollLeft = 200; window.scrollTo(0, 150); });
     const rolagem = await bia.evaluate(() => [$("listaAgenda").scrollLeft, window.scrollY]);
     await ana.evaluate(() => { encerrarModalAgenda(); abrirModalAgenda(1); });

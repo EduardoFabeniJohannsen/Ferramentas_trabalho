@@ -123,6 +123,44 @@
         });
 
 
+    // Celular: os links ficam atrás do ☰ Menu (style.css esconde e mostra),
+    // pra barra ocupar uma linha só. No computador o botão nem aparece.
+    const botaoMenu =
+        document.createElement("button");
+
+    botaoMenu.type = "button";
+
+    botaoMenu.className = "btn-menu-celular";
+
+    const abrirMenuCelular = (abrir) => {
+
+        topbar.classList.toggle("menu-aberto", abrir);
+
+        botaoMenu.innerText = abrir ? "✕ Fechar" : "☰ Menu";
+
+        botaoMenu.setAttribute("aria-expanded", String(abrir));
+    };
+
+    abrirMenuCelular(false);
+
+    botaoMenu.addEventListener("click", () =>
+        abrirMenuCelular(!topbar.classList.contains("menu-aberto"))
+    );
+
+    // tocar fora da barra ou Esc fecha
+    document.addEventListener("click", evento => {
+
+        if(!topbar.contains(evento.target)) abrirMenuCelular(false);
+    });
+
+    document.addEventListener("keydown", evento => {
+
+        if(evento.key === "Escape") abrirMenuCelular(false);
+    });
+
+    topbar.prepend(botaoMenu);
+
+
     // A topbar é fixa e quebra em mais linhas conforme a largura e os links
     // (os de acesso só aparecem depois de ler o perfil). O conteúdo (.container,
     // em style.css) desce a altura real dela, guardada em --altura-topbar, pra

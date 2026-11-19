@@ -1,0 +1,182 @@
+/* Agenda no celular (até 700px de largura): cada agendamento vira um cartão, sem rolar para o lado e sem largura de coluna para ajustar. É a mesma linha da tabela, só com outro desenho: as mesmas informações (as ligadas em 👁️ Colunas, na ordem escolhida, com o nome da coluna na frente) e os mesmos botões. No alto do cartão ficam o horário, o tipo e o status; embaixo, os botões. Com o celular deitado (mais de 700px) volta a tabela. Carregar antes do agenda-tema-claro. */
+
+@media (max-width:700px){
+
+    /* a explicação do modo fala de arrastar as colunas: no cartão não tem */
+    #dicaModo{
+        display:none;
+    }
+
+    #listaAgenda{
+        overflow-x:visible;
+    }
+
+    /* a largura escolhida para as colunas (agenda-larguras.js) não vale aqui */
+    #listaAgenda .ag-tabela{
+        display:block;
+        width:auto !important;
+        max-width:none;
+        border-spacing:0;
+    }
+    #listaAgenda .ag-tabela thead,
+    #listaAgenda .ag-tabela colgroup{
+        display:none;
+    }
+    #listaAgenda .ag-tabela tbody{
+        display:block;
+    }
+
+    /* ===== O dia ===== */
+    #listaAgenda tr.ag-dia{
+        display:block;
+        margin:16px 0 8px;
+    }
+    #listaAgenda tr.ag-dia:first-child{
+        margin-top:0;
+    }
+    #listaAgenda tr.ag-dia th{
+        display:block;
+        padding:6px 12px;
+        border-top:none;
+    }
+
+    /* ===== O cartão ===== */
+    #listaAgenda tr.ag-item{
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:8px;
+        margin-bottom:8px;
+        padding:10px 12px;
+        border:1px solid var(--cor-dia);
+        border-left:6px solid var(--cor-dia);
+        border-radius:10px;
+        background:#0f172a;
+        background:color-mix(in srgb, var(--cor-dia) 16%, #0f172a);
+    }
+    #listaAgenda tr.ag-item td{
+        display:block;
+        flex:1 1 100%;
+        order:1;
+        min-width:0;
+        padding:0;
+        border:none;
+        border-radius:0;
+        background:transparent;
+        font-size:14px;
+        text-align:left;
+        white-space:normal;
+    }
+    #listaAgenda .ag-conteudo{
+        max-width:none !important;
+    }
+    /* coluna sem nada neste agendamento: não ocupa espaço */
+    #listaAgenda tr.ag-item td:has(> .ag-conteudo:empty){
+        display:none;
+    }
+
+    /* cada informação com o nome da coluna na frente */
+    #listaAgenda tr.ag-item td[data-rotulo]{
+        display:grid;
+        grid-template-columns:104px minmax(0, 1fr);
+        gap:10px;
+        align-items:baseline;
+    }
+    #listaAgenda tr.ag-item td[data-rotulo]::before{
+        content:attr(data-rotulo);
+        font-size:10px;
+        font-weight:bold;
+        text-transform:uppercase;
+        color:#94a3b8;
+        /* quebra entre as palavras ("FRETE POR CONTA DE"), não no meio delas */
+        overflow-wrap:break-word;
+    }
+
+    /* no alto, na mesma linha: horário, tipo e status (o status no canto) */
+    #listaAgenda tr.ag-item td[data-coluna="horario"],
+    #listaAgenda tr.ag-item td[data-coluna="tipo"],
+    #listaAgenda tr.ag-item td[data-coluna="status"]{
+        display:block;
+        flex:0 0 auto;
+    }
+    #listaAgenda tr.ag-item td[data-coluna="horario"]::before,
+    #listaAgenda tr.ag-item td[data-coluna="tipo"]::before,
+    #listaAgenda tr.ag-item td[data-coluna="status"]::before,
+    #listaAgenda tr.ag-item td[data-coluna="titulo"]::before{
+        content:none;
+    }
+    #listaAgenda tr.ag-item td[data-coluna="horario"]{
+        order:-3;
+        font-size:16px;
+    }
+    #listaAgenda tr.ag-item td[data-coluna="horario"].ag-hora-texto{
+        font-size:12px;
+    }
+    #listaAgenda .ag-data-linha{
+        display:inline;
+        margin:0 6px 0 0;
+    }
+    #listaAgenda tr.ag-item td[data-coluna="tipo"]{
+        order:-2;
+    }
+    #listaAgenda tr.ag-item td[data-coluna="status"]{
+        order:-1;
+        margin-left:auto;
+    }
+    #listaAgenda tr.ag-item select.tag-select{
+        padding:4px 12px;
+        font-size:12px;
+    }
+
+    /* a máquina e o cliente em destaque, logo abaixo, sem o nome da coluna */
+    #listaAgenda tr.ag-item td[data-coluna="titulo"]{
+        display:block;
+        order:0;
+        font-size:15px;
+    }
+
+    /* o link do mapa numa linha só (o endereço inteiro não cabe) */
+    #listaAgenda .ag-link{
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        word-break:normal;
+    }
+
+    /* ===== Os botões, embaixo, com espaço para o dedo ===== */
+    #listaAgenda tr.ag-item td.ag-lado{
+        order:2;
+        padding-top:8px;
+        border-top:1px dashed #475569;
+    }
+    /* todos numa linha, do mesmo tamanho */
+    #listaAgenda .ag-botoes{
+        gap:6px;
+    }
+    #listaAgenda .ag-botoes button{
+        flex:1 1 0;
+        min-width:0;
+        padding:8px 4px;
+        font-size:16px;
+    }
+    /* na tabela, os botões que não valem ficam invisíveis só para alinhar */
+    #listaAgenda .ag-botoes button[style*="hidden"]{
+        display:none;
+    }
+    /* excluir um pouco afastado dos outros (dedo escorrega) */
+    #listaAgenda .ag-botoes .btn-excluir-ag{
+        margin-left:10px;
+    }
+
+    /* ===== Fundo claro ===== */
+    body.tema-claro #listaAgenda tr.ag-item{
+        background:var(--claro-card);
+        background:color-mix(in srgb, var(--cor-dia) var(--claro-mistura), var(--claro-card));
+    }
+    body.tema-claro #listaAgenda tr.ag-item td[data-rotulo]::before{
+        color:#52617a;
+    }
+    body.tema-claro #listaAgenda tr.ag-item td.ag-lado{
+        border-top-color:var(--claro-linha);
+    }
+}

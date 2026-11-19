@@ -258,5 +258,16 @@ function criarCelulasAgenda(item){
 
     celulas.proposta.classList.add("ag-proposta");
 
-    return colunas.map(coluna => celulas[coluna.id]);
+    // no celular a linha vira um cartão e cada informação ganha o nome da
+    // coluna na frente (agenda-celular.css)
+    return colunas.map(coluna => {
+
+        const celulaDaColuna = celulas[coluna.id];
+
+        celulaDaColuna.dataset.coluna = coluna.id;
+
+        celulaDaColuna.dataset.rotulo = coluna.titulo;
+
+        return celulaDaColuna;
+    });
 }

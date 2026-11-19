@@ -123,6 +123,40 @@ TOPBAR
     white-space:nowrap;
 }
 
+/* ☰ Menu (menu.js): só no celular. A barra fica numa linha (☰, Sair e a
+   versão) e os links das páginas aparecem embaixo, dois por linha, quando o
+   menu abre. Tocar fora ou Esc fecha. */
+.topbar .btn-menu-celular{
+    display:none;
+    background:#334155;
+}
+
+@media(max-width:700px){
+
+    .topbar{
+        gap:8px;
+        padding:8px 12px;
+    }
+
+    .topbar .btn-menu-celular{
+        display:inline-block;
+    }
+
+    .topbar .botao-topbar{
+        display:none;
+        order:1;
+        flex:1 1 calc(50% - 8px);
+        box-sizing:border-box;
+        padding:10px 8px;
+        text-align:center;
+    }
+
+    .topbar.menu-aberto .botao-topbar{
+        display:block;
+    }
+
+}
+
 
 /* =========================
 LAYOUT

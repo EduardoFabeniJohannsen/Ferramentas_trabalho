@@ -288,6 +288,26 @@ const confere = (nome, ok, extra) => {
         // a atualização automática das abas abertas depende deste endereço
         confere(`${arquivo}: usa js/helpers.js`, resumo.scripts.includes("js/helpers.js"), resumo.scripts.length);
 
+        // ☰ Menu (menu.js): no computador não aparece; no celular a barra fica
+        // numa linha e os links só aparecem com o menu aberto
+        const menu = () => pagina.evaluate(() => ({
+            botao: !!document.querySelector(".btn-menu-celular")?.offsetParent,
+            altura: document.querySelector(".topbar").offsetHeight,
+            links: [...document.querySelectorAll(".topbar a.botao-topbar")].filter(link => link.offsetParent).length
+        }));
+        const noComputador = await menu();
+        await pagina.setViewportSize({ width: 390, height: 800 });
+        const fechado = await menu();
+        await pagina.click(".btn-menu-celular");
+        const aberto = await menu();
+        await pagina.mouse.click(200, 700);
+        const fechouFora = await menu();
+        confere(`${arquivo}: ☰ Menu só no celular; fechado, a barra tem uma linha`,
+            !noComputador.botao && noComputador.links > 0 && fechado.botao && fechado.links === 0 && fechado.altura <= 70,
+            { noComputador, fechado });
+        confere(`${arquivo}: ☰ Menu abre os links e tocar fora fecha`,
+            aberto.links === noComputador.links && fechouFora.links === 0, { aberto, fechouFora });
+
         await pagina.close();
     }
 

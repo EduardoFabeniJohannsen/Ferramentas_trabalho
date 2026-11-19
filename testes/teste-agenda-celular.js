@@ -107,7 +107,8 @@ const cartoes = (pagina) => pagina.evaluate(() =>
 (async () => {
 
     navegador = await chromium.launch({ channel: "chrome", headless: true });
-    const contexto = await navegador.newContext({ viewport: { width: 390, height: 844 } });
+    // como o celular de verdade (isMobile): sem a meta viewport a página viria com 980px
+    const contexto = await navegador.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     await contexto.route("**/*", (rota) => {
         const url = new URL(rota.request().url());
         if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
@@ -134,12 +135,16 @@ const cartoes = (pagina) => pagina.evaluate(() =>
     // ---------- sem rolar para o lado ----------
     const larguras = await pagina.evaluate(() => ({
         pagina: document.documentElement.scrollWidth, tela: window.innerWidth,
+        // o iPhone dá zoom ao tocar num campo com menos de 16px (style.css)
+        campos: [...document.querySelectorAll("input, select, textarea")].filter(c => c.offsetParent).map(c => parseFloat(getComputedStyle(c).fontSize)),
         lista: $("listaAgenda").scrollWidth, area: $("listaAgenda").clientWidth,
         cabecalho: getComputedStyle(document.querySelector(".ag-tabela thead")).display,
         larguraFixa: document.querySelector(".ag-tabela").classList.contains("largura-fixa")
     }));
     confere("celular: nem a página nem a lista rolam para o lado (mesmo com largura de coluna escolhida)", larguras.pagina <= larguras.tela && larguras.lista <= larguras.area && larguras.larguraFixa, larguras);
     confere("celular: sem a linha de títulos das colunas", larguras.cabecalho === "none", larguras.cabecalho);
+    confere("celular: a página tem a largura da tela (meta viewport)", larguras.tela === 390, larguras.tela);
+    confere("celular: todo campo com 16px ou mais (o iPhone não dá zoom ao tocar)", larguras.campos.length > 3 && larguras.campos.every(tamanho => tamanho >= 16), larguras.campos);
 
     // ---------- o cartão ----------
     const [entrega, coleta, troca] = await cartoes(pagina);

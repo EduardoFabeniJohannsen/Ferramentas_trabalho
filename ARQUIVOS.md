@@ -374,7 +374,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 ## CSS
 
-- `style.css`: base comum (letra Inter, topbar com o ☰ Menu do celular (até 700px os links das páginas ficam atrás dele), layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou). A letra fica em `site/fonts/` (`inter-latin-wght-normal.woff2`, todos os pesos num arquivo só; licença OFL ao lado): a CSP não deixa baixar letra de fora.
+- `style.css`: base comum (letra Inter, topbar com o ☰ Menu do celular (até 700px os links das páginas ficam atrás dele; no celular todo campo tem 16px, senão o iPhone dá zoom ao tocar), layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou). A letra fica em `site/fonts/` (`inter-latin-wght-normal.woff2`, todos os pesos num arquivo só; licença OFL ao lado): a CSP não deixa baixar letra de fora.
 - `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `leads.css`, `propostas-copiadas.css`, `analise-fretes.css`: estilos de cada página (a propostas-copiadas.html e a analise-fretes.html carregam também o admin.css)
 - Agenda, em sete arquivos carregados nesta ordem (a ordem conta: uma regra posterior vence a anterior):
   - `agenda.css`: card, barra, ⚙️ Filtros, pesquisa e filtro de datas.
@@ -460,6 +460,7 @@ Cada chave tem o prefixo da página. As de `...:<usuário>` são separadas por u
 - Vários equipamentos no mesmo agendamento vão juntos na coluna `plataforma` (texto), ex: `2x WAD16 + WTE12`. Card, Zap, ordem e filtro leem esse texto; sem mudança no Supabase. A máquina de recolha da troca continua uma só.
 - Faturamento (forma, prazos, pedido) só em entregas; a coleta gerada de uma entrega não copia esses campos e o Zap não leva essas informações (só o card).
 - `menu.js` é a lista única dos links da topbar: página nova entra lá (nada de links digitados à mão). Página nova com acesso controlado entra também em `ACESSOS_ADMIN` (`admin-config.js`).
+- Toda página tem `<meta name="viewport" content="width=device-width, initial-scale=1">` logo depois da CSP (o teste-paginas confere): sem ela o celular desenha a página com 980px e diminui, e nenhum estilo de celular (`max-width`) vale.
 - Leads: as tabelas e permissões foram criadas à mão no SQL Editor e o SQL não fica neste repositório. Policies com `tem_acesso('leads')`. A regra "só quem marcou registra o resultado" é da tela, não do banco.
 - Agente de leads: tarefa agendada do Claude Code (conta individual, todo dia às 07:00). Lê e entrega pela Edge Function `agente-leads`, que valida tudo e grava com service_role; o token fica nos segredos do Supabase e no segredo de rede do ambiente da tarefa. O código da função e o SQL não ficam neste repositório, que é público.
 - Mudou VERSAO_SISTEMA? Fica em `helpers.js`.

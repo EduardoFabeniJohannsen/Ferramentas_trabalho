@@ -155,6 +155,14 @@ TOPBAR
         display:block;
     }
 
+    /* o iPhone dá zoom na página inteira ao tocar num campo com letra menor
+       que 16px (e ela fica ampliada): no celular, todo campo tem 16px */
+    input,
+    select,
+    textarea{
+        font-size:16px !important;
+    }
+
 }
 
 

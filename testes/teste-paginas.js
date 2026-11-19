@@ -132,6 +132,8 @@ const confere = (nome, ok, extra) => {
         const scripts = [...html.matchAll(/<script\b([^>]*)>/g)].map(achou => achou[1]);
         confere(`${arquivo}: tem a CSP padrão`, cspDe(html) === (cspDaPagina[arquivo] || cspPadrao), cspDe(html));
         confere(`${arquivo}: a CSP vem antes de qualquer script`, html.indexOf("Content-Security-Policy") < html.indexOf("<script"));
+        // sem ela o celular desenha a página com 980px e diminui: nada feito para o celular vale
+        confere(`${arquivo}: tem a meta viewport (largura do celular)`, html.includes('<meta name="viewport" content="width=device-width, initial-scale=1">'));
         confere(`${arquivo}: nenhum <script> com código dentro`, scripts.every(atributos => /\bsrc="/.test(atributos)));
         // a <meta> da CSP desliga a busca antecipada do Chrome: sem defer, cada script só começa
         // a baixar quando o anterior termina (uns 3 s pra abrir a agenda com o cache vencido)

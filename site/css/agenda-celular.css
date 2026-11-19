@@ -123,9 +123,12 @@
         order:-1;
         margin-left:auto;
     }
+    /* o campo tem 16px (menos que isso o iPhone dá zoom ao tocar, style.css):
+       a etiqueta é desenhada em 75% para não ficar maior que a máquina */
     #listaAgenda tr.ag-item select.tag-select{
-        padding:4px 12px;
-        font-size:12px;
+        padding:4px 14px;
+        transform:scale(.75);
+        transform-origin:right center;
     }
 
     /* a máquina e o cliente em destaque, logo abaixo, sem o nome da coluna */

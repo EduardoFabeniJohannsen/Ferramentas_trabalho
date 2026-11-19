@@ -94,7 +94,8 @@ let navegador = null;
     navegador = await chromium.launch({ channel: "chrome", headless: true });
 
     const abrir = async (tela, agendamentos, opcoes = {}) => {
-        const contexto = await navegador.newContext({ viewport: tela, timezoneId: "America/Sao_Paulo" });
+        // celular: como o iPhone (respeita a meta viewport e o toque)
+        const contexto = await navegador.newContext({ viewport: tela, timezoneId: "America/Sao_Paulo", ...(opcoes.celular ? { isMobile: true, hasTouch: true } : {}) });
         await contexto.route("**/*", (rota) => {
             const url = new URL(rota.request().url());
             if(url.pathname.endsWith("/vendor/supabase-2.45.0.js")) return rota.fulfill({ contentType: "text/javascript", body: clienteFalso });
@@ -238,12 +239,17 @@ let navegador = null;
 
     // ---------- celular ----------
     {
-        const { contexto, pagina, erros } = await abrir({ width: 390, height: 844 }, AGENDAMENTOS);
+        const { contexto, pagina, erros } = await abrir({ width: 390, height: 844 }, AGENDAMENTOS, { celular: true });
         await definirPeriodo(pagina, "2026-10-01", "2026-10-31");
         const larguras = await pagina.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
         confere("celular: a página não passa da largura da tela (as tabelas rolam dentro)", larguras[0] <= larguras[1], larguras);
         const caixa = await pagina.$eval("#graficoViagens svg", svg => svg.getBoundingClientRect().width);
         confere("celular: o gráfico cabe na tela", caixa <= larguras[1], caixa);
+        await pagina.tap("#graficoViagens svg");
+        await pagina.waitForTimeout(150);
+        confere("celular: tocar no gráfico mostra a dica (e ela fica depois de soltar o dedo)", !(await pagina.$eval("#dicaViagens", d => d.hidden)));
+        await pagina.tap("h2");
+        confere("celular: tocar fora do gráfico fecha a dica", await pagina.$eval("#dicaViagens", d => d.hidden));
         await pagina.screenshot({ path: path.join(saida, "analise-fretes-celular.png"), fullPage: true });
         confere("celular: sem erros", erros.length === 0, erros);
         await contexto.close();

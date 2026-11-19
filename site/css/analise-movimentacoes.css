@@ -1,0 +1,99 @@
+/* ===== Análise de movimentações: as cores de saída e retorno (legenda, colunas do gráfico e a dica) e o botão "Mostrar todos" dos clientes. Filtros, resumo, tabelas e a caixa do gráfico vêm do analise-fretes.css e do admin.css. ===== */
+
+/* azul e laranja: distintos também para quem não enxerga cores (conferido) */
+.card-movimentos{
+    --cor-saida:#3987e5;
+    --cor-saida-destaque:#7fb2f0;
+    --cor-retorno:#d95926;
+    --cor-retorno-destaque:#ec9670;
+}
+
+/* ===== Legenda ===== */
+.legenda-movimentos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 18px;
+    margin-bottom:8px;
+    color:#cbd5e1;
+    font-size:13px;
+}
+.legenda-movimentos > span{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+}
+.chave-legenda{
+    display:inline-block;
+    width:12px;
+    height:12px;
+    border-radius:3px;
+}
+.chave-legenda.chave-saida{
+    background:var(--cor-saida);
+}
+.chave-legenda.chave-retorno{
+    background:var(--cor-retorno);
+}
+
+/* ===== Gráfico ===== */
+/* grade fina e contínua, discreta; a linha do zero (base-grafico) é mais forte */
+.grade-movimentos{
+    stroke:#2b3a51;
+    stroke-width:1;
+}
+.barra-saida{
+    fill:var(--cor-saida);
+}
+.barra-retorno{
+    fill:var(--cor-retorno);
+}
+.barra-saida.destacada{
+    fill:var(--cor-saida-destaque);
+}
+.barra-retorno.destacada{
+    fill:var(--cor-retorno-destaque);
+}
+
+/* dica: o número em destaque, com um traço da cor na frente */
+.dica-titulo{
+    margin-bottom:2px;
+    color:#94a3b8;
+}
+.dica-linha{
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+.dica-linha strong{
+    color:#f1f5f9;
+}
+.chave-dica{
+    display:inline-block;
+    width:12px;
+    height:3px;
+    border-radius:2px;
+}
+.chave-dica.chave-saida{
+    background:var(--cor-saida);
+}
+.chave-dica.chave-retorno{
+    background:var(--cor-retorno);
+}
+.dica-saldo{
+    margin-top:2px;
+    color:#94a3b8;
+}
+
+/* ===== Tabelas ===== */
+.tabela-analise td.col-saldo{
+    font-weight:bold;
+}
+.btn-todos-clientes{
+    margin:10px 0 0;
+    padding:7px 12px;
+    background:#334155;
+    font-size:13px;
+}
+.btn-todos-clientes:hover{
+    background:#475569;
+}

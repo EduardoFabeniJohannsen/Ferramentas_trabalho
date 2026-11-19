@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
+
+<title>Análise de movimentações</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<!-- admin.css: card largo, tabelas e barra de filtros; analise-fretes.css: filtros,
+     resumo e gráfico (os mesmos da Análise de fretes); analise-movimentacoes.css:
+     as cores de saída e retorno -->
+<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/analise-fretes.css">
+<link rel="stylesheet" href="css/analise-movimentacoes.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <!-- links das outras páginas: montados pelo js/menu.js -->
+
+    <button data-clique="fazerLogout">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER (só admin: quantas máquinas saíram e voltaram)
+========================= -->
+
+<div class="container">
+
+    <div class="card card-admin card-analise card-movimentos">
+
+        <h2>🔄 Análise de movimentações</h2>
+
+        <p class="dica-admin">
+            Máquinas que saíram para os clientes e que voltaram, pela data dos agendamentos,
+            sem os cancelados (nem os da lixeira). <strong>Saídas</strong>: entregas e a máquina
+            que vai na troca técnica. <strong>Retornos</strong>: coletas e a máquina recolhida
+            na troca. "2x WTE12" conta 2. Transferências e fretes frustrados ficam fora do saldo.
+        </p>
+
+        <!-- filtros (movimentos-filtros.js) -->
+        <div class="barra-admin barra-analise">
+
+            <label class="campo-periodo">De
+                <input type="date" id="movimentosDe" data-mudanca="trocarPeriodoMovimentos">
+            </label>
+
+            <label class="campo-periodo">Até
+                <input type="date" id="movimentosAte" data-mudanca="trocarPeriodoMovimentos">
+            </label>
+
+            <div class="atalhos-periodo">
+                <button type="button" data-clique="escolherPeriodoMovimentos" data-arg="mes">Este mês</button>
+                <button type="button" data-clique="escolherPeriodoMovimentos" data-arg="mes-passado">Mês passado</button>
+                <button type="button" data-clique="escolherPeriodoMovimentos" data-arg="30">30 dias</button>
+                <button type="button" data-clique="escolherPeriodoMovimentos" data-arg="90">90 dias</button>
+                <button type="button" data-clique="escolherPeriodoMovimentos" data-arg="ano">Este ano</button>
+            </div>
+
+            <select id="movimentosModelo" data-mudanca="desenharAnaliseMovimentos" title="Modelo de máquina">
+                <option value="">Todos os modelos</option>
+            </select>
+
+            <label class="so-concluidos">
+                <input type="checkbox" id="movimentosConcluidos" data-mudanca="desenharAnaliseMovimentos">
+                Só concluídos
+            </label>
+
+            <span class="contagem" id="contagemMovimentos"></span>
+
+        </div>
+
+        <!-- os números grandes (movimentos-tela.js) -->
+        <div class="resumo-fretes" id="resumoMovimentos"></div>
+
+
+        <section class="secao-analise">
+
+            <h3 id="tituloMovimentos">Saídas e retornos por dia</h3>
+
+            <p class="dica-admin">
+                Passe o mouse (ou toque) numa coluna para ver o dia. Períodos de mais de 2 meses
+                mostram uma coluna por semana.
+            </p>
+
+            <div class="legenda-movimentos">
+                <span><span class="chave-legenda chave-saida"></span>Saídas ▲</span>
+                <span><span class="chave-legenda chave-retorno"></span>Retornos ▼</span>
+            </div>
+
+            <!-- movimentos-grafico.js -->
+            <div class="grafico-viagens" id="graficoMovimentos">
+                <div class="dica-grafico" id="dicaMovimentos" hidden></div>
+            </div>
+
+            <details class="numeros-viagens">
+
+                <summary>Ver os números</summary>
+
+                <div class="area-admin">
+                    <table class="tabela-admin tabela-analise">
+                        <thead>
+                            <tr>
+                                <th>Dia</th>
+                                <th>Saídas</th>
+                                <th>Retornos</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoDiasMovimentos"></tbody>
+                    </table>
+                </div>
+
+            </details>
+
+        </section>
+
+
+        <section class="secao-analise">
+
+            <h3>Por modelo de máquina</h3>
+
+            <p class="dica-admin">
+                Saldo positivo: saíram mais máquinas desse modelo do que voltaram.
+            </p>
+
+            <div class="area-admin">
+                <table class="tabela-admin tabela-analise">
+                    <thead>
+                        <tr>
+                            <th class="col-nome">Modelo</th>
+                            <th>Saídas</th>
+                            <th>Retornos</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoModelosMovimentos"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+
+        <section class="secao-analise">
+
+            <h3>Por cliente</h3>
+
+            <p class="dica-admin">
+                Mais movimento primeiro. Coleta com mais de um contrato fica com o cliente
+                principal do agendamento.
+            </p>
+
+            <div class="area-admin">
+                <table class="tabela-admin tabela-analise">
+                    <thead>
+                        <tr>
+                            <th class="col-nome">Cliente</th>
+                            <th>Saídas</th>
+                            <th>Retornos</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoClientesMovimentos"></tbody>
+                </table>
+            </div>
+
+            <button type="button" class="btn-todos-clientes" id="btnTodosClientes" data-clique="alternarTodosClientes" hidden></button>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
+
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<!-- o mesmo da agenda: tipos e status, máquinas e modelo -->
+<script src="js/agendamento-comum.js" defer></script>
+<!-- o mesmo da Análise de fretes: busca, período, formatos e peças da tela -->
+<script src="js/analise-comum.js" defer></script>
+<script src="js/analise-movimentacoes/movimentos-dados.js" defer></script>
+<script src="js/analise-movimentacoes/movimentos-calculo.js" defer></script>
+<script src="js/analise-movimentacoes/movimentos-filtros.js" defer></script>
+<script src="js/analise-movimentacoes/movimentos-grafico.js" defer></script>
+<script src="js/analise-movimentacoes/movimentos-tela.js" defer></script>
+<script src="js/analise-movimentacoes/movimentos-init.js" defer></script>
+
+</body>
+
+</html>

@@ -1,7 +1,7 @@
 // ======================================
 // AGENDAMENTO - O QUE É COMUM
 // ======================================
-// O que a Agenda e a Análise de fretes usam do agendamento: os tipos (e o nome na tela), o status Concluído, a cidade do endereço e as máquinas da plataforma (vários equipamentos e o modelo de cada um). Carregar antes de agenda-config.js.
+// O que a Agenda e as Análises (fretes e movimentações) usam do agendamento: os tipos (e o nome na tela), o status Concluído, a cidade do endereço e as máquinas da plataforma (vários equipamentos e o modelo de cada um). Carregar antes de agenda-config.js.
 
 // ======================================
 // TIPOS E STATUS

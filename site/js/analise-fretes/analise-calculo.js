@@ -1,35 +1,12 @@
 // ======================================
 // ANÁLISE DE FRETES - CONTAS
 // ======================================
-// Só contas, sem tela: totais e médias (por frete e por máquina), por transportadora, a mesma cidade feita por transportadoras diferentes (a mais usada cobra mais?) e frete por modelo. Cancelado não entra. As viagens por dia ficam em analise-viagens.js.
+// Só contas, sem tela: totais e médias (por frete e por máquina), por transportadora, a mesma cidade feita por transportadoras diferentes (a mais usada cobra mais?) e frete por modelo. Cancelado não entra. As viagens por dia ficam em analise-viagens.js; somar e agrupar, em analise-comum.js.
 
 const ROTULO_SEM_TRANSPORTADORA = "(Sem transportadora)";
 
 // a mais usada numa cidade só vira alerta cobrando pelo menos isso a mais
 const DIFERENCA_ALERTA_CIDADE = 0.05;
-
-function somar(lista, valorDe){
-
-    return lista.reduce((total, item) => total + valorDe(item), 0);
-}
-
-
-// Map na ordem em que cada chave apareceu
-function agrupar(lista, chaveDe){
-
-    const grupos = new Map();
-
-    lista.forEach(item => {
-
-        const chave = chaveDe(item);
-
-        if(!grupos.has(chave)) grupos.set(chave, []);
-
-        grupos.get(chave).push(item);
-    });
-
-    return grupos;
-}
 
 
 // filtro: { de, ate, tipo ("" = todos), soConcluidos }

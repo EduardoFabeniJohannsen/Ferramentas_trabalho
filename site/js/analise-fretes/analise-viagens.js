@@ -1,27 +1,7 @@
 // ======================================
 // ANÁLISE DE FRETES - VIAGENS
 // ======================================
-// Só contas: viagens de cada dia do período (os dias sem viagem também) ou de cada semana (segunda a domingo) no período longo, com o valor e quem fez, mais a média nos dias com viagem e o dia mais cheio. Viagem = um agendamento.
-
-// períodos maiores que isso: uma barra por semana em vez de uma por dia
-const DIAS_GRAFICO_POR_DIA = 62;
-
-
-function diaSeguinte(iso, dias = 1){
-
-    const data = new Date(iso + "T00:00:00Z");
-
-    data.setUTCDate(data.getUTCDate() + dias);
-
-    return data.toISOString().slice(0, 10);
-}
-
-
-// 0 = domingo
-function diaDaSemana(iso){
-
-    return new Date(iso + "T00:00:00Z").getUTCDay();
-}
+// Só contas: viagens de cada dia do período (os dias sem viagem também) ou de cada semana (segunda a domingo) no período longo (faixasDoPeriodo, em analise-comum.js), com o valor e quem fez, mais a média nos dias com viagem e o dia mais cheio. Viagem = um agendamento.
 
 
 // { "Transportadora X": 3, ... } (mais viagens primeiro)
@@ -51,37 +31,11 @@ function barrasDeViagens(lista, de, ate){
 
     const porDia = agrupar(lista, frete => frete.data);
 
-    const totalDias = Math.round((Date.parse(ate) - Date.parse(de)) / 86400000) + 1;
+    const { porSemana, faixas } = faixasDoPeriodo(de, ate);
 
-    const porSemana = totalDias > DIAS_GRAFICO_POR_DIA;
-
-    const barras = [];
-
-    let inicio = de;
-
-    while(inicio <= ate){
-
-        let fim = inicio;
-
-        if(porSemana){
-
-            // até o domingo da semana (ou o fim do período)
-            fim = diaSeguinte(inicio, (7 - diaDaSemana(inicio)) % 7);
-
-            if(fim > ate) fim = ate;
-        }
-
-        const daBarra = [];
-
-        for(let dia = inicio; dia <= fim; dia = diaSeguinte(dia)){
-
-            daBarra.push(...(porDia.get(dia) || []));
-        }
-
-        barras.push(barraDeViagens(inicio, fim, daBarra));
-
-        inicio = diaSeguinte(fim);
-    }
+    const barras = faixas.map(faixa =>
+        barraDeViagens(faixa.inicio, faixa.fim, faixa.dias.flatMap(dia => porDia.get(dia) || []))
+    );
 
     return { porSemana, barras };
 }

@@ -1,15 +1,11 @@
 // ======================================
 // ANÁLISE DE FRETES - DADOS
 // ======================================
-// Busca os agendamentos com data no período (sem os da lixeira), de 1000 em 1000, e deixa cada um pronto para as contas: valor do frete e nosso custo em número, máquinas, modelos e cidade do cliente. Só o admin abre esta página.
+// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e deixa cada um pronto para as contas: valor do frete e nosso custo em número, máquinas, modelos e cidade do cliente. Só o admin abre esta página.
 
 const COLUNAS_ANALISE_FRETES =
     "id, data, tipo, status, transportadora, plataforma, frete, frete_conta, frete_nossa, origem_endereco, destino_endereco";
 
-const TAMANHO_PAGINA_ANALISE = 1000;
-
-// trava contra laço sem fim (anos de agenda cabem nisso)
-const LIMITE_LINHAS_ANALISE = 50000;
 
 let fretesAnalise = [];
 
@@ -76,33 +72,6 @@ function freteDaLinha(linha){
 }
 
 
-async function buscarAgendamentosDoPeriodo(de, ate){
-
-    let linhas = [];
-
-    for(let inicio = 0; inicio < LIMITE_LINHAS_ANALISE; inicio += TAMANHO_PAGINA_ANALISE){
-
-        const { data, error } =
-            await supabaseClient
-                .from("agendamentos")
-                .select(COLUNAS_ANALISE_FRETES)
-                .gte("data", de)
-                .lte("data", ate)
-                .is("excluido_em", null)
-                .order("id")
-                .range(inicio, inicio + TAMANHO_PAGINA_ANALISE - 1);
-
-        if(error) throw error;
-
-        linhas = linhas.concat(data || []);
-
-        if((data || []).length < TAMANHO_PAGINA_ANALISE) break;
-    }
-
-    return linhas;
-}
-
-
 async function carregarAnaliseFretes(){
 
     const busca = ++buscaAnaliseAtual;
@@ -130,7 +99,7 @@ async function carregarAnaliseFretes(){
 
     try{
 
-        const linhas = await buscarAgendamentosDoPeriodo(de, ate);
+        const linhas = await buscarAgendamentosDoPeriodo(de, ate, COLUNAS_ANALISE_FRETES);
 
         if(busca !== buscaAnaliseAtual) return;
 

@@ -19,6 +19,7 @@ const PAGINAS = {
     "admin.html": "admin",
     "propostas-copiadas.html": "propostas-copiadas",
     "analise-fretes.html": "analise-fretes",
+    "analise-movimentacoes.html": "analise-movimentacoes",
     "leads.html": "leads"
 };
 
@@ -500,7 +501,7 @@ const confere = (nome, ok, extra) => {
         // na página de propostas o link aparece (comAcesso) e o do Admin não
         await pagina.waitForFunction(() => document.querySelector('.topbar a[href="propostas-copiadas.html"]')?.style.display === "", null, { timeout: 5000 }).catch(() => {});
         const links = await pagina.$$eval(".topbar a", l => l.filter(a => a.style.display !== "none").map(a => a.getAttribute("href")));
-        confere("com o acesso, o link 📊 Propostas Zap aparece no menu", links.includes("propostas-copiadas.html") && !links.includes("admin.html") && !links.includes("analise-fretes.html"), links);
+        confere("com o acesso, o link 📊 Propostas Zap aparece no menu", links.includes("propostas-copiadas.html") && !links.includes("admin.html") && !links.includes("analise-fretes.html") && !links.includes("analise-movimentacoes.html"), links);
 
         await pagina.close();
     }
@@ -617,6 +618,7 @@ const confere = (nome, ok, extra) => {
         confere("admin aparelhos: abre sem erro", erros.length === 0, erros.length ? erros : undefined);
         const linksAdmin = await pagina.$$eval(".topbar a", l => l.filter(a => a.style.display !== "none").map(a => a.getAttribute("href")));
         confere("admin: o link 📈 Análise de fretes aparece no menu", linksAdmin.includes("analise-fretes.html"), linksAdmin);
+        confere("admin: o link 🔄 Análise de movimentações aparece no menu", linksAdmin.includes("analise-movimentacoes.html"), linksAdmin);
         confere("admin aparelhos: aguardando vem primeiro, com o e-mail", /filial@empresa\.com/.test(linhas[0]) && /Aguardando/.test(linhas[0]) && /Liberado/.test(linhas[1]), linhas);
         confere("admin aparelhos: mostra o código do aparelho", linhas[0].includes("Código A3F9C2"), linhas[0]);
         confere("admin aparelhos: mostra a cidade e o IP de onde acessou", linhas[0].includes("Itajaí/Santa Catarina") && linhas[0].includes("IP 189.4.5.6"), linhas[0]);

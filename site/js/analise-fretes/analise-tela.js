@@ -7,26 +7,6 @@
 // TABELAS
 // ======================================
 
-function celula(texto, classe){
-
-    return criar("td", classe, texto);
-}
-
-
-// tabela vazia: uma linha só com o motivo
-function linhaVaziaAnalise(corpo, colunas, texto){
-
-    const linha = criar("tr");
-
-    const vazia = celula(texto, "analise-vazio");
-
-    vazia.colSpan = colunas;
-
-    linha.appendChild(vazia);
-
-    corpo.replaceChildren(linha);
-}
-
 
 // barrinha da parte de cada uma (o número fica do lado: não depende da cor)
 function celulaParte(fracao){
@@ -105,7 +85,7 @@ function desenharViagensAnalise(lista){
         const linha = criar("tr");
 
         linha.append(
-            celula(tituloBarraViagens(barra, dados.porSemana)),
+            celula(tituloDaFaixa(barra, dados.porSemana)),
             celula(numeroBR(barra.viagens)),
             celula(dinheiro(barra.valor)),
             celula(barra.transportadoras.map(item => `${item.nome}: ${item.viagens}`).join(" · "), "col-nome")

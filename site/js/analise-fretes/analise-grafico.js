@@ -1,7 +1,7 @@
 // ======================================
 // ANÁLISE DE FRETES - GRÁFICO DE VIAGENS
 // ======================================
-// Colunas de viagens por dia (ou por semana, no período longo) em SVG, sem biblioteca (a CSP só deixa script do próprio site). Passar o mouse ou tocar mostra o dia: viagens, valor e quem fez. Redesenha quando a tela muda de largura.
+// Colunas de viagens por dia (ou por semana, no período longo) em SVG, sem biblioteca (a CSP só deixa script do próprio site). Passar o mouse ou tocar mostra o dia: viagens, valor e quem fez (no celular, até tocar fora). Redesenha quando a tela muda de largura. O eixo, as datas e o desenho da coluna ficam em analise-comum.js.
 
 const ALTURA_GRAFICO_VIAGENS = 190;
 
@@ -16,64 +16,8 @@ const ESPACO_DATA_GRAFICO = 46;
 // na dica, as transportadoras do dia (o resto vira "+N outras")
 const TRANSPORTADORAS_NA_DICA = 5;
 
-const NOMES_DIA_SEMANA = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
 let graficoViagens = null;
-
-
-function elementoSvg(tag, atributos = {}){
-
-    const elemento = document.createElementNS("http://www.w3.org/2000/svg", tag);
-
-    Object.entries(atributos).forEach(([nome, valor]) => elemento.setAttribute(nome, valor));
-
-    return elemento;
-}
-
-
-// "2026-11-03" -> "03/11"
-function diaMes(iso){
-
-    return `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
-}
-
-
-function tituloBarraViagens(barra, porSemana){
-
-    if(!porSemana) return `${NOMES_DIA_SEMANA[diaDaSemana(barra.inicio)]}, ${diaMes(barra.inicio)}`;
-
-    if(barra.inicio === barra.fim) return diaMes(barra.inicio);
-
-    return `${diaMes(barra.inicio)} a ${diaMes(barra.fim)}`;
-}
-
-
-// topo do eixo redondo, com no máximo 4 faixas: 7 -> 0, 2, 4, 6, 8
-function eixoViagens(maximo){
-
-    const passos = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000];
-
-    const passo = passos.find(item => Math.ceil(maximo / item) <= 4) || Math.ceil(maximo / 4);
-
-    return { passo, topo: Math.max(passo, Math.ceil(maximo / passo) * passo) };
-}
-
-
-// topo arredondado (4px), base reta na linha do zero
-function caminhoBarra(x, y, largura, altura){
-
-    const raio = Math.min(4, largura / 2, altura);
-
-    return [
-        `M${x},${y + altura}`,
-        `V${y + raio}`,
-        `Q${x},${y} ${x + raio},${y}`,
-        `H${x + largura - raio}`,
-        `Q${x + largura},${y} ${x + largura},${y + raio}`,
-        `V${y + altura}`,
-        "Z"
-    ].join(" ");
-}
 
 
 function esconderDicaViagens(){
@@ -89,7 +33,7 @@ function esconderDicaViagens(){
 
 function conteudoDicaViagens(barra, porSemana){
 
-    const linhas = [criar("strong", "", tituloBarraViagens(barra, porSemana))];
+    const linhas = [criar("strong", "", tituloDaFaixa(barra, porSemana))];
 
     if(!barra.viagens){
 
@@ -208,7 +152,7 @@ function desenharGraficoViagens(dados, textoVazio = "Nenhuma viagem no período"
 
     const maximo = Math.max(...dados.barras.map(barra => barra.viagens));
 
-    const { passo, topo } = eixoViagens(maximo);
+    const { passo, topo } = eixoDoGrafico(maximo);
 
     const total = dados.barras.reduce((soma, barra) => soma + barra.viagens, 0);
 
@@ -271,12 +215,23 @@ function desenharGraficoViagens(dados, textoVazio = "Nenhuma viagem no período"
 
     svg.addEventListener("pointerdown", aoMoverNoGrafico);
 
-    svg.addEventListener("pointerleave", esconderDicaViagens);
+    // no dedo, soltar também conta como sair do gráfico: a dica fica até tocar fora
+    svg.addEventListener("pointerleave", evento => {
+
+        if(evento.pointerType !== "touch") esconderDicaViagens();
+    });
 
     area.insertBefore(svg, $("dicaViagens"));
 
     graficoViagens = { svg, barras: dados.barras, porSemana: dados.porSemana, inicioX: margem.esquerda, passoX, largura };
 }
+
+
+// tocou fora do gráfico (no celular a dica não some sozinha ao soltar o dedo)
+document.addEventListener("pointerdown", evento => {
+
+    if(graficoViagens && !graficoViagens.svg.contains(evento.target)) esconderDicaViagens();
+});
 
 
 // a largura da tela mudou (girar o celular, abrir o menu): redesenha

@@ -35,6 +35,8 @@
 
         { arquivo: "analise-fretes.html", rotulo: "📈 Análise de fretes", soAdmin: true },
 
+        { arquivo: "analise-movimentacoes.html", rotulo: "🔄 Análise de movimentações", soAdmin: true },
+
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
     ];
 

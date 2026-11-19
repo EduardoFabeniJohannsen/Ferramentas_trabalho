@@ -1,7 +1,7 @@
 // ======================================
 // ANÁLISE DE FRETES - RESUMO
 // ======================================
-// Os números grandes do topo (fretes, valor, nosso custo, frete médio, por máquina e viagens por dia) e os formatos usados nas tabelas: dinheiro, porcentagem, número e plural.
+// Os números grandes do topo (fretes, valor, nosso custo, frete médio, por máquina e viagens por dia) e os formatos de dinheiro e porcentagem (número, plural e o cartão ficam em analise-comum.js).
 
 function dinheiro(valor){
 
@@ -15,35 +15,9 @@ function porcento(fracao){
 }
 
 
-function numeroBR(valor, casas = 0){
-
-    return valor.toLocaleString("pt-BR", { maximumFractionDigits: casas });
-}
-
-
-function plural(quantidade, singular, varios){
-
-    return `${numeroBR(quantidade)} ${quantidade === 1 ? singular : varios}`;
-}
-
-
 // ======================================
 // RESUMO (os números grandes do topo)
 // ======================================
-
-function cartaoResumo(titulo, valor, detalhe, aviso){
-
-    const cartao = criar("div", "cartao-resumo");
-
-    cartao.append(
-        criar("div", "cartao-titulo", titulo),
-        criar("div", "cartao-valor", valor)
-    );
-
-    if(detalhe) cartao.appendChild(criar("div", aviso ? "cartao-detalhe aviso" : "cartao-detalhe", detalhe));
-
-    return cartao;
-}
 
 
 function desenharResumoFretes(lista){

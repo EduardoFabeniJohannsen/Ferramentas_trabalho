@@ -368,7 +368,7 @@ O site continua sem build: `package.json` e `node_modules` servem só para os te
 
 ## CSS
 
-- `style.css`: base comum (topbar, layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou)
+- `style.css`: base comum (letra Inter, topbar, layout, cards, inputs, botões, toast, documento da proposta, avisos de versão nova e de arquivo que não carregou). A letra fica em `site/fonts/` (`inter-latin-wght-normal.woff2`, todos os pesos num arquivo só; licença OFL ao lado): a CSP não deixa baixar letra de fora.
 - `propostas.css`, `estoque.css`, `tabelas.css`, `admin.css`, `leads.css`, `propostas-copiadas.css`, `analise-fretes.css`: estilos de cada página (a propostas-copiadas.html e a analise-fretes.html carregam também o admin.css)
 - Agenda, em sete arquivos carregados nesta ordem (a ordem conta: uma regra posterior vence a anterior):
   - `agenda.css`: card, barra, ⚙️ Filtros, pesquisa e filtro de datas.

@@ -190,6 +190,9 @@ let navegador = null;
 
     // ---------- gráfico ----------
     confere("uma coluna por dia com viagem (31 dias, 7 com viagem)", (await pagina.$$("#graficoViagens .barra-viagens")).length === 7 && (await pagina.innerText("#tituloViagens")) === "Viagens por dia");
+    // a letra do site (Inter) chegando depois muda a altura do texto e o gráfico desce:
+    // mede só com ela carregada, senão o mouse cai fora do gráfico
+    await pagina.evaluate(() => document.fonts.ready.then(() => true));
     const caixa = await pagina.$eval("#graficoViagens svg", svg => { const c = svg.getBoundingClientRect(); return { x: c.x, y: c.y, w: c.width, h: c.height }; });
     const passo = (caixa.w - 32 - 8) / 31;
     await pagina.mouse.move(caixa.x + 32 + passo * 1.5, caixa.y + caixa.h - 30);

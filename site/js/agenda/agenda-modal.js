@@ -274,5 +274,7 @@ document.addEventListener("keydown", (evento) => {
         fecharEstoqueAgenda();
 
         fecharMapaAgenda();
+
+        fecharDemandaAgenda();
     }
 });

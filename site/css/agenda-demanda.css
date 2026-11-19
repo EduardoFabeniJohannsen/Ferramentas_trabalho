@@ -1,0 +1,175 @@
+/* Agenda: o 📦 Demanda (quantas máquinas de cada modelo saem num período). */
+
+.modal-agenda.modal-demanda{
+    max-width:820px;
+}
+.resumo-demanda{
+    font-size:12px;
+    color:#94a3b8;
+}
+
+/* ===== Período ===== */
+.demanda-filtros{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    align-items:flex-end;
+}
+.demanda-filtros label{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    font-size:12px;
+    color:#94a3b8;
+}
+.demanda-filtros input{
+    width:auto;
+    margin:0;
+    padding:6px 8px;
+    font-size:14px;
+}
+.demanda-atalhos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+}
+.demanda-filtros button{
+    margin:0;
+    padding:7px 10px;
+    font-size:13px;
+}
+.demanda-atalhos button.ativo{
+    background:#2563eb;
+}
+.demanda-dica{
+    margin:10px 0 0;
+    font-size:12px;
+    color:#94a3b8;
+}
+.aviso-demanda{
+    margin:8px 0 0;
+    font-size:13px;
+    color:#fbbf24;
+}
+
+/* ===== Tabela por modelo ===== */
+.demanda-area{
+    margin-top:12px;
+    overflow-x:auto;
+}
+.demanda-tabela{
+    width:100%;
+    min-width:520px;
+    border-collapse:collapse;
+    font-size:14px;
+}
+.demanda-tabela th,
+.demanda-tabela td{
+    padding:6px 8px;
+    text-align:left;
+    border-bottom:1px solid #334155;
+}
+.demanda-tabela th{
+    font-size:11px;
+    text-transform:uppercase;
+    opacity:.75;
+}
+.demanda-tabela th + th,
+.demanda-tabela .demanda-num{
+    text-align:right;
+}
+.demanda-saem{
+    font-size:16px;
+    font-weight:bold;
+}
+.demanda-alerta{
+    font-weight:bold;
+    color:#fbbf24;
+}
+.demanda-filiais{
+    display:block;
+    font-size:11px;
+    opacity:.7;
+    white-space:nowrap;
+}
+.demanda-nome{
+    margin:0;
+    padding:2px 4px;
+    background:none;
+    color:inherit;
+    font-size:14px;
+    text-align:left;
+}
+.demanda-nome:hover{
+    text-decoration:underline;
+}
+.demanda-modelo.aberto td{
+    border-bottom:none;
+}
+.demanda-total td{
+    font-weight:bold;
+    border-bottom:none;
+    border-top:2px solid #475569;
+}
+
+/* os agendamentos do modelo */
+.demanda-agendamentos{
+    margin:0;
+    padding:0 0 4px 22px;
+    font-size:13px;
+}
+.demanda-agendamentos li{
+    padding:3px 0;
+    cursor:pointer;
+}
+.demanda-agendamentos li:hover{
+    text-decoration:underline;
+}
+.demanda-agendamentos li.demanda-volta{
+    opacity:.75;
+}
+.demanda-estoque-data{
+    margin-top:6px;
+}
+
+/* ===== Celular: a tabela cabe na tela, sem rolar para o lado ===== */
+@media (max-width:600px){
+    .modal-demanda .modal-corpo{
+        padding:12px;
+    }
+    .demanda-tabela{
+        min-width:0;
+        font-size:13px;
+    }
+    .demanda-tabela th,
+    .demanda-tabela td{
+        padding:5px 4px;
+    }
+    .demanda-tabela th{
+        font-size:10px;
+    }
+    .demanda-filiais{
+        white-space:normal;
+    }
+    .demanda-agendamentos{
+        padding-left:16px;
+    }
+}
+
+/* ===== Fundo claro ===== */
+body.tema-claro .resumo-demanda,
+body.tema-claro .demanda-filtros label,
+body.tema-claro .demanda-dica{
+    color:#52617a;
+}
+body.tema-claro .demanda-tabela th,
+body.tema-claro .demanda-tabela td{
+    border-bottom-color:var(--claro-linha);
+}
+body.tema-claro .demanda-total td{
+    border-top-color:var(--claro-linha);
+}
+body.tema-claro .aviso-demanda,
+body.tema-claro .demanda-alerta{
+    color:#a14a09;
+}

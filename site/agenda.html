@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="css/agenda-estoque.css">
 <link rel="stylesheet" href="css/agenda-formulario.css">
 <link rel="stylesheet" href="css/agenda-mapa.css">
+<link rel="stylesheet" href="css/agenda-demanda.css">
 <!-- sempre o último: o fundo claro troca as cores dos outros -->
 <link rel="stylesheet" href="css/agenda-tema-claro.css">
 
@@ -368,6 +369,16 @@ CONTAINER
                 title="Os agendamentos da lista (com os filtros) num mapa do Google Maps"
             >
                 🗺️ Mapa
+            </button>
+
+            <!-- quantas máquinas de cada modelo saem num período (agenda-demanda.js) -->
+            <button
+                type="button"
+                class="btn-secundario"
+                data-clique="abrirDemandaAgenda"
+                title="Quantas máquinas de cada modelo saem para os clientes num período (o total, para saber quantas comprar)"
+            >
+                📦 Demanda
             </button>
 
             <button
@@ -904,6 +915,79 @@ MAPA (botão 🗺️ Mapa)
 
 </div>
 
+<!-- =========================
+DEMANDA (botão 📦 Demanda)
+========================= -->
+<div id="modalDemanda" class="modal-overlay">
+
+    <div class="modal-agenda modal-demanda">
+
+        <div class="modal-agenda-topo">
+
+            <div class="modal-titulo">
+                <h3>📦 Demanda de máquinas</h3>
+                <span id="resumoDemanda" class="resumo-demanda"></span>
+            </div>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                data-clique="fecharDemandaAgenda"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-corpo">
+
+            <div class="demanda-filtros">
+
+                <label>De
+                    <input type="date" id="demandaDe" data-mudanca="desenharDemandaAgenda">
+                </label>
+
+                <label>Até
+                    <input type="date" id="demandaAte" data-mudanca="desenharDemandaAgenda">
+                </label>
+
+                <div class="demanda-atalhos">
+                    <button type="button" class="btn-secundario" data-clique="escolherPeriodoDemanda" data-arg="semana">Esta semana</button>
+                    <button type="button" class="btn-secundario" data-clique="escolherPeriodoDemanda" data-arg="proxima-semana">Próxima semana</button>
+                    <button type="button" class="btn-secundario" data-clique="escolherPeriodoDemanda" data-arg="mes">Este mês</button>
+                    <button type="button" class="btn-secundario" data-clique="escolherPeriodoDemanda" data-arg="proximo-mes">Próximo mês</button>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn-secundario"
+                    data-clique="copiarDemandaAgenda"
+                    title="Copia o total de cada modelo, para mandar no Zap"
+                >
+                    📋 Copiar
+                </button>
+
+            </div>
+
+            <p class="demanda-dica">
+                O total de cada modelo no período (pela data da entrega), na agenda toda: os filtros
+                da lista não valem aqui. <strong>Saem</strong> = entregas e trocas técnicas
+                ("2x WTE12" conta 2); <strong>Voltam</strong> = coletas. Cancelados não contam.
+            </p>
+
+            <div id="avisosDemanda"></div>
+
+            <div id="tabelaDemanda" class="demanda-area"></div>
+
+            <div id="estoqueDataDemanda"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
 <datalist id="listaHorarios">
     <option value="CONFIRMAR">
     <option value="IMEDIATO">
@@ -981,6 +1065,9 @@ MAPA (botão 🗺️ Mapa)
 <script src="js/agenda/agenda-mapa-rota.js" defer></script>
 <script src="js/agenda/agenda-mapa-google.js" defer></script>
 <script src="js/agenda/agenda-mapa.js" defer></script>
+<script src="js/agenda/agenda-demanda-calculo.js" defer></script>
+<script src="js/agenda/agenda-demanda-tabela.js" defer></script>
+<script src="js/agenda/agenda-demanda.js" defer></script>
 <script src="js/agenda/agenda-tempo-real.js" defer></script>
 <script src="js/agenda/agenda-init.js" defer></script>
 

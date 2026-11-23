@@ -9,7 +9,9 @@
 // chave = nome do arquivo da página sem .html, em minúsculas
 // (mesma regra de recursoDaPagina em auth-guard.js).
 // "fretes" não é página: libera os dados das tabelas de frete.
-// Página nova no menu? Some uma linha aqui.
+// Página nova no menu? Some uma linha aqui (e no PAGINAS_DESTINO do
+// auth-guard.js); o teste-paginas confere. Só o Admin fica de fora: quem é
+// admin vem do papel no login (app_metadata.role), não desta lista.
 
 const ACESSOS_ADMIN = [
 
@@ -33,6 +35,12 @@ const ACESSOS_ADMIN = [
     // ver as Propostas Zap copiadas de todo mundo (propostas-copiadas.html);
     // os dados vêm pela policy com tem_acesso('propostas-copiadas')
     { chave: "propostas-copiadas", rotulo: "Propostas Zap" },
+
+    // as análises leem os agendamentos (só ler): no banco, pela policy
+    // "agendamentos: leitura das analises", com tem_acesso de cada uma
+    { chave: "analise-fretes", rotulo: "Análise de fretes" },
+
+    { chave: "analise-movimentacoes", rotulo: "Análise de movimentações" },
 
     { chave: "fretes", rotulo: "Dados de frete" }
 ];

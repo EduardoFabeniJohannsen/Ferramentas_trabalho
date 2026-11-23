@@ -1,7 +1,7 @@
 // ======================================
 // ANÁLISE DE FRETES - DADOS
 // ======================================
-// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e deixa cada um pronto para as contas: valor do frete e nosso custo em número, máquinas, modelos e cidade do cliente, mais o que vai no 📥 Excel (cliente, proposta, motorista, de onde sai e para onde vai). Só o admin abre esta página.
+// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e deixa cada um pronto para as contas: valor do frete e nosso custo em número, máquinas, modelos e cidade do cliente, mais o que vai no 📥 Excel (cliente, proposta, motorista, de onde sai e para onde vai). Abre para o admin e para quem tem o acesso "analise-fretes" (página Admin).
 
 const COLUNAS_ANALISE_FRETES =
     "id, data, horario, tipo, status, transportadora, motorista, plataforma, plataforma_recolha, cliente, proposta, " +

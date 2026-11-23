@@ -31,11 +31,11 @@
 
         { arquivo: "propostas-copiadas.html", rotulo: "📊 Propostas Zap", comAcesso: true },
 
+        { arquivo: "analise-fretes.html", rotulo: "📈 Análise de fretes", comAcesso: true },
+
+        { arquivo: "analise-movimentacoes.html", rotulo: "🔄 Análise de movimentações", comAcesso: true },
+
         // soAdmin: o link só aparece para admin
-
-        { arquivo: "analise-fretes.html", rotulo: "📈 Análise de fretes", soAdmin: true },
-
-        { arquivo: "analise-movimentacoes.html", rotulo: "🔄 Análise de movimentações", soAdmin: true },
 
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
     ];

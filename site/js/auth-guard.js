@@ -317,7 +317,8 @@ function nomeArquivoAtual(){
 
 
 // páginas pra onde mandar quem abriu uma página sem acesso
-// (a primeira que ele tiver)
+// (a primeira que ele tiver). Todas as que o Admin libera estão aqui: quem só
+// tem uma delas não pode ser mandado embora do sistema (o teste-paginas confere)
 const PAGINAS_DESTINO = [
     "propostas.html",
     "index.html",
@@ -325,7 +326,11 @@ const PAGINAS_DESTINO = [
     "estoque.html",
     "tabelas.html",
     "WEG.html",
-    "leads.html"
+    "leads.html",
+    "transportadoras.html",
+    "propostas-copiadas.html",
+    "analise-fretes.html",
+    "analise-movimentacoes.html"
 ];
 
 

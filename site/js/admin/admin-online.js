@@ -19,11 +19,6 @@ function nomePaginaOnline(pagina){
 
     if(pagina === "admin") return "Admin";
 
-    // só admin: não tem acesso para marcar
-    if(pagina === "analise-fretes") return "Análise de fretes";
-
-    if(pagina === "analise-movimentacoes") return "Análise de movimentações";
-
     const acesso = ACESSOS_ADMIN.find(item => item.chave === pagina);
 
     return acesso ? acesso.rotulo.replace(" (ver)", "") : pagina;

@@ -125,6 +125,22 @@ const confere = (nome, ok, extra) => {
     confere("CSP: só scripts do próprio site", /(^|; )script-src 'self'(;|$)/.test(cspPadrao || ""), cspPadrao);
     confere("CSP: dados só para o Supabase do projeto", /connect-src 'self' https:\/\/qhneylwmrzuesaloqetr\.supabase\.co wss:\/\/qhneylwmrzuesaloqetr\.supabase\.co https:\/\/get\.geojs\.io;/.test(cspPadrao || ""), cspPadrao);
 
+    // toda página (menos o Admin) pode ser liberada na página Admin e serve de destino
+    // para quem abriu uma página sem acesso (senão quem só tem ela sai do sistema)
+    {
+        const textoConfig = fs.readFileSync(path.join(raiz, "js", "admin", "admin-config.js"), "utf8");
+        const liberaveis = [...textoConfig.slice(textoConfig.indexOf("const ACESSOS_ADMIN")).matchAll(/chave: "([^"]+)"/g)].map(achou => achou[1]);
+        const textoGuarda = fs.readFileSync(path.join(raiz, "js", "auth-guard.js"), "utf8");
+        const destinos = textoGuarda.slice(textoGuarda.indexOf("const PAGINAS_DESTINO"), textoGuarda.indexOf("];", textoGuarda.indexOf("const PAGINAS_DESTINO")));
+        const paginasComAcesso = Object.entries(PAGINAS).filter(([arquivo]) => arquivo !== "admin.html");
+        const semCaixa = paginasComAcesso.filter(([, acesso]) => !liberaveis.includes(acesso)).map(([arquivo]) => arquivo);
+        const semDestino = paginasComAcesso.filter(([arquivo]) => !destinos.includes(`"${arquivo}"`)).map(([arquivo]) => arquivo);
+        confere("toda página (menos o Admin) tem a caixinha de acesso na página Admin", semCaixa.length === 0, semCaixa);
+        confere("toda página (menos o Admin) está no PAGINAS_DESTINO do auth-guard", semDestino.length === 0, semDestino);
+        const noSite = fs.readdirSync(raiz).filter(nome => nome.endsWith(".html") && nome !== "login.html");
+        confere("toda página do site está na lista PAGINAS deste teste", noSite.every(nome => nome in PAGINAS), noSite.filter(nome => !(nome in PAGINAS)));
+    }
+
     for(const arquivo of [...Object.keys(PAGINAS), "login.html"]){
         const html = fs.readFileSync(path.join(raiz, arquivo), "utf8");
         for(const achou of html.matchAll(/src="(js\/[^"]+)"/g)){
@@ -515,6 +531,60 @@ const confere = (nome, ok, extra) => {
     }
 
     await comAcessoMarcado.contexto.close();
+
+    // ---------- análises liberadas no Admin ----------
+    const analista = await novoContexto({ acessos: ["propostas", "analise-fretes"] });
+
+    {
+        const pagina = await analista.contexto.newPage();
+
+        await pagina.goto("http://site.test/propostas.html");
+        await pagina.waitForFunction(() => document.querySelector('.topbar a[href="analise-fretes.html"]')?.style.display === "", null, { timeout: 5000 }).catch(() => {});
+        const links = await pagina.$$eval(".topbar a", l => l.filter(a => a.style.display !== "none").map(a => a.getAttribute("href")));
+        confere("com o acesso, o link 📈 Análise de fretes aparece (e o da outra análise não)", links.includes("analise-fretes.html") && !links.includes("analise-movimentacoes.html") && !links.includes("admin.html"), links);
+
+        await pagina.close();
+    }
+
+    {
+        const { pagina, erros } = await abrir(analista.contexto, "analise-fretes.html");
+
+        confere("analise-fretes.html: abre com o acesso marcado", pagina.url().endsWith("/analise-fretes.html") && erros.length === 0, erros.length ? erros : pagina.url());
+
+        await pagina.close();
+    }
+
+    {
+        const pagina = await analista.contexto.newPage();
+
+        await pagina.goto("http://site.test/analise-movimentacoes.html");
+        await pagina.waitForURL("**/propostas.html", { timeout: 5000 }).catch(() => {});
+
+        confere("analise-movimentacoes.html: sem o acesso dela vai para outra página", pagina.url().endsWith("/propostas.html"), pagina.url());
+
+        await pagina.close();
+    }
+
+    await analista.contexto.close();
+
+    // só com uma análise: abrir outra página leva para ela (não sai do sistema)
+    const soMovimentos = await novoContexto({ acessos: ["analise-movimentacoes"] });
+
+    {
+        const pagina = await soMovimentos.contexto.newPage();
+        let aviso = "";
+
+        pagina.on("dialog", d => { aviso = d.message(); d.accept(); });
+
+        await pagina.goto("http://site.test/index.html");
+        await pagina.waitForURL("**/analise-movimentacoes.html", { timeout: 5000 }).catch(() => {});
+
+        confere("só com a Análise de movimentações: abrir outra página leva para ela", pagina.url().endsWith("/analise-movimentacoes.html") && !aviso, [pagina.url(), aviso]);
+
+        await pagina.close();
+    }
+
+    await soMovimentos.contexto.close();
 
     // ---------- usuário desativado ----------
     const desativado = await novoContexto({ acessos: ["propostas"], ativo: false });

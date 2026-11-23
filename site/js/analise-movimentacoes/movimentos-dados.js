@@ -1,7 +1,7 @@
 // ======================================
 // ANÁLISE DE MOVIMENTAÇÕES - DADOS
 // ======================================
-// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e transforma cada um nas máquinas que ele movimenta: uma linha por modelo, com a quantidade ("2x WTE12" conta 2) e o sentido. Entrega sai, coleta volta, troca técnica sai uma e volta a recolha; transferências e frete frustrado ficam à parte. Cancelado não entra. Só o admin abre esta página.
+// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e transforma cada um nas máquinas que ele movimenta: uma linha por modelo, com a quantidade ("2x WTE12" conta 2) e o sentido. Entrega sai, coleta volta, troca técnica sai uma e volta a recolha; transferências e frete frustrado ficam à parte. Cancelado não entra. Abre para o admin e para quem tem o acesso "analise-movimentacoes" (página Admin).
 
 const COLUNAS_ANALISE_MOVIMENTOS =
     "id, data, tipo, status, plataforma, plataforma_recolha, cliente";

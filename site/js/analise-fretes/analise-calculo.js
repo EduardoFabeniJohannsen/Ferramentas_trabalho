@@ -9,7 +9,7 @@ const ROTULO_SEM_TRANSPORTADORA = "(Sem transportadora)";
 const DIFERENCA_ALERTA_CIDADE = 0.05;
 
 
-// filtro: { de, ate, tipo ("" = todos), soConcluidos }
+// filtro: { de, ate, tipo ("" = todos), transportadora ("" = todas), soConcluidos }
 function fretesDaAnalise(fretes, filtro){
 
     return fretes.filter(frete =>
@@ -17,6 +17,7 @@ function fretesDaAnalise(fretes, filtro){
         frete.data >= filtro.de &&
         frete.data <= filtro.ate &&
         (!filtro.tipo || frete.tipo === filtro.tipo) &&
+        (!filtro.transportadora || (frete.transportadora || ROTULO_SEM_TRANSPORTADORA) === filtro.transportadora) &&
         (!filtro.soConcluidos || frete.status === STATUS_CONCLUIDO)
     );
 }

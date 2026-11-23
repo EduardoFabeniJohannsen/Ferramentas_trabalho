@@ -1,7 +1,7 @@
 // Página "Análise de fretes" (analise-fretes.html, só admin): resumo (fretes, valor, nosso
 // custo, médias, viagens por dia), tabela por transportadora, gráfico de viagens com a dica,
 // comparação por cidade (alerta quando a mais usada cobra mais), frete por modelo, filtros
-// e a busca no banco (período, lixeira, de 1000 em 1000). Os números esperados foram feitos
+// (inclusive transportadora), o 📥 Excel (o arquivo baixado é aberto e conferido) e a busca no banco (período, lixeira, de 1000 em 1000). Os números esperados foram feitos
 // à mão a partir dos agendamentos abaixo. Banco simulado: nada aqui toca o Supabase de produção.
 const { chromium } = require("playwright-core");
 const fs = require("fs");
@@ -62,15 +62,15 @@ const ag = (id, data, tipo, status, transportadora, plataforma, frete, conta, ex
 
 // outubro/2026 (1º de outubro é quinta)
 const AGENDAMENTOS = [
-    ag(1, "2026-10-02", "Entrega", "Concluído", "Transp A", "WAE1520", 300, "nossa", { destino_endereco: "Rua X, 10, Centro, Brusque/SC" }),
-    ag(2, "2026-10-02", "Entrega", "Concluído", "Transp A", "2x WAE15 + WTE14046", 600, "nossa", { destino_endereco: "Rua Y, Brusque - SC" }),
+    ag(1, "2026-10-02", "Entrega", "Concluído", "Transp A", "WAE1520", 300, "nossa", { destino_endereco: "Rua X, 10, Centro, Brusque/SC", horario: "10:00", cliente: "Construtora Alfa", proposta: "712804", motorista: "João", origem_nome: "W Rental Itajaí", origem_endereco: "Av. Abrahão, 3455, Itajaí/SC", destino_nome: "Obra Alfa" }),
+    ag(2, "2026-10-02", "Entrega", "Concluído", "Transp A", "2x WAE15 + WTE14046", 600, "nossa", { destino_endereco: "Rua Y, Brusque - SC", horario: "08:00", cliente: "Beta" }),
     // coleta: a cidade do cliente é a origem; o frete é por conta do cliente
     ag(3, "2026-10-03", "Coleta", "Confirmado", "Transp B", "WAE1530", 250, "cliente", { origem_endereco: "Rua Z, 5, Brusque/SC", destino_endereco: "W Rental" }),
     // dividido: nosso custo é só a nossa parte
     ag(4, "2026-10-05", "Entrega", "Concluído", "Transp B", "WTE14046", 400, "dividido", { frete_nossa: 100, destino_endereco: "Av. Brasil, 200, Blumenau/SC" }),
     ag(5, "2026-10-05", "Entrega", "Cancelado", "Transp A", "WAE1520", 999, "nossa", { destino_endereco: "Brusque/SC" }),
     ag(6, "2026-10-07", "Entrega", "Confirmado", "Transp A", "WAE1520", null, "nossa", { destino_endereco: "Rua A, Brusque/SC" }),
-    ag(7, "2026-10-07", "Troca técnica", "Concluído", "", "WAE1540", null, null),
+    ag(7, "2026-10-07", "Troca técnica", "Concluído", "", "WAE1540", null, null, { plataforma_recolha: "WAE1541" }),
     // fora do período (o banco simulado não filtra: a página confere também)
     ag(8, "2026-09-15", "Entrega", "Concluído", "Transp B", "WAE1520", 100, "nossa", { destino_endereco: "Itajaí/SC" }),
     ag(9, "2026-10-10", "Entrega", "Concluído", "Transp A", "WAE1520", 500, "nossa", { destino_endereco: "Rua B, Itajaí/SC" }),
@@ -219,6 +219,63 @@ let navegador = null;
     await pagina.check("#analiseConcluidos");
     confere("só concluídos", (await resumo(pagina))["Fretes"][0] === "7", (await resumo(pagina))["Fretes"]);
     await pagina.uncheck("#analiseConcluidos");
+
+    // ---------- transportadora e 📥 Excel ----------
+    confere("transportadoras na caixa: as do período, sem transportadora por último", JSON.stringify(await pagina.$$eval("#analiseTransportadora option", opcoes => opcoes.map(opcao => opcao.value))) === JSON.stringify(["", "Transp A", "Transp B", "(Sem transportadora)"]));
+    await pagina.selectOption("#analiseTransportadora", "Transp A");
+    confere("transportadora: só os fretes dela", (await resumo(pagina))["Fretes"][0] === "5" && (await tabela(pagina, "corpoTransportadorasAnalise")).length === 1, (await resumo(pagina))["Fretes"]);
+    confere("a planilha só é baixada no clique", await pagina.evaluate(() => !window.XLSX && !document.querySelector('script[src*="xlsx"]')));
+
+    // baixa e abre o arquivo na própria página (com a biblioteca que ela carregou)
+    const baixarExcel = async () => {
+        const [download] = await Promise.all([pagina.waitForEvent("download"), pagina.click("#btnExcelFretes")]);
+        const conteudo = fs.readFileSync(await download.path()).toString("base64");
+        const livro = await pagina.evaluate((base64) => {
+            const lido = XLSX.read(base64, { type: "base64", cellNF: true });
+            const abas = {};
+            lido.SheetNames.forEach(nome => {
+                const aba = lido.Sheets[nome];
+                abas[nome] = {
+                    linhas: XLSX.utils.sheet_to_json(aba, { header: 1, raw: true, defval: "" }),
+                    celulas: Object.fromEntries(Object.entries(aba).filter(([chave]) => !chave.startsWith("!")).map(([chave, celula]) => [chave, { v: celula.v, w: celula.w, f: celula.f, z: celula.z }])),
+                    filtro: aba["!autofilter"]?.ref || ""
+                };
+            });
+            return { nomes: lido.SheetNames, abas };
+        }, conteudo);
+        return { nome: download.suggestedFilename(), ...livro };
+    };
+
+    let excel = await baixarExcel();
+    let aba = excel.abas["Transp A"];
+    confere("Excel de uma transportadora: nome do arquivo com ela e o período", excel.nome === "Fretes - Transp A - 01-10-2026 a 31-10-2026.xlsx", excel.nome);
+    confere("Excel: uma aba só (sem Resumo)", JSON.stringify(excel.nomes) === JSON.stringify(["Transp A"]), excel.nomes);
+    confere("Excel: título e filtros em cima", aba.linhas[0][0] === "Fretes - Transp A" && aba.linhas[1][0] === "Período: 01/10/2026 a 31/10/2026 · Todos os tipos · Concluídos e não concluídos (sem os cancelados)", aba.linhas.slice(0, 2));
+    confere("Excel: títulos das colunas", aba.linhas[3].join("|") === "Data|Horário|Tipo|Status|Cliente|Proposta|Máquinas|Sai de|Vai para|Motorista|Frete por conta de|Valor do frete|Por nossa conta|Por conta do cliente", aba.linhas[3]);
+    confere("Excel: 5 fretes na ordem da data e do horário", aba.linhas.length === 10 && aba.linhas[4][1] === "08:00" && aba.linhas[5][1] === "10:00", aba.linhas.map(l => l[1]));
+    confere("Excel: o frete com cliente, proposta, máquina, de onde sai, para onde vai e motorista", JSON.stringify(aba.linhas[5].slice(2, 12)) === JSON.stringify(["Entrega", "Concluído", "Construtora Alfa", "712804", "WAE1520", "W Rental Itajaí - Itajaí/SC", "Obra Alfa - Brusque/SC", "João", "Nossa conta", 300]), aba.linhas[5]);
+    confere("Excel: data de verdade (número com formato de data)", typeof aba.celulas.A5.v === "number" && aba.celulas.A5.w === "02/10/2026" && aba.celulas.A5.z === "dd/mm/yyyy", aba.celulas.A5);
+    confere("Excel: valor em número com formato de dinheiro", aba.celulas.L5.v === 600 && aba.celulas.L5.z === '"R$" #,##0.00', aba.celulas.L5);
+    confere("Excel: frete sem valor fica em branco", aba.linhas[6][11] === "" && aba.linhas[6][0] !== "", aba.linhas[6]);
+    confere("Excel: total em fórmula (soma de novo se mudarem um valor)", aba.linhas[9][0] === "Total: 5 fretes" && aba.celulas.L10.f === "SUM(L5:L9)" && aba.celulas.L10.v === 1940 && aba.celulas.M10.v === 1940 && aba.celulas.N10.v === 0, [aba.linhas[9], aba.celulas.L10]);
+    confere("Excel: filtro nos títulos das colunas", aba.filtro === "A4:N9", aba.filtro);
+
+    await pagina.selectOption("#analiseTransportadora", "");
+    excel = await baixarExcel();
+    confere("Excel de todas: Resumo na frente e uma aba por transportadora", excel.nome === "Fretes - 01-10-2026 a 31-10-2026.xlsx" && JSON.stringify(excel.nomes) === JSON.stringify(["Resumo", "Transp A", "Transp B", "(Sem transportadora)"]), [excel.nome, excel.nomes]);
+    aba = excel.abas["Resumo"];
+    confere("Resumo: cada transportadora com fretes, máquinas, valor, nossa parte e a do cliente", JSON.stringify(aba.linhas[5]) === JSON.stringify(["Transp B", 3, 3, 1050, 500, 550, 0]), aba.linhas[5]);
+    confere("Resumo: total de tudo", JSON.stringify(aba.linhas[7]) === JSON.stringify(["Total", 9, 11, 2990, 2440, 550, 2]) && aba.celulas.B8.f === "SUM(B5:B7)", aba.linhas[7]);
+    confere("Excel: troca técnica mostra a máquina recolhida", excel.abas["(Sem transportadora)"].linhas[4][6] === "WAE1540 (recolhe WAE1541)", excel.abas["(Sem transportadora)"].linhas[4]);
+    confere("Excel: conta do cliente e dividido separam a nossa parte", JSON.stringify(excel.abas["Transp B"].linhas.slice(4, 6).map(l => l.slice(10))) === JSON.stringify([["Conta do cliente", 250, 0, 250], ["Dividido", 400, 100, 300]]), excel.abas["Transp B"].linhas.slice(4, 6));
+
+    await pagina.selectOption("#analiseTipo", "Frete frustrado");
+    let baixou = false;
+    pagina.once("download", () => { baixou = true; });
+    await pagina.click("#btnExcelFretes");
+    await pagina.waitForTimeout(300);
+    confere("nenhum frete com os filtros: avisa e não baixa", !baixou && (await pagina.innerText("#toast")).includes("Nenhum frete com esses filtros"), await pagina.innerText("#toast"));
+    await pagina.selectOption("#analiseTipo", "");
 
     await definirPeriodo(pagina, "2026-01-01", "2026-10-31");
     confere("período longo: uma coluna por semana", (await pagina.innerText("#tituloViagens")) === "Viagens por semana" && (await pagina.$$("#graficoViagens .barra-viagens")).length === 4, (await pagina.$$("#graficoViagens .barra-viagens")).length);

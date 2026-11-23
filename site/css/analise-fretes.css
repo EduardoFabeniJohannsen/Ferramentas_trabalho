@@ -51,6 +51,15 @@
 .atalhos-periodo button.ativo{
     background:#2563eb;
 }
+/* 📥 Excel no fim da barra, em verde (planilha) */
+.barra-analise .btn-excel{
+    margin-left:auto;
+    padding:8px 14px;
+    background:#15803d;
+}
+.barra-analise .btn-excel:hover{
+    background:#166534;
+}
 /* o admin.css estica os inputs da barra: a caixinha fica do tamanho dela */
 .so-concluidos input{
     flex:none;

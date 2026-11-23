@@ -53,6 +53,8 @@ CONTAINER (só admin: quanto se gasta e com quem)
             agendamento é um frete e uma viagem. <strong>Valor</strong> é o que as transportadoras
             cobraram; <strong>nosso custo</strong> é a parte por nossa conta (Nossa conta, ou a
             nossa parte quando o frete é dividido com o cliente).
+            <strong>📥 Excel</strong> baixa os fretes filtrados para a prestação de contas: uma aba
+            por transportadora, com o total.
         </p>
 
         <!-- filtros (analise-filtros.js) -->
@@ -78,12 +80,20 @@ CONTAINER (só admin: quanto se gasta e com quem)
                 <option value="">Todos os tipos</option>
             </select>
 
+            <!-- as que fizeram frete no período (analise-filtros.js) -->
+            <select id="analiseTransportadora" data-mudanca="desenharAnaliseFretes" title="Transportadora">
+                <option value="">Todas as transportadoras</option>
+            </select>
+
             <label class="so-concluidos">
                 <input type="checkbox" id="analiseConcluidos" data-mudanca="desenharAnaliseFretes">
                 Só concluídos
             </label>
 
             <span class="contagem" id="contagemAnalise"></span>
+
+            <!-- analise-excel.js -->
+            <button type="button" class="btn-excel" id="btnExcelFretes" data-clique="baixarExcelFretes" title="Baixar os fretes filtrados em Excel (uma aba por transportadora)">📥 Excel</button>
 
         </div>
 
@@ -240,6 +250,8 @@ CONTAINER (só admin: quanto se gasta e com quem)
 <script src="js/analise-fretes/analise-grafico.js" defer></script>
 <script src="js/analise-fretes/analise-resumo.js" defer></script>
 <script src="js/analise-fretes/analise-tela.js" defer></script>
+<!-- a biblioteca de planilha (js/vendor/xlsx) só é baixada no clique do 📥 Excel -->
+<script src="js/analise-fretes/analise-excel.js" defer></script>
 <script src="js/analise-fretes/analise-init.js" defer></script>
 
 </body>

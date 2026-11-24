@@ -151,22 +151,26 @@
     // cliente: sugere os anteriores e puxa endereço, contato e e-mails
     ligarSugestoesClientes();
 
-    // período: sugestões enquanto digita e formato certo ao sair do campo
-    $("agPeriodo").addEventListener("input", atualizarSugestoesPeriodo);
+    // período (e o da coleta, na entrega/coleta): sugestões enquanto digita e
+    // formato certo ao sair do campo
+    ["agPeriodo", "agPeriodoRecolha"].forEach(id => {
 
-    $("agPeriodo").addEventListener(
-        "change",
-        () => {
+        $(id).addEventListener("input", atualizarSugestoesPeriodo);
 
-            const resultado =
-                normalizarPeriodo($("agPeriodo").value);
+        $(id).addEventListener(
+            "change",
+            () => {
 
-            if(resultado.valor !== undefined){
+                const resultado =
+                    normalizarPeriodo($(id).value);
 
-                $("agPeriodo").value = resultado.valor;
+                if(resultado.valor !== undefined){
+
+                    $(id).value = resultado.valor;
+                }
             }
-        }
-    );
+        );
+    });
 
     // rascunho: guarda sozinho o que for digitado no formulário
     $("modalAgenda").addEventListener("input", agendarRascunho);

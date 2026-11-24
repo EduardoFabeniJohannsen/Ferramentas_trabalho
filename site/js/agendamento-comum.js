@@ -17,7 +17,16 @@ const TIPO_TRANSFERENCIA_UNIDADES = "Transferência entre unidades";
 // expedição; o faturamento da entrega fica guardado (agenda-pagamento.js)
 const TIPO_FRETE_FRUSTRADO = "Frete frustrado";
 
-const TIPOS = ["Entrega", "Coleta", "Transferência", TIPO_TRANSFERENCIA_UNIDADES, "Troca técnica", TIPO_FRETE_FRUSTRADO];
+// o cliente troca de máquina (ex: devolve a WTE12 e passa para uma WTE16): numa
+// viagem só, leva uma e traz a outra, como a troca técnica, mas são dois
+// contratos: o da entrega (a máquina nova, com faturamento) e o da coleta (a que
+// volta: proposta e período da coleta, em agenda-contratos.js)
+const TIPO_ENTREGA_COLETA = "Entrega/Coleta";
+
+const TIPOS = ["Entrega", "Coleta", "Transferência", TIPO_TRANSFERENCIA_UNIDADES, "Troca técnica", TIPO_ENTREGA_COLETA, TIPO_FRETE_FRUSTRADO];
+
+// leva uma máquina e traz outra na mesma viagem (a que volta: plataformaRecolha)
+const TIPOS_COM_RECOLHA = ["Troca técnica", TIPO_ENTREGA_COLETA];
 
 // como o tipo aparece na tela ("Transferência" é a entre obras: o valor salvo
 // continua o de sempre, então os agendamentos antigos não mudam)

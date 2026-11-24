@@ -45,6 +45,7 @@ function somarMovimentos(lista){
         entregas: agendamentosDoTipo(lista, "Entrega"),
         coletas: agendamentosDoTipo(lista, "Coleta"),
         trocas: agendamentosDoTipo(lista, "Troca técnica"),
+        entregasColetas: agendamentosDoTipo(lista, TIPO_ENTREGA_COLETA),
         transferencias: agendamentosDoTipo(lista, "Transferência", TIPO_TRANSFERENCIA_UNIDADES),
         frustrados: agendamentosDoTipo(lista, TIPO_FRETE_FRUSTRADO)
     };

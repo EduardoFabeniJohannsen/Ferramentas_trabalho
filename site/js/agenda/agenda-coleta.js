@@ -50,7 +50,7 @@ function valoresColetaDaEntrega(item){
 // Nada é salvo até clicar em Salvar.
 function copiarEntregaParaColeta(item){
 
-    if(item.tipo !== "Entrega") return;
+    if(!TIPOS_CONTRATO_NOVO.includes(item.tipo)) return;
 
     // já tem um rascunho de agendamento novo: não apaga sem perguntar
     if(

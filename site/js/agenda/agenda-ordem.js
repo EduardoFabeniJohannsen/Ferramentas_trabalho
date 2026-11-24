@@ -48,8 +48,8 @@ function ordenarAgendamentos(lista){
 
     const ordemTipos =
         ordem === "coletas"
-            ? ["Coleta", "Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES, "Transferência"]
-            : ["Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES, "Coleta", "Transferência"];
+            ? ["Coleta", "Entrega", "Troca técnica", TIPO_ENTREGA_COLETA, TIPO_TRANSFERENCIA_UNIDADES, "Transferência"]
+            : ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA, TIPO_TRANSFERENCIA_UNIDADES, "Coleta", "Transferência"];
 
     // Horário ▼ no transportador: dias mais recentes primeiro (agenda-ordem-colunas.js)
     const sentido = sentidoDasDatas();

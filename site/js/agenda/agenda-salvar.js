@@ -69,12 +69,15 @@ async function salvarAgendamento(){
         dados.freteNossa = "";
     }
 
-    // troca técnica precisa da máquina de recolha; nos outros tipos não vale
-    if(dados.tipo === "Troca técnica"){
+    // troca técnica e entrega/coleta precisam da máquina que volta; nos outros tipos não vale
+    if(TIPOS_COM_RECOLHA.includes(dados.tipo)){
 
         if(!dados.plataformaRecolha){
 
-            return avisoFormulario("Informe a máquina de recolha da troca", "demanda");
+            return avisoFormulario(
+                dados.tipo === TIPO_ENTREGA_COLETA ? "Informe a máquina de coleta" : "Informe a máquina de recolha da troca",
+                "demanda"
+            );
         }
 
     }else{
@@ -116,6 +119,12 @@ async function salvarAgendamento(){
 
         dados.periodo = periodo.valor;
     }
+
+    // entrega/coleta: o contrato da máquina que volta (agenda-contratos.js)
+    const erroContratoColeta =
+        conferirContratoColeta(dados, idEmEdicao ? agendamentos.find(ag => ag.id === idEmEdicao) : null);
+
+    if(erroContratoColeta) return avisoFormulario(erroContratoColeta, "demanda");
 
     // outros contratos: só na coleta (agenda-contratos.js)
     const contratos = conferirOutrosContratos(dados);

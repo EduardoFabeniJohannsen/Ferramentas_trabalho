@@ -570,7 +570,8 @@ MODAL (novo / editar)
                     </div>
 
                     <div class="largo" id="blocoRecolha" style="display:none">
-                        <label for="agPlataformaRecolha">Máquina de recolha (volta com a troca)</label>
+                        <!-- troca técnica: "recolha"; entrega/coleta: "coleta" (agenda-form-campos.js) -->
+                        <label for="agPlataformaRecolha" id="rotuloRecolha">Máquina de recolha (volta com a troca)</label>
                         <input type="text" id="agPlataformaRecolha" autocomplete="off" placeholder="Ex: WTE10014">
                         <p class="aviso-patrimonio" id="avisoPatrimonioRecolha" style="display:none"></p>
                     </div>
@@ -591,15 +592,32 @@ MODAL (novo / editar)
                     </div>
 
                     <div>
-                        <label for="agProposta">Nº da proposta</label>
+                        <label for="agProposta" id="rotuloProposta">Nº da proposta</label>
                         <input type="text" id="agProposta">
                     </div>
 
                     <div>
-                        <label for="agPeriodo">Período</label>
+                        <label for="agPeriodo" id="rotuloPeriodo">Período</label>
                         <input
                             type="text"
                             id="agPeriodo"
+                            list="listaPeriodos"
+                            autocomplete="off"
+                            placeholder="16 dias, 3 períodos ou Anual"
+                        >
+                    </div>
+
+                    <!-- entrega/coleta: o contrato da máquina que volta (o de cima é o da entrega) -->
+                    <div class="campo-contrato-coleta" style="display:none">
+                        <label for="agPropostaRecolha">Nº da proposta da coleta</label>
+                        <input type="text" id="agPropostaRecolha" autocomplete="off">
+                    </div>
+
+                    <div class="campo-contrato-coleta" style="display:none">
+                        <label for="agPeriodoRecolha">Período da coleta</label>
+                        <input
+                            type="text"
+                            id="agPeriodoRecolha"
                             list="listaPeriodos"
                             autocomplete="off"
                             placeholder="16 dias, 3 períodos ou Anual"

@@ -85,13 +85,13 @@ function criarItemAgenda(item){
 
     if(botaoLigado("zap")) botoes.appendChild(botaoZap);
 
-    // faturamento (forma, prazo e e-mails): só entrega tem. Nos outros
-    // tipos fica invisível, pra manter os botões alinhados.
+    // faturamento (forma, prazo e e-mails): só entrega e entrega/coleta têm. Nos
+    // outros tipos fica invisível, pra manter os botões alinhados.
     const botaoFaturamento = criar("button", "btn-faturamento", "🧾");
 
     botaoFaturamento.type = "button";
 
-    if(item.tipo === "Entrega"){
+    if(TIPOS_CONTRATO_NOVO.includes(item.tipo)){
 
         botaoFaturamento.title = "Copiar faturamento (pagamento, prazo e e-mails)";
 
@@ -109,13 +109,14 @@ function criarItemAgenda(item){
 
     if(botaoLigado("faturamento")) botoes.appendChild(botaoFaturamento);
 
-    // entrega: cria uma coleta a partir dela. Nos outros tipos fica um
-    // botão invisível, só pra os botões da direita ficarem alinhados.
+    // entrega (e entrega/coleta, da máquina nova): cria uma coleta a partir dela.
+    // Nos outros tipos fica um botão invisível, só pra os botões da direita
+    // ficarem alinhados.
     const botaoColeta = criar("button", "btn-coleta", "↩️");
 
     botaoColeta.type = "button";
 
-    if(item.tipo === "Entrega"){
+    if(TIPOS_CONTRATO_NOVO.includes(item.tipo)){
 
         botaoColeta.title = "Criar uma coleta a partir desta entrega";
 

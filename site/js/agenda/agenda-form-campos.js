@@ -18,6 +18,9 @@ const CAMPOS_AGENDA = [
     ["status", "agStatus"],
     ["plataforma", "agPlataforma"],
     ["plataformaRecolha", "agPlataformaRecolha"],
+    // entrega/coleta: o contrato da máquina que volta
+    ["propostaRecolha", "agPropostaRecolha"],
+    ["periodoRecolha", "agPeriodoRecolha"],
     ["transportadora", "agTransportadora"],
     ["motorista", "agMotorista"],
     ["cliente", "agCliente"],
@@ -205,15 +208,16 @@ function normalizarPeriodo(texto){
 
 
 // sugestões enquanto digita: começou um número, oferece "N dias",
-// "N períodos" e os dias de 1 a 30 que começam com o que foi digitado
-function atualizarSugestoesPeriodo(){
+// "N períodos" e os dias de 1 a 30 que começam com o que foi digitado (no
+// Período ou no Período da coleta: a lista de sugestões é a mesma)
+function atualizarSugestoesPeriodo(evento){
 
     const lista = $("listaPeriodos");
 
     if(!lista) return;
 
     const texto =
-        $("agPeriodo").value.trim();
+        (evento?.target || $("agPeriodo")).value.trim();
 
     const opcoes = [];
 
@@ -263,17 +267,33 @@ function atualizarSugestoesPeriodo(){
 }
 
 
-// troca técnica: aparece a máquina de recolha
+// troca técnica e entrega/coleta: aparece a máquina que volta; na entrega/coleta
+// também o contrato dela (proposta e período da coleta)
 function atualizarCamposTipo(){
 
-    const troca =
-        $("agTipo").value === "Troca técnica";
+    const tipo = $("agTipo").value;
+
+    const troca = TIPOS_COM_RECOLHA.includes(tipo);
+
+    const entregaColeta = tipo === TIPO_ENTREGA_COLETA;
 
     $("blocoRecolha").style.display =
         troca ? "" : "none";
 
+    $("rotuloRecolha").innerText =
+        entregaColeta ? "Máquina de coleta (volta na mesma viagem)" : "Máquina de recolha (volta com a troca)";
+
     $("rotuloPlataforma").innerText =
         troca ? "Máquina de entrega" : "Plataforma";
+
+    $("rotuloProposta").innerText = entregaColeta ? "Nº da proposta da entrega" : "Nº da proposta";
+
+    $("rotuloPeriodo").innerText = entregaColeta ? "Período da entrega" : "Período";
+
+    document.querySelectorAll(".campo-contrato-coleta").forEach(campo => {
+
+        campo.style.display = entregaColeta ? "" : "none";
+    });
 
     atualizarRetirada();
 
@@ -317,7 +337,7 @@ function mostrarRetirada(aberta){
 function atualizarRetirada(){
 
     mostrarRetirada(
-        $("agTipo").value !== "Entrega" || retiradaPreenchida()
+        !TIPOS_CONTRATO_NOVO.includes($("agTipo").value) || retiradaPreenchida()
     );
 }
 

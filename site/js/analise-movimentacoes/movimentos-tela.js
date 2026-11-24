@@ -40,16 +40,18 @@ function desenharResumoMovimentos(lista){
 
     const troca = ["troca técnica", "trocas técnicas"];
 
+    const entregaColeta = ["entrega/coleta", "entregas/coletas"];
+
     $("resumoMovimentos").replaceChildren(
         cartaoResumo(
             "Saídas",
             numeroBR(soma.saidas),
-            textoAgendamentosMovimentos([[soma.entregas, "entrega", "entregas"], [soma.trocas, ...troca]])
+            textoAgendamentosMovimentos([[soma.entregas, "entrega", "entregas"], [soma.entregasColetas, ...entregaColeta], [soma.trocas, ...troca]])
         ),
         cartaoResumo(
             "Retornos",
             numeroBR(soma.retornos),
-            textoAgendamentosMovimentos([[soma.coletas, "coleta", "coletas"], [soma.trocas, ...troca]])
+            textoAgendamentosMovimentos([[soma.coletas, "coleta", "coletas"], [soma.entregasColetas, ...entregaColeta], [soma.trocas, ...troca]])
         ),
         cartaoResumo(
             "Saldo",

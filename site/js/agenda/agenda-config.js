@@ -22,7 +22,11 @@
 let TRANSPORTADORAS = [];
 
 // o que a expedição mostra: o que sai da W Rental
-const TIPOS_EXPEDICAO = ["Entrega", "Troca técnica", TIPO_TRANSFERENCIA_UNIDADES];
+const TIPOS_EXPEDICAO = ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA, TIPO_TRANSFERENCIA_UNIDADES];
+
+// leva uma máquina num contrato novo: tem a etapa Faturamento (e o botão 🧾) e,
+// depois, a coleta dela (botão ↩️)
+const TIPOS_CONTRATO_NOVO = ["Entrega", TIPO_ENTREGA_COLETA];
 
 // quem vendeu (campo Vendedor do formulário)
 const VENDEDORES = ["Eduardo", "Maria Luiza", "Fernanda", "Abdan", "Julie"];

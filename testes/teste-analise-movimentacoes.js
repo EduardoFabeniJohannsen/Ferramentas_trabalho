@@ -173,6 +173,8 @@ let navegador = null;
     confere("máquinas por dia (11 em 6 dias) e o dia mais cheio", r["Máquinas por dia"][0] === "1,8" && r["Máquinas por dia"][1].includes("02/10 (4)"), r["Máquinas por dia"]);
     confere("transferências (entre obras e entre unidades) fora do saldo", r["Transferências"][0] === "3" && r["Transferências"][1] === "2 agendamentos entre obras ou unidades (fora do saldo)", r["Transferências"]);
     confere("frete frustrado fora do saldo", r["Fretes frustrados"][0] === "1", r["Fretes frustrados"]);
+    const entregaColeta = await pagina.evaluate(() => movimentosDaLinha({ id: 50, data: "2026-10-20", tipo: "Entrega/Coleta", status: "Confirmado", plataforma: "WTE16R010", plataforma_recolha: "WTE12R020", cliente: "X" }).map(m => `${m.sentido}:${m.modelo}`).join(" "));
+    confere("entrega/coleta: a máquina nova sai e a outra volta", entregaColeta === "saida:WTE16 retorno:WTE12", entregaColeta);
 
     let linhas = await tabela(pagina, "corpoModelosMovimentos");
     confere("por modelo: mais movimento primeiro, sem máquina por último (transferência não entra)", JSON.stringify(linhas) === JSON.stringify([["WTE12", "4", "3", "+1"], ["WAE15", "2", "1", "+1"], ["Sem máquina informada", "0", "1", "−1"]]), linhas);

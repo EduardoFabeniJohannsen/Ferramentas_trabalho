@@ -448,7 +448,7 @@ const confere = (nome, ok, extra) => {
     await pagina.click("#btnTipos");
     confere("tipos: abrir fecha a lista de datas", await visivelAgora("#painelTipos") && !(await visivelAgora("#painelDatas")));
     await pagina.uncheck("#marcarTodosTipos");
-    await pagina.locator("#listaTiposFiltro label", { hasText: "Entrega" }).locator("input").check();
+    await pagina.locator("#listaTiposFiltro label", { has: pagina.locator(".tag", { hasText: /^Entrega$/ }) }).locator("input").check();
     confere("tipos: lista segue aberta", await visivelAgora("#painelTipos") && await visivelAgora("#painelFiltros"));
     await pagina.click("#btnSemPatrimonio");
     confere("sem patrimônio mantém aberto", await visivelAgora("#painelFiltros"));
@@ -673,10 +673,10 @@ const confere = (nome, ok, extra) => {
         inserirAgendamento = async (dados) => { window.__inseridos.push(dados); return { ...dados, id: 99 }; };
     });
     const tiposForm = await pagina.$$eval("#agTipo option", l => l.map(o => `${o.value}=${o.textContent}`));
-    confere("tipos: entre obras (o valor de sempre), entre unidades e frete frustrado", JSON.stringify(tiposForm) === JSON.stringify([
+    confere("tipos: entre obras (o valor de sempre), entre unidades, entrega/coleta e frete frustrado", JSON.stringify(tiposForm) === JSON.stringify([
         "Entrega=Entrega", "Coleta=Coleta", "Transferência=Transferência entre obras",
         "Transferência entre unidades=Transferência entre unidades", "Troca técnica=Troca técnica",
-        "Frete frustrado=Frete frustrado"
+        "Entrega/Coleta=Entrega/Coleta", "Frete frustrado=Frete frustrado"
     ]), tiposForm);
     const tiposFiltro = await pagina.evaluate(() => { desenharPainelTipos(); return [...document.querySelectorAll("#listaTiposFiltro .tag")].map(e => e.textContent); });
     confere("o filtro de tipo usa os mesmos nomes", tiposFiltro.includes("Transferência entre obras") && tiposFiltro.includes("Transferência entre unidades"), tiposFiltro);

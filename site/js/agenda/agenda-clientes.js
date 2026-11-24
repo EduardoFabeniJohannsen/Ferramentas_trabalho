@@ -152,7 +152,7 @@ function localDoCliente(item){
     const lado =
         item.tipo === "Coleta"
             ? { nome: item.origemNome, endereco: item.origemEndereco, link: item.linkOrigem }
-            : (item.tipo === "Entrega" || item.tipo === "Troca técnica")
+            : (item.tipo === "Entrega" || TIPOS_COM_RECOLHA.includes(item.tipo))
                 ? { nome: item.destinoNome, endereco: item.destinoEndereco, link: item.linkDestino }
                 : null;
 
@@ -194,7 +194,7 @@ function camposLocalCliente(){
         return { nome: "agOrigemNome", endereco: "agOrigemEndereco", link: "agLinkOrigem" };
     }
 
-    if(tipo === "Entrega" || tipo === "Troca técnica"){
+    if(tipo === "Entrega" || TIPOS_COM_RECOLHA.includes(tipo)){
 
         return { nome: "agDestinoNome", endereco: "agDestinoEndereco", link: "agLinkDestino" };
     }
@@ -351,11 +351,11 @@ function textoPagamentoFormulario(){
 }
 
 
-// em entrega: forma e prazos da última entrega dele, se o faturamento está
-// vazio ou ainda com o que foi preenchido sozinho
+// em entrega (e entrega/coleta): forma e prazos da última entrega dele, se o
+// faturamento está vazio ou ainda com o que foi preenchido sozinho
 function preencherPagamentoCliente(cliente){
 
-    if($("agTipo").value !== "Entrega") return false;
+    if(!TIPOS_CONTRATO_NOVO.includes($("agTipo").value)) return false;
 
     const livre =
         !faturamentoPreenchido() ||
@@ -364,7 +364,7 @@ function preencherPagamentoCliente(cliente){
     if(!livre) return false;
 
     const ultima =
-        cliente.itens.find(item => item.tipo === "Entrega" && item.formaPagamento);
+        cliente.itens.find(item => TIPOS_CONTRATO_NOVO.includes(item.tipo) && item.formaPagamento);
 
     $("agFormaPagamento").value = ultima ? ultima.formaPagamento : "";
 

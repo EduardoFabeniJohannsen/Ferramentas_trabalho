@@ -147,12 +147,12 @@ function validarPrazos(){
 // BLOCO DE FATURAMENTO NO FORMULÁRIO
 // ======================================
 
-// a etapa Faturamento só existe nas entregas (a coleta, a transferência e
-// a troca não têm)
+// a etapa Faturamento só existe na entrega e na entrega/coleta (TIPOS_CONTRATO_NOVO:
+// a coleta, a transferência e a troca técnica não têm)
 function atualizarBlocoFaturamento(){
 
     document.querySelector(".etapa-faturamento").style.display =
-        $("agTipo").value === "Entrega" ? "" : "none";
+        TIPOS_CONTRATO_NOVO.includes($("agTipo").value) ? "" : "none";
 }
 
 
@@ -237,12 +237,12 @@ function coletarFaturamento(tipo){
         return { dados: {} };
     }
 
-    if(tipo !== "Entrega"){
+    if(!TIPOS_CONTRATO_NOVO.includes(tipo)){
 
         if(
             faturamentoPreenchido() &&
             !confirm(
-                "Só entregas têm faturamento (pagamento e pedido de compra). " +
+                "Só entrega e entrega/coleta têm faturamento (pagamento e pedido de compra). " +
                 "O que está preenchido aqui será apagado ao salvar. Continuar?"
             )
         ){

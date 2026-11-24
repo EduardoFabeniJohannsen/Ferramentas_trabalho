@@ -6,9 +6,10 @@
 // a máquina sai do pátio para o cliente. Não entram: a transferência entre obras
 // (a mesma máquina muda de obra), a entre unidades (fica na W Rental) e o frete
 // frustrado (a máquina voltou)
-const TIPOS_SAEM_DEMANDA = ["Entrega", "Troca técnica"];
+const TIPOS_SAEM_DEMANDA = ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA];
 
-// a máquina volta para o pátio (a recolha da troca técnica volta com defeito: não conta)
+// a máquina volta para o pátio (a recolha da troca técnica volta com defeito: não
+// conta; a da entrega/coleta conta, em maquinasDaDemanda)
 const TIPOS_VOLTAM_DEMANDA = ["Coleta"];
 
 // entrega sem nada na coluna plataforma
@@ -71,6 +72,19 @@ function ordemDemanda(a, b){
 }
 
 
+// as máquinas de um agendamento na demanda: [{ texto, volta }]. Na entrega/coleta
+// uma sai e a outra volta (a coleta) no mesmo agendamento
+function maquinasDaDemanda(item){
+
+    if(item.tipo === TIPO_ENTREGA_COLETA){
+
+        return [{ texto: item.plataforma, volta: false }, { texto: item.plataformaRecolha, volta: true }];
+    }
+
+    return [{ texto: item.plataforma, volta: TIPOS_VOLTAM_DEMANDA.includes(item.tipo) }];
+}
+
+
 // { modelos: [{ modelo, saem, semPatrimonio, voltam, agendamentos }], total, semData }
 // agendamentos de cada modelo: [{ item, quantidade, patrimonio, volta }] por dia e horário
 function demandaPorModelo(itens, de, ate){
@@ -109,11 +123,9 @@ function demandaPorModelo(itens, de, ate){
             (Number(a.id) || 0) - (Number(b.id) || 0)
         );
 
-    doPeriodo.forEach(item => {
+    doPeriodo.forEach(item => maquinasDaDemanda(item).forEach(({ texto, volta }) => {
 
-        const volta = TIPOS_VOLTAM_DEMANDA.includes(item.tipo);
-
-        let partes = separarPlataformas(item.plataforma);
+        let partes = separarPlataformas(texto);
 
         // coleta sem máquina não acrescenta nada; entrega sem máquina ainda precisa de uma
         if(!partes.length && volta) return;
@@ -149,7 +161,7 @@ function demandaPorModelo(itens, de, ate){
                 total.semPatrimonio += quantidade;
             }
         });
-    });
+    }));
 
     return { modelos: [...modelos.values()].sort(ordemDemanda), total, semData };
 }

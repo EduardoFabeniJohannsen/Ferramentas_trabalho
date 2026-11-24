@@ -1,7 +1,7 @@
 // ======================================
 // ANÁLISE DE MOVIMENTAÇÕES - DADOS
 // ======================================
-// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e transforma cada um nas máquinas que ele movimenta: uma linha por modelo, com a quantidade ("2x WTE12" conta 2) e o sentido. Entrega sai, coleta volta, troca técnica sai uma e volta a recolha; transferências e frete frustrado ficam à parte. Cancelado não entra. Abre para o admin e para quem tem o acesso "analise-movimentacoes" (página Admin).
+// Busca os agendamentos com data no período (buscarAgendamentosDoPeriodo, em analise-comum.js) e transforma cada um nas máquinas que ele movimenta: uma linha por modelo, com a quantidade ("2x WTE12" conta 2) e o sentido. Entrega sai, coleta volta, troca técnica e entrega/coleta saem uma e volta a outra; transferências e frete frustrado ficam à parte. Cancelado não entra. Abre para o admin e para quem tem o acesso "analise-movimentacoes" (página Admin).
 
 const COLUNAS_ANALISE_MOVIMENTOS =
     "id, data, tipo, status, plataforma, plataforma_recolha, cliente";
@@ -14,6 +14,7 @@ const MOVIMENTOS_DO_TIPO = {
     "Entrega": [["plataforma", "saida"]],
     "Coleta": [["plataforma", "retorno"]],
     "Troca técnica": [["plataforma", "saida"], ["plataforma_recolha", "retorno"]],
+    [TIPO_ENTREGA_COLETA]: [["plataforma", "saida"], ["plataforma_recolha", "retorno"]],
     "Transferência": [["plataforma", "transferencia"]],
     [TIPO_TRANSFERENCIA_UNIDADES]: [["plataforma", "transferencia"]],
     [TIPO_FRETE_FRUSTRADO]: [["plataforma", "frustrado"]]

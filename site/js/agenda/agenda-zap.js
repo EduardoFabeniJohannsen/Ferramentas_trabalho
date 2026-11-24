@@ -184,12 +184,13 @@ function montarTextoZap(item){
         return { erro: "Informe o frete do agendamento" };
     }
 
+    // entrega/coleta: igual à troca (leva uma, traz a outra), com o próprio nome
     const troca =
-        item.tipo === "Troca técnica";
+        TIPOS_COM_RECOLHA.includes(item.tipo);
 
     if(troca && !item.plataformaRecolha){
 
-        return { erro: "Informe a máquina de recolha da troca" };
+        return { erro: item.tipo === TIPO_ENTREGA_COLETA ? "Informe a máquina de coleta" : "Informe a máquina de recolha da troca" };
     }
 
     // dividido (agenda-utils.js): o cliente paga uma parte e nós a outra
@@ -227,7 +228,7 @@ function montarTextoZap(item){
 
     const linhas = [
 
-        `🚚 AGENDAMENTO DE ${troca ? "TROCA" : String(item.tipo).toUpperCase()}`,
+        `🚚 AGENDAMENTO DE ${item.tipo === "Troca técnica" ? "TROCA" : String(item.tipo).toUpperCase()}`,
 
         "",
 

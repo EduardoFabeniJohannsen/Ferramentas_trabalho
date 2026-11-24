@@ -82,13 +82,13 @@ function patrimonioIncompleto(texto){
 }
 
 
-// na troca técnica vale também a máquina de recolha
+// na troca técnica e na entrega/coleta vale também a máquina que volta
 function itemSemPatrimonio(item){
 
     return (
         patrimonioIncompleto(item.plataforma) ||
         (
-            item.tipo === "Troca técnica" &&
+            TIPOS_COM_RECOLHA.includes(item.tipo) &&
             patrimonioIncompleto(item.plataformaRecolha)
         )
     );

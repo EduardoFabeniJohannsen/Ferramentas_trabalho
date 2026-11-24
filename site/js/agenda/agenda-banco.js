@@ -32,6 +32,9 @@ const CAMPOS_BANCO = {
     status: "status",
     plataforma: "plataforma",
     plataformaRecolha: "plataforma_recolha",
+    // entrega/coleta: o contrato da máquina que volta (agenda-contratos.js)
+    propostaRecolha: "proposta_recolha",
+    periodoRecolha: "periodo_recolha",
     cliente: "cliente",
     proposta: "proposta",
     transportadora: "transportadora",

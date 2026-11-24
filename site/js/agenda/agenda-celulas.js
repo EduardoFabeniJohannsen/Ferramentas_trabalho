@@ -3,14 +3,14 @@
 // ======================================
 // Monta o conteúdo de cada coluna de um agendamento.
 
-// entrega e troca saem da W Rental e coleta volta pra ela, quando o local fica
-// vazio (também usado para ordenar pela coluna, agenda-ordem-colunas.js)
+// entrega, troca e entrega/coleta saem da W Rental e coleta volta pra ela, quando
+// o local fica vazio (também usado para ordenar pela coluna, agenda-ordem-colunas.js)
 function origemNomeDaTela(item){
 
     if(
         !item.origemNome &&
         !item.origemEndereco &&
-        (item.tipo === "Entrega" || item.tipo === "Troca técnica")
+        (item.tipo === "Entrega" || TIPOS_COM_RECOLHA.includes(item.tipo))
     ){
         return LOCAL_PADRAO;
     }
@@ -88,13 +88,13 @@ function criarCelulasAgenda(item){
     celulas.tipo = celula("tipo", tagTipo);
 
     // ---------- plataforma / cliente ----------
-    // troca técnica mostra as duas máquinas: a que vai e a que volta
+    // troca técnica e entrega/coleta mostram as duas máquinas: a que vai e a que volta
 
     const titulo = criar("p", "ag-titulo");
 
     titulo.appendChild(criarMaquina(item.plataforma));
 
-    if(item.tipo === "Troca técnica" && item.plataformaRecolha){
+    if(TIPOS_COM_RECOLHA.includes(item.tipo) && item.plataformaRecolha){
 
         titulo.appendChild(criar("span", "", " ⇄ "));
 

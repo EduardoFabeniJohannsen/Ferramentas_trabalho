@@ -120,11 +120,8 @@ async function salvarAgendamento(){
         dados.periodo = periodo.valor;
     }
 
-    // entrega/coleta: o contrato da máquina que volta (agenda-contratos.js)
-    const erroContratoColeta =
-        conferirContratoColeta(dados, idEmEdicao ? agendamentos.find(ag => ag.id === idEmEdicao) : null);
-
-    if(erroContratoColeta) return avisoFormulario(erroContratoColeta, "demanda");
+    // entrega/coleta: a referência da coleta (agenda-entrega-coleta.js)
+    conferirReferenciaColeta(dados, idEmEdicao ? agendamentos.find(ag => ag.id === idEmEdicao) : null);
 
     // outros contratos: só na coleta (agenda-contratos.js)
     const contratos = conferirOutrosContratos(dados);

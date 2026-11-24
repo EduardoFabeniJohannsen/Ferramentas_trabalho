@@ -41,17 +41,8 @@ function listaOutrosContratos(valor, manterVazias = false){
 }
 
 
-// o primeiro (os campos de sempre) e os outros; fora da coleta, só o primeiro.
-// Entrega/coleta: o da entrega e o da coleta (se tiver proposta ou período;
-// contratoDaColeta em agenda-entrega-coleta.js)
+// o primeiro (os campos de sempre) e os outros; fora da coleta, só o primeiro
 function contratosDoAgendamento(item){
-
-    if(item.tipo === TIPO_ENTREGA_COLETA){
-
-        const coleta = contratoDaColeta(item);
-
-        return coleta.proposta || coleta.periodo ? [contratoLimpo(item), coleta] : [contratoLimpo(item)];
-    }
 
     const outros =
         item.tipo === TIPO_COM_OUTROS_CONTRATOS
@@ -99,8 +90,8 @@ function textoPropostasAgendamento(item){
 
 function referenciasZap(item){
 
-    // entrega/coleta: sempre as duas, a da entrega e a da coleta (agenda-entrega-coleta.js)
-    if(item.tipo === TIPO_ENTREGA_COLETA) return [referenciaZap(item), referenciaColetaZap(item)];
+    // entrega/coleta: as duas digitadas, a da coleta e a da entrega (agenda-entrega-coleta.js)
+    if(item.tipo === TIPO_ENTREGA_COLETA) return referenciasEntregaColetaZap(item);
 
     const contratos = contratosDoAgendamento(item);
 

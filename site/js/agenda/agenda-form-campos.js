@@ -18,9 +18,6 @@ const CAMPOS_AGENDA = [
     ["status", "agStatus"],
     ["plataforma", "agPlataforma"],
     ["plataformaRecolha", "agPlataformaRecolha"],
-    // entrega/coleta: o contrato da máquina que volta
-    ["propostaRecolha", "agPropostaRecolha"],
-    ["periodoRecolha", "agPeriodoRecolha"],
     ["transportadora", "agTransportadora"],
     ["motorista", "agMotorista"],
     ["cliente", "agCliente"],
@@ -41,6 +38,8 @@ const CAMPOS_AGENDA = [
     ["obsExpedicao", "agObsExpedicao"],
     ["obsEntrega", "agObsEntrega"],
     ["referencia", "agReferencia"],
+    // entrega/coleta: a referência da coleta (agenda-entrega-coleta.js)
+    ["referenciaRecolha", "agReferenciaRecolha"],
     ["contato", "agContato"],
     ["card", "agCard"],
     ["emails", "agEmails"]
@@ -208,16 +207,15 @@ function normalizarPeriodo(texto){
 
 
 // sugestões enquanto digita: começou um número, oferece "N dias",
-// "N períodos" e os dias de 1 a 30 que começam com o que foi digitado (no
-// Período ou no Período da coleta: a lista de sugestões é a mesma)
-function atualizarSugestoesPeriodo(evento){
+// "N períodos" e os dias de 1 a 30 que começam com o que foi digitado
+function atualizarSugestoesPeriodo(){
 
     const lista = $("listaPeriodos");
 
     if(!lista) return;
 
     const texto =
-        (evento?.target || $("agPeriodo")).value.trim();
+        $("agPeriodo").value.trim();
 
     const opcoes = [];
 
@@ -268,7 +266,7 @@ function atualizarSugestoesPeriodo(evento){
 
 
 // troca técnica e entrega/coleta: aparece a máquina que volta; na entrega/coleta
-// também o contrato dela (proposta e período da coleta)
+// também a referência da coleta (e a de sempre vira a da entrega)
 function atualizarCamposTipo(){
 
     const tipo = $("agTipo").value;
@@ -286,11 +284,12 @@ function atualizarCamposTipo(){
     $("rotuloPlataforma").innerText =
         troca ? "Máquina de entrega" : "Plataforma";
 
-    $("rotuloProposta").innerText = entregaColeta ? "Nº da proposta da entrega" : "Nº da proposta";
+    $("rotuloReferencia").innerText =
+        entregaColeta
+            ? "Referência da entrega — mensagem do Zap (digitada à mão)"
+            : "Referência da mensagem do Zap (ficha / proposta — digitada à mão)";
 
-    $("rotuloPeriodo").innerText = entregaColeta ? "Período da entrega" : "Período";
-
-    document.querySelectorAll(".campo-contrato-coleta").forEach(campo => {
+    document.querySelectorAll(".so-entrega-coleta").forEach(campo => {
 
         campo.style.display = entregaColeta ? "" : "none";
     });

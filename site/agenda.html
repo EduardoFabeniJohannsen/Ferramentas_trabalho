@@ -592,32 +592,15 @@ MODAL (novo / editar)
                     </div>
 
                     <div>
-                        <label for="agProposta" id="rotuloProposta">Nº da proposta</label>
+                        <label for="agProposta">Nº da proposta</label>
                         <input type="text" id="agProposta">
                     </div>
 
                     <div>
-                        <label for="agPeriodo" id="rotuloPeriodo">Período</label>
+                        <label for="agPeriodo">Período</label>
                         <input
                             type="text"
                             id="agPeriodo"
-                            list="listaPeriodos"
-                            autocomplete="off"
-                            placeholder="16 dias, 3 períodos ou Anual"
-                        >
-                    </div>
-
-                    <!-- entrega/coleta: o contrato da máquina que volta (o de cima é o da entrega) -->
-                    <div class="campo-contrato-coleta" style="display:none">
-                        <label for="agPropostaRecolha">Nº da proposta da coleta</label>
-                        <input type="text" id="agPropostaRecolha" autocomplete="off">
-                    </div>
-
-                    <div class="campo-contrato-coleta" style="display:none">
-                        <label for="agPeriodoRecolha">Período da coleta</label>
-                        <input
-                            type="text"
-                            id="agPeriodoRecolha"
                             list="listaPeriodos"
                             autocomplete="off"
                             placeholder="16 dias, 3 períodos ou Anual"
@@ -638,8 +621,15 @@ MODAL (novo / editar)
                         <input type="hidden" id="agOutrosContratos">
                     </div>
 
+                    <!-- entrega/coleta: uma referência para cada proposta, digitada inteira;
+                         a da coleta sai primeiro no Zap (agenda-entrega-coleta.js) -->
+                    <div class="largo so-entrega-coleta" style="display:none">
+                        <label for="agReferenciaRecolha">Referência da coleta — mensagem do Zap (digitada à mão)</label>
+                        <input type="text" id="agReferenciaRecolha" autocomplete="off" placeholder="Ex: ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA CLIENTE_WTE14_2 DIAS - Proposta: 713740">
+                    </div>
+
                     <div class="largo">
-                        <label for="agReferencia">Referência da mensagem do Zap (ficha / proposta — digitada à mão)</label>
+                        <label for="agReferencia" id="rotuloReferencia">Referência da mensagem do Zap (ficha / proposta — digitada à mão)</label>
                         <input type="text" id="agReferencia" placeholder="Ficha / referência">
                     </div>
 

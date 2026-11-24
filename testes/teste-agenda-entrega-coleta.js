@@ -149,6 +149,27 @@ let navegador = null;
     const erroZap = await pagina.evaluate(() => montarTextoZap({ ...agendamentos.find(a => a.id === 1), plataformaRecolha: "" }).erro);
     confere("Zap sem a máquina de coleta: avisa", erroZap === "Informe a máquina de coleta", erroZap);
 
+    // referência digitada à mão (o nome da proposta no sistema): a da coleta sai no mesmo jeito
+    const referencias = (extra) => pagina.evaluate((extra) => {
+        const resultado = montarTextoZap({ ...agendamentos.find(a => a.id === 1), ...extra });
+        return resultado.erro || resultado.texto.split(String.fromCharCode(10)).filter(linha => linha.startsWith("* ") && linha.includes("Proposta"));
+    }, extra);
+    const orbmaq = { plataforma: "WTE14R001", plataformaRecolha: "WTE16R002", proposta: "713740", periodo: "2 dias", propostaRecolha: "713833", periodoRecolha: "", referencia: "ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA ORBMAQ_WTE14_2 DIAS" };
+    const esperado = JSON.stringify([
+        "* ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA ORBMAQ_WTE14_2 DIAS - Proposta: 713740",
+        "* ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA ORBMAQ_WTE16_2 DIAS - Proposta: 713833"
+    ]);
+    let refs = await referencias(orbmaq);
+    confere("Zap com a referência digitada: as duas propostas no mesmo jeito (o modelo de cada máquina)", JSON.stringify(refs) === esperado, refs);
+    refs = await referencias({ ...orbmaq, referencia: "ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA ORBMAQ_WTE14_2 DIAS - Proposta: 713740" });
+    confere("Zap: digitada já com a proposta da entrega, a da coleta sai com a dela", JSON.stringify(refs) === esperado, refs);
+    refs = await referencias({ ...orbmaq, periodoRecolha: "15 dias" });
+    confere("Zap: a coleta com outro período troca o período também", refs[1] === "* ORÇAMENTO DE LOCAÇÃO DE PLATAFORMA ORBMAQ_WTE16_15 DIAS - Proposta: 713833", refs);
+    refs = await referencias({ ...orbmaq, referencia: "", cliente: "Orbmaq" });
+    confere("Zap sem referência digitada: as duas montadas (período da coleta em branco = o da entrega)", JSON.stringify(refs) === JSON.stringify(["* ORBMAQ_WTE14_2 DIAS - Proposta: 713740", "* ORBMAQ_WTE16_2 DIAS - Proposta: 713833"]), refs);
+    refs = await referencias({ ...orbmaq, propostaRecolha: "" });
+    confere("Zap sem a proposta da coleta: avisa (não sai com uma só)", refs === "Informe o nº da proposta da coleta", refs);
+
     // ---------- 📦 Demanda ----------
     const demanda = await pagina.evaluate(([de, ate]) => demandaPorModelo(agendamentos, de, ate).modelos.map(m => `${m.modelo}:${m.saem}/${m.voltam}`).sort().join(" "), [dia(0), dia(0)]);
     confere("Demanda: a máquina nova sai e a da coleta volta (a recolha da troca técnica não volta)", demanda === "WAE18:1/0 WTE12:1/1 WTE16:1/0", demanda);

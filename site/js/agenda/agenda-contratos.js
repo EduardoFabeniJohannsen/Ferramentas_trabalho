@@ -42,7 +42,8 @@ function listaOutrosContratos(valor, manterVazias = false){
 
 
 // o primeiro (os campos de sempre) e os outros; fora da coleta, só o primeiro.
-// Entrega/coleta: o da entrega e o da coleta (se tiver proposta ou período)
+// Entrega/coleta: o da entrega e o da coleta (se tiver proposta ou período;
+// contratoDaColeta em agenda-entrega-coleta.js)
 function contratosDoAgendamento(item){
 
     if(item.tipo === TIPO_ENTREGA_COLETA){
@@ -98,18 +99,12 @@ function textoPropostasAgendamento(item){
 
 function referenciasZap(item){
 
+    // entrega/coleta: sempre as duas, a da entrega e a da coleta (agenda-entrega-coleta.js)
+    if(item.tipo === TIPO_ENTREGA_COLETA) return [referenciaZap(item), referenciaColetaZap(item)];
+
     const contratos = contratosDoAgendamento(item);
 
     if(contratos.length === 1) return [referenciaZap(item)];
-
-    // entrega/coleta: a da entrega (com a máquina nova) e a da coleta (com a que volta)
-    if(item.tipo === TIPO_ENTREGA_COLETA){
-
-        return [
-            referenciaZap(item),
-            referenciaZap({ ...contratos[1], tipo: "Coleta", plataforma: item.plataformaRecolha, referencia: "" })
-        ];
-    }
 
     return contratos.map((contrato, indice) =>
         referenciaZap({
@@ -250,56 +245,6 @@ function atualizarBlocoOutrosContratos(){
         temOutros
             ? "Outros contratos (o 1 é o Cliente, a proposta e o período de cima)"
             : "Mais de um contrato nesta coleta?";
-}
-
-
-// ======================================
-// ENTREGA/COLETA: O CONTRATO DA COLETA
-// ======================================
-// A máquina que volta é de outro contrato: proposta e período da coleta (colunas
-// proposta_recolha e periodo_recolha). O cliente é o mesmo.
-
-function contratoDaColeta(item){
-
-    return contratoLimpo({ cliente: item.cliente, proposta: item.propostaRecolha, periodo: item.periodoRecolha });
-}
-
-
-// ao salvar: devolve o erro, ou "". Período no formato da agenda (valor antigo,
-// sem mexer, passa). Em outro tipo fica vazio e, se nunca teve, nem vai para o
-// banco: salvar continua funcionando antes do SQL das duas colunas
-function conferirContratoColeta(dados, anterior){
-
-    if(dados.tipo === TIPO_ENTREGA_COLETA){
-
-        const periodo = normalizarPeriodo(dados.periodoRecolha);
-
-        if(periodo.erro){
-
-            if(dados.periodoRecolha !== (anterior?.periodoRecolha || "")) return `Período da coleta: ${periodo.erro}`;
-
-        }else{
-
-            dados.periodoRecolha = periodo.valor;
-        }
-
-        return "";
-    }
-
-    if(anterior?.propostaRecolha || anterior?.periodoRecolha){
-
-        dados.propostaRecolha = "";
-
-        dados.periodoRecolha = "";
-
-    }else{
-
-        delete dados.propostaRecolha;
-
-        delete dados.periodoRecolha;
-    }
-
-    return "";
 }
 
 

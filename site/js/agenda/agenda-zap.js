@@ -193,6 +193,9 @@ function montarTextoZap(item){
         return { erro: item.tipo === TIPO_ENTREGA_COLETA ? "Informe a máquina de coleta" : "Informe a máquina de recolha da troca" };
     }
 
+    // entrega/coleta: sem a proposta da coleta sairia uma referência só
+    if(erroColetaZap(item)) return { erro: erroColetaZap(item) };
+
     // dividido (agenda-utils.js): o cliente paga uma parte e nós a outra
     const dividido =
         partesFrete(item);

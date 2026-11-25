@@ -230,6 +230,7 @@ let navegador = null;
         "⚠️ Importante:",
         "• O controle da data de vencimento é essencial para evitar renovações não planejadas.",
         "• Equipamentos devolvidos após a data de vencimento terão diárias adicionais, inclusive em finais de semana.",
+        "• Se o contrato for renovado automaticamente e o equipamento for devolvido antes do fim do novo período, a fatura de locação não será cancelada: o valor ficará como crédito.",
         "• Para encerrar a locação, basta responder a este e-mail confirmando a coleta ou avisar seu consultor pelo WhatsApp.",
         "",
         "Estamos à disposição para qualquer dúvida.",

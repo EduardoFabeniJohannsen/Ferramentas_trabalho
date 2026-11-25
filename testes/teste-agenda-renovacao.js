@@ -154,7 +154,7 @@ let navegador = null;
     confere("prazo: já vencido, hoje", contas.vencido === "2026-11-24", contas.vencido);
     confere("prazo: feriado municipal marcado na quarta, responde na terça", contas.municipal === "2026-12-08", contas.municipal);
     confere("prazo: nunca antes de hoje", contas.nuncaAntesDeHoje === "2026-11-28", contas.nuncaAntesDeHoje);
-    confere("dia da semana calculado (14/11/2026 é sábado)", JSON.stringify(contas.semana) === JSON.stringify(["Domingo", "Sábado", "Segunda Feira"]), contas.semana);
+    confere("dia da semana calculado (14/11/2026 é sábado)", JSON.stringify(contas.semana) === JSON.stringify(["domingo", "sábado", "segunda-feira"]), contas.semana);
 
     // ---------- vencimento pela entrega e o período (fixas) ----------
     const vencimentos = await pagina.evaluate(() => {
@@ -204,39 +204,54 @@ let navegador = null;
             manha: manha.saudacao, venceu: textoRenovacao(depois).split("\n")[5],
             feriado: textoRenovacao(feriado).split("\n")[5],
             variasAssunto: assuntoRenovacao(varias), variasLinhas: textoRenovacao(varias).split("\n").slice(3, 5),
+            variasReferente: textoRenovacao(varias).includes("referente aos equipamentos:"),
             perigoso: perigoso.includes("&lt;b&gt;Obra&lt;/b&gt;") && !perigoso.includes("<b>Obra</b>")
         };
     });
     confere("assunto: o padrão das regras do Outlook, com os marcadores", exemplo.assunto === "RENOVAÇÃO DE LOCAÇÃO -> NÚMERO_CONTRATO ( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA", exemplo.assunto);
+    // o modelo do email real (24/11/2026) com as melhorias aprovadas: "nos informe",
+    // "referente ao equipamento", "vence no dia ... (domingo)", a linha da coleta e
+    // o encerramento pelo e-mail ou pelo WhatsApp do consultor
     const esperado = [
         "Boa tarde NOME_CONTATO, tudo bem?",
         "",
-        "Estamos entrando em contato para lembrar que o contrato de locação nº NÚMERO_CONTRATO referente à:",
+        "Estamos entrando em contato para lembrar que o contrato de locação nº NÚMERO_CONTRATO referente ao equipamento:",
         "DESCRIÇÃO_EQUIPAMENTO - (WTE8C15)",
         "",
-        "vence dia 29/11/2026 – Domingo",
+        "vence no dia 29/11/2026 (domingo)",
         "",
         "Local:  Diagonal Tecidos",
         "Endereço: R. José Gall, 1337 - Ressacada, Itajaí - SC, 88307-101",
         "",
-        "Por gentileza, pedimos que nos informes até o final do dia 27/11 se deseja prorrogar ou encerrar a locação.",
+        "Por gentileza, nos informe até o final do dia 27/11 se deseja prorrogar ou encerrar a locação.",
+        "Se for encerrar, informe também o melhor dia e horário para a coleta.",
         "Caso não haja retorno, o contrato será renovado automaticamente por mais um período.",
         "",
         "⚠️ Importante:",
         "• O controle da data de vencimento é essencial para evitar renovações não planejadas.",
-        "• Equipamentos devolvidos após o prazo terão diárias adicionais, inclusive em finais de semana.",
-        "• A locação só será oficialmente encerrada com o envio da nota de devolução para o e-mail do comercial.",
+        "• Equipamentos devolvidos após a data de vencimento terão diárias adicionais, inclusive em finais de semana.",
+        "• Para encerrar a locação, basta responder a este e-mail confirmando a coleta ou avisar seu consultor pelo WhatsApp.",
         "",
         "Estamos à disposição para qualquer dúvida.",
         "Desde já, agradecemos pela atenção!"
     ].join("\n");
-    confere("corpo: igual ao email real (24/11/2026), com os marcadores", exemplo.texto === esperado, exemplo.texto);
-    confere("HTML: vencimento e prazo em amarelo, prazo em 14pt, Calibri 11", exemplo.html.includes('<span style="background:yellow">vence dia 29/11/2026</span> – Domingo') && exemplo.html.includes('<span style="background:yellow;font-size:14pt">27/11</span>') && exemplo.html.includes("font-family:Calibri,sans-serif;font-size:11pt"));
+    confere("corpo: o modelo do email real com as melhorias, com os marcadores", exemplo.texto === esperado, exemplo.texto);
+    confere("HTML: vencimento e prazo em amarelo, prazo em 14pt, Calibri 11", exemplo.html.includes('<span style="background:yellow">vence no dia 29/11/2026</span> (domingo)') && exemplo.html.includes('<span style="background:yellow;font-size:14pt">27/11</span>') && exemplo.html.includes("font-family:Calibri,sans-serif;font-size:11pt"));
     confere("HTML: o que vem da agenda entra como texto", exemplo.perigoso);
     confere("Bom dia antes do meio-dia", exemplo.manha === "Bom dia");
-    confere("já passou: venceu", exemplo.venceu === "venceu dia 29/11/2026 – Domingo", exemplo.venceu);
-    confere("feriado: o sufixo na linha do vencimento", exemplo.feriado === "vence dia 02/11/2026 – Segunda Feira ( Feriado )", exemplo.feriado);
-    confere("várias máquinas: as do mesmo modelo juntas (+), uma linha por modelo", exemplo.variasAssunto.includes("( WTE10025 + WTE10N041 + WAE18R001 )") && JSON.stringify(exemplo.variasLinhas) === JSON.stringify(["DESCRIÇÃO_EQUIPAMENTO - (WTE10025 + WTE10N041)", "DESCRIÇÃO_EQUIPAMENTO - (WAE18R001)"]), [exemplo.variasAssunto, exemplo.variasLinhas]);
+    confere("já passou: venceu", exemplo.venceu === "venceu no dia 29/11/2026 (domingo)", exemplo.venceu);
+    confere("feriado: na linha do vencimento", exemplo.feriado === "vence no dia 02/11/2026 (segunda-feira, feriado)", exemplo.feriado);
+    confere("várias máquinas: as do mesmo modelo juntas (+), uma linha por modelo", exemplo.variasAssunto.includes("( WTE10025 + WTE10N041 + WAE18R001 )") && JSON.stringify(exemplo.variasLinhas) === JSON.stringify(["DESCRIÇÃO_EQUIPAMENTO - (WTE10025 + WTE10N041)", "DESCRIÇÃO_EQUIPAMENTO - (WAE18R001)"]) && exemplo.variasReferente, [exemplo.variasAssunto, exemplo.variasLinhas]);
+
+    const enderecos = await pagina.evaluate(() => [
+        enderecoDoSisloc("R PRESIDENTE COSTA E SILVA Numero: 740 Complemento: - Bairro: TESTO REGA Cidade: POMERODE Estado: SC"),
+        enderecoDoSisloc("RUA XV DE NOVEMBRO Numero: 10 Complemento: GALPAO 2 Bairro: CENTRO Cidade: BLUMENAU Estado: SC CEP: 89010-000"),
+        enderecoDoSisloc("ROD BR 101 Número: 47305 Bairro: ARAQUARI Cidade: JOINVILLE UF: sc"),
+        enderecoDoSisloc("R. José Gall, 1337 - Ressacada, Itajaí - SC, 88307-101")
+    ]);
+    confere("endereço do Sisloc arrumado (o exemplo de Pomerode)", enderecos[0] === "R Presidente Costa e Silva, 740 - Testo Rega, Pomerode/SC", enderecos[0]);
+    confere("endereço do Sisloc: complemento, CEP, número romano e BR", enderecos[1] === "Rua XV de Novembro, 10, Galpao 2 - Centro, Blumenau/SC, CEP 89010-000" && enderecos[2] === "Rod BR 101, 47305 - Araquari, Joinville/SC", enderecos.slice(1, 3));
+    confere("endereço digitado (sem os rótulos do Sisloc) fica como está", enderecos[3] === "R. José Gall, 1337 - Ressacada, Itajaí - SC, 88307-101", enderecos[3]);
 
     const empresas = await pagina.evaluate(() => [
         empresaNfRetorno({ cliente: "WEG Tintas Ltda" }),
@@ -273,7 +288,7 @@ let navegador = null;
     confere("abre com o vencimento pela entrega e o período (entregue há 20 dias, 25 dias: daqui a 4)", janela.aberta && janela.vencimento === dia(4) && janela.origem.startsWith("1º vencimento: entrega em"), janela);
     confere("prazo calculado pela regra", janela.prazo === janela.prazoCalculado, [janela.prazo, janela.prazoCalculado]);
     confere("local e endereço da entrega", janela.local === "Diagonal Tecidos" && janela.endereco.startsWith("R. José Gall"), janela);
-    confere("prévia com o vencimento e o dia da semana certos", janela.previa.includes(`vence dia ${br(dia(4))} – ${janela.semana}`) && janela.assunto.includes("( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA"), janela.previa.split("\n").slice(0, 8));
+    confere("prévia com o vencimento e o dia da semana certos", janela.previa.includes(`vence no dia ${br(dia(4))} (${janela.semana})`) && janela.assunto.includes("( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA"), janela.previa.split("\n").slice(0, 8));
     confere("sem aviso extra marcado (não é WEG nem as outras); o nome da empresa vem do local, para editar", janela.marcados === 0 && janela.empresa === "Diagonal Tecidos", janela);
     await pagina.screenshot({ path: path.join(saida, "agenda-renovacao.png") });
 
@@ -288,7 +303,7 @@ let navegador = null;
     confere("prazo depois do vencimento: avisa", (await pagina.innerText("#alertasRenovacao")).includes("O prazo de resposta passa do vencimento"), await pagina.innerText("#alertasRenovacao"));
     await pagina.fill("#renovacaoVencimento", dia(-2));
     await pagina.locator("#renovacaoVencimento").dispatchEvent("change");
-    confere("já vencido: venceu, prazo hoje e o aviso", (await pagina.inputValue("#renovacaoPrazo")) === dia(0) && (await pagina.innerText("#previaRenovacao")).includes(`venceu dia ${br(dia(-2))}`) && (await pagina.innerText("#alertasRenovacao")).includes("Já venceu"));
+    confere("já vencido: venceu, prazo hoje e o aviso", (await pagina.inputValue("#renovacaoPrazo")) === dia(0) && (await pagina.innerText("#previaRenovacao")).includes(`venceu no dia ${br(dia(-2))}`) && (await pagina.innerText("#alertasRenovacao")).includes("Já venceu"));
     await pagina.fill("#renovacaoVencimento", dia(4));
     await pagina.locator("#renovacaoVencimento").dispatchEvent("change");
 
@@ -318,7 +333,7 @@ let navegador = null;
     confere("entrega sem período: pede o vencimento e não copia", (await pagina.innerText("#origemVencimento")).includes("Entrega sem período: informe o vencimento") && await pagina.isDisabled("#btnCopiarEmailRenovacao") && (await pagina.innerText("#previaRenovacao")).includes("Informe o vencimento"), await pagina.innerText("#origemVencimento"));
     await pagina.fill("#renovacaoVencimento", dia(3));
     await pagina.locator("#renovacaoVencimento").dispatchEvent("change");
-    confere("informado o vencimento, o email aparece", !(await pagina.isDisabled("#btnCopiarEmailRenovacao")) && (await pagina.innerText("#previaRenovacao")).includes(`vence dia ${br(dia(3))}`));
+    confere("informado o vencimento, o email aparece", !(await pagina.isDisabled("#btnCopiarEmailRenovacao")) && (await pagina.innerText("#previaRenovacao")).includes(`vence no dia ${br(dia(3))}`));
     confere("sem endereço, vai o link do mapa", (await pagina.inputValue("#renovacaoEndereco")) === "https://maps.app.goo.gl/abc");
     await pagina.evaluate(() => fecharRenovacaoAgenda());
 

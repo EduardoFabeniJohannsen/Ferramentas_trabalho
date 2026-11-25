@@ -3,7 +3,7 @@
 // ======================================
 // Só contas de datas, sem tela, para o ✉️ Email de renovação: o vencimento pela data da entrega e o período do agendamento (o dia da entrega conta como o 1º; depois renova por mais um período igual), feriados nacionais (os de data fixa e, pela Páscoa, Carnaval, Sexta-feira Santa e Corpus Christi), dia útil, prazo de resposta (dia útil: o próprio vencimento; fim de semana ou feriado: o dia útil anterior; já vencido: hoje; nunca antes de hoje) e o dia da semana por extenso. Os municipais ficam com a pessoa (caixinha Feriado da janela).
 
-const DIAS_SEMANA_RENOVACAO = ["Domingo", "Segunda Feira", "Terça Feira", "Quarta Feira", "Quinta Feira", "Sexta Feira", "Sábado"];
+const DIAS_SEMANA_RENOVACAO = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
 
 // "3 períodos" = 90 dias (como nas Propostas: acima de 30 dias, em períodos de 30)
 const DIAS_POR_PERIODO_RENOVACAO = 30;

@@ -81,7 +81,8 @@ function abrirRenovacaoAgenda(item){
 
     $("renovacaoLocal").value = item.destinoNome || "";
 
-    $("renovacaoEndereco").value = item.destinoEndereco || item.linkDestino || "";
+    // o do Sisloc vem arrumado ("R X, 740 - Bairro, Cidade/UF")
+    $("renovacaoEndereco").value = enderecoDoSisloc(item.destinoEndereco) || item.linkDestino || "";
 
     desenharAvisosRenovacao(item);
 

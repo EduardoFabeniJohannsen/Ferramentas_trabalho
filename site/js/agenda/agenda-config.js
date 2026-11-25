@@ -24,9 +24,12 @@ let TRANSPORTADORAS = [];
 // o que a expedição mostra: o que sai da W Rental
 const TIPOS_EXPEDICAO = ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA, TIPO_TRANSFERENCIA_UNIDADES];
 
-// leva uma máquina num contrato novo: tem a etapa Faturamento (e o botão 🧾) e,
-// depois, a coleta dela (botão ↩️)
+// leva uma máquina num contrato novo: tem a etapa Faturamento (e o botão 🧾)
 const TIPOS_CONTRATO_NOVO = ["Entrega", TIPO_ENTREGA_COLETA];
+
+// deixa uma máquina no cliente: dá para criar a coleta dela depois (botão ↩️,
+// agenda-coleta.js). Na troca técnica, a máquina que foi no lugar da outra
+const TIPOS_GERAM_COLETA = ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA];
 
 // quem vendeu (campo Vendedor do formulário)
 const VENDEDORES = ["Eduardo", "Maria Luiza", "Fernanda", "Abdan", "Julie"];
@@ -131,7 +134,7 @@ const BOTOES_LINHA = [
     { id: "concluir", rotulo: "✅ Marcar como concluído (só na expedição)", soExpedicao: true },
     { id: "zap", rotulo: "📋 Copiar agendamento" },
     { id: "faturamento", rotulo: "🧾 Copiar faturamento" },
-    { id: "coleta", rotulo: "↩️ Criar coleta da entrega" },
+    { id: "coleta", rotulo: "↩️ Criar coleta (da entrega ou da troca)" },
     { id: "renovacao", rotulo: "✉️ Email de renovação" },
     { id: "duplicar", rotulo: "📆 Duplicar (outro dia)" },
     { id: "estoque", rotulo: "🔍 Consultar estoque" },

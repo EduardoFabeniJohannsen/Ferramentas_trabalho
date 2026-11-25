@@ -109,16 +109,16 @@ function criarItemAgenda(item){
 
     if(botaoLigado("faturamento")) botoes.appendChild(botaoFaturamento);
 
-    // entrega (e entrega/coleta, da máquina nova): cria uma coleta a partir dela.
-    // Nos outros tipos fica um botão invisível, só pra os botões da direita
-    // ficarem alinhados.
+    // entrega, troca técnica e entrega/coleta (da máquina que ficou no cliente):
+    // cria uma coleta a partir dela. Nos outros tipos fica um botão invisível,
+    // só pra os botões da direita ficarem alinhados.
     const botaoColeta = criar("button", "btn-coleta", "↩️");
 
     botaoColeta.type = "button";
 
-    if(TIPOS_CONTRATO_NOVO.includes(item.tipo)){
+    if(TIPOS_GERAM_COLETA.includes(item.tipo)){
 
-        botaoColeta.title = "Criar uma coleta a partir desta entrega";
+        botaoColeta.title = `Criar uma coleta a partir desta ${item.tipo === "Troca técnica" ? "troca técnica" : "entrega"}`;
 
         botaoColeta.addEventListener(
             "click",

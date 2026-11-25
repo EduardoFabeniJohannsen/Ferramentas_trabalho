@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - COLETA A PARTIR DE ENTREGA E DUPLICAR
 // ======================================
-// Cria uma coleta já preenchida a partir de uma entrega e duplica um
+// Cria uma coleta já preenchida a partir de uma entrega (ou troca técnica) e duplica um
 // agendamento para outro dia.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
@@ -46,11 +46,12 @@ function valoresColetaDaEntrega(item){
 }
 
 
-// abre o formulário de novo agendamento já preenchido como coleta.
-// Nada é salvo até clicar em Salvar.
+// abre o formulário de novo agendamento já preenchido como coleta (da entrega,
+// da troca técnica ou da entrega/coleta: a máquina que ficou no cliente; a
+// que voltou não entra). Nada é salvo até clicar em Salvar.
 function copiarEntregaParaColeta(item){
 
-    if(!TIPOS_CONTRATO_NOVO.includes(item.tipo)) return;
+    if(!TIPOS_GERAM_COLETA.includes(item.tipo)) return;
 
     // já tem um rascunho de agendamento novo: não apaga sem perguntar
     if(
@@ -65,7 +66,7 @@ function copiarEntregaParaColeta(item){
     abrirModalAgenda(
         null,
         valoresColetaDaEntrega(item),
-        `📋 Coleta criada a partir da entrega de ${item.plataforma}. Informe a data, o horário e o motorista.`
+        `📋 Coleta criada a partir da ${item.tipo === "Troca técnica" ? "troca técnica" : "entrega"} de ${item.plataforma}. Informe a data, o horário e o motorista.`
     );
 }
 

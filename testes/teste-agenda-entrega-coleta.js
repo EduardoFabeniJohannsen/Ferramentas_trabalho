@@ -2,7 +2,8 @@
 // que tinha). Igual à troca técnica no caminho (máquina de coleta, ⇄ na lista, 🔁 no Zap, vai
 // para a expedição e reserva a máquina nova), mas cada máquina é de uma proposta: duas referências
 // da mensagem do Zap digitadas inteiras (a da coleta, coluna referencia_recolha, sai primeiro) e
-// faturamento como a entrega. Na 📦 Demanda a nova sai e a outra volta.
+// faturamento como a entrega. Na 📦 Demanda a nova sai e a outra volta. O ↩️ cria a coleta da
+// máquina que ficou no cliente também a partir da troca técnica.
 // Banco simulado: nada aqui toca o Supabase de produção.
 const { chromium } = require("playwright-core");
 const fs = require("fs");
@@ -226,6 +227,33 @@ let navegador = null;
         recolha: document.getElementById("agPlataformaRecolha").value
     }));
     confere("↩️: a coleta da máquina nova, com a proposta da entrega", coleta.tipo === "Coleta" && coleta.plataforma === "WTE16R010" && coleta.proposta === "713000" && !coleta.referenciaColeta && !coleta.recolha, coleta);
+    await pagina.evaluate(() => fecharModalAgenda?.());
+    await pagina.waitForTimeout(100);
+
+    // ---------- ↩️ coleta a partir da troca técnica ----------
+    const linhaTroca = linhaDe("WAE18R030");
+    const botaoTroca = await linhaTroca.locator(".btn-coleta").evaluate(b => [b.style.visibility, b.title]);
+    confere("troca técnica: tem o ↩️ da coleta", botaoTroca[0] !== "hidden" && botaoTroca[1] === "Criar uma coleta a partir desta troca técnica", botaoTroca);
+    await linhaTroca.locator(".btn-coleta").click();
+    await pagina.waitForTimeout(100);
+    const coletaTroca = await pagina.evaluate(() => ({
+        aberto: document.getElementById("modalAgenda").style.display,
+        tipo: document.getElementById("agTipo").value,
+        plataforma: document.getElementById("agPlataforma").value,
+        recolha: document.getElementById("agPlataformaRecolha").value,
+        cliente: document.getElementById("agCliente").value,
+        entrega: document.getElementById("agDestinoEndereco").value,
+        retirada: document.getElementById("agOrigemEndereco").value,
+        data: document.getElementById("agData").value,
+        aviso: document.getElementById("avisoRascunho").innerText
+    }));
+    confere("↩️ da troca: coleta da máquina que foi (a recolhida não entra), retirada no cliente", coletaTroca.tipo === "Coleta" && coletaTroca.plataforma === "WAE18R030" && !coletaTroca.recolha && coletaTroca.cliente === "Beta" && coletaTroca.retirada === "Rua Y, Itajaí/SC" && coletaTroca.entrega !== "Rua Y, Itajaí/SC" && !coletaTroca.data, coletaTroca);
+    confere("↩️ da troca: o aviso fala da troca técnica", coletaTroca.aviso.includes("Coleta criada a partir da troca técnica de WAE18R030"), coletaTroca.aviso);
+    const antesTroca = await quantosGravados();
+    await pagina.evaluate(() => fecharModalAgenda?.());
+    await pagina.waitForTimeout(100);
+    confere("↩️ da troca: nada salvo sem clicar em Salvar", (await quantosGravados()) === antesTroca);
+    confere("↩️ não aparece na coleta nem na transferência", await pagina.evaluate(() => !TIPOS_GERAM_COLETA.includes("Coleta") && !TIPOS_GERAM_COLETA.includes("Transferência") && !TIPOS_GERAM_COLETA.includes(TIPO_TRANSFERENCIA_UNIDADES)));
 
     confere("sem erros na página", erros.length === 0, erros);
 

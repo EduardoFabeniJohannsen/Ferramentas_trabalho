@@ -276,5 +276,7 @@ document.addEventListener("keydown", (evento) => {
         fecharMapaAgenda();
 
         fecharDemandaAgenda();
+
+        fecharRenovacaoAgenda();
     }
 });

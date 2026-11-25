@@ -155,7 +155,7 @@ const cartoes = (pagina) => pagina.evaluate(() =>
     confere("coluna vazia some (sem motorista)", !entrega.colunas.includes("motorista") && troca.colunas.includes("motorista"), [entrega.colunas, troca.colunas]);
     confere("ordem: horário, tipo e status em cima, a máquina e o resto na ordem das colunas", JSON.stringify(entrega.colunas) === JSON.stringify(["horario", "tipo", "status", "titulo", "transportadora", "retirada", "entrega", "frete", "proposta"]), entrega.colunas);
     confere("botões numa linha só", entrega.botoes.length >= 5 && new Set(entrega.botoes).size === 1, entrega.botoes);
-    confere("botões que não valem (coleta: faturamento e ↩️) somem em vez de deixar buraco", coleta.botoes.length === entrega.botoes.length - 2, [entrega.botoes.length, coleta.botoes.length]);
+    confere("botões que não valem (coleta: faturamento, ↩️ e ✉️) somem em vez de deixar buraco", coleta.botoes.length === entrega.botoes.length - 3, [entrega.botoes.length, coleta.botoes.length]);
     confere("link do mapa numa linha só", entrega.linkUmaLinha);
     await pagina.screenshot({ path: path.join(saida, "agenda-celular.png"), fullPage: true });
 

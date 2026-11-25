@@ -1,0 +1,127 @@
+/* Agenda: a janela do ✉️ Email de renovação (campos, avisos extras, prévia do email e os botões de copiar). */
+
+.modal-agenda.modal-renovacao{
+    max-width:760px;
+}
+
+/* ===== Vencimento, prazo, local e endereço ===== */
+.renovacao-campos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 12px;
+    align-items:flex-end;
+}
+.renovacao-campos label{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    font-size:12px;
+    color:#94a3b8;
+}
+.renovacao-campos input{
+    margin:0;
+    padding:6px 8px;
+    font-size:14px;
+}
+.renovacao-campos input[type="date"]{
+    width:auto;
+}
+.renovacao-campos label.renovacao-feriado{
+    flex-direction:row;
+    align-items:center;
+    gap:6px;
+    padding-bottom:8px;
+    font-size:14px;
+    color:#e2e8f0;
+}
+.renovacao-feriado input{
+    width:auto;
+}
+.renovacao-campos .renovacao-largo{
+    flex:1 1 100%;
+}
+.renovacao-origem{
+    flex:1 1 100%;
+    margin:0;
+    font-size:12px;
+    color:#94a3b8;
+}
+
+/* ===== Avisos extras ===== */
+.renovacao-bloco{
+    margin-top:12px;
+    font-size:13px;
+}
+.renovacao-lista-avisos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 14px;
+    margin-top:4px;
+}
+.renovacao-aviso{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    cursor:pointer;
+}
+.renovacao-aviso input{
+    width:auto;
+    margin:0;
+}
+.renovacao-alertas p{
+    margin:8px 0 0;
+    color:#fbbf24;
+    font-size:13px;
+}
+
+/* ===== Prévia (do jeito que fica no Outlook: fundo branco) ===== */
+/* a letra Inter desenha "->" como uma seta: aqui aparece o que é copiado */
+.renovacao-assunto{
+    margin-top:12px;
+    font-size:13px;
+    overflow-wrap:anywhere;
+    font-feature-settings:"calt" 0, "liga" 0;
+    font-variant-ligatures:none;
+}
+.renovacao-previa{
+    margin-top:6px;
+    padding:12px 14px;
+    border-radius:8px;
+    background:#ffffff;
+    color:#000000;
+    overflow-wrap:anywhere;
+}
+.renovacao-sem-previa{
+    margin:0;
+    color:#475569;
+}
+.renovacao-dica{
+    margin:10px 0 0;
+    font-size:12px;
+    color:#94a3b8;
+}
+.renovacao-botoes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+.renovacao-botoes button{
+    margin:0;
+}
+
+/* ===== Fundo claro ===== */
+body.tema-claro .renovacao-campos label,
+body.tema-claro .renovacao-origem,
+body.tema-claro .renovacao-dica{
+    color:#52617a;
+}
+body.tema-claro .renovacao-campos label.renovacao-feriado{
+    color:#0f172a;
+}
+body.tema-claro .renovacao-previa{
+    border:1px solid #cbd5e1;
+}
+body.tema-claro .renovacao-alertas p{
+    color:#a14a09;
+}

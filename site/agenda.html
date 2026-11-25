@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="css/agenda-formulario.css">
 <link rel="stylesheet" href="css/agenda-mapa.css">
 <link rel="stylesheet" href="css/agenda-demanda.css">
+<link rel="stylesheet" href="css/agenda-renovacao.css">
 <link rel="stylesheet" href="css/agenda-celular.css">
 <!-- sempre o último: o fundo claro troca as cores dos outros -->
 <link rel="stylesheet" href="css/agenda-tema-claro.css">
@@ -998,6 +999,91 @@ DEMANDA (botão 📦 Demanda)
 
 </div>
 
+<!-- ✉️ email de renovação da entrega (agenda-renovacao.js): copia o assunto e o
+     email para colar na conversa do Outlook -->
+<div id="modalRenovacao" class="modal-overlay">
+
+    <div class="modal-agenda modal-renovacao">
+
+        <div class="modal-agenda-topo">
+
+            <div class="modal-titulo">
+                <h3>✉️ Email de renovação</h3>
+                <span id="resumoRenovacao" class="resumo-demanda"></span>
+            </div>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                data-clique="fecharRenovacaoAgenda"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-corpo">
+
+            <div class="renovacao-campos">
+
+                <label>Vencimento
+                    <input type="date" id="renovacaoVencimento" data-mudanca="mudarVencimentoRenovacao">
+                </label>
+
+                <label class="renovacao-feriado" title="Marcada sozinha nos feriados nacionais; marque nos municipais">
+                    <input type="checkbox" id="renovacaoFeriado" data-mudanca="mudarFeriadoRenovacao">
+                    Feriado
+                </label>
+
+                <label>Prazo de resposta
+                    <input type="date" id="renovacaoPrazo" data-mudanca="mudarPrazoRenovacao">
+                </label>
+
+                <p class="renovacao-origem" id="origemVencimento"></p>
+
+                <label class="renovacao-largo">Local
+                    <input type="text" id="renovacaoLocal" autocomplete="off" data-entrada="desenharRenovacao">
+                </label>
+
+                <label class="renovacao-largo">Endereço
+                    <input type="text" id="renovacaoEndereco" autocomplete="off" data-entrada="desenharRenovacao">
+                </label>
+
+            </div>
+
+            <div class="renovacao-bloco">
+                <strong>Avisos extras</strong>
+                <div id="avisosRenovacao" class="renovacao-lista-avisos"></div>
+            </div>
+
+            <div id="alertasRenovacao" class="renovacao-alertas"></div>
+
+            <div class="renovacao-assunto">
+                <strong>Assunto:</strong> <span id="assuntoRenovacao"></span>
+            </div>
+
+            <!-- prévia do jeito que fica no Outlook -->
+            <div id="previaRenovacao" class="renovacao-previa"></div>
+
+            <p class="renovacao-dica">
+                No Outlook: <strong>Responder a todos</strong> na conversa da NF de remessa (ou da
+                renovação anterior), colar o assunto e o email acima da assinatura e trocar
+                NOME_CONTATO, NÚMERO_CONTRATO, NÚMERO (código do cliente) e DESCRIÇÃO_EQUIPAMENTO
+                (dois cliques em cada).
+            </p>
+
+            <div class="renovacao-botoes">
+                <button type="button" id="btnCopiarAssuntoRenovacao" data-clique="copiarAssuntoRenovacao">📋 Copiar assunto</button>
+                <button type="button" id="btnCopiarEmailRenovacao" data-clique="copiarEmailRenovacao">📋 Copiar email</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 <datalist id="listaHorarios">
     <option value="CONFIRMAR">
     <option value="IMEDIATO">
@@ -1079,6 +1165,9 @@ DEMANDA (botão 📦 Demanda)
 <script src="js/agenda/agenda-demanda-calculo.js" defer></script>
 <script src="js/agenda/agenda-demanda-tabela.js" defer></script>
 <script src="js/agenda/agenda-demanda.js" defer></script>
+<script src="js/agenda/agenda-renovacao-datas.js" defer></script>
+<script src="js/agenda/agenda-renovacao-texto.js" defer></script>
+<script src="js/agenda/agenda-renovacao.js" defer></script>
 <script src="js/agenda/agenda-tempo-real.js" defer></script>
 <script src="js/agenda/agenda-init.js" defer></script>
 

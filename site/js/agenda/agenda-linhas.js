@@ -134,6 +134,27 @@ function criarItemAgenda(item){
 
     if(botaoLigado("coleta")) botoes.appendChild(botaoColeta);
 
+    // email de renovação do contrato (agenda-renovacao.js): só entrega e
+    // entrega/coleta; nos outros tipos fica invisível, para alinhar
+    const botaoRenovacao = criar("button", "btn-renovacao", "✉️");
+
+    botaoRenovacao.type = "button";
+
+    if(TIPOS_CONTRATO_NOVO.includes(item.tipo)){
+
+        botaoRenovacao.title = "Email de renovação da locação (copiar para o Outlook)";
+
+        botaoRenovacao.addEventListener("click", () => abrirRenovacaoAgenda(item));
+
+    }else{
+
+        botaoRenovacao.style.visibility = "hidden";
+
+        botaoRenovacao.tabIndex = -1;
+    }
+
+    if(botaoLigado("renovacao")) botoes.appendChild(botaoRenovacao);
+
     // mesma demanda em outro dia (agenda-coleta.js)
     const botaoDuplicar = criar("button", "btn-duplicar", "📆");
 

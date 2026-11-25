@@ -273,13 +273,13 @@ const confere = (nome, ok, extra) => {
     const qtdBotoes = () => pagina.$eval("tr.ag-item .ag-botoes", b => b.children.length);
     const caixaBotao = (nome) => pagina.locator("#listaBotoesLinha label", { hasText: nome }).locator("input");
     const classesBotoes = () => pagina.$eval("tr.ag-item .ag-botoes", b => [...b.children].map(c => c.className).join("|"));
-    confere("de início: todos menos o excluir, com o ✅ primeiro", (await qtdBotoes()) === 7 && !(await classesBotoes()).includes("btn-excluir-ag") && (await classesBotoes()).startsWith("btn-concluir"), await classesBotoes());
-    confere("texto do botão", (await pagina.innerText("#btnBotoes")).includes("7 de 8"), await pagina.innerText("#btnBotoes"));
+    confere("de início: todos menos o excluir, com o ✅ primeiro", (await qtdBotoes()) === 8 && !(await classesBotoes()).includes("btn-excluir-ag") && (await classesBotoes()).startsWith("btn-concluir"), await classesBotoes());
+    confere("texto do botão", (await pagina.innerText("#btnBotoes")).includes("8 de 9"), await pagina.innerText("#btnBotoes"));
     await abreOpcao("#btnBotoes");
     await pagina.screenshot({ path: path.join(saida, "6-painel-botoes.png") });
     await caixaBotao("Copiar faturamento").uncheck();
     await caixaBotao("Criar coleta").uncheck();
-    confere("oculta dois botões", (await qtdBotoes()) === 5);
+    confere("oculta dois botões", (await qtdBotoes()) === 6);
     const classes = await pagina.$eval("tr.ag-item .ag-botoes", b => [...b.children].map(c => c.className).join("|"));
     confere("sumiram os botões certos", !classes.includes("btn-faturamento") && !classes.includes("btn-coleta"), classes);
     confere("painel segue aberto", await pagina.isVisible("#painelBotoes"));
@@ -288,9 +288,9 @@ const confere = (nome, ok, extra) => {
 
     await abrir();
     await pagina.waitForTimeout(100);
-    confere("escolha continua ao recarregar", (await qtdBotoes()) === 5);
+    confere("escolha continua ao recarregar", (await qtdBotoes()) === 6);
     await modo("transportador");
-    confere("vale também no transportador (sem o ✅, que é só da expedição)", (await qtdBotoes()) === 4 && !(await classesBotoes()).includes("btn-concluir"), await classesBotoes());
+    confere("vale também no transportador (sem o ✅, que é só da expedição)", (await qtdBotoes()) === 5 && !(await classesBotoes()).includes("btn-concluir"), await classesBotoes());
     await pagina.click("#btnFiltros"); confere("botão aparece no transportador", await pagina.isVisible("#btnBotoes")); await pagina.mouse.click(5, 5);
 
     // clique dos que ficaram continua certo
@@ -337,7 +337,7 @@ const confere = (nome, ok, extra) => {
     // só o excluir (ligado à mão): sem margem sobrando, e o último não desliga
     // (o ✅ não conta: no transportador a linha ficaria sem botão)
     await caixaBotao("Excluir").check();
-    for(const nome of ["Marcar como concluído", "Copiar agendamento", "Copiar faturamento", "Criar coleta", "Duplicar", "Consultar estoque", "Editar"]){
+    for(const nome of ["Marcar como concluído", "Copiar agendamento", "Copiar faturamento", "Criar coleta", "Email de renovação", "Duplicar", "Consultar estoque", "Editar"]){
         await caixaBotao(nome).uncheck();
     }
     confere("largura fixa: só excluir cabe", await cabe());
@@ -355,13 +355,13 @@ const confere = (nome, ok, extra) => {
     await abrir();
     await pagina.waitForTimeout(100);
     let cls = await classesBotoes();
-    confere("escolha antiga: mantém o que estava oculto e esconde o excluir", (await qtdBotoes()) === 6 && !cls.includes("btn-coleta") && !cls.includes("btn-excluir-ag") && cls.includes("btn-concluir"), cls);
+    confere("escolha antiga: mantém o que estava oculto e esconde o excluir", (await qtdBotoes()) === 7 && !cls.includes("btn-coleta") && !cls.includes("btn-excluir-ag") && cls.includes("btn-concluir"), cls);
 
     // lixo salvo não quebra
     await pagina.evaluate(() => localStorage.setItem("agendaBotoes:u1", "{quebrado"));
     await abrir();
     await pagina.waitForTimeout(100);
-    confere("dado inválido é ignorado", (await qtdBotoes()) === 7);
+    confere("dado inválido é ignorado", (await qtdBotoes()) === 8);
 
     // ---------- ✅ marcar como concluído (expedição) ----------
     await pagina.evaluate(() => {

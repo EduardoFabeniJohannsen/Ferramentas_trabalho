@@ -238,13 +238,15 @@ let navegador = null;
     confere("feriado: o sufixo na linha do vencimento", exemplo.feriado === "vence dia 02/11/2026 – Segunda Feira ( Feriado )", exemplo.feriado);
     confere("várias máquinas: as do mesmo modelo juntas (+), uma linha por modelo", exemplo.variasAssunto.includes("( WTE10025 + WTE10N041 + WAE18R001 )") && JSON.stringify(exemplo.variasLinhas) === JSON.stringify(["DESCRIÇÃO_EQUIPAMENTO - (WTE10025 + WTE10N041)", "DESCRIÇÃO_EQUIPAMENTO - (WAE18R001)"]), [exemplo.variasAssunto, exemplo.variasLinhas]);
 
-    const avisos = await pagina.evaluate(() => [
-        avisosDoLocal({ cliente: "WEG Tintas Ltda" }),
-        avisosDoLocal({ cliente: "Parisotti", destinoNome: "Lear" }),
-        avisosDoLocal({ cliente: "J.B. World", destinoNome: "Parque" }),
-        avisosDoLocal({ cliente: "Wegner Construções", destinoNome: "Clear Obras" })
-    ].map(lista => lista.join()));
-    confere("avisos extras pelo cliente ou local (WEG, Lear, Beto Carrero; palavra inteira)", JSON.stringify(avisos) === JSON.stringify(["weg", "lear", "beto-carrero", ""]), avisos);
+    const empresas = await pagina.evaluate(() => [
+        empresaNfRetorno({ cliente: "WEG Tintas Ltda" }),
+        empresaNfRetorno({ cliente: "Parisotti", destinoNome: "Lear" }),
+        empresaNfRetorno({ cliente: "J.B. World", destinoNome: "Parque" }),
+        empresaNfRetorno({ cliente: "Wegner Construções", destinoNome: "Clear Obras" })
+    ]);
+    confere("empresa que exige a NF de retorno pelo cliente ou local (WEG, Lear, Beto Carrero; palavra inteira)", JSON.stringify(empresas) === JSON.stringify(["WEG", "Lear", "Beto Carrero World", ""]), empresas);
+    const avisoEmpresa = await pagina.evaluate(() => textoAvisoExtra(AVISOS_EXTRAS_RENOVACAO[0], "Karsten"));
+    confere("um aviso só para todas, com o nome da empresa", avisoEmpresa === "Informamos que a Karsten não autoriza a retirada do equipamento sem a apresentação da Nota Fiscal de Retorno.", avisoEmpresa);
 
     // ---------- o botão ----------
     const visivel = (seletor) => pagina.isVisible(seletor);
@@ -265,13 +267,14 @@ let navegador = null;
         assunto: document.getElementById("assuntoRenovacao").innerText,
         previa: document.getElementById("previaRenovacao").innerText,
         semana: diaDaSemanaRenovacao(document.getElementById("renovacaoVencimento").value),
-        marcados: [...document.querySelectorAll("#avisosRenovacao input:checked")].length
+        marcados: [...document.querySelectorAll("#avisosRenovacao input:checked")].length,
+        empresa: document.getElementById("renovacaoEmpresa").value
     }));
     confere("abre com o vencimento pela entrega e o período (entregue há 20 dias, 25 dias: daqui a 4)", janela.aberta && janela.vencimento === dia(4) && janela.origem.startsWith("1º vencimento: entrega em"), janela);
     confere("prazo calculado pela regra", janela.prazo === janela.prazoCalculado, [janela.prazo, janela.prazoCalculado]);
     confere("local e endereço da entrega", janela.local === "Diagonal Tecidos" && janela.endereco.startsWith("R. José Gall"), janela);
     confere("prévia com o vencimento e o dia da semana certos", janela.previa.includes(`vence dia ${br(dia(4))} – ${janela.semana}`) && janela.assunto.includes("( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA"), janela.previa.split("\n").slice(0, 8));
-    confere("sem aviso extra marcado (não é WEG nem os outros)", janela.marcados === 0, janela.marcados);
+    confere("sem aviso extra marcado (não é WEG nem as outras); o nome da empresa vem do local, para editar", janela.marcados === 0 && janela.empresa === "Diagonal Tecidos", janela);
     await pagina.screenshot({ path: path.join(saida, "agenda-renovacao.png") });
 
     // adiar o vencimento (a entrega atrasou): o prazo acompanha
@@ -322,7 +325,12 @@ let navegador = null;
     await botao("Weg Tintas").click();
     await pagina.waitForTimeout(150);
     confere("entrega/coleta: a máquina nova, pela entrega e o período dela", (await pagina.inputValue("#renovacaoVencimento")) === dia(2) && (await pagina.innerText("#assuntoRenovacao")).includes("( WTE16L007 )"), await pagina.inputValue("#renovacaoVencimento"));
-    confere("na WEG: o aviso da nota de retorno vem marcado", await pagina.locator("#avisosRenovacao label", { hasText: "WEG" }).locator("input").isChecked() && (await pagina.innerText("#previaRenovacao")).includes("a própria WEG não autoriza"));
+    const caixaEmpresa = pagina.locator("#avisosRenovacao input[value='empresa']");
+    confere("na WEG: o aviso da NF de retorno vem marcado, com WEG", await caixaEmpresa.isChecked() && (await pagina.inputValue("#renovacaoEmpresa")) === "WEG" && (await pagina.innerText("#previaRenovacao")).includes("Informamos que a WEG não autoriza a retirada"));
+    await pagina.fill("#renovacaoEmpresa", "WEG Guaramirim");
+    confere("editar o nome da empresa muda o email", (await pagina.innerText("#previaRenovacao")).includes("a WEG Guaramirim não autoriza"));
+    await pagina.fill("#renovacaoEmpresa", "");
+    confere("marcado sem o nome: avisa", (await pagina.innerText("#alertasRenovacao")).includes("Escreva o nome da empresa"), await pagina.innerText("#alertasRenovacao"));
     await pagina.evaluate(() => fecharRenovacaoAgenda());
 
     confere("sem erros na página", erros.length === 0, erros);

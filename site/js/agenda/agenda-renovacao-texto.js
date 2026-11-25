@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - EMAIL DE RENOVAÇÃO: OS TEXTOS
 // ======================================
-// Só textos, sem tela, para o ✉️ Email de renovação (agenda-renovacao.js): vence/venceu, Bom dia/Boa tarde, máquinas do mesmo modelo juntas, avisos extras pelo local ou cliente, e o assunto e o corpo (texto e HTML com o amarelo e o negrito do modelo do Outlook). As datas (feriados, prazo, dia da semana) ficam em agenda-renovacao-datas.js. O que o site não tem sai como marcador para trocar no Outlook (MARCADORES_RENOVACAO).
+// Só textos, sem tela, para o ✉️ Email de renovação (agenda-renovacao.js): vence/venceu, Bom dia/Boa tarde, máquinas do mesmo modelo juntas, avisos extras (o da NF de retorno com o nome da empresa), e o assunto e o corpo (texto e HTML com o amarelo e o negrito do modelo do Outlook). As datas (feriados, prazo, dia da semana) ficam em agenda-renovacao-datas.js. O que o site não tem sai como marcador para trocar no Outlook (MARCADORES_RENOVACAO).
 
 // o que o site não tem: sai assim no email e é trocado no Outlook (dois cliques)
 const MARCADORES_RENOVACAO = {
@@ -19,23 +19,25 @@ const AVISOS_PADRAO_RENOVACAO = [
     "A locação só será oficialmente encerrada com o envio da nota de devolução para o e-mail do comercial."
 ];
 
-// avisos extras: os com "busca" já vêm marcados quando o local, o endereço ou o
-// cliente têm uma dessas palavras (sem ligar para acento e maiúsculas)
+// avisos extras. O "empresa" é um só para qualquer lugar que não libera a
+// coleta sem a NF de retorno: o nome da empresa é escrito na janela
 const AVISOS_EXTRAS_RENOVACAO = [
-    { id: "weg", rotulo: "WEG", busca: [/\bweg\b/],
-        texto: "Informamos que a própria WEG não autoriza a retirada do equipamento sem a apresentação da Nota Fiscal de Retorno." },
-    { id: "biomedical", rotulo: "Biomedical", busca: [/biomedical/],
-        texto: "Informamos que a própria Biomedical não autoriza a retirada do equipamento sem a apresentação da Nota Fiscal de Retorno." },
-    { id: "lear", rotulo: "Lear", busca: [/\blear\b/],
-        texto: "Como o equipamento locado se encontra na Lear, a mesma não permite realizar a coleta sem a nota fiscal de retorno" },
-    { id: "karsten", rotulo: "Karsten", busca: [/karsten/],
-        texto: "A Karsten não autoriza retirada dos equipamentos sem apresentar NF na portaria." },
-    { id: "beto-carrero", rotulo: "Beto Carrero World", busca: [/beto carrero/, /\bj\.? ?b\.? world\b/],
-        texto: "Para a retirada do equipamento, o Beto Carrero World exige a apresentação da nota fiscal de devolução." },
+    { id: "empresa", rotulo: "Retirada só com NF de retorno:",
+        texto: (empresa) => `Informamos que a ${empresa || "EMPRESA"} não autoriza a retirada do equipamento sem a apresentação da Nota Fiscal de Retorno.` },
     { id: "sem-ie", rotulo: "Cliente sem Inscrição Estadual",
         texto: "A W Rental somente poderá emitir a NF de Retorno quando o cliente não possuir Inscrição Estadual, situação em que estará impossibilitado de realizar a emissão." },
     { id: "credito", rotulo: "Cliente com restrição de crédito",
         texto: "Ressaltamos que, devido à condição de crédito vigente, o não pagamento das FTs nos respectivos vencimentos poderá resultar no recolhimento do equipamento no vencimento da locação" }
+];
+
+// as que já se sabe que não liberam sem a NF de retorno: no local, no endereço ou
+// no cliente (sem ligar para acento e maiúsculas), o aviso vem marcado com o nome
+const EMPRESAS_NF_RETORNO = [
+    { nome: "WEG", busca: /\bweg\b/ },
+    { nome: "Biomedical", busca: /biomedical/ },
+    { nome: "Lear", busca: /\blear\b/ },
+    { nome: "Karsten", busca: /karsten/ },
+    { nome: "Beto Carrero World", busca: /beto carrero|\bj\.? ?b\.? world\b/ }
 ];
 
 
@@ -43,15 +45,19 @@ const AVISOS_EXTRAS_RENOVACAO = [
 // AVISOS EXTRAS
 // ======================================
 
-// os avisos que combinam com o local, o endereço ou o cliente (ids)
-function avisosDoLocal(item){
+// a empresa conhecida no local, no endereço ou no cliente ("WEG"), ou ""
+function empresaNfRetorno(item){
 
     const texto =
         semAcento([item.cliente, item.destinoNome, item.destinoEndereco].join(" ")).toLowerCase();
 
-    return AVISOS_EXTRAS_RENOVACAO
-        .filter(aviso => (aviso.busca || []).some(regra => regra.test(texto)))
-        .map(aviso => aviso.id);
+    return EMPRESAS_NF_RETORNO.find(empresa => empresa.busca.test(texto))?.nome || "";
+}
+
+
+function textoAvisoExtra(aviso, empresa){
+
+    return typeof aviso.texto === "function" ? aviso.texto(String(empresa || "").trim()) : aviso.texto;
 }
 
 
@@ -80,7 +86,7 @@ function equipamentosRenovacao(plataforma){
 
 
 // tudo o que o email usa, já calculado. dados: { item, vencimento, prazo,
-// feriado, local, endereco, avisos (ids), agora (Date) }
+// feriado, local, endereco, avisos (ids), empresa (do aviso da NF de retorno), agora (Date) }
 function camposRenovacao(dados){
 
     const hoje = isoDoDiaRenovacao(dados.agora);
@@ -100,7 +106,9 @@ function camposRenovacao(dados){
         endereco: String(dados.endereco || "").trim(),
         avisos: [
             ...AVISOS_PADRAO_RENOVACAO,
-            ...AVISOS_EXTRAS_RENOVACAO.filter(aviso => dados.avisos.includes(aviso.id)).map(aviso => aviso.texto)
+            ...AVISOS_EXTRAS_RENOVACAO
+                .filter(aviso => dados.avisos.includes(aviso.id))
+                .map(aviso => textoAvisoExtra(aviso, dados.empresa))
         ]
     };
 }

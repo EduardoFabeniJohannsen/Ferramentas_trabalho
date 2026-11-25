@@ -1,7 +1,7 @@
 // ======================================
 // AGENDA - EMAIL DE RENOVAÇÃO: A JANELA
 // ======================================
-// Botão ✉️ da entrega (e da entrega/coleta): abre a janela do email de renovação já preenchida. O vencimento vem da data da entrega e do período (o próximo a partir de hoje; agenda-renovacao-datas.js) e pode ser mudado; o prazo de resposta é calculado (e pode ser mudado); local e endereço vêm da entrega; os avisos extras vêm marcados pelo local ou cliente. Mostra a prévia e copia o assunto e o email (formatado, para colar no Outlook). Os textos ficam em agenda-renovacao-texto.js.
+// Botão ✉️ da entrega (e da entrega/coleta): abre a janela do email de renovação já preenchida. O vencimento vem da data da entrega e do período (o próximo a partir de hoje; agenda-renovacao-datas.js) e pode ser mudado; o prazo de resposta é calculado (e pode ser mudado); local e endereço vêm da entrega; o aviso da NF de retorno vem com o nome da empresa para editar (marcado nas conhecidas, como a WEG). Mostra a prévia e copia o assunto e o email (formatado, para colar no Outlook). Os textos ficam em agenda-renovacao-texto.js.
 
 
 let itemRenovacao = null;
@@ -11,13 +11,17 @@ let itemRenovacao = null;
 let prazoRenovacaoManual = false;
 
 
+// o da NF de retorno vem com o nome da empresa para editar: marcado quando o
+// local ou o cliente é uma das conhecidas (WEG...); senão, com o nome do local
 function desenharAvisosRenovacao(item){
 
-    const marcados = avisosDoLocal(item);
+    const empresa = empresaNfRetorno(item);
 
     $("avisosRenovacao").replaceChildren(...AVISOS_EXTRAS_RENOVACAO.map(aviso => {
 
-        const rotulo = criar("label", "renovacao-aviso");
+        const linha = criar("div", "renovacao-aviso");
+
+        const rotulo = criar("label");
 
         const caixa = criar("input");
 
@@ -25,15 +29,36 @@ function desenharAvisosRenovacao(item){
 
         caixa.value = aviso.id;
 
-        caixa.checked = marcados.includes(aviso.id);
+        caixa.checked = aviso.id === "empresa" && !!empresa;
 
         caixa.dataset.mudanca = "desenharRenovacao";
 
-        rotulo.title = aviso.texto;
+        rotulo.title = textoAvisoExtra(aviso, "EMPRESA");
 
         rotulo.append(caixa, ` ${aviso.rotulo}`);
 
-        return rotulo;
+        linha.appendChild(rotulo);
+
+        if(aviso.id === "empresa"){
+
+            const nome = criar("input");
+
+            nome.type = "text";
+
+            nome.id = "renovacaoEmpresa";
+
+            nome.autocomplete = "off";
+
+            nome.placeholder = "Nome da empresa";
+
+            nome.value = empresa || item.destinoNome || "";
+
+            nome.dataset.entrada = "desenharRenovacao";
+
+            linha.appendChild(nome);
+        }
+
+        return linha;
     }));
 }
 
@@ -162,6 +187,7 @@ function camposRenovacaoDaJanela(){
         local: $("renovacaoLocal").value,
         endereco: $("renovacaoEndereco").value,
         avisos: [...document.querySelectorAll("#avisosRenovacao input:checked")].map(caixa => caixa.value),
+        empresa: $("renovacaoEmpresa")?.value || "",
         agora: new Date()
     });
 }
@@ -193,6 +219,11 @@ function alertasRenovacao(){
     if(!$("renovacaoLocal").value.trim()) alertas.push("Local em branco.");
 
     if(!$("renovacaoEndereco").value.trim()) alertas.push("Endereço em branco.");
+
+    if(document.querySelector("#avisosRenovacao input[value='empresa']")?.checked && !$("renovacaoEmpresa").value.trim()){
+
+        alertas.push("Escreva o nome da empresa no aviso da NF de retorno.");
+    }
 
     return alertas;
 }

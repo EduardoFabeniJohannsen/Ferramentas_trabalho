@@ -56,6 +56,8 @@ const CAMPOS_BANCO = {
     freteNossa: "frete_nossa",
     referencia: "referencia",
     contato: "contato",
+    // transferência entre obras: o contato no local de coleta (agenda-transferencia-obras.js)
+    contatoOrigem: "contato_origem",
     card: "card",
     emails: "emails",
     obsExpedicao: "obs_expedicao",

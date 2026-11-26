@@ -27,6 +27,10 @@ const TIPOS_EXPEDICAO = ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA, TIPO_
 // leva uma máquina num contrato novo: tem a etapa Faturamento (e o botão 🧾)
 const TIPOS_CONTRATO_NOVO = ["Entrega", TIPO_ENTREGA_COLETA];
 
+// transferência entre obras (o valor salvo de sempre; aparece como "Transferência
+// entre obras"): os dois lados são locais do cliente, cada um com o seu contato
+const TIPO_TRANSFERENCIA_OBRAS = "Transferência";
+
 // deixa uma máquina no cliente: dá para criar a coleta dela depois (botão ↩️,
 // agenda-coleta.js). Na troca técnica, a máquina que foi no lugar da outra
 const TIPOS_GERAM_COLETA = ["Entrega", "Troca técnica", TIPO_ENTREGA_COLETA];

@@ -220,11 +220,6 @@ function montarTextoZap(item){
     const linhaHorario =
         `*Horário:* ${horario.toUpperCase() === "IMEDIATO" ? "imediato" : horario}`.trimEnd();
 
-    // por conta do cliente, sem contato, aponta pros contatos lá embaixo
-    const contato =
-        String(item.contato || "").trim() ||
-        (porCliente ? "abaixo ⤵️" : "");
-
     // observação para a entrega (a do transportador): só sai se foi preenchida
     const observacao =
         String(item.obsEntrega || "").trim();
@@ -275,7 +270,9 @@ function montarTextoZap(item){
 
     linhas.push("");
 
-    linhas.push(`Contato de quem vai receber: ${contato}`.trimEnd());
+    // por conta do cliente, sem contato, aponta pros contatos lá embaixo.
+    // Transferência entre obras: o da coleta e o da entrega (agenda-transferencia-obras.js)
+    linhasContatoZap(item, porCliente ? "abaixo ⤵️" : "").forEach(linha => linhas.push(linha));
 
     linhas.push("");
 

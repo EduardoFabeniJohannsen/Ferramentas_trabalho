@@ -41,6 +41,8 @@ const CAMPOS_AGENDA = [
     // entrega/coleta: a referência da coleta (agenda-entrega-coleta.js)
     ["referenciaRecolha", "agReferenciaRecolha"],
     ["contato", "agContato"],
+    // transferência entre obras: o contato no local de coleta (o "contato" é o da entrega)
+    ["contatoOrigem", "agContatoOrigem"],
     ["card", "agCard"],
     ["emails", "agEmails"]
 ];
@@ -266,7 +268,8 @@ function atualizarSugestoesPeriodo(){
 
 
 // troca técnica e entrega/coleta: aparece a máquina que volta; na entrega/coleta
-// também a referência da coleta (e a de sempre vira a da entrega)
+// também a referência da coleta (e a de sempre vira a da entrega). Transferência
+// entre obras: "Local de coleta" e "Local de entrega", com um contato em cada
 function atualizarCamposTipo(){
 
     const tipo = $("agTipo").value;
@@ -293,6 +296,24 @@ function atualizarCamposTipo(){
 
         campo.style.display = entregaColeta ? "" : "none";
     });
+
+    // transferência entre obras: local de coleta e local de entrega, cada um
+    // com o seu contato
+    const transferencia = tipo === TIPO_TRANSFERENCIA_OBRAS;
+
+    document.querySelectorAll(".so-transferencia").forEach(campo => {
+
+        campo.style.display = transferencia ? "" : "none";
+    });
+
+    $("textoTituloRetirada").innerText =
+        transferencia ? "📍 Local de coleta" : "📍 Retirada (vazio em entrega e troca = W Rental)";
+
+    $("tituloEntregaLocal").innerText =
+        transferencia ? "📍 Local de entrega" : "📍 Entrega (vazio em coleta = W Rental)";
+
+    $("rotuloContato").innerText =
+        transferencia ? "Contato no local de entrega" : "Contato de quem vai receber";
 
     atualizarRetirada();
 

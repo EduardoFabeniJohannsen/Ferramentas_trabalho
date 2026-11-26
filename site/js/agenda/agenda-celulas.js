@@ -207,7 +207,8 @@ function criarCelulasAgenda(item){
     celulas.cidade =
         celulaTexto("cidade", cidadeDoEndereco(item.destinoEndereco));
 
-    celulas.contato = celulaTexto("contato", item.contato);
+    // transferência entre obras: os dois, com o local (agenda-transferencia-obras.js)
+    celulas.contato = celulaTexto("contato", textoContatoCelula(item));
 
     celulas.obsEntrega = celulaTexto("obsEntrega", item.obsEntrega);
 

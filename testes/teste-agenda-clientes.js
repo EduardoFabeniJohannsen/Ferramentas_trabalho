@@ -20,7 +20,8 @@ const linhas = [
       destino_nome: "Obra Centro", destino_endereco: "Rua B, 200, Centro, Brusque/SC", link_destino: "",
       contato: "João 47 9999", emails: "fin@alfa.com", forma_pagamento: "Boleto", prazos_pagamento: ["28", "56"] },
     { ...base, id: 2, data: hoje, tipo: "Transferência", plataforma: "WTE14", cliente: "Gama Transferências",
-      origem_nome: "Obra 1", origem_endereco: "Rua X, 1, Itajaí/SC", destino_nome: "Obra 2", destino_endereco: "Rua Y, 2, Itajaí/SC" }
+      origem_nome: "Obra 1", origem_endereco: "Rua X, 1, Itajaí/SC", destino_nome: "Obra 2", destino_endereco: "Rua Y, 2, Itajaí/SC",
+      contato_origem: "Ana 47 1111", contato: "Bia 47 2222" }
 ];
 
 // só no histórico (mais antigos que os 30 dias)
@@ -33,16 +34,25 @@ const antigas = [
       forma_pagamento: "Depósito", prazos_pagamento: ["30"] }
 ];
 
+// guarda o que é gravado (insert/update) em window.__gravados
 const clienteFalso = `
+window.__gravados = [];
 window.supabase = { createClient(){
     const linhas = ${JSON.stringify(linhas)};
     const antigas = ${JSON.stringify(antigas)};
     const consulta = (tabela) => {
         let inicio = 0;
         let colunas = "*";
+        let gravando = null;
+        let modo = "";
         const q = new Proxy(function(){}, {
             get(_, nome){
+                if(nome === "insert" || nome === "update") return (dados) => { modo = nome; gravando = { ...dados }; window.__gravados.push({ modo: nome, dados }); return q; };
                 if(nome === "then"){
+                    if(gravando){
+                        const linha = { id: 99, ...gravando };
+                        return (ok) => ok({ data: modo === "insert" ? linha : [linha], error: null });
+                    }
                     let data = [];
                     if(tabela === "agendamentos" && inicio === 0){
                         data = colunas.includes("forma_pagamento") ? [...linhas, ...antigas] : linhas;
@@ -192,10 +202,87 @@ const confere = (nome, ok, extra) => {
     confere("coleta: sem pagamento", (await pagina.inputValue("#agFormaPagamento")) === "");
     confere("coleta: lista na retirada", (await pagina.getAttribute("#agOrigemEndereco", "list")) === "listaLocaisCliente");
 
-    // ---------- transferência: nada de local ----------
+    // ---------- transferência entre obras: local de coleta e local de entrega ----------
+    const botoes = (id) => pagina.$$eval(`#${id} .chip-local`, l => l.map(b => [b.innerText.replace(/\s*\n\s*/g, " | "), b.classList.contains("ativo")]));
     await novo("Transferência");
+    const telaTransferencia = await pagina.evaluate(() => ({
+        coleta: $("textoTituloRetirada").innerText, entrega: $("tituloEntregaLocal").innerText,
+        contato: $("rotuloContato").innerText, contatoColeta: !!$("agContatoOrigem").offsetParent,
+        retiradaAberta: !$("tituloRetirada").classList.contains("recolhida")
+    }));
+    confere("transferência: Local de coleta e Local de entrega, cada um com o seu contato", JSON.stringify(telaTransferencia) === JSON.stringify({ coleta: "📍 Local de coleta", entrega: "📍 Local de entrega", contato: "Contato no local de entrega", contatoColeta: true, retiradaAberta: true }), telaTransferencia);
     await escolher("agCliente", "Construtora Alfa Ltda");
-    confere("transferência: sem botões de local, só e-mails", !(await pagina.isVisible("#blocoLocaisCliente")) && (await valor("agOrigemEndereco")) === "" && (await valor("agDestinoEndereco")) === "" && (await valor("agEmails")) === "fin@alfa.com");
+    confere("transferência: com dois locais, os dois lados esperam a escolha", (await valor("agOrigemEndereco")) === "" && (await valor("agDestinoEndereco")) === "" && (await valor("agEmails")) === "fin@alfa.com");
+    confere("transferência: uma fileira de botões para cada lado", JSON.stringify(await botoes("chipsLocaisCliente")) === JSON.stringify([["Obra Centro | Brusque/SC", false], ["Obra Norte | Itajaí/SC", false]]) && JSON.stringify(await botoes("chipsLocaisEntrega")) === JSON.stringify(await botoes("chipsLocaisCliente")), [await botoes("chipsLocaisCliente"), await botoes("chipsLocaisEntrega")]);
+    confere("transferência: cada fileira diz o lado", (await pagina.innerText("#tituloLocaisCliente")).includes("escolha o de coleta") && (await pagina.innerText("#tituloLocaisEntrega")).includes("escolha o de entrega"), [await pagina.innerText("#tituloLocaisCliente"), await pagina.innerText("#tituloLocaisEntrega")]);
+    confere("transferência: avisa para escolher os dois", (await pagina.innerText("#toast")).includes("Escolha os locais de coleta e de entrega"), await pagina.innerText("#toast"));
+    confere("transferência: lista nos dois endereços", (await pagina.getAttribute("#agOrigemEndereco", "list")) === "listaLocaisCliente" && (await pagina.getAttribute("#agDestinoEndereco", "list")) === "listaLocaisCliente");
+    await pagina.click("#chipsLocaisCliente .chip-local >> nth=1");
+    confere("botão de cima: vai no local de coleta, com o contato da coleta", (await valor("agOrigemEndereco")) === "Rua C, 5, Itajaí/SC" && (await valor("agOrigemNome")) === "Obra Norte" && (await valor("agLinkOrigem")) === "https://maps/norte" && (await valor("agContatoOrigem")) === "Pedro 47 8888" && (await valor("agContato")) === "" && (await valor("agDestinoEndereco")) === "");
+    await pagina.click("#chipsLocaisEntrega .chip-local >> nth=0");
+    confere("botão de baixo: vai no local de entrega, com o contato da entrega", (await valor("agDestinoEndereco")) === "Rua B, 200, Centro, Brusque/SC" && (await valor("agDestinoNome")) === "Obra Centro" && (await valor("agContato")) === "João 47 9999" && (await valor("agOrigemEndereco")) === "Rua C, 5, Itajaí/SC" && (await valor("agContatoOrigem")) === "Pedro 47 8888");
+    confere("cada fileira marca o local do seu lado", JSON.stringify((await botoes("chipsLocaisCliente")).map(b => b[1])) === "[false,true]" && JSON.stringify((await botoes("chipsLocaisEntrega")).map(b => b[1])) === "[true,false]");
+    await pagina.$eval("#blocoLocaisCliente", e => e.scrollIntoView({ block: "start" }));
+    await pagina.screenshot({ path: path.join(__dirname, "capturas", "agenda-transferencia-locais.png") });
+    await escolher("agDestinoEndereco", "Rua C, 5, Itajaí/SC");
+    confere("escolher na lista do endereço de entrega troca só a entrega", (await valor("agDestinoNome")) === "Obra Norte" && (await valor("agContato")) === "Pedro 47 8888" && (await valor("agOrigemNome")) === "Obra Norte" && (await valor("agContatoOrigem")) === "Pedro 47 8888");
+
+    // salvar: o contato da coleta vai na coluna contato_origem
+    await pagina.fill("#agContatoOrigem", "Ana 47 1111");
+    await pagina.locator("#listaPlataformas .ag-plataforma-item").first().fill("WAE18R009");
+    await pagina.evaluate(() => { window.__gravados.length = 0; });
+    await pagina.click("#btnSalvarAgenda");
+    await pagina.waitForTimeout(200);
+    const gravado = await pagina.evaluate(() => window.__gravados.pop());
+    confere("salvar a transferência grava os dois contatos", gravado?.modo === "insert" && gravado.dados.contato_origem === "Ana 47 1111" && gravado.dados.contato === "Pedro 47 8888" && gravado.dados.origem_endereco === "Rua C, 5, Itajaí/SC", gravado?.dados);
+
+    // um local só: vai na coleta (a máquina está lá); a entrega a pessoa escolhe
+    await novo("Transferência");
+    await escolher("agCliente", "Mercado Beta");
+    confere("transferência com um local só: já vem no local de coleta, com o contato", (await valor("agOrigemEndereco")) === "Av D, 9, Blumenau/SC" && (await valor("agOrigemNome")) === "Loja" && (await valor("agContatoOrigem")) === "Ana" && (await valor("agDestinoEndereco")) === "" && (await valor("agContato")) === "");
+    confere("e pede o local de entrega", (await pagina.innerText("#toast")).includes("Escolha o local de entrega"), await pagina.innerText("#toast"));
+
+    // os locais de uma transferência antiga também são sugeridos, cada um com o seu contato
+    await novo("Entrega");
+    await escolher("agCliente", "Gama Transferências");
+    confere("transferência antiga: os dois locais viram sugestão (a entrega primeiro)", JSON.stringify((await botoes("chipsLocaisCliente")).map(b => b[0])) === JSON.stringify(["Obra 2 | Itajaí/SC", "Obra 1 | Itajaí/SC"]) && !(await pagina.isVisible("#blocoLocaisEntrega")), await botoes("chipsLocaisCliente"));
+    await pagina.click("#chipsLocaisCliente .chip-local >> nth=1");
+    confere("o local de coleta antigo vem com o contato da coleta", (await valor("agDestinoEndereco")) === "Rua X, 1, Itajaí/SC" && (await valor("agContato")) === "Ana 47 1111", await valor("agContato"));
+
+    // fora da transferência o contato da coleta não vai para o banco (funciona antes do SQL)
+    await pagina.evaluate(() => { $("agContatoOrigem").value = "sobrou"; });
+    await pagina.locator("#listaPlataformas .ag-plataforma-item").first().fill("WAE18R008");
+    await pagina.evaluate(() => { window.__gravados.length = 0; });
+    await pagina.click("#btnSalvarAgenda");
+    await pagina.waitForTimeout(200);
+    const entrega = await pagina.evaluate(() => window.__gravados.pop());
+    confere("entrega: sem a coluna contato_origem", entrega?.modo === "insert" && !("contato_origem" in entrega.dados), entrega && Object.keys(entrega.dados));
+    const regras = await pagina.evaluate(() => {
+        const conferir = (dados, anterior) => { conferirContatoColeta(dados, anterior); return "contatoOrigem" in dados ? dados.contatoOrigem : "(fora)"; };
+        return [
+            conferir({ tipo: "Transferência", contatoOrigem: "" }, null),
+            conferir({ tipo: "Transferência", contatoOrigem: "" }, { contatoOrigem: "Ana" }),
+            conferir({ tipo: "Entrega", contatoOrigem: "x" }, { contatoOrigem: "Ana" })
+        ];
+    });
+    confere("contato da coleta vazio e sem ter tido: não vai; apagado ou trocou de tipo: vai vazio", JSON.stringify(regras) === JSON.stringify(["(fora)", "", ""]), regras);
+
+    // Zap e coluna Contato
+    const zap = await pagina.evaluate(() => {
+        const item = { ...agendamentos.find(ag => ag.id === 2), data: "2026-12-01", frete: "450,00" };
+        const contatos = (texto) => texto.split("\n").filter(linha => linha.startsWith("Contato"));
+        return {
+            transferencia: contatos(montarTextoZap(item).texto),
+            semColeta: contatos(montarTextoZap({ ...item, contatoOrigem: "", freteConta: "cliente" }).texto),
+            entrega: contatos(montarTextoZap({ ...agendamentos.find(ag => ag.id === 1), data: "2026-12-01" }).texto),
+            celula: textoContatoCelula(item),
+            celulaEntrega: textoContatoCelula(agendamentos.find(ag => ag.id === 1))
+        };
+    });
+    confere("Zap da transferência: o contato de cada local", JSON.stringify(zap.transferencia) === JSON.stringify(["Contato no local de coleta: Ana 47 1111", "Contato no local de entrega: Bia 47 2222"]), zap.transferencia);
+    confere("Zap: sem o contato da coleta e frete do cliente, aponta para baixo", JSON.stringify(zap.semColeta) === JSON.stringify(["Contato no local de coleta: abaixo ⤵️", "Contato no local de entrega: Bia 47 2222"]), zap.semColeta);
+    confere("Zap dos outros tipos continua igual", JSON.stringify(zap.entrega) === JSON.stringify(["Contato de quem vai receber: João 47 9999"]), zap.entrega);
+    confere("coluna Contato: os dois, com o local", zap.celula === "Coleta: Ana 47 1111 · Entrega: Bia 47 2222" && zap.celulaEntrega === "João 47 9999", [zap.celula, zap.celulaEntrega]);
 
     // ---------- cliente novo e edição ----------
     await novo();

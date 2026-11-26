@@ -668,7 +668,7 @@ MODAL (novo / editar)
 
                     <p class="largo so-entre-unidades enderecos-unidades" id="enderecosUnidades"></p>
 
-                    <!-- locais que o cliente já usou: clique preenche (agenda-clientes.js) -->
+                    <!-- locais que o cliente já usou: clique preenche (agenda-clientes-locais.js) -->
                     <div class="largo locais-cliente esconde-entre-unidades" id="blocoLocaisCliente" style="display:none">
 
                         <p class="subtitulo-form" id="tituloLocaisCliente"></p>
@@ -685,7 +685,8 @@ MODAL (novo / editar)
                         role="button"
                         title="Clique para mostrar ou esconder o local de retirada"
                     >
-                        📍 Retirada (vazio em entrega e troca = W Rental)
+                        <!-- na transferência entre obras: "Local de coleta" (agenda-form-campos.js) -->
+                        <span id="textoTituloRetirada">📍 Retirada (vazio em entrega e troca = W Rental)</span>
                         <span class="retirada-resumo" id="resumoRetirada"></span>
                         <span class="retirada-seta">▾</span>
                     </p>
@@ -705,9 +706,18 @@ MODAL (novo / editar)
                         <input type="text" id="agLinkOrigem" placeholder="https://maps...">
                     </div>
 
-                    <p class="largo subtitulo-form esconde-entre-unidades">
-                        📍 Entrega (vazio em coleta = W Rental)
-                    </p>
+                    <!-- transferência entre obras: os locais do cliente também para a
+                         entrega (os de cima vão na coleta; agenda-clientes-locais.js) -->
+                    <div class="largo locais-cliente esconde-entre-unidades" id="blocoLocaisEntrega" style="display:none">
+
+                        <p class="subtitulo-form" id="tituloLocaisEntrega"></p>
+
+                        <div class="chips" id="chipsLocaisEntrega"></div>
+
+                    </div>
+
+                    <!-- na transferência entre obras: "Local de entrega" (agenda-form-campos.js) -->
+                    <p class="largo subtitulo-form esconde-entre-unidades" id="tituloEntregaLocal">📍 Entrega (vazio em coleta = W Rental)</p>
 
                     <div class="largo esconde-entre-unidades">
                         <label for="agDestinoNome">Nome do local</label>
@@ -756,8 +766,14 @@ MODAL (novo / editar)
                         <input type="text" id="agEmails" placeholder="a@cliente.com; b@cliente.com">
                     </div>
 
+                    <!-- transferência entre obras: um contato em cada local -->
+                    <div class="largo so-transferencia" style="display:none">
+                        <label for="agContatoOrigem">Contato no local de coleta</label>
+                        <input type="text" id="agContatoOrigem" placeholder="Nome e telefone">
+                    </div>
+
                     <div class="largo">
-                        <label for="agContato">Contato de quem vai receber</label>
+                        <label for="agContato" id="rotuloContato">Contato de quem vai receber</label>
                         <input type="text" id="agContato" placeholder="Nome e telefone">
                     </div>
 
@@ -1151,6 +1167,7 @@ DEMANDA (botão 📦 Demanda)
 <script src="js/agenda/agenda-plataformas.js" defer></script>
 <script src="js/agenda/agenda-contratos.js" defer></script>
 <script src="js/agenda/agenda-entrega-coleta.js" defer></script>
+<script src="js/agenda/agenda-transferencia-obras.js" defer></script>
 <script src="js/agenda/agenda-rascunho.js" defer></script>
 <script src="js/agenda/agenda-etapas.js" defer></script>
 <script src="js/agenda/agenda-modal.js" defer></script>
@@ -1158,6 +1175,7 @@ DEMANDA (botão 📦 Demanda)
 <script src="js/agenda/agenda-coleta.js" defer></script>
 <script src="js/agenda/agenda-pagamento.js" defer></script>
 <script src="js/agenda/agenda-clientes.js" defer></script>
+<script src="js/agenda/agenda-clientes-locais.js" defer></script>
 <script src="js/agenda/agenda-pedido.js" defer></script>
 <script src="js/agenda/agenda-pedido-pdf.js" defer></script>
 <script src="js/agenda/agenda-lixeira.js" defer></script>

@@ -123,6 +123,9 @@ async function salvarAgendamento(){
     // entrega/coleta: a referência da coleta (agenda-entrega-coleta.js)
     conferirReferenciaColeta(dados, idEmEdicao ? agendamentos.find(ag => ag.id === idEmEdicao) : null);
 
+    // transferência entre obras: o contato no local de coleta (agenda-transferencia-obras.js)
+    conferirContatoColeta(dados, idEmEdicao ? agendamentos.find(ag => ag.id === idEmEdicao) : null);
+
     // outros contratos: só na coleta (agenda-contratos.js)
     const contratos = conferirOutrosContratos(dados);
 

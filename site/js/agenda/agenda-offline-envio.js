@@ -26,6 +26,7 @@ const ROTULOS_CAMPOS_OFFLINE = {
     destinoEndereco: "Endereço de entrega",
     frete: "Frete",
     contato: "Contato",
+    contatoOrigem: "Contato no local de coleta",
     obsExpedicao: "Observação da expedição",
     obsEntrega: "Observação da entrega"
 };

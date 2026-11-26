@@ -1,7 +1,7 @@
 // ======================================
 // PROPOSTAS - RESUMO DA PROPOSTA
 // ======================================
-// Card "Resumo da proposta" (no PC na coluna do meio; no celular logo depois do Calcular Desconto): todas as contas num lugar só, iguais às da Proposta Zap. Por equipamento: tabela, desconto (em vermelho acima de 20%, com o 📋 que copia no formato do Zoho), locação, seguro, máquina + seguro e diária. Depois o frete e o valor final (propostas-resumo-frete.js). Os outros cards ficam só com os campos.
+// Card "Resumo da proposta" (no PC na coluna do meio; no celular logo depois do Calcular Desconto): todas as contas num lugar só, iguais às da Proposta Zap. Por equipamento: tabela, desconto (de um período só, como é lançado no Zoho; em vermelho acima de 20%, com o 📋 que copia no formato do Zoho), locação, seguro, máquina + seguro e diária. Depois o frete e o valor final (propostas-resumo-frete.js). Os outros cards ficam só com os campos.
 
 // desconto acima disso (em %) fica em vermelho, com destaque
 const LIMITE_DESCONTO_RESUMO = 20;
@@ -129,6 +129,11 @@ function secaoEquipamentoResumo(item, infoPeriodo){
 
         const percentual = Math.abs(diferenca / item.tabela * 100);
 
+        // o desconto vai no Zoho por período: com 12 períodos, o de 1 (o % é o mesmo)
+        const periodos = infoPeriodo.multiplicador;
+
+        const descontoPeriodo = diferenca / periodos;
+
         // compara o % como aparece (2 casas): 20,00% não fica vermelho
         const descontoAlto =
             diferenca > 0 &&
@@ -138,12 +143,18 @@ function secaoEquipamentoResumo(item, infoPeriodo){
             linhaResumo("Tabela", moedaResumo(item.tabela)),
             linhaResumo(
                 diferenca > 0 ? "Desconto" : "Acréscimo",
-                `${moedaResumo(Math.abs(diferenca))} (${formatarMoedaBR(percentual)}%)`,
+                `${moedaResumo(Math.abs(descontoPeriodo))} (${formatarMoedaBR(percentual)}%)`,
                 descontoAlto ? "resumo-desconto-alto" : "",
                 // no Zoho o acréscimo entra como desconto negativo
-                diferenca
+                descontoPeriodo
             )
         );
+
+        // nota em vez de "Desconto por período" no rótulo: não cabe numa linha
+        if(periodos > 1){
+
+            secao.append(notaResumo(`de 1 período (${infoPeriodo.diasBusca} dias)`, "resumo-desconto-periodo"));
+        }
 
         if(descontoAlto){
 
@@ -153,11 +164,11 @@ function secaoEquipamentoResumo(item, infoPeriodo){
             ));
         }
 
-        // o desconto é lançado por máquina no Zoho: já no formato de lá
-        // ("408.40"; acréscimo com menos: "-408.40"), com o 📋 ao lado
+        // o desconto é lançado por máquina (e por período) no Zoho: já no formato
+        // de lá ("408.40"; acréscimo com menos: "-408.40"), com o 📋 ao lado
         if(item.quantidade > 1){
 
-            const porMaquina = diferenca / item.quantidade;
+            const porMaquina = descontoPeriodo / item.quantidade;
 
             const nota = notaResumo(`${formatarNumeroPonto(porMaquina)} por máquina `, "resumo-por-maquina");
 

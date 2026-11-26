@@ -405,6 +405,7 @@ const confere = (nome, ok, extra) => {
     await pagina.fill("#periodo", "60");
     rs = await resumo();
     confere("com 2 períodos divide o total", (await pagina.inputValue(".descValorDesejado")) === "2.336,45" && rs.periodo === "60 dias (2 períodos de 30)" && rs.eq[0].linhas["Locação"] === "R$ 4.672,90" && rs.eq[0].linhas["Tabela"] === "R$ 12.000,00" && rs.eq[0].linhas["Máquina + seguro"] === "R$ 5.000,00", [await pagina.inputValue(".descValorDesejado"), rs.periodo, rs.eq[0]]);
+    confere("com 2 períodos o desconto é o de 1 período (o % é o mesmo)", rs.eq[0].linhas["Desconto"] === "R$ 3.663,55 (61,06%)" && rs.eq[0].notas.startsWith("de 1 período (30 dias)"), rs.eq[0]);
     zap = await zapAtual();
     confere("Zap com 2 períodos continua no total digitado", linhaZap(zap, "Total máquina + seguro").endsWith("R$ 5.000,00*"), linhaZap(zap, "Total máquina + seguro"));
 
@@ -586,7 +587,7 @@ const confere = (nome, ok, extra) => {
     confere("diária sem desconto, com o seguro ao lado", rs.eq[0].linhas["📅 Diária"] === "R$ 196,43" && rs.eq[0].notas.includes("com seguro R$ 210,18") && !rs.eq[0].notas.includes("tabela") && !("Tabela" in rs.eq[0].linhas), rs.eq[0]);
     await pagina.locator(".descPercentual").nth(0).fill("10");
     rs = await resumo();
-    confere("com desconto mostra a diária de tabela", rs.eq[0].linhas["📅 Diária"] === "R$ 176,79" && rs.eq[0].notas.includes("tabela R$ 196,43") && rs.eq[0].linhas["Desconto"] === "R$ 550,00 (10,00%)", rs.eq[0]);
+    confere("com desconto mostra a diária de tabela (1 período: sem a nota do período)", rs.eq[0].linhas["📅 Diária"] === "R$ 176,79" && rs.eq[0].notas.includes("tabela R$ 196,43") && !rs.eq[0].notas.includes("de 1 período") && rs.eq[0].linhas["Desconto"] === "R$ 550,00 (10,00%)", rs.eq[0]);
     confere("10% de desconto não fica vermelho", !rs.eq[0].descontoAlto && !rs.eq[0].notas.includes("acima de 20%"), rs.eq[0]);
     await pagina.locator(".descPercentual").nth(0).fill("20");
     rs = await resumo();
@@ -632,6 +633,23 @@ const confere = (nome, ok, extra) => {
     await pagina.fill("#periodo", "60");
     rs = await resumo();
     confere("60 dias: diária pelo total de dias", rs.eq[0].linhas["📅 Diária"] === "R$ 180,00" && rs.periodo === "60 dias (2 períodos de 30)" && rs.eq[0].notas.includes("tabela R$ 200,00"), [rs.periodo, rs.eq[0]]);
+    // o desconto vai no Zoho por período (e por máquina): o 📋 copia o de 1 período
+    const zohoDaSecao = () => pagina.evaluate(async () => {
+        const copiados = [];
+        for(const botao of document.querySelectorAll("#conteudoResumo .resumo-secao")[0].querySelectorAll(".resumo-zoho")){
+            window.__copiado = null;
+            botao.click();
+            await new Promise(r => setTimeout(r, 30));
+            copiados.push(window.__copiado);
+        }
+        return copiados;
+    });
+    confere("60 dias: desconto de 1 período, 📋 copia ele", rs.eq[0].linhas["Desconto"] === "R$ 600,00 (10,00%)" && rs.eq[0].notas.startsWith("de 1 período (30 dias)") && (await zohoDaSecao()).join() === "600.00", [rs.eq[0], await zohoDaSecao()]);
+    await pagina.locator(".quantidadeEquipamento").nth(0).fill("2");
+    rs = await resumo();
+    confere("60 dias e 2 máquinas: por máquina também é de 1 período", rs.eq[0].linhas["Desconto"] === "R$ 1.200,00 (10,00%)" && rs.eq[0].notas.includes("600.00 por máquina") && (await zohoDaSecao()).join() === "1200.00,600.00", [rs.eq[0], await zohoDaSecao()]);
+    await pagina.locator(".resumo-card").screenshot({ path: path.join(saida, "25c-propostas-desconto-por-periodo.png") });
+    await pagina.locator(".quantidadeEquipamento").nth(0).fill("1");
     await pagina.evaluate(() => { valorDiariaAtivo = true; });
     zap = await zapAtual();
     confere("a Proposta Zap mostra a mesma diária", linhaZap(zap, "Valor da locação").includes("( Diária = R$ 180,00 )"), linhaZap(zap, "Valor da locação"));

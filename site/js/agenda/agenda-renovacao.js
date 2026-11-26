@@ -277,6 +277,6 @@ function copiarEmailRenovacao(){
     copiarFormatado(
         htmlRenovacao(campos),
         textoRenovacao(campos),
-        "Email copiado: troque NOME_CONTATO, NÚMERO_CONTRATO e DESCRIÇÃO_EQUIPAMENTO no Outlook"
+        "Email copiado: troque NOMECONTATO, NÚMEROCONTRATO e DESCRIÇÃOEQUIPAMENTO no Outlook"
     );
 }

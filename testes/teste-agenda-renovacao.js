@@ -208,15 +208,15 @@ let navegador = null;
             perigoso: perigoso.includes("&lt;b&gt;Obra&lt;/b&gt;") && !perigoso.includes("<b>Obra</b>")
         };
     });
-    confere("assunto: o padrão das regras do Outlook, com os marcadores", exemplo.assunto === "RENOVAÇÃO DE LOCAÇÃO -> NÚMERO_CONTRATO ( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA", exemplo.assunto);
+    confere("assunto: o padrão das regras do Outlook, com os marcadores", exemplo.assunto === "RENOVAÇÃO DE LOCAÇÃO -> NÚMEROCONTRATO ( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA", exemplo.assunto);
     // o modelo do email real (24/11/2026) com as melhorias aprovadas: "nos informe",
     // "referente ao equipamento", "vence no dia ... (domingo)", a linha da coleta e
     // o encerramento pelo e-mail ou pelo WhatsApp do consultor
     const esperado = [
-        "Boa tarde NOME_CONTATO, tudo bem?",
+        "Boa tarde NOMECONTATO, tudo bem?",
         "",
-        "Estamos entrando em contato para lembrar que o contrato de locação nº NÚMERO_CONTRATO referente ao equipamento:",
-        "DESCRIÇÃO_EQUIPAMENTO - (WTE8C15)",
+        "Estamos entrando em contato para lembrar que o contrato de locação nº NÚMEROCONTRATO referente ao equipamento:",
+        "DESCRIÇÃOEQUIPAMENTO - (WTE8C15)",
         "",
         "vence no dia 29/11/2026 (domingo)",
         "",
@@ -242,7 +242,7 @@ let navegador = null;
     confere("Bom dia antes do meio-dia", exemplo.manha === "Bom dia");
     confere("já passou: venceu", exemplo.venceu === "venceu no dia 29/11/2026 (domingo)", exemplo.venceu);
     confere("feriado: na linha do vencimento", exemplo.feriado === "vence no dia 02/11/2026 (segunda-feira, feriado)", exemplo.feriado);
-    confere("várias máquinas: as do mesmo modelo juntas (+), uma linha por modelo", exemplo.variasAssunto.includes("( WTE10025 + WTE10N041 + WAE18R001 )") && JSON.stringify(exemplo.variasLinhas) === JSON.stringify(["DESCRIÇÃO_EQUIPAMENTO - (WTE10025 + WTE10N041)", "DESCRIÇÃO_EQUIPAMENTO - (WAE18R001)"]) && exemplo.variasReferente, [exemplo.variasAssunto, exemplo.variasLinhas]);
+    confere("várias máquinas: as do mesmo modelo juntas (+), uma linha por modelo", exemplo.variasAssunto.includes("( WTE10025 + WTE10N041 + WAE18R001 )") && JSON.stringify(exemplo.variasLinhas) === JSON.stringify(["DESCRIÇÃOEQUIPAMENTO - (WTE10025 + WTE10N041)", "DESCRIÇÃOEQUIPAMENTO - (WAE18R001)"]) && exemplo.variasReferente, [exemplo.variasAssunto, exemplo.variasLinhas]);
 
     const enderecos = await pagina.evaluate(() => [
         enderecoDoSisloc("R PRESIDENTE COSTA E SILVA Numero: 740 Complemento: - Bairro: TESTO REGA Cidade: POMERODE Estado: SC"),
@@ -318,12 +318,12 @@ let navegador = null;
     // copiar
     await pagina.click("#btnCopiarAssuntoRenovacao");
     await pagina.waitForTimeout(100);
-    confere("copia o assunto", (await pagina.evaluate(() => window.__copiado)) === "RENOVAÇÃO DE LOCAÇÃO -> NÚMERO_CONTRATO ( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA", await pagina.evaluate(() => window.__copiado));
+    confere("copia o assunto", (await pagina.evaluate(() => window.__copiado)) === "RENOVAÇÃO DE LOCAÇÃO -> NÚMEROCONTRATO ( WTE8C15 ) -> NÚMERO - DIAGONAL TECIDOS LTDA", await pagina.evaluate(() => window.__copiado));
     await pagina.click("#btnCopiarEmailRenovacao");
     await pagina.waitForTimeout(100);
     const copia = await pagina.evaluate(() => ({ texto: window.__copiado, html: window.__copiadoHtml }));
-    confere("copia o email formatado (HTML para o Outlook e o texto)", copia.html?.includes("background:yellow") && copia.texto.includes("NOME_CONTATO, tudo bem?") && copia.texto.includes("devido à condição de crédito vigente"), [!!copia.html, copia.html?.includes("background:yellow"), copia.texto?.slice(-500)]);
-    confere("avisa o que trocar no Outlook", (await pagina.innerText("#toast")).includes("troque NOME_CONTATO"), await pagina.innerText("#toast"));
+    confere("copia o email formatado (HTML para o Outlook e o texto)", copia.html?.includes("background:yellow") && copia.texto.includes("NOMECONTATO, tudo bem?") && copia.texto.includes("devido à condição de crédito vigente"), [!!copia.html, copia.html?.includes("background:yellow"), copia.texto?.slice(-500)]);
+    confere("avisa o que trocar no Outlook", (await pagina.innerText("#toast")).includes("troque NOMECONTATO"), await pagina.innerText("#toast"));
 
     await pagina.keyboard.press("Escape");
     confere("Esc fecha", !(await visivel("#modalRenovacao")));

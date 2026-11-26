@@ -3,12 +3,13 @@
 // ======================================
 // Só textos, sem tela, para o ✉️ Email de renovação (agenda-renovacao.js): o endereço do Sisloc arrumado ("R X Numero: 740 ... Cidade: POMERODE Estado: SC" -> "R X, 740 - Bairro, Pomerode/SC"), vence/venceu, Bom dia/Boa tarde, máquinas do mesmo modelo juntas, avisos extras (o da NF de retorno com o nome da empresa), e o assunto e o corpo (texto e HTML com o amarelo e o negrito do modelo do Outlook). As datas (feriados, prazo, dia da semana) ficam em agenda-renovacao-datas.js. O que o site não tem sai como marcador para trocar no Outlook (MARCADORES_RENOVACAO).
 
-// o que o site não tem: sai assim no email e é trocado no Outlook (dois cliques)
+// o que o site não tem: sai assim no email e é trocado no Outlook (dois cliques:
+// sem "_", senão o clique duplo seleciona só um pedaço)
 const MARCADORES_RENOVACAO = {
-    contato: "NOME_CONTATO",
-    contrato: "NÚMERO_CONTRATO",
+    contato: "NOMECONTATO",
+    contrato: "NÚMEROCONTRATO",
     codigoCliente: "NÚMERO",
-    descricao: "DESCRIÇÃO_EQUIPAMENTO"
+    descricao: "DESCRIÇÃOEQUIPAMENTO"
 };
 
 
@@ -192,7 +193,7 @@ function camposRenovacao(dados){
 }
 
 
-// RENOVAÇÃO DE LOCAÇÃO -> NÚMERO_CONTRATO ( WTE8C15 ) -> NÚMERO - CLIENTE
+// RENOVAÇÃO DE LOCAÇÃO -> NÚMEROCONTRATO ( WTE8C15 ) -> NÚMERO - CLIENTE
 function assuntoRenovacao(campos){
 
     const m = MARCADORES_RENOVACAO;

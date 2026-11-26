@@ -2,6 +2,8 @@
 // AGENDA - SUPABASE (agendamentos)
 // ======================================
 // Leitura/gravação dos agendamentos e recarga geral (agendamentos, motoristas, transportadoras).
+// Sem internet a carga usa a cópia do aparelho (agenda-offline-dados.js). Gravar
+// (inserir e atualizar, com a fila sem internet) fica em agenda-banco-gravar.js.
 // (Arquivo gerado da divisão dos arquivos grandes; ver ARQUIVOS.md.)
 
 // ======================================
@@ -218,7 +220,7 @@ function mensagemErroSalvar(erro){
         return "O banco recusou os dados: confira forma de pagamento e pedido de compra.";
     }
 
-    if(/failed to fetch|networkerror|network request/i.test(texto)){
+    if(/failed to fetch|networkerror|network request|load failed|sem resposta do servidor|sem internet/i.test(texto)){
 
         return "Sem conexão com o servidor. Confira a internet e tente de novo.";
     }
@@ -233,10 +235,14 @@ function mensagemErroSalvar(erro){
 
 
 // o Supabase devolve no máximo 1000 linhas por consulta,
-// então busca em páginas até acabar
+// então busca em páginas até acabar. Sem internet: a cópia guardada no
+// aparelho (agenda-offline-dados.js). Nos dois casos, por cima, o que está na
+// fila sem subir (agenda-offline-fila.js).
 async function carregarAgenda(){
 
     erroAgenda = "";
+
+    agendaDaCopiaEm = 0;
 
     try{
 
@@ -251,13 +257,16 @@ async function carregarAgenda(){
         while(true){
 
             const { data, error } =
-                await supabaseClient
-                    .from(TABELA_AGENDAMENTOS)
-                    .select("*")
-                    .or(`data.gte.${limite},data.is.null`)
-                    .is("excluido_em", null)
-                    .order("id")
-                    .range(inicio, inicio + tamanhoPagina - 1);
+                await comTempoLimite(
+                    supabaseClient
+                        .from(TABELA_AGENDAMENTOS)
+                        .select("*")
+                        .or(`data.gte.${limite},data.is.null`)
+                        .is("excluido_em", null)
+                        .order("id")
+                        .range(inicio, inicio + tamanhoPagina - 1),
+                    TEMPO_LIMITE_CARGA_MS
+                );
 
             if(error) throw error;
 
@@ -270,56 +279,32 @@ async function carregarAgenda(){
 
         agendamentos = linhas.map(doBanco);
 
+        guardarCopiaOffline("agenda", linhas);
+
     }catch(erro){
 
-        console.error("[agenda] Falha ao carregar:", detalhesErro(erro));
+        const copia = erroDeRede(erro) ? await lerCopiaOffline("agenda") : null;
 
-        erroAgenda =
-            "Não foi possível carregar a agenda (verifique conexão/login)";
+        if(copia){
 
-        mostrarToast("Falha ao carregar a agenda", true);
-    }
-}
+            console.warn("[agenda] Sem conexão: usando a cópia deste aparelho");
 
+            agendamentos = copia.valor.map(doBanco);
 
-async function inserirAgendamento(dados){
+            agendaDaCopiaEm = copia.em;
 
-    const { data, error } =
-        await supabaseClient
-            .from(TABELA_AGENDAMENTOS)
-            .insert(paraBanco(dados))
-            .select()
-            .single();
+        }else{
 
-    if(error) throw error;
+            console.error("[agenda] Falha ao carregar:", detalhesErro(erro));
 
-    avisarMudancaNaAgenda();
+            erroAgenda =
+                "Não foi possível carregar a agenda (verifique conexão/login)";
 
-    return doBanco(data);
-}
-
-
-// .select() devolve as linhas alteradas: se vier vazio, o agendamento
-// não existe mais (alguém excluiu) ou o RLS bloqueou
-async function atualizarAgendamento(id, dados){
-
-    const { data, error } =
-        await supabaseClient
-            .from(TABELA_AGENDAMENTOS)
-            .update(paraBanco(dados))
-            .eq("id", id)
-            .select();
-
-    if(error) throw error;
-
-    if(!data.length){
-
-        throw new Error("Agendamento não encontrado (foi excluído?)");
+            mostrarToast("Falha ao carregar a agenda", true);
+        }
     }
 
-    avisarMudancaNaAgenda();
-
-    return doBanco(data[0]);
+    await aplicarFilaNaLista();
 }
 
 

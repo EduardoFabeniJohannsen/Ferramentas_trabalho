@@ -68,14 +68,17 @@ function carregarHistoricoClientes(){
         try{
 
             const { data, error } =
-                await supabaseClient
-                    .from(TABELA_AGENDAMENTOS)
-                    .select(COLUNAS_HISTORICO_CLIENTES)
-                    .neq("cliente", "")
-                    .is("excluido_em", null)
-                    .order("data", { ascending: false, nullsFirst: true })
-                    .order("id", { ascending: false })
-                    .limit(LIMITE_HISTORICO_CLIENTES);
+                await comTempoLimite(
+                    supabaseClient
+                        .from(TABELA_AGENDAMENTOS)
+                        .select(COLUNAS_HISTORICO_CLIENTES)
+                        .neq("cliente", "")
+                        .is("excluido_em", null)
+                        .order("data", { ascending: false, nullsFirst: true })
+                        .order("id", { ascending: false })
+                        .limit(LIMITE_HISTORICO_CLIENTES),
+                    TEMPO_LIMITE_CARGA_MS
+                );
 
             if(error) throw error;
 
@@ -83,10 +86,22 @@ function carregarHistoricoClientes(){
 
             historicoClientesEm = Date.now();
 
+            guardarCopiaOffline("clientes", data || []);
+
         }catch(erro){
 
-            // sem o histórico, sugere só o que a agenda já carregou
-            console.warn("[agenda] Falha ao carregar os clientes antigos:", detalhesErro(erro));
+            // sem internet: os clientes da cópia do aparelho (agenda-offline-dados.js);
+            // sem ela, sugere só o que a agenda já carregou
+            const copia = erroDeRede(erro) ? await lerCopiaOffline("clientes") : null;
+
+            if(copia){
+
+                historicoClientes = copia.valor.map(doBanco);
+
+            }else{
+
+                console.warn("[agenda] Falha ao carregar os clientes antigos:", detalhesErro(erro));
+            }
         }
 
         cargaHistoricoClientes = null;

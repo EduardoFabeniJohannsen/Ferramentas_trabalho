@@ -16,16 +16,31 @@ async function carregarTransportadoras(){
     try{
 
         const { data, error } =
-            await supabaseClient
-                .from(TABELA_TRANSPORTADORAS)
-                .select("id, nome")
-                .order("nome");
+            await comTempoLimite(
+                supabaseClient
+                    .from(TABELA_TRANSPORTADORAS)
+                    .select("id, nome")
+                    .order("nome"),
+                TEMPO_LIMITE_CARGA_MS
+            );
 
         if(error) throw error;
 
         definirTransportadoras(data);
 
+        guardarCopiaOffline("transportadoras", data);
+
     }catch(erro){
+
+        // sem internet: a cópia do aparelho (agenda-offline-dados.js)
+        const copia = erroDeRede(erro) ? await lerCopiaOffline("transportadoras") : null;
+
+        if(copia){
+
+            definirTransportadoras(copia.valor);
+
+            return;
+        }
 
         console.error("[transportadoras] Falha ao carregar:", detalhesErro(erro));
 

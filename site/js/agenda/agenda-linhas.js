@@ -38,6 +38,9 @@ function criarItemAgenda(item){
         linha.appendChild(celula);
     });
 
+    // feito sem internet e ainda não subiu (agenda-offline-tela.js)
+    marcarLinhaOffline(linha, item);
+
     // ---------- controles (fora da área do print) ----------
     // cada usuário escolhe quais aparecem (agenda-botoes-linha.js)
 

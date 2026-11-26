@@ -97,6 +97,14 @@ async function sincronizarPdfPedido(registro){
 
     if(!pendencia.apagar && !pendencia.enviar) return {};
 
+    // ficou só no aparelho (o servidor não respondeu): o Storage precisa de conexão
+    if(registro.pendenteOffline){
+
+        return pendencia.enviar
+            ? { erro: "Agendamento salvo neste aparelho (sem internet), mas o PDF do pedido não foi junto. Anexe de novo e salve quando a internet voltar" }
+            : {};
+    }
+
     if(pendencia.enviar){
 
         try{

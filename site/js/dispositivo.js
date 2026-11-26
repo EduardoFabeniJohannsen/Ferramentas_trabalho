@@ -83,21 +83,38 @@ async function cidadeDoDispositivo(){
 }
 
 
+// servidor sem responder (sinal fraco): depois disso conta como sem rede
+const ESPERA_RESPOSTA_DISPOSITIVO_MS = 8000;
+
+
 // 'liberado', 'pendente', 'bloqueado' ou 'erro' (função não existe, sem rede).
 // Quem chama decide o que fazer com 'erro': ao abrir a página, segue normal;
-// na tela de espera, continua esperando.
+// na tela de espera, continua esperando. Sem internet nem pergunta: com o login
+// vencido, o supabase-js ficaria até 30 s tentando renovar e a página escondida.
 async function situacaoDoDispositivo(){
 
     try{
 
         await esperarScriptsDaPagina();
 
+        if(navigator.onLine === false) return "erro";
+
+        const cidade = await cidadeDoDispositivo();
+
         const { data, error } =
-            await supabaseClient.rpc("registrar_dispositivo", {
-                p_chave: CHAVE_DISPOSITIVO,
-                p_aparelho: descricaoDoDispositivo(),
-                p_cidade: await cidadeDoDispositivo()
-            });
+            await Promise.race([
+                supabaseClient.rpc("registrar_dispositivo", {
+                    p_chave: CHAVE_DISPOSITIVO,
+                    p_aparelho: descricaoDoDispositivo(),
+                    p_cidade: cidade
+                }),
+                new Promise(pronto =>
+                    setTimeout(
+                        () => pronto({ data: null, error: { message: "sem resposta do servidor" } }),
+                        ESPERA_RESPOSTA_DISPOSITIVO_MS
+                    )
+                )
+            ]);
 
         if(error){
 

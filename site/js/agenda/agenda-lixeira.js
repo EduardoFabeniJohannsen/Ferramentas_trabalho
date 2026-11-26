@@ -11,17 +11,49 @@
 let itensLixeira = [];
 
 
-// manda para a lixeira; false = já não estava na agenda
-async function moverParaLixeiraBanco(id){
+// false = já não estava na agenda
+async function moverParaLixeiraNoBanco(id){
 
     const { data, error } =
-        await supabaseClient.rpc("mover_agendamento_lixeira", { p_id: id });
+        await comTempoLimite(
+            supabaseClient.rpc("mover_agendamento_lixeira", { p_id: id }),
+            TEMPO_LIMITE_GRAVAR_MS
+        );
 
     if(error) throw error;
 
-    avisarMudancaNaAgenda();
-
     return data === true;
+}
+
+
+// manda para a lixeira; false = já não estava na agenda. Sem internet (ou
+// criado sem internet e ainda não subiu): vai pela fila (agenda-offline-fila.js)
+async function moverParaLixeiraBanco(id){
+
+    const idAtual = filaOffline.ids[id] ?? id;
+
+    if(
+        navigator.onLine === false ||
+        idSoDoAparelho(idAtual) ||
+        temPendenciaOffline(idAtual)
+    ){
+        return gravarOffline("lixeira", idAtual);
+    }
+
+    try{
+
+        const excluiu = await moverParaLixeiraNoBanco(idAtual);
+
+        avisarMudancaNaAgenda();
+
+        return excluiu;
+
+    }catch(erro){
+
+        if(!erroDeRede(erro)) throw erro;
+
+        return gravarOffline("lixeira", idAtual);
+    }
 }
 
 

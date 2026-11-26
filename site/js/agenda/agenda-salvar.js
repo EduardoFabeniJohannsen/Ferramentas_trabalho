@@ -150,6 +150,15 @@ async function salvarAgendamento(){
 
     Object.assign(dados, faturamento.dados);
 
+    // sem internet o PDF do pedido não sobe (o Storage precisa de conexão)
+    if(navigator.onLine === false && (pendenciaPdf.enviar || pendenciaPdf.apagar)){
+
+        return avisoFormulario(
+            "Sem internet: o PDF do pedido só pode ser anexado ou apagado com internet. Desfaça a mudança do PDF para salvar neste aparelho",
+            "faturamento"
+        );
+    }
+
     const id = idEmEdicao;
 
     // patrimônio já em outra demanda (agenda-conflitos.js)
@@ -235,7 +244,8 @@ async function salvarAgendamento(){
 
     renderizarAgenda();
 
-    mostrarToast("Agendamento salvo" + avisoSalvoEscondido(salvo));
+    // sem internet: ficou na fila do aparelho (agenda-offline-tela.js)
+    mostrarToast("Agendamento salvo" + textoSalvoOffline(salvo) + avisoSalvoEscondido(salvo));
 }
 
 
@@ -306,7 +316,7 @@ async function concluirAgendamento(item){
 
     renderizarAgenda();
 
-    mostrarToast("Agendamento concluído");
+    mostrarToast("Agendamento concluído" + textoSalvoOffline(item));
 
     return true;
 }
@@ -346,10 +356,16 @@ async function excluirAgendamento(id){
 
     renderizarAgenda();
 
+    // sem internet: a exclusão ficou na fila do aparelho (agenda-offline-fila.js)
+    const naFila =
+        filaOffline.itens.some(entrada => entrada.acao === "lixeira" && entrada.id === (filaOffline.ids[id] ?? id));
+
     mostrarToast(
-        excluiu
-            ? "Agendamento movido para a lixeira"
-            : "Esse agendamento já tinha sido excluído"
+        naFila
+            ? "Excluído neste aparelho: vai para a lixeira quando a internet voltar"
+            : excluiu
+                ? "Agendamento movido para a lixeira"
+                : "Esse agendamento já tinha sido excluído"
     );
 
     return true;

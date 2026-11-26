@@ -15,16 +15,31 @@ async function carregarMotoristas(){
     try{
 
         const { data, error } =
-            await supabaseClient
-                .from(TABELA_MOTORISTAS)
-                .select("id, transportadora, nome")
-                .order("nome");
+            await comTempoLimite(
+                supabaseClient
+                    .from(TABELA_MOTORISTAS)
+                    .select("id, transportadora, nome")
+                    .order("nome"),
+                TEMPO_LIMITE_CARGA_MS
+            );
 
         if(error) throw error;
 
         motoristasCadastrados = data;
 
+        guardarCopiaOffline("motoristas", data);
+
     }catch(erro){
+
+        // sem internet: a cópia do aparelho (agenda-offline-dados.js)
+        const copia = erroDeRede(erro) ? await lerCopiaOffline("motoristas") : null;
+
+        if(copia){
+
+            motoristasCadastrados = copia.valor;
+
+            return;
+        }
 
         console.error("[motoristas] Falha ao carregar:", detalhesErro(erro));
 

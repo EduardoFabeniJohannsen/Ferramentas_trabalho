@@ -112,6 +112,20 @@
 .btn-perigo:hover{
     background:#b91c1c;
 }
+/* sem internet / alterações esperando para subir (agenda-offline-tela.js) */
+.btn-offline{
+    background:#b45309;
+    white-space:nowrap;
+}
+.btn-offline:hover{
+    background:#92400e;
+}
+.btn-offline.com-erro{
+    background:#dc2626;
+}
+.btn-offline.com-erro:hover{
+    background:#b91c1c;
+}
 /* ===== Filtro de datas (estilo Excel) ===== */
 .filtro-datas,
 .filtro-status,

@@ -84,8 +84,9 @@ function temTrabalhoAberto(){
         !!document.querySelector(".modal-overlay.aberto") ||
         // estoque: prévia ainda não publicada
         (typeof previaAtual !== "undefined" && !!previaAtual) ||
-        // agenda gravando
+        // agenda gravando ou subindo o que foi feito sem internet
         (typeof salvandoAgendamento !== "undefined" && salvandoAgendamento) ||
+        (typeof enviandoFilaOffline !== "undefined" && enviandoFilaOffline) ||
         // página inicial: texto no conversor
         (!!$("texto") && !!$("texto").value.trim()) ||
         // tabelas: linha nova digitada e ainda não adicionada

@@ -7,6 +7,23 @@
 // login, confere se o usuário tem acesso a esta página
 // (tabela "perfis"); se não tiver, manda pra uma que tenha.
 
+// ======================================
+// SESSÃO AO ABRIR A PÁGINA
+// ======================================
+// Sem internet, o login vencido (dura 1 h) fica até 30 s tentando renovar
+// (supabase-js) e a página escondida esse tempo todo. Com login salvo no
+// aparelho, a abertura não espera mais que isso: segue com o login salvo
+// (quem protege os dados é o banco). A mesma resposta serve para a abertura
+// inteira (protegerPagina, ehAdmin, buscarPerfil): lerSessao(), mais abaixo.
+// Ficam antes da protegerPagina, que roda assim que o arquivo carrega.
+
+const ESPERA_SESSAO_MS = 8000;
+
+const ESPERA_SESSAO_SEM_REDE_MS = 1500;
+
+let promessaSessao = null;
+
+
 (async function protegerPagina(){
 
     // Esconde a página até a sessão ser confirmada, pra quem
@@ -15,8 +32,7 @@
 
     try{
 
-        const { data, error } =
-            await supabaseClient.auth.getSession();
+        const { data, error } = await lerSessao();
 
         if(error || !data.session){
 
@@ -70,7 +86,55 @@
 
     document.documentElement.style.visibility = "";
 
+    // daqui em diante, cada consulta lê a sessão de novo
+    promessaSessao = null;
+
 })();
+
+
+function lerSessao(){
+
+    if(promessaSessao) return promessaSessao;
+
+    const consulta = supabaseClient.auth.getSession();
+
+    if(!existeLoginSalvo()) return consulta;
+
+    promessaSessao =
+        Promise.race([
+            consulta,
+            new Promise(pronto =>
+                setTimeout(
+                    () => pronto({
+                        data: { session: null },
+                        error: { name: "AuthRetryableFetchError", message: "O login não renovou a tempo (sem internet?)" }
+                    }),
+                    navigator.onLine === false ? ESPERA_SESSAO_SEM_REDE_MS : ESPERA_SESSAO_MS
+                )
+            )
+        ]);
+
+    return promessaSessao;
+}
+
+
+// o usuário do login guardado no aparelho (sem internet, quando não renovou)
+function usuarioSalvoNoAparelho(){
+
+    try{
+
+        const chave =
+            Object.keys(localStorage).find(nome =>
+                nome.startsWith("sb-") && nome.endsWith("-auth-token")
+            );
+
+        return chave ? (JSON.parse(localStorage.getItem(chave) || "null")?.user || null) : null;
+
+    }catch(erro){
+
+        return null;
+    }
+}
 
 
 // ======================================
@@ -108,12 +172,12 @@ async function ehAdmin(){
 
     try{
 
-        const { data } =
-            await supabaseClient.auth.getSession();
+        const { data } = await lerSessao();
 
-        return (
-            data?.session?.user?.app_metadata?.role === "admin"
-        );
+        // sem internet o login vencido não renova: vale o salvo no aparelho
+        const usuario = data?.session?.user || usuarioSalvoNoAparelho();
+
+        return usuario?.app_metadata?.role === "admin";
 
     }catch(erro){
 
@@ -205,8 +269,7 @@ async function buscarPerfil(){
 
     try{
 
-        const { data } =
-            await supabaseClient.auth.getSession();
+        const { data } = await lerSessao();
 
         usuario = data?.session?.user || null;
 
@@ -253,9 +316,10 @@ async function buscarPerfil(){
         console.error("[auth] Falha ao ler o perfil:", erro);
     }
 
-    // sem conexão ou sem sessão: usa a cópia salva (ou só propostas)
+    // sem conexão ou sem sessão: usa a cópia salva (ou só propostas), do
+    // mesmo usuário do login guardado no aparelho
     perfilUsuario =
-        lerPerfilCache(usuario?.id) || padrao;
+        lerPerfilCache(usuario?.id || usuarioSalvoNoAparelho()?.id) || padrao;
 
     return perfilUsuario;
 }
@@ -379,9 +443,12 @@ async function liberarPaginaAtual(){
 // ======================================
 // LOGOUT
 // ======================================
-// Chamado pelo botão "Sair" na topbar.
+// Chamado pelo botão "Sair" na topbar. Na agenda, com alteração feita sem
+// internet que ainda não subiu, pergunta antes (agenda-offline-tela.js).
 
 async function fazerLogout(){
+
+    if(typeof confirmarSaidaOffline === "function" && !(await confirmarSaidaOffline())) return;
 
     await supabaseClient.auth.signOut();
 

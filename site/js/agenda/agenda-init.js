@@ -222,6 +222,9 @@
 
         // mudou algo em outro navegador: atualiza aqui (agenda-tempo-real.js)
         iniciarTempoReal();
+
+        // abre sem internet e sobe o que foi feito sem ela (agenda-offline-tela.js)
+        iniciarOffline();
     });
 
     // várias pessoas usam: ao voltar pra aba, atualiza se passou um tempo

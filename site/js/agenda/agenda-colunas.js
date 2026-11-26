@@ -67,14 +67,16 @@ async function obterUsuarioAgenda(){
 
     try{
 
+        // sem internet o login vencido não renova (e fica até 30 s tentando): o
+        // usuário vem do login guardado no aparelho (agenda-offline-dados.js)
         const { data } =
-            await supabaseClient.auth.getSession();
+            await comTempoLimite(supabaseClient.auth.getSession(), 3000);
 
-        return data?.session?.user?.id || "";
+        return data?.session?.user?.id || usuarioDoLoginSalvo();
 
     }catch(erro){
 
-        return "";
+        return usuarioDoLoginSalvo();
     }
 }
 

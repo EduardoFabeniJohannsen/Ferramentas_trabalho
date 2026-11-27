@@ -278,5 +278,7 @@ document.addEventListener("keydown", (evento) => {
         fecharDemandaAgenda();
 
         fecharRenovacaoAgenda();
+
+        fecharEmailColetaAgenda();
     }
 });

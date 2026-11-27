@@ -1109,6 +1109,89 @@ DEMANDA (botão 📦 Demanda)
 
 </div>
 
+<!-- ✉️ email de agendamento da coleta (agenda-email-coleta.js): as instruções da
+     coleta e da NF de devolução, para colar no Outlook -->
+<div id="modalEmailColeta" class="modal-overlay">
+
+    <div class="modal-agenda modal-renovacao">
+
+        <div class="modal-agenda-topo">
+
+            <div class="modal-titulo">
+                <h3>✉️ Email de agendamento da coleta</h3>
+                <span id="resumoEmailColeta" class="resumo-demanda"></span>
+            </div>
+
+            <button
+                type="button"
+                class="btn-fechar"
+                data-clique="fecharEmailColetaAgenda"
+                title="Fechar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-corpo">
+
+            <div class="renovacao-campos">
+
+                <label>Data da coleta
+                    <input type="date" id="emailColetaData" data-mudanca="desenharEmailColeta">
+                </label>
+
+                <label>Horário previsto
+                    <input type="text" id="emailColetaHorario" maxlength="20" autocomplete="off" data-entrada="desenharEmailColeta">
+                </label>
+
+                <label class="renovacao-largo">Equipamentos
+                    <input type="text" id="emailColetaEquipamentos" autocomplete="off" data-entrada="desenharEmailColeta">
+                </label>
+
+                <label class="renovacao-largo">Local
+                    <input type="text" id="emailColetaLocal" autocomplete="off" data-entrada="desenharEmailColeta">
+                </label>
+
+                <label class="renovacao-largo">Endereço
+                    <input type="text" id="emailColetaEndereco" autocomplete="off" data-entrada="desenharEmailColeta">
+                </label>
+
+            </div>
+
+            <div class="renovacao-bloco renovacao-aviso">
+                <label title="Sem Inscrição Estadual o cliente não emite a NF de devolução: a W Rental emite">
+                    <input type="checkbox" id="emailColetaSemIe" data-mudanca="desenharEmailColeta">
+                    Cliente sem Inscrição Estadual (a W Rental emite a NF de retorno)
+                </label>
+            </div>
+
+            <div id="alertasEmailColeta" class="renovacao-alertas"></div>
+
+            <div class="renovacao-assunto">
+                <strong>Assunto:</strong> <span id="assuntoEmailColeta"></span>
+            </div>
+
+            <!-- prévia do jeito que fica no Outlook -->
+            <div id="previaEmailColeta" class="renovacao-previa"></div>
+
+            <p class="renovacao-dica">
+                No Outlook: cole o email acima da assinatura, troque NÚMEROCONTRATO e NÚMERO
+                (código do cliente) no assunto e anexe a NF de remessa (cliente sem Inscrição
+                Estadual: sem anexo).
+            </p>
+
+            <div class="renovacao-botoes">
+                <button type="button" id="btnCopiarAssuntoEmailColeta" data-clique="copiarAssuntoEmailColeta">📋 Copiar assunto</button>
+                <button type="button" id="btnCopiarEmailColeta" data-clique="copiarEmailColeta">📋 Copiar email</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 <datalist id="listaHorarios">
     <option value="CONFIRMAR">
     <option value="IMEDIATO">
@@ -1196,6 +1279,8 @@ DEMANDA (botão 📦 Demanda)
 <script src="js/agenda/agenda-renovacao-datas.js" defer></script>
 <script src="js/agenda/agenda-renovacao-texto.js" defer></script>
 <script src="js/agenda/agenda-renovacao.js" defer></script>
+<script src="js/agenda/agenda-email-coleta-texto.js" defer></script>
+<script src="js/agenda/agenda-email-coleta.js" defer></script>
 <script src="js/agenda/agenda-tempo-real.js" defer></script>
 <script src="js/agenda/agenda-offline-dados.js" defer></script>
 <script src="js/agenda/agenda-offline-fila.js" defer></script>

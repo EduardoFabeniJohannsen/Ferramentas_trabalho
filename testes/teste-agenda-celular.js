@@ -155,7 +155,7 @@ const cartoes = (pagina) => pagina.evaluate(() =>
     confere("coluna vazia some (sem motorista)", !entrega.colunas.includes("motorista") && troca.colunas.includes("motorista"), [entrega.colunas, troca.colunas]);
     confere("ordem: horário, tipo e status em cima, a máquina e o resto na ordem das colunas", JSON.stringify(entrega.colunas) === JSON.stringify(["horario", "tipo", "status", "titulo", "transportadora", "retirada", "entrega", "frete", "proposta"]), entrega.colunas);
     confere("botões numa linha só", entrega.botoes.length >= 5 && new Set(entrega.botoes).size === 1, entrega.botoes);
-    confere("botões que não valem (coleta: faturamento, ↩️ e ✉️) somem em vez de deixar buraco", coleta.botoes.length === entrega.botoes.length - 3, [entrega.botoes.length, coleta.botoes.length]);
+    confere("botões que não valem (coleta: faturamento e ↩️; o ✉️ é o do email da coleta) somem em vez de deixar buraco", coleta.botoes.length === entrega.botoes.length - 2, [entrega.botoes.length, coleta.botoes.length]);
     confere("link do mapa numa linha só", entrega.linkUmaLinha);
     await pagina.screenshot({ path: path.join(saida, "agenda-celular.png"), fullPage: true });
 
@@ -174,9 +174,15 @@ const cartoes = (pagina) => pagina.evaluate(() =>
         const linha = document.querySelector("#listaAgenda tr.ag-item");
         return { cartao: getComputedStyle(linha).backgroundColor, celula: getComputedStyle(linha.querySelector("td")).backgroundColor };
     });
-    // "rgb(212, 192, 249)" ou "color(srgb 0.83 0.75 0.97)" (o color-mix)
-    const primeiroCanal = (cor) => { const n = Number((cor.match(/[\d.]+/) || [0])[0]); return cor.startsWith("color(") ? n * 255 : n; };
-    confere("fundo claro: o cartão é claro e as células não pintam por cima", primeiroCanal(fundo.cartao) > 150 && fundo.celula === "rgba(0, 0, 0, 0)", fundo);
+    // "rgb(212, 192, 249)" ou "color(srgb 0.83 0.75 0.97)" (o color-mix). A cor é a do
+    // dia da semana de hoje: vale a média dos três canais (na sexta, azul claro, o
+    // vermelho sozinho fica em 146)
+    const claridade = (cor) => {
+        const canais = (cor.replace(/^color\(srgb/, "").match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+        const escala = cor.startsWith("color(") ? 255 : 1;
+        return canais.length === 3 ? canais.reduce((soma, n) => soma + n * escala, 0) / 3 : 0;
+    };
+    confere("fundo claro: o cartão é claro e as células não pintam por cima", claridade(fundo.cartao) > 150 && fundo.celula === "rgba(0, 0, 0, 0)", [fundo, claridade(fundo.cartao)]);
     await pagina.screenshot({ path: path.join(saida, "agenda-celular-claro.png") });
     await pagina.click("#btnTema");
 

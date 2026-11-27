@@ -267,7 +267,7 @@ let navegador = null;
     // ---------- o botão ----------
     const visivel = (seletor) => pagina.isVisible(seletor);
     const botao = (cliente) => pagina.locator("tr.ag-item", { hasText: cliente }).locator(".btn-renovacao");
-    confere("✉️ na entrega e na entrega/coleta; na coleta fica invisível", await botao("Diagonal").isVisible() && await botao("Weg Tintas").isVisible() && (await botao("Beta").evaluate(b => b.style.visibility)) === "hidden");
+    confere("✉️ de renovação na entrega e na entrega/coleta; na coleta é o do email da coleta (teste-agenda-email-coleta.js)", await botao("Diagonal").isVisible() && await botao("Weg Tintas").isVisible() && (await botao("Diagonal").getAttribute("title")).includes("renovação") && (await botao("Beta").getAttribute("title")).includes("agendamento da coleta"));
 
     // ---------- a janela ----------
     await botao("Diagonal").click();

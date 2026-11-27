@@ -137,8 +137,9 @@ function criarItemAgenda(item){
 
     if(botaoLigado("coleta")) botoes.appendChild(botaoColeta);
 
-    // email de renovação do contrato (agenda-renovacao.js): só entrega e
-    // entrega/coleta; nos outros tipos fica invisível, para alinhar
+    // ✉️: na entrega e na entrega/coleta, o email de renovação do contrato
+    // (agenda-renovacao.js); na coleta, o email de agendamento dela
+    // (agenda-email-coleta.js); nos outros tipos fica invisível, para alinhar
     const botaoRenovacao = criar("button", "btn-renovacao", "✉️");
 
     botaoRenovacao.type = "button";
@@ -148,6 +149,12 @@ function criarItemAgenda(item){
         botaoRenovacao.title = "Email de renovação da locação (copiar para o Outlook)";
 
         botaoRenovacao.addEventListener("click", () => abrirRenovacaoAgenda(item));
+
+    }else if(item.tipo === "Coleta"){
+
+        botaoRenovacao.title = "Email de agendamento da coleta (copiar para o Outlook)";
+
+        botaoRenovacao.addEventListener("click", () => abrirEmailColetaAgenda(item));
 
     }else{
 

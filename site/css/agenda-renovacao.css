@@ -1,4 +1,4 @@
-/* Agenda: a janela do ✉️ Email de renovação (campos, avisos extras, prévia do email e os botões de copiar). */
+/* Agenda: a janela do ✉️ Email de renovação (campos, avisos extras, prévia do email e os botões de copiar); a do ✉️ Email de agendamento da coleta usa as mesmas classes. */
 
 .modal-agenda.modal-renovacao{
     max-width:760px;

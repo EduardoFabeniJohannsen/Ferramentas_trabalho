@@ -2,7 +2,15 @@
 // ADMIN - SUPABASE (perfis)
 // ======================================
 // Ler e salvar os acessos de cada usuário (tabela "perfis").
-// Só admin enxerga todos e altera (policies de RLS).
+// Só admin enxerga todos e altera (policies de RLS). Sem a coluna motorista_id
+// no banco (SQL do login de motorista não aplicado), lê e salva sem ela.
+
+// com a coluna do login de motorista (perfis.motorista_id) quando o banco já tem
+function camposPerfisAdmin(){
+
+    return "id, email, acessos, filiais, ativo" + (semColunaMotoristaAdmin ? "" : ", motorista_id");
+}
+
 
 async function carregarPerfisAdmin(){
 
@@ -10,11 +18,21 @@ async function carregarPerfisAdmin(){
 
     try{
 
-        const { data, error } =
-            await supabaseClient
+        const consultar = () =>
+            supabaseClient
                 .from(TABELA_PERFIS)
-                .select("id, email, acessos, filiais, ativo")
+                .select(camposPerfisAdmin())
                 .order("email");
+
+        let { data, error } = await consultar();
+
+        // SQL do login de motorista ainda não aplicado: o resto funciona sem a coluna
+        if(error && !semColunaMotoristaAdmin && faltaColunaMotoristaAdmin(error)){
+
+            semColunaMotoristaAdmin = true;
+
+            ({ data, error } = await consultar());
+        }
 
         if(error) throw error;
 
@@ -45,7 +63,7 @@ async function salvarPerfilAdmin(perfil, dados){
             .from(TABELA_PERFIS)
             .update(dados)
             .eq("id", perfil.id)
-            .select("id, email, acessos, filiais, ativo");
+            .select(camposPerfisAdmin());
 
     if(error || !data || !data.length){
 

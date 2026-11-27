@@ -42,7 +42,11 @@ const ACESSOS_ADMIN = [
 
     { chave: "analise-movimentacoes", rotulo: "Análise de movimentações" },
 
-    { chave: "fretes", rotulo: "Dados de frete" }
+    { chave: "fretes", rotulo: "Dados de frete" },
+
+    // login de motorista (motorista.html): só as entregas do motorista escolhido
+    // na coluna Motorista (perfis.motorista_id), pela função entregas_motorista
+    { chave: "motorista", rotulo: "Minhas entregas (motorista)" }
 ];
 
 // filiais do estoque (mesmas chaves de FILIAIS em estoque-config.js)
@@ -55,5 +59,12 @@ const FILIAIS_ADMIN = [
 
 const TABELA_PERFIS = "perfis";
 
-// [{ id, email, acessos, filiais, ativo }]
+// [{ id, email, acessos, filiais, ativo, motorista_id }]
 let perfisAdmin = [];
+
+// motoristas cadastrados (página Transportadoras): [{ id, transportadora, nome }]
+// para a coluna Motorista (admin-motoristas.js)
+let motoristasAdmin = [];
+
+// o banco ainda não tem perfis.motorista_id (SQL do login de motorista)
+let semColunaMotoristaAdmin = false;

@@ -35,7 +35,11 @@
     // o tempo de "parado há 12 min" continua contando sem ninguém avisar
     setInterval(desenharUsuariosOnline, 30000);
 
-    await carregarPerfisAdmin();
+    // a coluna Motorista precisa da lista dos motoristas: desenha de novo quando
+    // as duas chegarem
+    await Promise.all([carregarMotoristasAdmin(), carregarPerfisAdmin()]);
+
+    desenharPerfis();
 
     // aparelhos depois dos perfis: a lista mostra o e-mail de cada login
     await carregarAparelhos();

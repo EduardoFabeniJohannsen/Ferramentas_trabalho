@@ -1,7 +1,8 @@
 // ======================================
 // ADMIN - TELA
 // ======================================
-// Tabela de usuários com uma caixinha por acesso e por filial.
+// Tabela de usuários com uma caixinha por acesso e por filial, e a coluna
+// Motorista (admin-motoristas.js) logo depois dos acessos.
 
 // liga ou desliga um item de uma lista, sem repetir
 function alternarItemLista(lista, item, ligado){
@@ -60,6 +61,7 @@ function desenharCabecalhoAdmin(){
         { texto: "Usuário", classe: "col-usuario" },
         { texto: "Ativo", classe: "" },
         ...ACESSOS_ADMIN.map(acesso => ({ texto: acesso.rotulo, classe: "" })),
+        { texto: "Motorista", classe: "" },
         ...FILIAIS_ADMIN.map((filial, indice) => ({
             texto: `Estoque ${filial.rotulo}`,
             classe: indice === 0 ? "inicio-grupo" : ""
@@ -173,6 +175,8 @@ function desenharPerfis(){
                 )
             );
         });
+
+        tr.appendChild(criarCelulaMotoristaAdmin(perfil));
 
         FILIAIS_ADMIN.forEach((filial, indice) => {
 

@@ -394,7 +394,8 @@ const PAGINAS_DESTINO = [
     "transportadoras.html",
     "propostas-copiadas.html",
     "analise-fretes.html",
-    "analise-movimentacoes.html"
+    "analise-movimentacoes.html",
+    "motorista.html"
 ];
 
 

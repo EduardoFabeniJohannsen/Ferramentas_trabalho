@@ -2,7 +2,9 @@
 // MENU (TOPBAR)
 // ======================================
 // Links entre TODAS as páginas, montados aqui, num lugar só.
-// Em cada página aparecem todos, menos o dela mesma.
+// Em cada página aparecem os das páginas que a pessoa pode abrir (admin ou
+// acesso liberado no Admin), menos o dela mesma: sem o acesso, o auth-guard.js
+// mandaria embora (o motorista só vê a dele). Sem nenhum link, o ☰ Menu some.
 // Os links digitados na mão em cada HTML são trocados por estes.
 // Página nova? É só somar uma linha na lista abaixo.
 // Carregar depois de helpers.js, em toda página que tem a topbar.
@@ -23,19 +25,21 @@
 
         { arquivo: "WEG.html", rotulo: "🏢 WEG" },
 
-        // comAcesso: o link só aparece para quem tem o acesso da página
-        // (admin ou liberado na página Admin)
-        { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras", comAcesso: true },
+        { arquivo: "transportadoras.html", rotulo: "🚚 Transportadoras" },
 
-        { arquivo: "leads.html", rotulo: "🎯 Leads", comAcesso: true },
+        { arquivo: "leads.html", rotulo: "🎯 Leads" },
 
-        { arquivo: "propostas-copiadas.html", rotulo: "📊 Propostas Zap", comAcesso: true },
+        { arquivo: "propostas-copiadas.html", rotulo: "📊 Propostas Zap" },
 
-        { arquivo: "analise-fretes.html", rotulo: "📈 Análise de fretes", comAcesso: true },
+        { arquivo: "analise-fretes.html", rotulo: "📈 Análise de fretes" },
 
-        { arquivo: "analise-movimentacoes.html", rotulo: "🔄 Análise de movimentações", comAcesso: true },
+        { arquivo: "analise-movimentacoes.html", rotulo: "🔄 Análise de movimentações" },
 
-        // soAdmin: o link só aparece para admin
+        // a página do login de motorista (só as entregas dele)
+        { arquivo: "motorista.html", rotulo: "🚛 Minhas entregas" },
+
+        // soAdmin: o link só aparece para admin (as outras: para quem tem o
+        // acesso da página, admin ou liberado na página Admin)
 
         { arquivo: "admin.html", rotulo: "👤 Admin", soAdmin: true }
     ];
@@ -96,30 +100,22 @@
 
             link.innerText = pagina.rotulo;
 
-            // página só de admin: link escondido até confirmar o papel
-            if(pagina.soAdmin){
+            // escondido até saber se a pessoa pode abrir a página (o papel de
+            // admin, ou o perfil; a página também fica escondida até lá, pelo
+            // auth-guard.js)
+            link.style.display = "none";
 
-                link.style.display = "none";
+            const liberada =
+                pagina.soAdmin
+                    ? ehAdmin()
+                    : carregarPerfil().then(() => temAcesso(recursoDaPagina(pagina.arquivo)));
 
-                ehAdmin().then(admin => {
+            liberada.then(pode => {
 
-                    if(admin) link.style.display = "";
-                });
-            }
+                if(pode) link.style.display = "";
 
-            // página com acesso controlado: escondido até ler o perfil
-            if(pagina.comAcesso){
-
-                link.style.display = "none";
-
-                carregarPerfil().then(() => {
-
-                    if(temAcesso(recursoDaPagina(pagina.arquivo))){
-
-                        link.style.display = "";
-                    }
-                });
-            }
+                mostrarBotaoMenu();
+            });
 
             topbar.insertBefore(link, referencia);
         });
@@ -144,6 +140,17 @@
     };
 
     abrirMenuCelular(false);
+
+    // sem link nenhum (o motorista, na página dele), o ☰ não abriria nada
+    function mostrarBotaoMenu(){
+
+        const algumLink =
+            [...topbar.querySelectorAll("a.botao-topbar")]
+                .some(link => link.style.display !== "none");
+
+        // no style (e não no hidden): o style.css mostra o botão no celular
+        botaoMenu.style.display = algumLink ? "" : "none";
+    }
 
     botaoMenu.addEventListener("click", () =>
         abrirMenuCelular(!topbar.classList.contains("menu-aberto"))

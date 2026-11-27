@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://qhneylwmrzuesaloqetr.supabase.co wss://qhneylwmrzuesaloqetr.supabase.co https://get.geojs.io; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- já abre a conexão com o banco enquanto os arquivos baixam -->
+<link rel="preconnect" href="https://qhneylwmrzuesaloqetr.supabase.co" crossorigin>
+
+<title>Minhas entregas</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="icon.png">
+
+<link rel="stylesheet" href="css/motorista.css">
+
+</head>
+
+<body>
+
+<!-- =========================
+TOPBAR
+========================= -->
+
+<div class="topbar">
+
+    <!-- links das outras páginas: montados pelo js/menu.js -->
+
+    <button data-clique="fazerLogout">Sair</button>
+
+    <div class="versao" id="versaoSistema"></div>
+
+</div>
+
+
+<!-- =========================
+CONTAINER (login de motorista: acesso "motorista" no Admin, e o admin)
+========================= -->
+
+<div class="container">
+
+    <div class="card card-motorista">
+
+        <h2>🚛 Minhas entregas</h2>
+
+        <!-- nome e transportadora do motorista do login (motorista-tela.js) -->
+        <p class="motorista-quem" id="motoristaQuem"></p>
+
+        <!-- só o admin: ver as entregas de qualquer motorista (motorista-dados.js) -->
+        <label class="motorista-ver-como" id="motoristaVerComo" hidden>
+            Ver como o motorista
+            <select id="motoristaVerComoSelect" data-mudanca="trocarVerComoMotorista"></select>
+        </label>
+
+        <div class="motorista-barra">
+
+            <button type="button" id="btnAtualizarMotorista" data-clique="carregarEntregasMotorista">
+                ↻ Atualizar
+            </button>
+
+            <span class="motorista-atualizado" id="motoristaAtualizado"></span>
+
+        </div>
+
+        <!-- as entregas por dia (motorista-tela.js) -->
+        <div id="listaMotorista" class="lista-motorista"></div>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script src="js/vendor/supabase-2.45.0.js" defer></script>
+<script src="js/acoes.js" defer></script>
+<script src="js/supabase-config.js" defer></script>
+<script src="js/registro-erros.js" defer></script>
+<script src="js/arquivo-faltando.js" defer></script>
+<script src="js/dispositivo.js" defer></script>
+<script src="js/auth-guard.js" defer></script>
+
+<script src="js/helpers.js" defer></script>
+<script src="js/atualizacao-sistema.js" defer></script>
+<script src="js/presenca.js" defer></script>
+<script src="js/menu.js" defer></script>
+<script src="js/agendamento-comum.js" defer></script>
+<script src="js/motorista/motorista-texto.js" defer></script>
+<script src="js/motorista/motorista-dados.js" defer></script>
+<script src="js/motorista/motorista-tela.js" defer></script>
+<script src="js/motorista/motorista-init.js" defer></script>
+
+</body>
+
+</html>

@@ -1,0 +1,285 @@
+/* =========================
+MINHAS ENTREGAS (motorista.html): feita para o celular
+========================= */
+
+.card-motorista{
+    width:100%;
+    max-width:760px;
+    text-align:left;
+}
+
+.card-motorista h2{
+    text-align:center;
+}
+
+.motorista-quem{
+    text-align:center;
+    font-size:16px;
+    font-weight:600;
+    color:#93c5fd;
+}
+
+.motorista-quem:empty{
+    display:none;
+}
+
+.motorista-ver-como{
+    display:block;
+    margin:10px 0;
+    font-size:13px;
+    color:#94a3b8;
+}
+
+/* só o admin (o display acima ganharia do hidden) */
+.motorista-ver-como[hidden]{
+    display:none;
+}
+
+.motorista-ver-como select{
+    margin:4px 0 0;
+}
+
+.motorista-barra{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:10px 0 14px;
+}
+
+.motorista-barra button{
+    width:auto;
+    margin:0;
+    padding:10px 16px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:#fff;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.motorista-barra button:disabled{
+    opacity:.6;
+    cursor:default;
+}
+
+.motorista-atualizado{
+    font-size:13px;
+    color:#94a3b8;
+}
+
+.aviso-motorista{
+    padding:14px;
+    border-radius:10px;
+    background:#0f172a;
+    color:#cbd5e1;
+    text-align:center;
+    line-height:1.4;
+}
+
+.aviso-motorista.aviso-erro{
+    color:#fecaca;
+    border:1px solid #7f1d1d;
+}
+
+
+/* um dia */
+
+.dia-motorista{
+    margin:0 0 18px;
+}
+
+.titulo-dia-motorista{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:8px;
+    margin:0 0 8px;
+    padding:8px 10px;
+    border-radius:8px;
+    background:#0f172a;
+    font-size:16px;
+}
+
+.dia-hoje .titulo-dia-motorista{
+    background:#1d4ed8;
+    color:#fff;
+}
+
+.quantos-motorista{
+    font-size:12px;
+    font-weight:400;
+    opacity:.8;
+    white-space:nowrap;
+}
+
+
+/* um agendamento */
+
+.entrega-motorista{
+    margin:0 0 10px;
+    padding:12px;
+    border-radius:10px;
+    background:#0f172a;
+    border-left:4px solid #3b82f6;
+    line-height:1.4;
+}
+
+.entrega-motorista.concluida{
+    border-left-color:#22c55e;
+    opacity:.75;
+}
+
+.entrega-motorista.cancelada{
+    border-left-color:#ef4444;
+    opacity:.55;
+}
+
+.entrega-motorista.cancelada .horario-motorista{
+    text-decoration:line-through;
+}
+
+.topo-entrega-motorista{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px 8px;
+    margin-bottom:6px;
+}
+
+.horario-motorista{
+    font-size:20px;
+    font-weight:700;
+    margin-right:4px;
+}
+
+.tipo-motorista,
+.status-motorista{
+    padding:2px 8px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    background:#334155;
+    color:#e2e8f0;
+}
+
+.status-a-confirmar{ background:#78350f; color:#fde68a; }
+.status-confirmado{ background:#1e3a8a; color:#bfdbfe; }
+.status-em-rota{ background:#581c87; color:#e9d5ff; }
+.status-concluido{ background:#14532d; color:#bbf7d0; }
+.status-cancelado{ background:#7f1d1d; color:#fecaca; }
+
+.card-motorista .linha-motorista{
+    margin:4px 0;
+    overflow-wrap:anywhere;
+}
+
+.rotulo-motorista{
+    color:#94a3b8;
+    font-size:13px;
+}
+
+.linha-equipamento{
+    font-weight:600;
+}
+
+.linha-carregamento,
+.linha-observacao{
+    padding:6px 8px;
+    border-radius:6px;
+    background:#1e293b;
+}
+
+.locais-motorista{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin:8px 0;
+}
+
+.local-motorista{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:8px;
+    border-radius:8px;
+    background:#1e293b;
+    overflow-wrap:anywhere;
+}
+
+.endereco-motorista{
+    font-size:13px;
+    color:#cbd5e1;
+}
+
+.contato-motorista{
+    margin:6px 0;
+}
+
+.botoes-contato-motorista{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:4px;
+}
+
+/* botões grandes para o dedo */
+.link-motorista{
+    display:inline-block;
+    padding:8px 12px;
+    border-radius:8px;
+    background:#334155;
+    color:#e2e8f0;
+    font-size:14px;
+    text-decoration:none;
+}
+
+.link-mapa{
+    align-self:flex-start;
+    margin-top:6px;
+    background:#1d4ed8;
+    color:#fff;
+}
+
+.link-ligar{
+    background:#15803d;
+    color:#fff;
+}
+
+.link-zap{
+    background:#166534;
+    color:#fff;
+}
+
+.anteriores-motorista{
+    margin-top:10px;
+}
+
+.anteriores-motorista summary{
+    padding:10px;
+    border-radius:8px;
+    background:#0f172a;
+    color:#94a3b8;
+    cursor:pointer;
+}
+
+.anteriores-motorista[open] summary{
+    margin-bottom:10px;
+}
+
+
+@media(max-width:560px){
+
+    .container:has(.card-motorista){
+        padding-left:10px;
+        padding-right:10px;
+    }
+
+    .card-motorista{
+        padding:12px;
+    }
+
+    .locais-motorista{
+        grid-template-columns:1fr;
+    }
+}

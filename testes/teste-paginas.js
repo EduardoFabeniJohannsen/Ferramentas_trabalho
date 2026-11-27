@@ -20,7 +20,8 @@ const PAGINAS = {
     "propostas-copiadas.html": "propostas-copiadas",
     "analise-fretes.html": "analise-fretes",
     "analise-movimentacoes.html": "analise-movimentacoes",
-    "leads.html": "leads"
+    "leads.html": "leads",
+    "motorista.html": "motorista"
 };
 
 const tipos = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png" };
@@ -585,6 +586,54 @@ const confere = (nome, ok, extra) => {
     }
 
     await soMovimentos.contexto.close();
+
+    // login de motorista: só a página dele, e o menu sem links (nem o ☰)
+    const motorista = await novoContexto({ acessos: ["motorista"] });
+
+    {
+        const pagina = await motorista.contexto.newPage();
+        let aviso = "";
+
+        pagina.on("dialog", d => { aviso = d.message(); d.accept(); });
+
+        await pagina.goto("http://site.test/propostas.html");
+        await pagina.waitForURL("**/motorista.html", { timeout: 5000 }).catch(() => {});
+        // (a CSP barra o waitForFunction: confere de tempo em tempo)
+        for(let i = 0; i < 50 && !(await pagina.evaluate(() => document.documentElement.style.visibility === "" && document.querySelector(".btn-menu-celular")?.style.display === "none").catch(() => false)); i++) await pagina.waitForTimeout(100);
+
+        confere("motorista: o login cai em Minhas entregas (sem sair do sistema)", pagina.url().endsWith("/motorista.html") && !aviso, [pagina.url(), aviso]);
+
+        // no celular, onde o ☰ apareceria
+        await pagina.setViewportSize({ width: 390, height: 800 });
+        const menu = await pagina.evaluate(() => ({
+            links: [...document.querySelectorAll(".topbar a")].filter(a => a.style.display !== "none").map(a => a.getAttribute("href")),
+            botaoMenu: !!document.querySelector(".btn-menu-celular")?.offsetParent,
+            sair: !!document.querySelector('.topbar button[data-clique="fazerLogout"]')?.offsetParent
+        }));
+        confere("motorista: o menu não mostra páginas que ele não abre, e o ☰ some (no celular)", menu.links.length === 0 && menu.botaoMenu === false && menu.sair, menu);
+
+        await pagina.goto("http://site.test/agenda.html");
+        await pagina.waitForURL("**/motorista.html", { timeout: 5000 }).catch(() => {});
+        confere("motorista: a agenda não abre (volta para Minhas entregas)", pagina.url().endsWith("/motorista.html"), pagina.url());
+
+        await pagina.close();
+    }
+
+    await motorista.contexto.close();
+
+    // quem tem só a Propostas não vê no menu as páginas que não abre
+    {
+        const vendedorMenu = await novoContexto({ acessos: ["propostas", "agenda"] });
+        const pagina = await vendedorMenu.contexto.newPage();
+
+        await pagina.goto("http://site.test/agenda.html");
+        for(let i = 0; i < 50 && !(await pagina.evaluate(() => document.querySelector('.topbar a[href="propostas.html"]')?.style.display === "").catch(() => false)); i++) await pagina.waitForTimeout(100);
+        const links = await pagina.$$eval(".topbar a", l => l.filter(a => a.style.display !== "none").map(a => a.getAttribute("href")));
+        confere("menu: só os links das páginas liberadas (Propostas + Agenda: na agenda, só o da Propostas)", JSON.stringify(links) === JSON.stringify(["propostas.html"]), links);
+
+        await pagina.close();
+        await vendedorMenu.contexto.close();
+    }
 
     // ---------- usuário desativado ----------
     const desativado = await novoContexto({ acessos: ["propostas"], ativo: false });

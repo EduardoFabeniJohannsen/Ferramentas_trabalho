@@ -117,6 +117,15 @@
     padding:0;
     cursor:pointer;
 }
+/* coluna Motorista (admin-motoristas.js) */
+.tabela-admin .select-motorista-admin{
+    width:auto;
+    min-width:150px;
+    max-width:220px;
+    margin:0;
+    padding:4px 6px;
+    font-size:13px;
+}
 .tabela-admin tr.inativo td{
     opacity:.5;
 }
